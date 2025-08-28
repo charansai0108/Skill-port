@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - SkillPort Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Josefin Sans', sans-serif; }
+    
+    .admin-users-page {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #dbeafe 100%);
+      min-height: 100vh;
+    }
+    
+    .admin-users-header {
+      margin-bottom: 2rem;
+    }
+    
+    .admin-users-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .admin-users-subtitle {
+      font-size: 1.125rem;
+      color: #475569;
+    }
+    
+    .admin-users-filters {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .admin-users-filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+    
+    .admin-filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .admin-filter-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .admin-filter-input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease-in-out;
+    }
+    
+    .admin-filter-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .admin-filter-button {
+      background: #3b82f6;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out;
+    }
+    
+    .admin-filter-button:hover {
+      background: #2563eb;
+    }
+    
+    .admin-users-table-container {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .admin-users-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .admin-users-table th {
+      background: #f8fafc;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .admin-users-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    
+    .admin-users-table tr:hover {
+      background: #f9fafb;
+    }
+    
+    .admin-user-avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .admin-user-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .admin-user-status.active {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .admin-user-status.inactive {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+    
+    .admin-user-status.suspended {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    .admin-user-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .admin-action-button {
+      padding: 0.25rem 0.5rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-action-button.edit {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .admin-action-button.edit:hover {
+      background: #bfdbfe;
+    }
+    
+    .admin-action-button.delete {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .admin-action-button.delete:hover {
+      background: #fecaca;
+    }
+    
+    .admin-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+    
+    .admin-pagination-button {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-pagination-button:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+    
+    .admin-pagination-button.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+    
+    .admin-pagination-button:disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .admin-header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .admin-add-user-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-add-user-button:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      transform: translateY(-1px);
+    }
+    
+    .admin-search-input-wrapper {
+      position: relative;
+    }
+    
+    .admin-search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      color: #9ca3af;
+    }
+    
+    .admin-table-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .admin-table-wrapper {
+      overflow-x: auto;
+    }
+    
+    .admin-loading-cell {
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    
+    .admin-loading-icon {
+      width: 2rem;
+      height: 2rem;
+      color: #9ca3af;
+      margin: 0 auto 1rem;
+      animation: spin 1s linear infinite;
+    }
+    
+    .admin-loading-text {
+      font-size: 1.125rem;
+      color: #475569;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .admin-page-info {
+      font-size: 0.875rem;
+      color: #475569;
+    }
+    
+    /* Modal Styles */
+    .admin-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .admin-modal-overlay.show {
+      display: flex;
+    }
+    
+    .admin-modal {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      max-width: 42rem;
+      width: 100%;
+      margin: 0 1rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .admin-modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .admin-modal-title-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .admin-modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    
+    .admin-modal-close {
+      color: #9ca3af;
+      cursor: pointer;
+      transition: color 0.15s ease-in-out;
+    }
+    
+    .admin-modal-close:hover {
+      color: #475569;
+    }
+    
+    .admin-modal-body {
+      padding: 1.5rem;
+    }
+    
+    /* Form Styles */
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+    
+    .admin-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .admin-form-group.full-width {
+      grid-column: span 2;
+    }
+    
+    .admin-form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .admin-form-input,
+    .admin-form-textarea {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-form-input:focus,
+    .admin-form-textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .admin-form-textarea {
+      resize: vertical;
+      min-height: 6rem;
+    }
+    
+    .admin-form-help {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+    
+    .admin-form-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    .admin-button-primary {
+      background: #3b82f6;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out;
+    }
+    
+    .admin-button-primary:hover {
+      background: #2563eb;
+    }
+    
+    .admin-button-secondary {
+      background: white;
+      color: #374151;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-button-secondary:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+    
+    /* Delete Modal Styles */
+    .delete-modal {
+      max-width: 28rem;
+    }
+    
+    .admin-delete-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .admin-delete-icon {
+      width: 3rem;
+      height: 3rem;
+      background: #fef2f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .admin-delete-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .admin-delete-subtitle {
+      font-size: 0.875rem;
+      color: #475569;
+    }
+    
+    .admin-delete-message {
+      font-size: 0.875rem;
+      color: #475569;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    
+    .admin-delete-name {
+      font-weight: 600;
+    }
+    
+    .admin-delete-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .admin-button-danger {
+      background: #dc2626;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out;
+      flex: 1;
+    }
+    
+    .admin-button-danger:hover {
+      background: #b91c1c;
+    }
+    
+    /* Table Row Styles */
+    .admin-table-row {
+      transition: background-color 0.15s ease-in-out;
+    }
+    
+    .admin-table-row:hover {
+      background: #f9fafb;
+    }
+    
+    .admin-table-cell {
+      padding: 0.75rem 1.5rem;
+      white-space: nowrap;
+    }
+    
+    .admin-user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .admin-user-avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      margin-right: 0.75rem;
+    }
+    
+    .admin-user-avatar.amber {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    }
+    
+    .admin-user-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #1e293b;
+    }
+    
+    .admin-user-username {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    .admin-user-email {
+      font-size: 0.875rem;
+      color: #1e293b;
+    }
+    
+    .admin-user-performance {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .admin-user-performance-change {
+      font-size: 0.75rem;
+    }
+    
+    .admin-user-performance-change.positive {
+      color: #059669;
+    }
+    
+    .admin-user-performance-change.negative {
+      color: #dc2626;
+    }
+    
+    .admin-user-join-date {
+      font-size: 0.875rem;
+      color: #1e293b;
+    }
+    
+    .admin-user-actions {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .admin-action-link {
+      cursor: pointer;
+      transition: color 0.15s ease-in-out;
+    }
+    
+    .admin-action-link.edit {
+      color: #2563eb;
+    }
+    
+    .admin-action-link.edit:hover {
+      color: #1e40af;
+    }
+    
+    .admin-action-link.view {
+      color: #059669;
+    }
+    
+    .admin-action-link.view:hover {
+      color: #047857;
+    }
+    
+    .admin-action-link.delete {
+      color: #dc2626;
+    }
+    
+    .admin-action-link.delete:hover {
+      color: #b91c1c;
+    }
+    
+    /* Empty State Styles */
+    .admin-empty-state {
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    
+    .admin-empty-icon {
+      width: 2rem;
+      height: 2rem;
+      color: #9ca3af;
+      margin: 0 auto 1rem;
+    }
+    
+    .admin-empty-title {
+      font-size: 1.125rem;
+      color: #475569;
+    }
+    
+    .admin-empty-subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+    }
+    
+    /* Status and Role Badge Styles */
+    .admin-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .admin-badge.status-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .admin-badge.status-inactive {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+    
+    .admin-badge.status-pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    .admin-badge.status-suspended {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    
+    .admin-badge.role-student {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .admin-badge.role-mentor {
+      background: #e9d5ff;
+      color: #7c3aed;
+    }
+    
+    .admin-badge.role-admin {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .admin-badge.role-community {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    /* Stat Color Classes */
+    .admin-stat-blue {
+      color: #2563eb;
+    }
+    
+    .admin-stat-green {
+      color: #059669;
+    }
+    
+    .admin-stat-red {
+      color: #dc2626;
+    }
+    
+    .admin-stat-purple {
+      color: #7c3aed;
+    }
+    
+    /* Icon Color Classes */
+    .admin-icon-white {
+      color: white;
+    }
+    
+    .admin-icon-red {
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body class="admin-users-page">
+  <!-- Navbar -->
+  <nav class="admin-navbar sticky top-0 z-50">
+    <div class="admin-nav-container">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">
+          <i data-lucide="shield" class="w-5 h-5 admin-icon-white"></i>
+        </div>
+        <span>Community Admin</span>
+      </div>
+      <div class="admin-nav-menu">
+          <a href="admin-dashboard.html" class="admin-nav-link">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="admin-users.html" class="admin-nav-link active">
+            <i data-lucide="users" class="w-4 h-4"></i> Users
+          </a>
+          <a href="admin-mentors.html" class="admin-nav-link">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
+          </a>
+          <a href="admin-contests.html" class="admin-nav-link">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="admin-analytics.html" class="admin-nav-link">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+          </a>
+          <a href="admin-leaderboard.html" class="admin-nav-link">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="admin-settings.html" class="admin-nav-link">
+            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          </a>
+          <button onclick="logout()" class="admin-nav-link">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-users-header">
+      <div class="admin-header-content">
+        <div>
+          <h1 class="admin-users-title">User Management</h1>
+          <p class="admin-users-subtitle">Manage all users, create accounts, and assign mentors.</p>
+        </div>
+        <button onclick="adminUsers.openAddUserModal()" class="admin-add-user-button">
+          <i data-lucide="user-plus" class="w-5 h-5"></i> Add New User
+        </button>
+      </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <i data-lucide="users" class="admin-stat-icon admin-stat-blue"></i>
+        <div class="admin-stat-value admin-stat-blue" id="total-users">-</div>
+        <div class="admin-stat-label">Total Users</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="user-check" class="admin-stat-icon admin-stat-green"></i>
+        <div class="admin-stat-value admin-stat-green" id="active-users">-</div>
+        <div class="admin-stat-label">Active Users</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="user-x" class="admin-stat-icon admin-stat-red"></i>
+        <div class="admin-stat-value admin-stat-red" id="inactive-users">-</div>
+        <div class="admin-stat-label">Inactive Users</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="user-plus" class="admin-stat-icon admin-stat-purple"></i>
+        <div class="admin-stat-value admin-stat-purple" id="new-users">-</div>
+        <div class="admin-stat-label">New This Week</div>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="admin-users-filters">
+      <h2 class="admin-content-title">Filter Users</h2>
+      <div class="admin-users-filters-grid">
+        <div class="admin-filter-group">
+          <label class="admin-filter-label">Search</label>
+          <div class="admin-search-input-wrapper">
+            <input type="text" id="search-users" placeholder="Search users..." class="admin-filter-input">
+            <i data-lucide="search" class="admin-search-icon"></i>
+          </div>
+        </div>
+        <div class="admin-filter-group">
+          <label class="admin-filter-label">Role</label>
+          <select id="role-filter" class="admin-filter-input">
+            <option value="">All Roles</option>
+            <option value="student">Student</option>
+            <option value="mentor">Mentor</option>
+            <option value="admin">Admin</option>
+            <option value="community">Community</option>
+          </select>
+        </div>
+        <div class="admin-filter-group">
+          <label class="admin-filter-label">Status</label>
+          <select id="status-filter" class="admin-filter-input">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+        <div class="admin-filter-group">
+          <label class="admin-filter-label">Sort by</label>
+          <select id="sort-users" class="admin-filter-input">
+            <option value="name">Name</option>
+            <option value="joinDate">Join Date</option>
+            <option value="performance">Performance</option>
+            <option value="role">Role</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="admin-users-table-container">
+      <div class="admin-table-header">
+        <h2 class="admin-content-title">All Users</h2>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Performance</th>
+              <th>Join Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            <!-- Loading state -->
+            <tr>
+              <td colspan="7" class="admin-loading-cell">
+                <i data-lucide="loader" class="admin-loading-icon"></i>
+                <p class="admin-loading-text">Loading users...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="admin-pagination hidden">
+      <button id="prev-page" class="admin-pagination-button">
+        Previous
+      </button>
+      <span id="page-info" class="admin-page-info"></span>
+      <button id="next-page" class="admin-pagination-button">
+        Next
+      </button>
+    </div>
+  </main>
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="admin-modal-overlay">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <div class="admin-modal-title-section">
+          <h2 class="admin-modal-title">Add New User</h2>
+          <button onclick="adminUsers.closeAddUserModal()" class="admin-modal-close">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="admin-modal-body">
+        <form id="addUserForm" class="api-form" data-action="create-user">
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label class="admin-form-label">First Name *</label>
+              <input type="text" name="firstName" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Last Name *</label>
+              <input type="text" name="lastName" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Email *</label>
+              <input type="email" name="email" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Username *</label>
+              <input type="text" name="username" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Role *</label>
+              <select name="role" class="admin-form-input" required>
+                <option value="">Select role</option>
+                <option value="student">Student</option>
+                <option value="mentor">Mentor</option>
+                <option value="community">Community</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Status *</label>
+              <select name="status" class="admin-form-input" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+            <div class="admin-form-group full-width">
+              <label class="admin-form-label">Password *</label>
+              <input type="password" name="password" class="admin-form-input" required>
+              <p class="admin-form-help">Minimum 8 characters</p>
+            </div>
+            <div class="admin-form-group full-width">
+              <label class="admin-form-label">Bio</label>
+              <textarea name="bio" class="admin-form-textarea" rows="3" placeholder="Brief description about the user..."></textarea>
+            </div>
+          </div>
+          
+          <div class="admin-form-actions">
+            <button type="button" onclick="adminUsers.closeAddUserModal()" class="admin-button-secondary">
+              Cancel
+            </button>
+            <button type="submit" class="admin-button-primary">
+              Create User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="editUserModal" class="admin-modal-overlay">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <div class="admin-modal-title-section">
+          <h2 class="admin-modal-title">Edit User</h2>
+          <button onclick="adminUsers.closeEditUserModal()" class="admin-modal-close">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="admin-modal-body">
+        <form id="editUserForm" class="api-form" data-action="update-user">
+          <input type="hidden" name="userId" id="editUserId">
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label class="admin-form-label">First Name *</label>
+              <input type="text" name="firstName" id="editFirstName" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Last Name *</label>
+              <input type="text" name="lastName" id="editLastName" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Email *</label>
+              <input type="email" name="email" id="editEmail" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Username *</label>
+              <input type="text" name="username" id="editUsername" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Role *</label>
+              <select name="role" id="editRole" class="admin-form-input" required>
+                <option value="student">Student</option>
+                <option value="mentor">Mentor</option>
+                <option value="community">Community</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Status *</label>
+              <select name="status" id="editStatus" class="admin-form-input" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+            <div class="admin-form-group full-width">
+              <label class="admin-form-label">Bio</label>
+              <textarea name="bio" id="editBio" class="admin-form-textarea" rows="3" placeholder="Brief description about the user..."></textarea>
+            </div>
+          </div>
+          
+          <div class="admin-form-actions">
+            <button type="button" onclick="adminUsers.closeEditUserModal()" class="admin-button-secondary">
+              Cancel
+            </button>
+            <button type="submit" class="admin-button-primary">
+              Update User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteUserModal" class="admin-modal-overlay">
+    <div class="admin-modal delete-modal">
+      <div class="admin-modal-body">
+        <div class="admin-delete-header">
+          <div class="admin-delete-icon">
+            <i data-lucide="alert-triangle" class="w-6 h-6 admin-icon-red"></i>
+          </div>
+          <div>
+            <h3 class="admin-delete-title">Delete User</h3>
+            <p class="admin-delete-subtitle">This action cannot be undone.</p>
+          </div>
+        </div>
+        <p class="admin-delete-message">Are you sure you want to delete <span id="deleteUserName" class="admin-delete-name"></span>? This will permanently remove the user and all associated data.</p>
+        <div class="admin-delete-actions">
+          <button onclick="adminUsers.closeDeleteUserModal()" class="admin-button-secondary">
+            Cancel
+          </button>
+          <button onclick="adminUsers.confirmDeleteUser()" class="admin-button-danger">
+            Delete User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load API and App scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/app.js"></script>
+
+  <script>
+    lucide.createIcons();
+    
+    // Admin Users Controller
+    class AdminUsers {
+      constructor() {
+        this.api = window.SkillPortAPI;
+        this.currentPage = 1;
+        this.usersPerPage = 20;
+        this.filters = {
+          search: '',
+          role: '',
+          status: '',
+          sortBy: 'name'
+        };
+        this.users = [];
+        this.userToDelete = null;
+        this.userToEdit = null;
+        this.init();
+      }
+
+      async init() {
+        try {
+                      // Check if user is admin
+            if (!this.api.isAuthenticated() || !this.api.isAdmin()) {
+              window.location.href = '../../index.html';
+              return;
+            }
+
+          // Load initial data
+          await this.loadUsers();
+          this.setupEventListeners();
+          
+        } catch (error) {
+          console.error('Users initialization failed:', error);
+          this.showError('Failed to initialize users page');
+        }
+      }
+
+      async loadUsers() {
+        try {
+          const response = await this.api.getUsers({
+            page: this.currentPage,
+            limit: this.usersPerPage,
+            ...this.filters
+          });
+
+          if (response.success) {
+            this.users = response.data.users;
+            this.updateUsersDisplay();
+            this.updatePagination(response.data.pagination);
+            this.updateStats(response.data.stats);
+          }
+        } catch (error) {
+          console.error('Failed to load users:', error);
+          this.showError('Failed to load users');
+        }
+      }
+
+      updateUsersDisplay() {
+        const tbody = document.querySelector('#users-table-body');
+        if (!tbody) return;
+
+        if (!this.users.length) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="admin-empty-state">
+                <i data-lucide="users" class="admin-empty-icon"></i>
+                <p class="admin-empty-title">No users found</p>
+                <p class="admin-empty-subtitle">Try adjusting your search or filters</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = this.users.map(user => this.createUserRow(user)).join('');
+        lucide.createIcons();
+      }
+
+      createUserRow(user) {
+        const statusColors = {
+          'active': 'admin-badge status-active',
+          'inactive': 'admin-badge status-inactive',
+          'pending': 'admin-badge status-pending',
+          'suspended': 'admin-badge status-suspended'
+        };
+
+        const roleColors = {
+          'student': 'admin-badge role-student',
+          'mentor': 'admin-badge role-mentor',
+          'admin': 'admin-badge role-admin',
+          'community': 'admin-badge role-community'
+        };
+
+        const statusColor = statusColors[user.status] || 'admin-badge status-suspended';
+        const roleColor = roleColors[user.role] || 'admin-badge role-student';
+        const joinDate = new Date(user.createdAt).toLocaleDateString();
+        const performance = user.contestStats?.totalPoints || 0;
+        const performanceChange = user.contestStats?.weeklyChange || 0;
+
+        return `
+          <tr class="admin-table-row">
+            <td class="admin-table-cell">
+              <div class="admin-user-info">
+                <div class="admin-user-avatar amber">
+                  ${user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}
+                </div>
+                <div>
+                  <div class="admin-user-name">${user.firstName} ${user.lastName}</div>
+                  <div class="admin-user-username">@${user.username}</div>
+                </div>
+              </div>
+            </td>
+            <td class="admin-table-cell">
+              <div class="admin-user-email">${user.email}</div>
+            </td>
+            <td class="admin-table-cell">
+              <span class="${roleColor}">${user.role}</span>
+            </td>
+            <td class="admin-table-cell">
+              <span class="${statusColor}">${user.status}</span>
+            </td>
+            <td class="admin-table-cell">
+              <div class="admin-user-performance">${performance} pts</div>
+              <div class="admin-user-performance-change ${performanceChange >= 0 ? 'positive' : 'negative'}">${performanceChange >= 0 ? '+' : ''}${performanceChange} this week</div>
+            </td>
+            <td class="admin-table-cell">
+              <div class="admin-user-join-date">${joinDate}</div>
+            </td>
+            <td class="admin-table-cell">
+              <div class="admin-user-actions">
+                <button onclick="adminUsers.editUser('${user.id}')" class="admin-action-link edit">Edit</button>
+                <button onclick="adminUsers.viewUserProfile('${user.id}')" class="admin-action-link view">View</button>
+                <button onclick="adminUsers.deleteUser('${user.id}', '${user.firstName} ${user.lastName}')" class="admin-action-link delete">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      updateStats(stats) {
+        const elements = {
+          totalUsers: document.querySelector('#total-users'),
+          activeUsers: document.querySelector('#active-users'),
+          inactiveUsers: document.querySelector('#inactive-users'),
+          newUsers: document.querySelector('#new-users')
+        };
+
+        if (elements.totalUsers) elements.totalUsers.textContent = stats.total || 0;
+        if (elements.activeUsers) elements.activeUsers.textContent = stats.active || 0;
+        if (elements.inactiveUsers) elements.inactiveUsers.textContent = stats.inactive || 0;
+        if (elements.newUsers) elements.newUsers.textContent = stats.newThisWeek || 0;
+      }
+
+      updatePagination(pagination) {
+        const paginationElement = document.querySelector('#pagination');
+        const pageInfo = document.querySelector('#page-info');
+        const prevButton = document.querySelector('#prev-page');
+        const nextButton = document.querySelector('#next-page');
+
+        if (pagination.totalPages <= 1) {
+          paginationElement.classList.add('hidden');
+          return;
+        }
+
+        paginationElement.classList.remove('hidden');
+        pageInfo.textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+        prevButton.disabled = pagination.currentPage === 1;
+        nextButton.disabled = pagination.currentPage === pagination.totalPages;
+      }
+
+      setupEventListeners() {
+        // Search and filters
+        document.querySelector('#search-users').addEventListener('input', (e) => {
+          this.filters.search = e.target.value;
+          this.currentPage = 1;
+          this.loadUsers();
+        });
+
+        document.querySelector('#role-filter').addEventListener('change', (e) => {
+          this.filters.role = e.target.value;
+          this.currentPage = 1;
+          this.loadUsers();
+        });
+
+        document.querySelector('#status-filter').addEventListener('change', (e) => {
+          this.filters.status = e.target.value;
+          this.currentPage = 1;
+          this.loadUsers();
+        });
+
+        document.querySelector('#sort-users').addEventListener('change', (e) => {
+          this.filters.sortBy = e.target.value;
+          this.currentPage = 1;
+          this.loadUsers();
+        });
+
+        // Pagination
+        document.querySelector('#prev-page').addEventListener('click', () => {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadUsers();
+          }
+        });
+
+        document.querySelector('#next-page').addEventListener('click', () => {
+          this.currentPage++;
+          this.loadUsers();
+        });
+
+        // Form submissions
+        document.getElementById('addUserForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleCreateUser(e.target);
+        });
+
+        document.getElementById('editUserForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleUpdateUser(e.target);
+        });
+      }
+
+      async handleCreateUser(form) {
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          const response = await this.api.createUser(data);
+          if (response.success) {
+            this.showSuccess('User created successfully!');
+            this.closeAddUserModal();
+            this.loadUsers();
+          } else {
+            this.showError(response.message || 'Failed to create user');
+          }
+        } catch (error) {
+          console.error('Failed to create user:', error);
+          this.showError('An error occurred while creating the user');
+        }
+      }
+
+      async handleUpdateUser(form) {
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          const userId = data.userId;
+          delete data.userId;
+          
+          const response = await this.api.updateUser(userId, data);
+          if (response.success) {
+            this.showSuccess('User updated successfully!');
+            this.closeEditUserModal();
+            this.loadUsers();
+          } else {
+            this.showError(response.message || 'Failed to update user');
+          }
+        } catch (error) {
+          console.error('Failed to update user:', error);
+          this.showError('An error occurred while updating the user');
+        }
+      }
+
+      // Modal functions
+      openAddUserModal() {
+      document.getElementById('addUserModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+      closeAddUserModal() {
+      document.getElementById('addUserModal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      document.getElementById('addUserForm').reset();
+    }
+    
+      async editUser(userId) {
+        try {
+          const response = await this.api.getUser(userId);
+          if (response.success) {
+            this.userToEdit = response.data.user;
+            this.populateEditForm(this.userToEdit);
+            document.getElementById('editUserModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          } else {
+            this.showError('Failed to load user data');
+          }
+        } catch (error) {
+          console.error('Failed to load user:', error);
+          this.showError('An error occurred while loading user data');
+        }
+      }
+
+      populateEditForm(user) {
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editFirstName').value = user.firstName || '';
+        document.getElementById('editLastName').value = user.lastName || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editUsername').value = user.username || '';
+        document.getElementById('editRole').value = user.role || 'student';
+        document.getElementById('editStatus').value = user.status || 'active';
+        document.getElementById('editBio').value = user.bio || '';
+      }
+
+      closeEditUserModal() {
+        document.getElementById('editUserModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        this.userToEdit = null;
+      }
+
+      deleteUser(userId, userName) {
+      document.getElementById('deleteUserName').textContent = userName;
+      document.getElementById('deleteUserModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+        this.userToDelete = userId;
+    }
+    
+      closeDeleteUserModal() {
+      document.getElementById('deleteUserModal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+        this.userToDelete = null;
+      }
+
+      async confirmDeleteUser() {
+        if (!this.userToDelete) return;
+
+        try {
+          const response = await this.api.deleteUser(this.userToDelete);
+          if (response.success) {
+            this.showSuccess('User deleted successfully!');
+            this.closeDeleteUserModal();
+            this.loadUsers();
+          } else {
+            this.showError(response.message || 'Failed to delete user');
+          }
+        } catch (error) {
+          console.error('Failed to delete user:', error);
+          this.showError('An error occurred while deleting the user');
+        }
+      }
+
+      viewUserProfile(userId) {
+        // Redirect to user profile page
+        window.location.href = `admin-user-profile.html?id=${userId}`;
+      }
+
+      // Utility functions
+      showSuccess(message) {
+        if (this.api.showNotification) {
+          this.api.showNotification(message, 'success');
+        } else {
+          alert(message);
+        }
+      }
+
+      showError(message) {
+        if (this.api.showNotification) {
+          this.api.showNotification(message, 'error');
+        } else {
+          alert(message);
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.adminUsers = new AdminUsers();
+    });
+  </script>
+</body>
+</html> 

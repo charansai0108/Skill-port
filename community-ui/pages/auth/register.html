@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .form-container { display: none; }
+        .form-container.show { display: block !important; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-slate-800 mb-4">Create Your Account</h1>
+            <p class="text-slate-600 text-lg">Join the SkillPort community and start your journey</p>
+        </div>
+
+        <!-- Role Selection -->
+        <div id="roleSelection" class="max-w-4xl mx-auto mb-12">
+            <h2 class="text-2xl font-bold text-slate-800 text-center mb-8">Choose Your Role</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Personal User Card -->
+                <div class="bg-white rounded-xl p-8 shadow-lg border-2 border-transparent hover:border-indigo-300 cursor-pointer transition-all" onclick="showForm('personal')">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Personal Learner</h3>
+                        <p class="text-slate-600 mb-6">Track progress, join contests, build portfolio</p>
+                        <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                            Start Learning Journey
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Community User Card -->
+                <div class="bg-white rounded-xl p-8 shadow-lg border-2 border-transparent hover:border-purple-300 cursor-pointer transition-all" onclick="showForm('community')">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Community Builder</h3>
+                        <p class="text-slate-600 mb-6">Manage teams, create learning communities</p>
+                        <button class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                            Build Community
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Registration Form -->
+        <div id="personalForm" class="form-container max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl p-8 shadow-lg">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Personal Learner Registration</h2>
+                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="personalRegistrationForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+                            <input type="text" name="firstName" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+                            <input type="text" name="lastName" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Username *</label>
+                            <input type="text" name="username" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email *</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Skill Level *</label>
+                            <select name="skillLevel" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Select skill level</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Primary Interest *</label>
+                            <select name="primaryInterest" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Select interest</option>
+                                <option value="algorithms">Algorithms</option>
+                                <option value="web-development">Web Development</option>
+                                <option value="data-science">Data Science</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Education Level</label>
+                            <select name="educationLevel" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Select education level</option>
+                                <option value="high-school">High School</option>
+                                <option value="bachelor">Bachelor's Degree</option>
+                                <option value="master">Master's Degree</option>
+                                <option value="phd">PhD</option>
+                                <option value="self-taught">Self Taught</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Field of Study</label>
+                            <input type="text" name="fieldOfStudy" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Computer Science">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+                        <textarea name="bio" rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Password *</label>
+                            <input type="password" name="password" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Confirm Password *</label>
+                            <input type="password" name="confirmPassword" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 mt-1">
+                        <label class="ml-3 text-sm text-slate-600">
+                            I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-indigo-700 transition-colors">
+                        Create Personal Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Community Registration Form -->
+        <div id="communityForm" class="form-container max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl p-8 shadow-lg">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Community Builder Registration</h2>
+                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="communityRegistrationForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+                            <input type="text" name="firstName" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+                            <input type="text" name="lastName" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Username *</label>
+                            <input type="text" name="username" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email *</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Organization Name *</label>
+                            <input type="text" name="organizationName" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Organization Type *</label>
+                            <select name="organizationType" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">Select organization type</option>
+                                <option value="university">University</option>
+                                <option value="bootcamp">Bootcamp</option>
+                                <option value="company">Company</option>
+                                <option value="school">School</option>
+                                <option value="nonprofit">Nonprofit</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Organization Size</label>
+                            <select name="organizationSize" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">Select size</option>
+                                <option value="small">Small (1-50 people)</option>
+                                <option value="medium">Medium (51-200 people)</option>
+                                <option value="large">Large (200+ people)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Your Position</label>
+                            <input type="text" name="position" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., Professor, Manager">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Primary Interest *</label>
+                        <select name="primaryInterest" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Select interest</option>
+                            <option value="algorithms">Algorithms</option>
+                            <option value="web-development">Web Development</option>
+                            <option value="data-science">Data Science</option>
+                            <option value="system-design">System Design</option>
+                            <option value="cybersecurity">Cybersecurity</option>
+                            <option value="game-development">Game Development</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Organization Website</label>
+                        <input type="url" name="organizationWebsite" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="https://example.com">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Password *</label>
+                            <input type="password" name="password" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Confirm Password *</label>
+                            <input type="password" name="confirmPassword" required class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-purple-600 border-slate-300 rounded focus:ring-purple-500 mt-1">
+                        <label class="ml-3 text-sm text-slate-600">
+                            I agree to the <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">Terms of Service</a> and <a href="#" class="text-purple-600 hover:text-purple-700 font-medium">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-purple-700 transition-colors">
+                        Create Community Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- OTP Form -->
+        <div id="otpForm" class="form-container max-w-md mx-auto">
+            <div class="bg-white rounded-xl p-8 shadow-lg text-center">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Email Verification</h2>
+                <p class="text-slate-600 mb-6">We've sent a 6-digit code to <span id="otpEmail" class="font-semibold"></span></p>
+                
+                <form id="otpVerificationForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Enter OTP</label>
+                        <input type="text" id="otpInput" maxlength="6" placeholder="000000" required class="w-full px-4 py-3 text-center text-xl font-bold border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-green-700 transition-colors">
+                        Verify Email
+                    </button>
+                    
+                    <div class="flex items-center justify-center space-x-4">
+                        <button type="button" id="resendOTPBtn" class="text-green-600 hover:text-green-700 font-medium hover:underline">
+                            Resend OTP
+                        </button>
+                        <button type="button" onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-700 font-medium hover:underline">
+                            Back to Registration
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Back to Login -->
+        <div class="text-center mt-12">
+            <p class="text-slate-600">
+                Already have an account? 
+                <a href="login.html" class="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Sign in here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Simple JavaScript -->
+    <script>
+        // Simple form switching
+        function showForm(role) {
+            console.log('Showing form for:', role);
+            
+            // Hide role selection
+            document.getElementById('roleSelection').style.display = 'none';
+            
+            // Show appropriate form
+            if (role === 'personal') {
+                document.getElementById('personalForm').classList.add('show');
+            } else if (role === 'community') {
+                document.getElementById('communityForm').classList.add('show');
+            }
+        }
+        
+        function showRoleSelection() {
+            console.log('Going back to role selection');
+            
+            // Hide all forms
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('show');
+            });
+            
+            // Show role selection
+            document.getElementById('roleSelection').style.display = 'block';
+        }
+        
+        // Form submission handlers
+        document.getElementById('personalRegistrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Personal form submitted');
+            
+            // Set the selected role for OTP redirect
+            selectedRole = 'personal';
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                role: 'personal',
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                confirmPassword: formData.get('confirmPassword'),
+                skillLevel: formData.get('skillLevel'),
+                primaryInterest: formData.get('primaryInterest'),
+                educationLevel: formData.get('educationLevel'),
+                fieldOfStudy: formData.get('fieldOfStudy'),
+                bio: formData.get('bio'),
+                agreeTerms: formData.get('agreeTerms')
+            };
+            
+            // Debug: Log all form data
+            console.log('🔍 Form data being sent:', userData);
+            console.log('🔍 skillLevel:', userData.skillLevel);
+            console.log('🔍 primaryInterest:', userData.primaryInterest);
+            console.log('🔍 educationLevel:', userData.educationLevel);
+            console.log('🔍 selectedRole:', selectedRole);
+            
+            if (userData.password !== userData.confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('🎉 Registration successful! Please check your email for OTP verification.');
+                    // Show OTP form or redirect
+                    showOTPForm(userData.email);
+                } else {
+                    console.log('❌ Registration failed:', result);
+                    alert('Registration failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                alert('Registration failed: ' + error.message);
+            }
+        });
+        
+        document.getElementById('communityRegistrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Community form submitted');
+            
+            // Set the selected role for OTP redirect
+            selectedRole = 'community';
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                role: 'community',
+                firstName: formData.get('firstName'),
+                lastName: formData.get('firstName'),
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                confirmPassword: formData.get('confirmPassword'),
+                organizationName: formData.get('organizationName'),
+                organizationType: formData.get('organizationType'),
+                organizationSize: formData.get('organizationSize'),
+                position: formData.get('position'),
+                organizationWebsite: formData.get('organizationWebsite'),
+                primaryInterest: formData.get('primaryInterest'),
+                agreeTerms: formData.get('agreeTerms')
+            };
+            
+            // Debug: Log all form data
+            console.log('🔍 Community form data being sent:', userData);
+            console.log('🔍 selectedRole:', selectedRole);
+            
+            if (userData.password !== userData.confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('🎉 Registration successful! Please check your email for OTP verification.');
+                    // Show OTP form or redirect
+                    showOTPForm(userData.email);
+                } else {
+                    console.log('❌ Community registration failed:', result);
+                    alert('Registration failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('❌ Community registration error:', error);
+                alert('Registration failed: ' + error.message);
+            }
+        });
+        
+        // Show OTP form
+        function showOTPForm(email) {
+            console.log('🎯 showOTPForm called with email:', email);
+            console.log('🎯 selectedRole:', selectedRole);
+            console.log('🎯 currentEmail:', currentEmail);
+            
+            currentEmail = email;
+            document.getElementById('otpEmail').textContent = email;
+            
+            // Hide all forms
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('show');
+                console.log('🔒 Hiding form:', form.id);
+            });
+            
+            // Show OTP form
+            const otpForm = document.getElementById('otpForm');
+            console.log('🎯 OTP form element:', otpForm);
+            console.log('🎯 OTP form classes before:', otpForm.className);
+            
+            otpForm.classList.add('show');
+            console.log('🎯 OTP form classes after:', otpForm.className);
+            console.log('🎯 OTP form display style:', window.getComputedStyle(otpForm).display);
+        }
+        
+        // OTP verification handler
+        document.getElementById('otpVerificationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('OTP verification submitted');
+            
+            const otp = document.getElementById('otpInput').value;
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        otp: otp,
+                        type: 'verification'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('🎉 Email verified successfully! Redirecting...');
+                    
+                    // Redirect to login page after successful registration
+                    setTimeout(() => {
+                        const loginUrl = 'login.html';
+                        console.log('🔄 Registration successful! Redirecting to login page:', loginUrl);
+                        window.location.href = loginUrl;
+                    }, 2000);
+                } else {
+                    alert('OTP verification failed: ' + result.message);
+                }
+            } catch (error) {
+                alert('OTP verification failed: ' + error.message);
+            }
+        });
+        
+        // Resend OTP handler
+        document.getElementById('resendOTPBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        type: 'verification'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('OTP resent successfully!');
+                } else {
+                    alert('Failed to resend OTP: ' + result.message);
+                }
+            } catch (error) {
+                alert('Failed to resend OTP: ' + error.message);
+            }
+        });
+        
+        // Track selected role
+        let selectedRole = '';
+        let currentEmail = '';
+        
+        // Update showForm to track role
+        function showForm(role) {
+            console.log('Showing form for:', role);
+            selectedRole = role;
+            
+            // Hide role selection
+            document.getElementById('roleSelection').style.display = 'none';
+            
+            // Show appropriate form
+            if (role === 'personal') {
+                document.getElementById('personalForm').classList.add('show');
+            } else if (role === 'community') {
+                document.getElementById('communityForm').classList.add('show');
+            }
+        }
+        
+        console.log('Registration page loaded successfully with full backend integration!');
+    </script>
+</body>
+</html>

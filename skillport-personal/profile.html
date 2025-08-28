@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - SkillPort</title>
+    <link rel="stylesheet" href="../community-ui/css/main.css">
+    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
+    <link rel="stylesheet" href="../community-ui/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Josefin Sans', sans-serif; }
+        
+        .profile-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .profile-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+        }
+        
+        .profile-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .profile-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+        
+        .profile-brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .profile-brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .profile-nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .profile-nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .profile-nav-link:hover,
+        .profile-nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .profile-hero {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar-section {
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 8rem;
+            height: 8rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-avatar-upload {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+        
+        .profile-avatar-upload:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-username {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-bio {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .profile-stat-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .profile-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .profile-main-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .profile-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .profile-section-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .profile-form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .profile-form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .profile-form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: white;
+            font-family: inherit;
+        }
+        
+        .profile-form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .profile-form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: white;
+            font-family: inherit;
+        }
+        
+        .profile-form-textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: white;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .profile-form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .profile-save-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .profile-save-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-cancel-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .profile-sidebar-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .profile-links {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .profile-link-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile-link-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .profile-link-content p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .profile-achievements {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .profile-achievement {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+        }
+        
+        .profile-achievement-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .profile-achievement-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .profile-achievement-content p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .profile-nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="profile-page">
+    <!-- Profile Header -->
+    <header class="profile-header">
+        <nav class="profile-nav">
+            <div class="profile-brand">
+                <div class="profile-brand-icon">🎯</div>
+                <span class="profile-brand-text">SkillPort</span>
+            </div>
+            
+            <div class="profile-nav-menu">
+                <a href="student-dashboard.html" class="profile-nav-link">Dashboard</a>
+                <a href="profile.html" class="profile-nav-link active">Profile</a>
+                <a href="tracker.html" class="profile-nav-link">Tracker</a>
+                <a href="stats.html" class="profile-nav-link">Stats</a>
+                <a href="communities.html" class="profile-nav-link">Communities</a>
+                <a href="projects.html" class="profile-nav-link">Projects</a>
+                <a href="posts.html" class="profile-nav-link">Posts</a>
+            </div>
+            
+            <button class="profile-back-btn" onclick="location.href='student-dashboard.html'">← Back to Dashboard</button>
+        </nav>
+    </header>
+
+    <!-- Main Profile Content -->
+    <main class="profile-main">
+        <!-- Profile Hero Section -->
+        <div class="profile-hero">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar" id="profileAvatar">JS</div>
+                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                <button class="profile-avatar-upload" onclick="document.getElementById('avatarUpload').click()">
+                    Change Photo
+                </button>
+            </div>
+            
+            <h1 class="profile-name" id="profileName">John Smith</h1>
+            <p class="profile-username" id="profileUsername">@johnsmith</p>
+            <p class="profile-bio" id="profileBio">Passionate software developer with expertise in algorithms and web development. Always learning and growing!</p>
+            
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-value">247</div>
+                    <div class="profile-stat-label">Problems Solved</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value">1,850</div>
+                    <div class="profile-stat-label">Skill Rating</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value">8</div>
+                    <div class="profile-stat-label">Communities</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value">23</div>
+                    <div class="profile-stat-label">Day Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Main Profile Section -->
+            <div class="profile-main-section">
+                <h2 class="profile-section-title">
+                    <div class="profile-section-icon">✏️</div>
+                    Edit Profile
+                </h2>
+                
+                <form class="profile-form" id="profileForm">
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">First Name</label>
+                        <input type="text" class="profile-form-input" id="firstName" name="firstName" placeholder="Enter first name">
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Last Name</label>
+                        <input type="text" class="profile-form-input" id="lastName" name="lastName" placeholder="Enter last name">
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Username</label>
+                        <input type="text" class="profile-form-input" id="username" name="username" placeholder="Enter username">
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Bio</label>
+                        <textarea class="profile-form-textarea" id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Primary Interest</label>
+                        <select class="profile-form-select" id="primaryInterest" name="primaryInterest">
+                            <option value="">Select primary interest</option>
+                            <option value="algorithms">Algorithms & Data Structures</option>
+                            <option value="web-development">Web Development</option>
+                            <option value="mobile-development">Mobile Development</option>
+                            <option value="data-science">Data Science & ML</option>
+                            <option value="system-design">System Design</option>
+                            <option value="cybersecurity">Cybersecurity</option>
+                            <option value="game-development">Game Development</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Skill Level</label>
+                        <select class="profile-form-select" id="skillLevel" name="skillLevel">
+                            <option value="">Select skill level</option>
+                            <option value="beginner">Beginner (0-2 years)</option>
+                            <option value="intermediate">Intermediate (2-5 years)</option>
+                            <option value="advanced">Advanced (5+ years)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Education Level</label>
+                        <select class="profile-form-select" id="educationLevel" name="educationLevel">
+                            <option value="">Select education level</option>
+                            <option value="high-school">High School</option>
+                            <option value="bachelor">Bachelor's Degree</option>
+                            <option value="master">Master's Degree</option>
+                            <option value="phd">PhD</option>
+                            <option value="self-taught">Self-Taught</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="profile-form-actions">
+                        <button type="submit" class="profile-save-btn">Save Changes</button>
+                        <button type="button" class="profile-cancel-btn" onclick="resetForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Profile Sidebar -->
+            <div class="profile-sidebar">
+                <!-- Quick Links -->
+                <div class="profile-sidebar-card">
+                    <h3 class="profile-section-title">
+                        <div class="profile-section-icon">🔗</div>
+                        Quick Links
+                    </h3>
+                    
+                    <div class="profile-links">
+                        <a href="tracker.html" class="profile-link">
+                            <div class="profile-link-icon">📝</div>
+                            <div class="profile-link-content">
+                                <h4>Practice Tracker</h4>
+                                <p>Track your daily progress</p>
+                            </div>
+                        </a>
+                        
+                        <a href="stats.html" class="profile-link">
+                            <div class="profile-link-icon">📊</div>
+                            <div class="profile-link-content">
+                                <h4>View Statistics</h4>
+                                <p>Analyze your performance</p>
+                            </div>
+                        </a>
+                        
+                        <a href="communities.html" class="profile-link">
+                            <div class="profile-link-icon">👥</div>
+                            <div class="profile-link-content">
+                                <h4>Join Communities</h4>
+                                <p>Connect with others</p>
+                            </div>
+                        </a>
+                        
+                        <a href="projects.html" class="profile-link">
+                            <div class="profile-link-icon">💼</div>
+                            <div class="profile-link-content">
+                                <h4>Showcase Projects</h4>
+                                <p>Display your work</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Achievements -->
+                <div class="profile-sidebar-card">
+                    <h3 class="profile-section-title">
+                        <div class="profile-section-icon">🏆</div>
+                        Recent Achievements
+                    </h3>
+                    
+                    <div class="profile-achievements">
+                        <div class="profile-achievement">
+                            <div class="profile-achievement-icon">🥇</div>
+                            <div class="profile-achievement-content">
+                                <h4>Problem Solver</h4>
+                                <p>Solved 100+ problems</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-achievement">
+                            <div class="profile-achievement-icon">🔥</div>
+                            <div class="profile-achievement-content">
+                                <h4>Streak Master</h4>
+                                <p>20+ day streak</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-achievement">
+                            <div class="profile-achievement-icon">⭐</div>
+                            <div class="profile-achievement-content">
+                                <h4>Skill Champion</h4>
+                                <p>Advanced level reached</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../community-ui/js/api.js"></script>
+    <script src="../community-ui/js/app.js"></script>
+    
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadProfileData();
+            setupAvatarUpload();
+        });
+
+        function checkAuthentication() {
+            const token = localStorage.getItem('skillport_token');
+            if (!token) {
+                window.location.href = '../community-ui/pages/auth/login.html';
+                return;
+            }
+            
+            // Verify token with backend
+            verifyToken(token);
+        }
+
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                
+                const data = await response.json();
+                if (data.user.role !== 'personal') {
+                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                localStorage.removeItem('skillport_token');
+                window.location.href = '../community-ui/pages/auth/login.html';
+            }
+        }
+
+        async function loadProfileData() {
+            try {
+                const token = localStorage.getItem('skillport_token');
+                const response = await fetch('http://localhost:5001/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    populateProfileForm(userData);
+                    updateProfileDisplay(userData);
+                }
+            } catch (error) {
+                console.error('Failed to load profile data:', error);
+            }
+        }
+
+        function populateProfileForm(userData) {
+            document.getElementById('firstName').value = userData.firstName || '';
+            document.getElementById('lastName').value = userData.lastName || '';
+            document.getElementById('username').value = userData.username || '';
+            document.getElementById('bio').value = userData.bio || '';
+            document.getElementById('primaryInterest').value = userData.primaryInterest || '';
+            document.getElementById('skillLevel').value = userData.skillLevel || '';
+            document.getElementById('educationLevel').value = userData.educationLevel || '';
+        }
+
+        function updateProfileDisplay(userData) {
+            // Update profile display
+            if (userData.firstName && userData.lastName) {
+                document.getElementById('profileName').textContent = `${userData.firstName} ${userData.lastName}`;
+                document.getElementById('profileAvatar').textContent = `${userData.firstName[0]}${userData.lastName[0]}`;
+            }
+            
+            if (userData.username) {
+                document.getElementById('profileUsername').textContent = `@${userData.username}`;
+            }
+            
+            if (userData.bio) {
+                document.getElementById('profileBio').textContent = userData.bio;
+            }
+        }
+
+        function setupAvatarUpload() {
+            const avatarUpload = document.getElementById('avatarUpload');
+            avatarUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    uploadAvatar(file);
+                }
+            });
+        }
+
+        async function uploadAvatar(file) {
+            try {
+                const formData = new FormData();
+                formData.append('avatar', file);
+                
+                const token = localStorage.getItem('skillport_token');
+                const response = await fetch('http://localhost:5001/api/users/avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update avatar display
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    profileAvatar.style.backgroundImage = `url(${data.avatarUrl})`;
+                    profileAvatar.textContent = '';
+                }
+            } catch (error) {
+                console.error('Failed to upload avatar:', error);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData(e.target);
+                const profileData = {
+                    firstName: formData.get('firstName'),
+                    lastName: formData.get('lastName'),
+                    username: formData.get('username'),
+                    bio: formData.get('bio'),
+                    primaryInterest: formData.get('primaryInterest'),
+                    skillLevel: formData.get('skillLevel'),
+                    educationLevel: formData.get('educationLevel')
+                };
+                
+                const token = localStorage.getItem('skillport_token');
+                const response = await fetch('http://localhost:5001/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+                
+                if (response.ok) {
+                    const updatedData = await response.json();
+                    updateProfileDisplay(updatedData);
+                    alert('Profile updated successfully!');
+                } else {
+                    throw new Error('Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Profile update failed:', error);
+                alert('Failed to update profile. Please try again.');
+            }
+        });
+
+        function resetForm() {
+            loadProfileData();
+        }
+    </script>
+</body>
+</html> 

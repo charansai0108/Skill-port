@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="../index.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-lg">✨</span>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">SkillPort</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="communities.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Communities</a>
+                    <a href="contests.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Contests</a>
+                    <a href="activity.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium bg-blue-50 text-blue-700 rounded-lg px-3 py-2">Activity</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gray-50 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Activity Feed</h1>
+                        <p class="text-gray-600 mt-2">Track your learning progress and achievements</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>All Activities</option>
+                            <option>Problem Solving</option>
+                            <option>Contest Participation</option>
+                            <option>Community Activity</option>
+                            <option>Achievements</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="space-y-6" id="activityTimeline">
+                    <!-- Today's Activities -->
+                    <div class="border-l-4 border-blue-500 pl-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Today</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-green-600 text-sm">✅</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Solved "Two Sum" problem</p>
+                                    <p class="text-xs text-gray-500">2 hours ago • Easy • Arrays</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>⏱️ 12 minutes</span>
+                                        <span>💡 45% success rate</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-blue-600 text-sm">🏆</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Joined "Weekly Algorithm Challenge" contest</p>
+                                    <p class="text-xs text-gray-500">4 hours ago • DSA Contest</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>🎯 5 problems</span>
+                                        <span>👥 45 participants</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-purple-600 text-sm">👥</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Joined "CS Students Community"</p>
+                                    <p class="text-xs text-gray-500">6 hours ago • Community</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>🏢 Programming Community</span>
+                                        <span>👥 156 members</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yesterday's Activities -->
+                    <div class="border-l-4 border-gray-300 pl-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Yesterday</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-green-600 text-sm">✅</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Solved "Longest Substring Without Repeating Characters" problem</p>
+                                    <p class="text-xs text-gray-500">Yesterday • Medium • Strings</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>⏱️ 28 minutes</span>
+                                        <span>💡 32% success rate</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-yellow-600 text-sm">🔥</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Maintained 7-day streak</p>
+                                    <p class="text-xs text-gray-500">Yesterday • Achievement</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>🎯 7 days in a row</span>
+                                        <span>+50 bonus points</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- This Week's Activities -->
+                    <div class="border-l-4 border-gray-300 pl-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">This Week</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-green-600 text-sm">✅</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Solved 3 problems in "Data Structures" category</p>
+                                    <p class="text-xs text-gray-500">3 days ago • Problem Solving</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>📊 +150 points</span>
+                                        <span>🎯 3/5 completed</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-blue-600 text-sm">🏆</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Completed "Beginner's Contest"</p>
+                                    <p class="text-xs text-gray-500">5 days ago • Contest</p>
+                                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>🥉 3rd place</span>
+                                        <span>📊 +300 points</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <div class="text-center mt-8 pt-6 border-t border-gray-200">
+                    <button class="bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+                        Load More Activities
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Activity functionality will be added here
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Activity page loaded');
+        });
+    </script>
+</body>
+</html>

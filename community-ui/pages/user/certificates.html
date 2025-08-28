@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillPort Community Certificates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            SkillPort
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="user-tasks.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="target" class="w-4 h-4"></i> Tasks
+          </a>
+          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Mentor Feedback
+          </a>
+          <a href="certificates.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+            <i data-lucide="award" class="w-4 h-4"></i> Certificates
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">Certificate Management</h1>
+      <p class="text-lg text-slate-600">Generate and manage certificates for completed contests and achievements.</p>
+    </div>
+
+    <!-- Certificate Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="award" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-amber-600" id="total-certificates">-</div>
+        <div class="text-sm text-slate-600">Total Certificates</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="check-circle" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-green-600" id="issued-certificates">-</div>
+        <div class="text-sm text-slate-600">Issued</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="clock" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-blue-600" id="pending-certificates">-</div>
+        <div class="text-sm text-slate-600">Pending</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="download" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-purple-600" id="downloads-count">-</div>
+        <div class="text-sm text-slate-600">Downloads</div>
+      </div>
+    </div>
+
+    <!-- Certificate Generation -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Generate Certificates</h2>
+        <button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <i data-lucide="plus" class="w-4 h-4"></i> New Certificate
+        </button>
+      </div>
+      
+      <div id="certificate-generation-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Dynamic content will be loaded here -->
+        <div class="text-center py-8">
+          <i data-lucide="loader-2" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
+          <p class="text-sm text-slate-500">Loading certificate data...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Certificates -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">Recent Certificates</h2>
+      <div id="recent-certificates-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic content will be loaded here -->
+        <div class="text-center py-8">
+          <i data-lucide="loader-2" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
+          <p class="text-sm text-slate-500">Loading recent certificates...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certificate Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Certificate Types -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Certificate Types</h2>
+        <div id="certificate-types-container" class="space-y-4">
+          <!-- Dynamic content will be loaded here -->
+          <div class="text-center py-4">
+            <i data-lucide="loader-2" class="w-6 h-6 text-slate-400 mx-auto mb-2 animate-spin"></i>
+            <p class="text-sm text-slate-500">Loading certificate types...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificate Analytics -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Certificate Analytics</h2>
+        <div id="certificate-analytics-container" class="grid grid-cols-2 gap-6">
+          <!-- Dynamic content will be loaded here -->
+          <div class="text-center py-4">
+            <i data-lucide="loader-2" class="w-6 h-6 text-slate-400 mx-auto mb-2 animate-spin"></i>
+            <p class="text-sm text-slate-500">Loading analytics...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load API and App scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+
+  <script>
+    lucide.createIcons();
+    
+    // Certificates Page Controller
+    class CertificatesPage {
+      constructor() {
+        this.api = window.SkillPortAPI;
+        this.certificates = [];
+        this.stats = null;
+        this.analytics = null;
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Check if user is authenticated
+          if (!this.api.isAuthenticated()) {
+            window.location.href = '../index.html';
+            return;
+          }
+
+          // Load certificates data
+          await this.loadCertificates();
+          await this.loadStats();
+          await this.loadAnalytics();
+          
+        } catch (error) {
+          console.error('Certificates initialization failed:', error);
+          this.showError('Failed to initialize certificates page');
+        }
+      }
+
+      async loadCertificates() {
+        try {
+          const response = await this.api.getUserCertificates();
+          if (response.success) {
+            this.certificates = response.data.certificates;
+            this.updateCertificatesDisplay();
+          }
+        } catch (error) {
+          console.error('Failed to load certificates:', error);
+          this.showError('Failed to load certificates');
+        }
+      }
+
+      async loadStats() {
+        try {
+          const response = await this.api.getUserCertificateStats();
+          if (response.success) {
+            this.stats = response.data.stats;
+            this.updateStatsDisplay();
+          }
+        } catch (error) {
+          console.error('Failed to load certificate stats:', error);
+        }
+      }
+
+      async loadAnalytics() {
+        try {
+          const response = await this.api.getUserCertificateAnalytics();
+          if (response.success) {
+            this.analytics = response.data.analytics;
+            this.updateAnalyticsDisplay();
+          }
+        } catch (error) {
+          console.error('Failed to load certificate analytics:', error);
+        }
+      }
+
+      updateCertificatesDisplay() {
+        // Update certificate generation section
+        this.updateCertificateGeneration();
+        
+        // Update recent certificates section
+        this.updateRecentCertificates();
+      }
+
+      updateCertificateGeneration() {
+        if (!this.certificates || !this.certificates.generationData) return;
+
+        const container = document.getElementById('certificate-generation-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        
+        this.certificates.generationData.forEach(contest => {
+          const contestElement = document.createElement('div');
+          contestElement.className = 'border border-slate-200 rounded-lg p-4';
+          
+          const statusClass = contest.status === 'completed' ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-600 hover:bg-slate-700';
+          const buttonText = contest.status === 'completed' ? 'Generate All' : 'Wait for End';
+          
+          contestElement.innerHTML = `
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-${contest.color || 'blue'}-500 to-${contest.secondaryColor || 'cyan'}-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="${contest.icon || 'target'}" class="w-5 h-5 text-white"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-slate-900">${contest.name}</h3>
+                <p class="text-sm text-slate-600">${contest.participants} participants</p>
+              </div>
+            </div>
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-slate-600">${contest.status === 'completed' ? 'Completed:' : 'Ends:'}</span>
+                <span class="text-slate-900">${contest.date}</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-slate-600">Certificates:</span>
+                <span class="text-slate-900">${contest.certificateInfo}</span>
+              </div>
+            </div>
+            <button class="w-full ${statusClass} text-white py-2 rounded-lg text-sm font-medium transition-colors" onclick="window.certificatesPage.generateCertificate('${contest.id}')">
+              ${buttonText}
+            </button>
+          `;
+          
+          container.appendChild(contestElement);
+        });
+      }
+
+      updateRecentCertificates() {
+        if (!this.certificates || !this.certificates.recent) return;
+
+        const container = document.getElementById('recent-certificates-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        
+        this.certificates.recent.forEach(certificate => {
+          const certElement = document.createElement('div');
+          certElement.className = 'bg-white rounded-lg shadow-lg overflow-hidden';
+          
+          const statusClass = certificate.status === 'issued' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+          const buttonClass = certificate.status === 'issued' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-amber-600 hover:bg-amber-700';
+          const buttonText = certificate.status === 'issued' ? 'View Certificate' : 'Generate Now';
+          
+          certElement.innerHTML = `
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-gradient-to-br from-${certificate.color || 'blue'}-400 to-${certificate.secondaryColor || 'indigo'}-500 rounded-lg flex items-center justify-center">
+                    <i data-lucide="award" class="w-6 h-6 text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-slate-900">${certificate.studentName}</h3>
+                    <p class="text-sm text-slate-600">${certificate.achievement}</p>
+                  </div>
+                </div>
+                <span class="${statusClass} px-2 py-1 rounded text-xs">${certificate.status}</span>
+              </div>
+              
+              <div class="space-y-3 mb-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600">${certificate.type === 'contest' ? 'Contest:' : 'Program:'}</span>
+                  <span class="text-slate-900">${certificate.contestName}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600">${certificate.type === 'contest' ? 'Score:' : 'Tasks:'}</span>
+                  <span class="font-semibold text-green-600">${certificate.score}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-600">${certificate.status === 'issued' ? 'Issued:' : 'Status:'}</span>
+                  <span class="text-slate-900">${certificate.date}</span>
+                </div>
+              </div>
+              
+              <div class="flex gap-2">
+                <button class="flex-1 ${buttonClass} text-white py-2 rounded-lg text-sm font-medium transition-colors" onclick="window.certificatesPage.${certificate.status === 'issued' ? 'viewCertificate' : 'generateCertificate'}('${certificate.id}')">
+                  ${buttonText}
+                </button>
+                <button class="px-3 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-sm font-medium transition-colors" onclick="window.certificatesPage.${certificate.status === 'issued' ? 'downloadCertificate' : 'checkStatus'}('${certificate.id}')">
+                  <i data-lucide="${certificate.status === 'issued' ? 'download' : 'clock'}" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(certElement);
+        });
+      }
+
+      updateStatsDisplay() {
+        if (!this.stats) return;
+
+        const elements = {
+          totalCertificates: document.getElementById('total-certificates'),
+          issued: document.getElementById('issued-certificates'),
+          pending: document.getElementById('pending-certificates'),
+          downloads: document.getElementById('downloads-count')
+        };
+
+        if (elements.totalCertificates) elements.totalCertificates.textContent = this.stats.totalCertificates || 0;
+        if (elements.issued) elements.issued.textContent = this.stats.issued || 0;
+        if (elements.pending) elements.pending.textContent = this.stats.pending || 0;
+        if (elements.downloads) elements.downloads.textContent = this.stats.downloads || 0;
+      }
+
+      updateAnalyticsDisplay() {
+        if (!this.analytics) return;
+
+        // Update certificate types
+        this.updateCertificateTypes();
+        
+        // Update certificate analytics
+        this.updateCertificateAnalytics();
+      }
+
+      updateCertificateTypes() {
+        if (!this.analytics || !this.analytics.certificateTypes) return;
+
+        const container = document.getElementById('certificate-types-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        
+        this.analytics.certificateTypes.forEach(type => {
+          const typeElement = document.createElement('div');
+          typeElement.className = 'space-y-2';
+          
+          typeElement.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-4 h-4 bg-${type.color || 'blue'}-500 rounded"></div>
+                <span class="text-sm font-medium text-slate-700">${type.name}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-slate-600">${type.count}</span>
+                <span class="text-sm text-slate-500">(${type.percentage}%)</span>
+              </div>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+              <div class="h-2 bg-${type.color || 'blue'}-500 rounded-full" style="width: ${type.percentage}%"></div>
+            </div>
+          `;
+          
+          container.appendChild(typeElement);
+        });
+      }
+
+      updateCertificateAnalytics() {
+        if (!this.analytics || !this.analytics.metrics) return;
+
+        const container = document.getElementById('certificate-analytics-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        
+        this.analytics.metrics.forEach(metric => {
+          const metricElement = document.createElement('div');
+          metricElement.className = 'text-center';
+          
+          metricElement.innerHTML = `
+            <div class="text-3xl font-bold text-${metric.color || 'blue'}-600 mb-2">${metric.value}</div>
+            <div class="text-sm text-slate-600">${metric.label}</div>
+            <div class="w-full bg-slate-200 rounded-full h-2 mt-3">
+              <div class="h-2 bg-gradient-to-r from-${metric.color || 'blue'}-500 to-${metric.secondaryColor || 'cyan'}-500 rounded-full" style="width: ${metric.percentage || 0}%"></div>
+            </div>
+          `;
+          
+          container.appendChild(metricElement);
+        });
+      }
+
+      async generateCertificate(contestId) {
+        try {
+          const response = await this.api.generateCertificate(contestId);
+          if (response.success) {
+            this.showSuccess('Certificate generated successfully!');
+            await this.loadCertificates(); // Reload certificates
+          } else {
+            this.showError(response.message || 'Failed to generate certificate');
+          }
+        } catch (error) {
+          console.error('Failed to generate certificate:', error);
+          this.showError('An error occurred while generating the certificate');
+        }
+      }
+
+      async downloadCertificate(certificateId) {
+        try {
+          const response = await this.api.downloadCertificate(certificateId);
+          if (response.success) {
+            this.showSuccess('Certificate download started!');
+            // Handle file download
+            const link = document.createElement('a');
+            link.href = response.data.downloadUrl;
+            link.download = `certificate-${certificateId}.pdf`;
+            link.click();
+          } else {
+            this.showError(response.message || 'Failed to download certificate');
+          }
+        } catch (error) {
+          console.error('Failed to download certificate:', error);
+          this.showError('An error occurred while downloading the certificate');
+        }
+      }
+
+      async viewCertificate(certificateId) {
+        try {
+          const response = await this.api.viewCertificate(certificateId);
+          if (response.success) {
+            // Open certificate in new tab or modal
+            window.open(response.data.viewUrl, '_blank');
+          } else {
+            this.showError(response.message || 'Failed to view certificate');
+          }
+        } catch (error) {
+          console.error('Failed to view certificate:', error);
+          this.showError('An error occurred while viewing the certificate');
+        }
+      }
+
+      async checkStatus(certificateId) {
+        try {
+          const response = await this.api.checkCertificateStatus(certificateId);
+          if (response.success) {
+            this.showSuccess(`Certificate status: ${response.data.status}`);
+            // Refresh the certificates display
+            await this.loadCertificates();
+          } else {
+            this.showError(response.message || 'Failed to check certificate status');
+          }
+        } catch (error) {
+          console.error('Failed to check certificate status:', error);
+          this.showError('An error occurred while checking the certificate status');
+        }
+      }
+
+      // Utility functions
+      showSuccess(message) {
+        this.showNotification(message, 'success');
+      }
+
+      showError(message) {
+        this.showNotification(message, 'error');
+      }
+
+      showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          type === 'success' ? 'bg-green-500 text-white' :
+          type === 'error' ? 'bg-red-500 text-white' :
+          'bg-blue-500 text-white'
+        }`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.certificatesPage = new CertificatesPage();
+    });
+  </script>
+</body>
+</html> 

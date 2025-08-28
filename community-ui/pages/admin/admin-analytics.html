@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - SkillPort Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            Community Admin
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="admin-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="admin-users.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="users" class="w-4 h-4"></i> Users
+          </a>
+          <a href="admin-mentors.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
+          </a>
+          <a href="admin-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="admin-analytics.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+          </a>
+          <a href="admin-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="admin-settings.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">Analytics Dashboard</h1>
+      <p class="text-lg text-slate-600">Monitor platform performance, user engagement, and growth metrics.</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Total Users</p>
+            <p class="text-2xl font-bold text-slate-900">2,847</p>
+            <p class="text-sm text-green-600">+12% from last month</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Active Sessions</p>
+            <p class="text-2xl font-bold text-slate-900">1,234</p>
+            <p class="text-sm text-green-600">+8% from last month</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="activity" class="w-6 h-6 text-green-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Contest Participation</p>
+            <p class="text-2xl font-bold text-slate-900">89%</p>
+            <p class="text-sm text-green-600">+5% from last month</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Avg. Response Time</p>
+            <p class="text-2xl font-bold text-slate-900">2.3s</p>
+            <p class="text-sm text-red-600">+0.2s from last month</p>
+          </div>
+          <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6 text-yellow-600"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- User Growth Chart -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">User Growth</h3>
+        <canvas id="userGrowthChart" width="400" height="200"></canvas>
+      </div>
+      
+      <!-- Contest Participation Chart -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Contest Participation</h3>
+        <canvas id="contestParticipationChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Detailed Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Top Performing Categories -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Top Categories</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Algorithms</span>
+            <div class="flex items-center gap-2">
+              <div class="w-20 bg-slate-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+              </div>
+              <span class="text-sm font-medium text-slate-900">85%</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Data Structures</span>
+            <div class="flex items-center gap-2">
+              <div class="w-20 bg-slate-200 rounded-full h-2">
+                <div class="bg-green-600 h-2 rounded-full" style="width: 72%"></div>
+              </div>
+              <span class="text-sm font-medium text-slate-900">72%</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Dynamic Programming</span>
+            <div class="flex items-center gap-2">
+              <div class="w-20 bg-slate-200 rounded-full h-2">
+                <div class="bg-purple-600 h-2 rounded-full" style="width: 68%"></div>
+              </div>
+              <span class="text-sm font-medium text-slate-900">68%</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Graph Theory</span>
+            <div class="flex items-center gap-2">
+              <div class="w-20 bg-slate-200 rounded-full h-2">
+                <div class="bg-yellow-600 h-2 rounded-full" style="width: 55%"></div>
+              </div>
+              <span class="text-sm font-medium text-slate-900">55%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Activity -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">User Activity</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Daily Active Users</span>
+            <span class="text-sm font-medium text-slate-900">1,234</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Weekly Active Users</span>
+            <span class="text-sm font-medium text-slate-900">2,156</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Monthly Active Users</span>
+            <span class="text-sm font-medium text-slate-900">2,847</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Avg. Session Duration</span>
+            <span class="text-sm font-medium text-slate-900">24m 32s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Performance</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Page Load Time</span>
+            <span class="text-sm font-medium text-slate-900">1.2s</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">API Response Time</span>
+            <span class="text-sm font-medium text-slate-900">180ms</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Uptime</span>
+            <span class="text-sm font-medium text-slate-900">99.9%</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Error Rate</span>
+            <span class="text-sm font-medium text-slate-900">0.1%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+    
+    // User Growth Chart
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userGrowthCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'New Users',
+          data: [120, 190, 300, 500, 200, 300],
+          borderColor: 'rgb(59, 130, 246)',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+    
+    // Contest Participation Chart
+    const contestParticipationCtx = document.getElementById('contestParticipationChart').getContext('2d');
+    new Chart(contestParticipationCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Algorithms', 'Data Structures', 'Dynamic Programming', 'Graph Theory'],
+        datasets: [{
+          data: [35, 25, 20, 20],
+          backgroundColor: [
+            'rgb(59, 130, 246)',
+            'rgb(34, 197, 94)',
+            'rgb(147, 51, 234)',
+            'rgb(234, 179, 8)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkillPort</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="../index.html" class="brand-link">
+                    <span class="brand-icon">🎯</span>
+                    <span class="brand-text">SkillPort</span>
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="communities.html" class="nav-link">Communities</a>
+                <a href="contests.html" class="nav-link">Contests</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="user-menu" id="userMenu">
+                    <button class="user-button" onclick="toggleUserMenu()">
+                        <img src="https://via.placeholder.com/32x32" alt="User Avatar" class="user-avatar" id="userAvatar">
+                        <span class="user-name" id="userName">User Name</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="profile.html" class="dropdown-item">
+                            <span class="item-icon">👤</span>
+                            My Profile
+                        </a>
+                        <a href="settings.html" class="dropdown-item">
+                            <span class="item-icon">⚙️</span>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" onclick="skillPort.logout()">
+                            <span class="item-icon">🚪</span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="nav-toggle" onclick="toggleMobileMenu()">
+                <span class="hamburger"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-content">
+                    <h1>Welcome back, <span id="welcomeName">User</span>! 👋</h1>
+                    <p>Here's what's happening in your SkillPort community today.</p>
+                </div>
+                <div class="welcome-actions">
+                    <a href="communities.html" class="btn btn-primary">Join Communities</a>
+                    <a href="contests.html" class="btn btn-secondary">View Contests</a>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-content">
+                        <h3 class="stat-value" id="contestsWon">0</h3>
+                        <p class="stat-label">Contests Won</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💻</div>
+                    <div class="stat-content">
+                        <h3 class="stat-value" id="problemsSolved">0</h3>
+                        <p class="stat-label">Problems Solved</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏘️</div>
+                    <div class="stat-content">
+                        <h3 class="stat-value" id="communitiesJoined">0</h3>
+                        <p class="stat-label">Communities</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <h3 class="stat-value" id="currentStreak">0</h3>
+                        <p class="stat-label">Day Streak</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="activity.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="recentActivity" class="activity-list">
+                            <div class="loading-placeholder">Loading activity...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Contests -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Upcoming Contests</h3>
+                        <a href="contests.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="upcomingContests" class="contest-list">
+                            <div class="loading-placeholder">Loading contests...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Communities -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>My Communities</h3>
+                        <a href="communities.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="myCommunities" class="community-list">
+                            <div class="loading-placeholder">Loading communities...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Top Performers</h3>
+                        <a href="leaderboard.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="leaderboard" class="leaderboard-list">
+                            <div class="loading-placeholder">Loading leaderboard...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="actions-grid">
+                    <a href="contests/create.html" class="action-card">
+                        <span class="action-icon">🏆</span>
+                        <h4>Create Contest</h4>
+                        <p>Start a new programming challenge</p>
+                    </a>
+                    <a href="communities/create.html" class="action-card">
+                        <span class="action-icon">🏘️</span>
+                        <h4>Create Community</h4>
+                        <p>Build a new developer community</p>
+                    </a>
+                    <a href="problems.html" class="action-card">
+                        <span class="action-icon">💻</span>
+                        <h4>Practice Problems</h4>
+                        <p>Solve coding challenges</p>
+                    </a>
+                    <a href="profile/edit.html" class="action-card">
+                        <span class="action-icon">👤</span>
+                        <h4>Edit Profile</h4>
+                        <p>Update your information</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Alert Container -->
+    <div id="alert-container" class="alert-container"></div>
+
+    <script src="../js/core.js"></script>
+    <script>
+        // Dashboard functionality
+        class Dashboard {
+            constructor() {
+                this.initializeDashboard();
+            }
+
+            async initializeDashboard() {
+                try {
+                    // Check authentication
+                    if (!skillPort.isAuthenticated) {
+                        window.location.href = '/login';
+                        return;
+                    }
+
+                    // Update user info
+                    this.updateUserInfo();
+                    
+                    // Load dashboard data
+                    await this.loadDashboardData();
+                    
+                } catch (error) {
+                    console.error('Dashboard initialization error:', error);
+                    skillPort.showAlert('Failed to load dashboard', 'error');
+                }
+            }
+
+            updateUserInfo() {
+                const user = skillPort.user;
+                if (user) {
+                    document.getElementById('welcomeName').textContent = user.firstName;
+                    document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+                    
+                    if (user.profilePicture) {
+                        document.getElementById('userAvatar').src = user.profilePicture;
+                    }
+                }
+            }
+
+            async loadDashboardData() {
+                try {
+                    // Load analytics
+                    const analytics = await skillPort.getDashboardAnalytics();
+                    this.updateStats(analytics.overview);
+                    this.updateRecentActivity(analytics.recentActivity);
+                    this.updateUpcomingContests(analytics.upcomingContests);
+                    this.updateMyCommunities(analytics.communities);
+                    this.updateLeaderboard(analytics.leaderboard);
+                    
+                } catch (error) {
+                    console.error('Failed to load dashboard data:', error);
+                    this.showErrorStates();
+                }
+            }
+
+            updateStats(overview) {
+                if (overview) {
+                    document.getElementById('contestsWon').textContent = overview.contestsWon || 0;
+                    document.getElementById('problemsSolved').textContent = overview.problemsSolved || 0;
+                    document.getElementById('communitiesJoined').textContent = overview.communitiesJoined || 0;
+                    document.getElementById('currentStreak').textContent = overview.currentStreak || 0;
+                }
+            }
+
+            updateRecentActivity(activities) {
+                const container = document.getElementById('recentActivity');
+                
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No recent activity</div>';
+                    return;
+                }
+
+                const activityHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">${this.getActivityIcon(activity.type)}</div>
+                        <div class="activity-content">
+                            <p class="activity-text">${activity.description}</p>
+                            <span class="activity-time">${skillPort.formatDate(activity.timestamp)}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = activityHTML;
+            }
+
+            updateUpcomingContests(contests) {
+                const container = document.getElementById('upcomingContests');
+                
+                if (!contests || contests.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No upcoming contests</div>';
+                    return;
+                }
+
+                const contestHTML = contests.slice(0, 3).map(contest => `
+                    <div class="contest-item">
+                        <div class="contest-info">
+                            <h4 class="contest-name">${contest.name}</h4>
+                            <p class="contest-date">${skillPort.formatDate(contest.startTime)}</p>
+                        </div>
+                        <a href="/contests/${contest._id}" class="btn btn-sm btn-outline">View</a>
+                    </div>
+                `).join('');
+
+                container.innerHTML = contestHTML;
+            }
+
+            updateMyCommunities(communities) {
+                const container = document.getElementById('myCommunities');
+                
+                if (!communities || communities.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No communities joined</div>';
+                    return;
+                }
+
+                const communityHTML = communities.slice(0, 3).map(community => `
+                    <div class="community-item">
+                        <div class="community-info">
+                            <h4 class="community-name">${community.name}</h4>
+                            <p class="community-role">${community.role}</p>
+                        </div>
+                        <a href="/communities/${community._id}" class="btn btn-sm btn-outline">View</a>
+                    </div>
+                `).join('');
+
+                container.innerHTML = communityHTML;
+            }
+
+            updateLeaderboard(leaderboard) {
+                const container = document.getElementById('leaderboard');
+                
+                if (!leaderboard || leaderboard.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No leaderboard data</div>';
+                    return;
+                }
+
+                const leaderboardHTML = leaderboard.slice(0, 5).map((user, index) => `
+                    <div class="leaderboard-item">
+                        <div class="rank">${index + 1}</div>
+                        <div class="user-info">
+                            <span class="username">${user.username}</span>
+                            <span class="score">${user.score} pts</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = leaderboardHTML;
+            }
+
+            getActivityIcon(type) {
+                const icons = {
+                    'contest_joined': '🏆',
+                    'problem_solved': '💻',
+                    'community_joined': '🏘️',
+                    'achievement_earned': '🏅',
+                    'streak_milestone': '🔥',
+                    'default': '📝'
+                };
+                return icons[type] || icons.default;
+            }
+
+            showErrorStates() {
+                const containers = ['recentActivity', 'upcomingContests', 'myCommunities', 'leaderboard'];
+                containers.forEach(id => {
+                    const container = document.getElementById(id);
+                    container.innerHTML = '<div class="error-state">Failed to load data</div>';
+                });
+            }
+        }
+
+        // Navigation functionality
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        });
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            new Dashboard();
+        });
+    </script>
+</body>
+</html>

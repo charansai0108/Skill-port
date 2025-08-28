@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Registration - SkillPort</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success { border-color: #28a745; background: #d4edda; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>🧪 SkillPort Registration System Test</h1>
+    
+    <div class="test-section">
+        <h2>🔧 Backend Status Check</h2>
+        <button class="test-button" onclick="testBackend()">Test Backend Connection</button>
+        <div id="backendResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>👤 Personal User Registration Test</h2>
+        <button class="test-button" onclick="testPersonalRegistration()">Test Personal Registration</button>
+        <div id="personalResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏢 Community User Registration Test</h2>
+        <button class="test-button" onclick="testCommunityRegistration()">Test Community Registration</button>
+        <div id="communityResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Current System Status</h2>
+        <div id="systemStatus" class="result">
+            ✅ Registration Form: Updated with Personal vs Community selection
+            ✅ User Model: Updated to support new role system
+            ✅ Auth Routes: Updated validation and user creation
+            ✅ Admin Middleware: Updated for new roles
+            ✅ Admin Routes: Updated role validation
+            🔄 Testing: In progress...
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+        }
+
+        async function testBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/status`);
+                if (response.ok) {
+                    showResult('backendResult', '✅ Backend is running and accessible!');
+                } else {
+                    showResult('backendResult', '❌ Backend responded with error: ' + response.status, false);
+                }
+            } catch (error) {
+                showResult('backendResult', '❌ Backend connection failed: ' + error.message, false);
+            }
+        }
+
+        async function testPersonalRegistration() {
+            const testData = {
+                firstName: 'Test',
+                lastName: 'Personal',
+                username: 'testpersonal',
+                email: 'testpersonal@example.com',
+                password: 'testpass123',
+                role: 'personal',
+                skillLevel: 'beginner',
+                primaryInterest: 'algorithms',
+                educationLevel: 'bachelor',
+                bio: 'Test personal user'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('personalResult', `✅ Personal Registration Successful!\n\nResponse: ${JSON.stringify(result, null, 2)}`);
+                } else {
+                    showResult('personalResult', `❌ Personal Registration Failed:\n\n${JSON.stringify(result, null, 2)}`, false);
+                }
+            } catch (error) {
+                showResult('personalResult', '❌ Personal Registration Error: ' + error.message, false);
+            }
+        }
+
+        async function testCommunityRegistration() {
+            const testData = {
+                firstName: 'Test',
+                lastName: 'Community',
+                username: 'testcommunity',
+                email: 'testcommunity@example.com',
+                password: 'testpass123',
+                role: 'community',
+                organizationName: 'Test University',
+                organizationType: 'university',
+                organizationSize: 'medium',
+                position: 'Program Director',
+                organizationWebsite: 'https://testuniversity.edu'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('communityResult', `✅ Community Registration Successful!\n\nResponse: ${JSON.stringify(result, null, 2)}`);
+                } else {
+                    showResult('communityResult', `❌ Community Registration Failed:\n\n${JSON.stringify(result, null, 2)}`, false);
+                }
+            } catch (error) {
+                showResult('communityResult', '❌ Community Registration Error: ' + error.message, false);
+            }
+        }
+
+        // Auto-test backend on page load
+        window.addEventListener('load', () => {
+            setTimeout(testBackend, 1000);
+        });
+    </script>
+</body>
+</html>

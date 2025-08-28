@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentor Management - SkillPort Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Josefin Sans', sans-serif; }
+    
+    /* Admin Mentors Page Styles */
+    .admin-mentors-page {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #dbeafe 100%);
+      min-height: 100vh;
+    }
+    
+    .admin-mentors-header {
+      margin-bottom: 2rem;
+    }
+    
+    .admin-mentors-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .admin-mentors-subtitle {
+      font-size: 1.125rem;
+      color: #475569;
+    }
+    
+    .admin-header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .admin-add-mentor-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-add-mentor-button:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body class="admin-mentors-page">
+  <!-- Navbar -->
+  <nav class="admin-navbar sticky top-0 z-50">
+    <div class="admin-nav-container">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">
+          <i data-lucide="shield" class="w-5 h-5 admin-icon-white"></i>
+        </div>
+        <span>Community Admin</span>
+      </div>
+      <div class="admin-nav-menu">
+          <a href="admin-dashboard.html" class="admin-nav-link">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="admin-users.html" class="admin-nav-link">
+            <i data-lucide="users" class="w-4 h-4"></i> Users
+          </a>
+          <a href="admin-mentors.html" class="admin-nav-link active">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
+          </a>
+          <a href="admin-contests.html" class="admin-nav-link">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="admin-analytics.html" class="admin-nav-link">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+          </a>
+          <a href="admin-leaderboard.html" class="admin-nav-link">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="admin-settings.html" class="admin-nav-link">
+            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          </a>
+          <button onclick="logout()" class="admin-nav-link">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 mb-2">Mentor Management</h1>
+          <p class="text-lg text-slate-600">Manage all mentors, create accounts, and assign contests.</p>
+        </div>
+        <button onclick="adminMentors.openAddMentorModal()" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5"></i> Add New Mentor
+        </button>
+      </div>
+    </div>
+
+    <!-- Mentor Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="graduation-cap" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-green-600" id="total-mentors">-</div>
+        <div class="text-sm text-slate-600">Total Mentors</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="user-check" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-blue-600" id="active-mentors">-</div>
+        <div class="text-sm text-slate-600">Active Mentors</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="users" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-purple-600" id="total-students">-</div>
+        <div class="text-sm text-slate-600">Total Students</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <i data-lucide="trophy" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-amber-600" id="active-contests">-</div>
+        <div class="text-sm text-slate-600">Active Contests</div>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <input type="text" id="search-mentors" placeholder="Search mentors..." class="border border-slate-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-64">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+          </div>
+          <select id="specialization-filter" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">All Specializations</option>
+            <option value="algorithms">Algorithms</option>
+            <option value="data-structures">Data Structures</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="strings">Strings</option>
+            <option value="arrays">Arrays</option>
+            <option value="dynamic-programming">Dynamic Programming</option>
+            <option value="graph-theory">Graph Theory</option>
+          </select>
+          <select id="status-filter" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">Sort by:</span>
+          <select id="sort-mentors" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <option value="name">Name</option>
+            <option value="joinDate">Join Date</option>
+            <option value="students">Students</option>
+            <option value="specialization">Specialization</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mentors Grid -->
+    <div id="mentors-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Loading state -->
+      <div class="col-span-full text-center py-12">
+        <i data-lucide="loader" class="w-12 h-12 text-slate-400 mx-auto mb-4 animate-spin"></i>
+        <p class="text-lg text-slate-600">Loading mentors...</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-8 flex justify-center items-center gap-2 hidden">
+      <button id="prev-page" class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        Previous
+      </button>
+      <span id="page-info" class="text-sm text-slate-600"></span>
+      <button id="next-page" class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        Next
+      </button>
+    </div>
+  </main>
+
+  <!-- Add Mentor Modal -->
+  <div id="addMentorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-slate-900">Add New Mentor</h2>
+          <button onclick="adminMentors.closeAddMentorModal()" class="text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <form id="addMentorForm" class="api-form" data-action="create-mentor">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+              <input type="text" name="firstName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+              <input type="text" name="lastName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Email *</label>
+              <input type="email" name="email" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Username *</label>
+              <input type="text" name="username" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Primary Specialization *</label>
+              <select name="primarySpecialization" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="">Select specialization</option>
+                <option value="algorithms">Algorithms</option>
+                <option value="data-structures">Data Structures</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="strings">Strings</option>
+                <option value="arrays">Arrays</option>
+                <option value="dynamic-programming">Dynamic Programming</option>
+                <option value="graph-theory">Graph Theory</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Secondary Specialization</label>
+              <select name="secondarySpecialization" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="">Select specialization</option>
+                <option value="algorithms">Algorithms</option>
+                <option value="data-structures">Data Structures</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="strings">Strings</option>
+                <option value="arrays">Arrays</option>
+                <option value="dynamic-programming">Dynamic Programming</option>
+                <option value="graph-theory">Graph Theory</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Experience Level *</label>
+              <select name="experienceLevel" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="">Select experience</option>
+                <option value="beginner">Beginner (1-3 years)</option>
+                <option value="intermediate">Intermediate (3-7 years)</option>
+                <option value="advanced">Advanced (7-15 years)</option>
+                <option value="expert">Expert (15+ years)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Max Students</label>
+              <input type="number" name="maxStudents" min="1" max="50" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" value="20">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Password *</label>
+              <input type="password" name="password" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+              <p class="text-xs text-slate-500 mt-1">Minimum 8 characters</p>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+              <textarea name="bio" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" rows="3" placeholder="Brief description about the mentor's expertise and teaching style..."></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Qualifications</label>
+              <textarea name="qualifications" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" rows="2" placeholder="Degrees, certifications, achievements..."></textarea>
+            </div>
+          </div>
+          
+          <div class="flex gap-3 mt-6">
+            <button type="button" onclick="adminMentors.closeAddMentorModal()" class="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Create Mentor
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Mentor Modal -->
+  <div id="editMentorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-slate-900">Edit Mentor</h2>
+          <button onclick="adminMentors.closeEditMentorModal()" class="text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <form id="editMentorForm" class="api-form" data-action="update-mentor">
+          <input type="hidden" name="mentorId" id="editMentorId">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+              <input type="text" name="firstName" id="editFirstName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+              <input type="text" name="lastName" id="editLastName" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Email *</label>
+              <input type="email" name="email" id="editEmail" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Username *</label>
+              <input type="text" name="username" id="editUsername" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Primary Specialization *</label>
+              <select name="primarySpecialization" id="editPrimarySpecialization" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="algorithms">Algorithms</option>
+                <option value="data-structures">Data Structures</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="strings">Strings</option>
+                <option value="arrays">Arrays</option>
+                <option value="dynamic-programming">Dynamic Programming</option>
+                <option value="graph-theory">Graph Theory</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Secondary Specialization</label>
+              <select name="secondarySpecialization" id="editSecondarySpecialization" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="">Select specialization</option>
+                <option value="algorithms">Algorithms</option>
+                <option value="data-structures">Data Structures</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="strings">Strings</option>
+                <option value="arrays">Arrays</option>
+                <option value="dynamic-programming">Dynamic Programming</option>
+                <option value="graph-theory">Graph Theory</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Experience Level *</label>
+              <select name="experienceLevel" id="editExperienceLevel" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="beginner">Beginner (1-3 years)</option>
+                <option value="intermediate">Intermediate (3-7 years)</option>
+                <option value="advanced">Advanced (7-15 years)</option>
+                <option value="expert">Expert (15+ years)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Max Students</label>
+              <input type="number" name="maxStudents" id="editMaxStudents" min="1" max="50" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Status *</label>
+              <select name="status" id="editStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+              <textarea name="bio" id="editBio" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" rows="3" placeholder="Brief description about the mentor's expertise and teaching style..."></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Qualifications</label>
+              <textarea name="qualifications" id="editQualifications" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" rows="2" placeholder="Degrees, certifications, achievements..."></textarea>
+            </div>
+          </div>
+          
+          <div class="flex gap-3 mt-6">
+            <button type="button" onclick="adminMentors.closeEditMentorModal()" class="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Update Mentor
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteMentorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900">Delete Mentor</h3>
+            <p class="text-sm text-slate-600">This action cannot be undone.</p>
+          </div>
+        </div>
+        <p class="text-sm text-slate-600 mb-6">Are you sure you want to delete <span id="deleteMentorName" class="font-semibold"></span>? This will permanently remove the mentor and all associated data.</p>
+        <div class="flex gap-3">
+          <button onclick="adminMentors.closeDeleteMentorModal()" class="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+            Cancel
+          </button>
+          <button onclick="adminMentors.confirmDeleteMentor()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Delete Mentor
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load API and App scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/app.js"></script>
+  
+  <script>
+    lucide.createIcons();
+    
+    // Admin Mentors Controller
+    class AdminMentors {
+      constructor() {
+        this.api = window.SkillPortAPI;
+        this.currentPage = 1;
+        this.mentorsPerPage = 9;
+        this.filters = {
+          search: '',
+          specialization: '',
+          status: '',
+          sortBy: 'name'
+        };
+        this.mentors = [];
+        this.mentorToDelete = null;
+        this.mentorToEdit = null;
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Check if user is admin
+          if (!this.api.isAuthenticated() || !this.api.isAdmin()) {
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // Load initial data
+          await this.loadMentors();
+          this.setupEventListeners();
+          
+        } catch (error) {
+          console.error('Mentors initialization failed:', error);
+          this.showError('Failed to initialize mentors page');
+        }
+      }
+
+      async loadMentors() {
+        try {
+          const response = await this.api.getUsers({
+            role: 'mentor',
+            page: this.currentPage,
+            limit: this.mentorsPerPage,
+            ...this.filters
+          });
+
+          if (response.success) {
+            this.mentors = response.data.users;
+            this.updateMentorsDisplay();
+            this.updatePagination(response.data.pagination);
+            this.updateStats(response.data.stats);
+          }
+        } catch (error) {
+          console.error('Failed to load mentors:', error);
+          this.showError('Failed to load mentors');
+        }
+      }
+
+      updateMentorsDisplay() {
+        const container = document.querySelector('#mentors-container');
+        if (!container) return;
+
+        if (!this.mentors.length) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <i data-lucide="graduation-cap" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+              <p class="text-lg text-slate-600">No mentors found</p>
+              <p class="text-sm text-slate-500 mt-2">Create your first mentor to get started</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = this.mentors.map(mentor => this.createMentorCard(mentor)).join('');
+        lucide.createIcons();
+      }
+
+      createMentorCard(mentor) {
+        const statusColors = {
+          'active': 'bg-green-100 text-green-700',
+          'inactive': 'bg-red-100 text-red-700',
+          'pending': 'bg-yellow-100 text-yellow-700',
+          'suspended': 'bg-gray-100 text-gray-700'
+        };
+
+        const statusColor = statusColors[mentor.status] || 'bg-slate-100 text-slate-700';
+        const joinDate = new Date(mentor.createdAt).toLocaleDateString();
+        const totalStudents = mentor.mentorStats?.totalStudents || 0;
+        const activeContests = mentor.mentorStats?.activeContests || 0;
+        const rating = mentor.mentorStats?.averageRating || 0;
+
+        return `
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                  <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="${statusColor} px-2 py-1 rounded text-xs">${mentor.status}</span>
+              </div>
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">${mentor.firstName} ${mentor.lastName}</h3>
+              <p class="text-sm text-slate-600 mb-4">${mentor.bio || 'No bio available'}</p>
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Specialization:</span>
+                  <span class="font-medium text-slate-900">${mentor.primarySpecialization || 'Not specified'}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Experience:</span>
+                  <span class="font-medium text-slate-900">${mentor.experienceLevel || 'Not specified'}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Students:</span>
+                  <span class="font-medium text-slate-900">${totalStudents} assigned</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Contests:</span>
+                  <span class="font-medium text-slate-900">${activeContests} active</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Rating:</span>
+                  <span class="font-medium text-slate-900">${rating.toFixed(1)}/5.0</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Join Date:</span>
+                  <span class="font-medium text-slate-900">${joinDate}</span>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="adminMentors.editMentor('${mentor.id}')" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                  Edit
+                </button>
+                <button onclick="adminMentors.viewMentorProfile('${mentor.id}')" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors">
+                  View
+                </button>
+                <button onclick="adminMentors.deleteMentor('${mentor.id}', '${mentor.firstName} ${mentor.lastName}')" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      updateStats(stats) {
+        const elements = {
+          totalMentors: document.querySelector('#total-mentors'),
+          activeMentors: document.querySelector('#active-mentors'),
+          totalStudents: document.querySelector('#total-students'),
+          activeContests: document.querySelector('#active-contests')
+        };
+
+        if (elements.totalMentors) elements.totalMentors.textContent = stats.totalMentors || 0;
+        if (elements.activeMentors) elements.activeMentors.textContent = stats.activeMentors || 0;
+        if (elements.totalStudents) elements.totalStudents.textContent = stats.totalStudents || 0;
+        if (elements.activeContests) elements.activeContests.textContent = stats.activeContests || 0;
+      }
+
+      updatePagination(pagination) {
+        const paginationElement = document.querySelector('#pagination');
+        const pageInfo = document.querySelector('#page-info');
+        const prevButton = document.querySelector('#prev-page');
+        const nextButton = document.querySelector('#next-page');
+
+        if (pagination.totalPages <= 1) {
+          paginationElement.classList.add('hidden');
+          return;
+        }
+
+        paginationElement.classList.remove('hidden');
+        pageInfo.textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+        prevButton.disabled = pagination.currentPage === 1;
+        nextButton.disabled = pagination.currentPage === pagination.totalPages;
+      }
+
+      setupEventListeners() {
+        // Search and filters
+        document.querySelector('#search-mentors').addEventListener('input', (e) => {
+          this.filters.search = e.target.value;
+          this.currentPage = 1;
+          this.loadMentors();
+        });
+
+        document.querySelector('#specialization-filter').addEventListener('change', (e) => {
+          this.filters.specialization = e.target.value;
+          this.currentPage = 1;
+          this.loadMentors();
+        });
+
+        document.querySelector('#status-filter').addEventListener('change', (e) => {
+          this.filters.status = e.target.value;
+          this.currentPage = 1;
+          this.loadMentors();
+        });
+
+        document.querySelector('#sort-mentors').addEventListener('change', (e) => {
+          this.filters.sortBy = e.target.value;
+          this.currentPage = 1;
+          this.loadMentors();
+        });
+
+        // Pagination
+        document.querySelector('#prev-page').addEventListener('click', () => {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadMentors();
+          }
+        });
+
+        document.querySelector('#next-page').addEventListener('click', () => {
+          this.currentPage++;
+          this.loadMentors();
+        });
+
+        // Form submissions
+        document.getElementById('addMentorForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleCreateMentor(e.target);
+        });
+
+        document.getElementById('editMentorForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleUpdateMentor(e.target);
+        });
+      }
+
+      async handleCreateMentor(form) {
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          // Set role to mentor
+          data.role = 'mentor';
+          
+          const response = await this.api.createUser(data);
+          if (response.success) {
+            this.showSuccess('Mentor created successfully!');
+            this.closeAddMentorModal();
+            this.loadMentors();
+          } else {
+            this.showError(response.message || 'Failed to create mentor');
+          }
+        } catch (error) {
+          console.error('Failed to create mentor:', error);
+          this.showError('An error occurred while creating the mentor');
+        }
+      }
+
+      async handleUpdateMentor(form) {
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          const mentorId = data.mentorId;
+          delete data.mentorId;
+          
+          const response = await this.api.updateUser(mentorId, data);
+          if (response.success) {
+            this.showSuccess('Mentor updated successfully!');
+            this.closeEditMentorModal();
+            this.loadMentors();
+          } else {
+            this.showError(response.message || 'Failed to update mentor');
+          }
+        } catch (error) {
+          console.error('Failed to update mentor:', error);
+          this.showError('An error occurred while updating the mentor');
+        }
+      }
+
+      // Modal functions
+      openAddMentorModal() {
+        document.getElementById('addMentorModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      closeAddMentorModal() {
+        document.getElementById('addMentorModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('addMentorForm').reset();
+      }
+
+      async editMentor(mentorId) {
+        try {
+          const response = await this.api.getUser(mentorId);
+          if (response.success) {
+            this.mentorToEdit = response.data.user;
+            this.populateEditForm(this.mentorToEdit);
+            document.getElementById('editMentorModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          } else {
+            this.showError('Failed to load mentor data');
+          }
+        } catch (error) {
+          console.error('Failed to load mentor:', error);
+          this.showError('An error occurred while loading mentor data');
+        }
+      }
+
+      populateEditForm(mentor) {
+        document.getElementById('editMentorId').value = mentor.id;
+        document.getElementById('editFirstName').value = mentor.firstName || '';
+        document.getElementById('editLastName').value = mentor.lastName || '';
+        document.getElementById('editEmail').value = mentor.email || '';
+        document.getElementById('editUsername').value = mentor.username || '';
+        document.getElementById('editPrimarySpecialization').value = mentor.primarySpecialization || 'algorithms';
+        document.getElementById('editSecondarySpecialization').value = mentor.secondarySpecialization || '';
+        document.getElementById('editExperienceLevel').value = mentor.experienceLevel || 'beginner';
+        document.getElementById('editMaxStudents').value = mentor.maxStudents || 20;
+        document.getElementById('editStatus').value = mentor.status || 'active';
+        document.getElementById('editBio').value = mentor.bio || '';
+        document.getElementById('editQualifications').value = mentor.qualifications || '';
+      }
+
+      closeEditMentorModal() {
+        document.getElementById('editMentorModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        this.mentorToEdit = null;
+      }
+
+      deleteMentor(mentorId, mentorName) {
+        document.getElementById('deleteMentorName').textContent = mentorName;
+        document.getElementById('deleteMentorModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        this.mentorToDelete = mentorId;
+      }
+
+      closeDeleteMentorModal() {
+        document.getElementById('deleteMentorModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        this.mentorToDelete = null;
+      }
+
+      async confirmDeleteMentor() {
+        if (!this.mentorToDelete) return;
+
+        try {
+          const response = await this.api.deleteUser(this.mentorToDelete);
+          if (response.success) {
+            this.showSuccess('Mentor deleted successfully!');
+            this.closeDeleteMentorModal();
+            this.loadMentors();
+          } else {
+            this.showError(response.message || 'Failed to delete mentor');
+          }
+        } catch (error) {
+          console.error('Failed to delete mentor:', error);
+          this.showError('An error occurred while deleting the mentor');
+        }
+      }
+
+      viewMentorProfile(mentorId) {
+        // Redirect to mentor profile page
+        window.location.href = `admin-mentor-profile.html?id=${mentorId}`;
+      }
+
+      // Utility functions
+      showSuccess(message) {
+        if (this.api.showNotification) {
+          this.api.showNotification(message, 'success');
+        } else {
+          alert(message);
+        }
+      }
+
+      showError(message) {
+        if (this.api.showNotification) {
+          this.api.showNotification(message, 'error');
+        } else {
+          alert(message);
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.adminMentors = new AdminMentors();
+    });
+  </script>
+</body>
+</html>

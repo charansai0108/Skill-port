@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Test - SkillPort</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="test-header">
+            <h1>🔧 SkillPort Integration Test</h1>
+            <p>Testing frontend-backend communication and API endpoints</p>
+        </header>
+
+        <div class="test-grid">
+            <!-- Server Status Test -->
+            <div class="test-card">
+                <h3>🌐 Server Status</h3>
+                <div class="test-content">
+                    <button id="testServerStatus" class="btn btn-primary">Test Server Connection</button>
+                    <div id="serverStatusResult" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Authentication Test -->
+            <div class="test-card">
+                <h3>🔐 Authentication</h3>
+                <div class="test-content">
+                    <div class="auth-form">
+                        <input type="email" id="testEmail" placeholder="Email" class="form-input">
+                        <input type="password" id="testPassword" placeholder="Password" class="form-input">
+                        <button id="testLogin" class="btn btn-primary">Test Login</button>
+                        <button id="testRegister" class="btn btn-secondary">Test Register</button>
+                    </div>
+                    <div id="authResult" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- API Endpoints Test -->
+            <div class="test-card">
+                <h3>📡 API Endpoints</h3>
+                <div class="test-content">
+                    <button id="testAuthEndpoints" class="btn btn-primary">Test Auth APIs</button>
+                    <button id="testUserEndpoints" class="btn btn-primary">Test User APIs</button>
+                    <button id="testCommunityEndpoints" class="btn btn-primary">Test Community APIs</button>
+                    <button id="testContestEndpoints" class="btn btn-primary">Test Contest APIs</button>
+                    <div id="apiResult" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Notification System Test -->
+            <div class="test-card">
+                <h3>🔔 Notifications</h3>
+                <div class="test-content">
+                    <button id="testNotification" class="btn btn-primary">Test Notification</button>
+                    <button id="testToast" class="btn btn-secondary">Test Toast</button>
+                    <div id="notificationResult" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Database Test -->
+            <div class="test-card">
+                <h3>🗄️ Database</h3>
+                <div class="test-content">
+                    <button id="testDatabase" class="btn btn-primary">Test MongoDB Connection</button>
+                    <div id="databaseResult" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Performance Test -->
+            <div class="test-card">
+                <h3>⚡ Performance</h3>
+                <div class="test-content">
+                    <button id="testPerformance" class="btn btn-primary">Test API Response Time</button>
+                    <div id="performanceResult" class="test-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results Summary -->
+        <div class="test-summary">
+            <h3>📊 Test Results Summary</h3>
+            <div id="testSummary" class="summary-content">
+                <div class="summary-item">
+                    <span class="summary-label">Server Status:</span>
+                    <span id="serverSummary" class="summary-value pending">Pending</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Authentication:</span>
+                    <span id="authSummary" class="summary-value pending">Pending</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">API Endpoints:</span>
+                    <span id="apiSummary" class="summary-value pending">Pending</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Notifications:</span>
+                    <span id="notificationSummary" class="summary-value pending">Pending</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Database:</span>
+                    <span id="databaseSummary" class="summary-value pending">Pending</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Performance:</span>
+                    <span id="performanceSummary" class="summary-value pending">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Run All Tests Button -->
+        <div class="test-actions">
+            <button id="runAllTests" class="btn btn-primary btn-large">🚀 Run All Tests</button>
+            <button id="clearResults" class="btn btn-secondary">🗑️ Clear Results</button>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alert-container" class="alert-container"></div>
+
+    <script src="js/core.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        // Test Results Storage
+        const testResults = {
+            server: { status: 'pending', message: '', timestamp: null },
+            auth: { status: 'pending', message: '', timestamp: null },
+            api: { status: 'pending', message: '', timestamp: null },
+            notification: { status: 'pending', message: '', timestamp: null },
+            database: { status: 'pending', message: '', timestamp: null },
+            performance: { status: 'pending', message: '', timestamp: null }
+        };
+
+        // Update summary display
+        function updateSummary() {
+            Object.keys(testResults).forEach(key => {
+                const summaryElement = document.getElementById(`${key}Summary`);
+                if (summaryElement) {
+                    summaryElement.className = `summary-value ${testResults[key].status}`;
+                    summaryElement.textContent = testResults[key].status.charAt(0).toUpperCase() + testResults[key].status.slice(1);
+                }
+            });
+        }
+
+        // Test Server Status
+        document.getElementById('testServerStatus').addEventListener('click', async () => {
+            const resultElement = document.getElementById('serverStatusResult');
+            resultElement.innerHTML = '<div class="loading">Testing server connection...</div>';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/health');
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    testResults.server = {
+                        status: 'success',
+                        message: `Server is running! Response time: ${responseTime}ms`,
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="success">
+                            ✅ Server is running<br>
+                            Response time: ${responseTime}ms<br>
+                            Environment: ${data.environment}<br>
+                            Uptime: ${Math.floor(data.uptime)}s
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.server = {
+                    status: 'error',
+                    message: `Server connection failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ Server connection failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Test Authentication
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const resultElement = document.getElementById('authResult');
+            
+            if (!email || !password) {
+                resultElement.innerHTML = '<div class="error">Please enter email and password</div>';
+                return;
+            }
+            
+            resultElement.innerHTML = '<div class="loading">Testing login...</div>';
+            
+            try {
+                const response = await skillPort.login(email, password);
+                testResults.auth = {
+                    status: 'success',
+                    message: 'Login successful',
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="success">
+                        ✅ Login successful<br>
+                        Welcome, ${response.user.firstName}!
+                    </div>
+                `;
+            } catch (error) {
+                testResults.auth = {
+                    status: 'error',
+                    message: `Login failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ Login failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Test API Endpoints
+        document.getElementById('testAuthEndpoints').addEventListener('click', async () => {
+            const resultElement = document.getElementById('apiResult');
+            resultElement.innerHTML = '<div class="loading">Testing auth endpoints...</div>';
+            
+            try {
+                const endpoints = [
+                    { name: 'Health Check', url: '/health', method: 'GET' },
+                    { name: 'Auth Status', url: '/api/auth/status', method: 'GET' }
+                ];
+                
+                let successCount = 0;
+                let totalCount = endpoints.length;
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint.url, { method: endpoint.method });
+                        if (response.ok || response.status === 401) { // 401 is expected for unauthenticated
+                            successCount++;
+                        }
+                    } catch (error) {
+                        console.error(`Endpoint ${endpoint.name} failed:`, error);
+                    }
+                }
+                
+                if (successCount === totalCount) {
+                    testResults.api = {
+                        status: 'success',
+                        message: `All auth endpoints working (${successCount}/${totalCount})`,
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="success">
+                            ✅ Auth endpoints working<br>
+                            Success: ${successCount}/${totalCount}
+                        </div>
+                    `;
+                } else {
+                    testResults.api = {
+                        status: 'partial',
+                        message: `Some auth endpoints failed (${successCount}/${totalCount})`,
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="warning">
+                            ⚠️ Some auth endpoints failed<br>
+                            Success: ${successCount}/${totalCount}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                testResults.api = {
+                    status: 'error',
+                    message: `API test failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ API test failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Test Notifications
+        document.getElementById('testNotification').addEventListener('click', () => {
+            const resultElement = document.getElementById('notificationResult');
+            
+            try {
+                if (notificationSystem) {
+                    notificationSystem.showNotification('Test Notification', 'This is a test notification from the integration test page', 'info');
+                    testResults.notification = {
+                        status: 'success',
+                        message: 'Notification system working',
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="success">
+                            ✅ Notification sent successfully
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Notification system not initialized');
+                }
+            } catch (error) {
+                testResults.notification = {
+                    status: 'error',
+                    message: `Notification test failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ Notification test failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Test Database Connection
+        document.getElementById('testDatabase').addEventListener('click', async () => {
+            const resultElement = document.getElementById('databaseResult');
+            resultElement.innerHTML = '<div class="loading">Testing database connection...</div>';
+            
+            try {
+                // Test by trying to access a public endpoint that requires database
+                const response = await fetch('/api/communities?limit=1');
+                
+                if (response.ok) {
+                    testResults.database = {
+                        status: 'success',
+                        message: 'Database connection successful',
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="success">
+                            ✅ Database connection successful<br>
+                            Communities endpoint working
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                testResults.database = {
+                    status: 'error',
+                    message: `Database test failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ Database test failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Test Performance
+        document.getElementById('testPerformance').addEventListener('click', async () => {
+            const resultElement = document.getElementById('performanceResult');
+            resultElement.innerHTML = '<div class="loading">Testing API performance...</div>';
+            
+            try {
+                const endpoints = ['/health', '/api/communities?limit=1'];
+                const responseTimes = [];
+                
+                for (const endpoint of endpoints) {
+                    const startTime = Date.now();
+                    const response = await fetch(endpoint);
+                    const endTime = Date.now();
+                    
+                    if (response.ok) {
+                        responseTimes.push(endTime - startTime);
+                    }
+                }
+                
+                const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+                
+                if (avgResponseTime < 1000) {
+                    testResults.performance = {
+                        status: 'success',
+                        message: `Average response time: ${Math.round(avgResponseTime)}ms`,
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="success">
+                            ✅ Performance test passed<br>
+                            Average response time: ${Math.round(avgResponseTime)}ms<br>
+                            All endpoints responded quickly
+                        </div>
+                    `;
+                } else {
+                    testResults.performance = {
+                        status: 'warning',
+                        message: `Slow response time: ${Math.round(avgResponseTime)}ms`,
+                        timestamp: new Date().toISOString()
+                    };
+                    resultElement.innerHTML = `
+                        <div class="warning">
+                            ⚠️ Performance test warning<br>
+                            Average response time: ${Math.round(avgResponseTime)}ms<br>
+                            Consider optimization
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                testResults.performance = {
+                    status: 'error',
+                    message: `Performance test failed: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                };
+                resultElement.innerHTML = `
+                    <div class="error">
+                        ❌ Performance test failed<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+            
+            updateSummary();
+        });
+
+        // Run All Tests
+        document.getElementById('runAllTests').addEventListener('click', async () => {
+            const buttons = document.querySelectorAll('.test-card button');
+            buttons.forEach(btn => btn.click());
+            
+            // Wait for all tests to complete
+            setTimeout(() => {
+                const allPassed = Object.values(testResults).every(result => result.status === 'success');
+                if (allPassed) {
+                    skillPort.showAlert('🎉 All tests passed! Integration is working perfectly!', 'success');
+                } else {
+                    const failedTests = Object.values(testResults).filter(result => result.status === 'error').length;
+                    skillPort.showAlert(`⚠️ ${failedTests} test(s) failed. Check results for details.`, 'warning');
+                }
+            }, 5000);
+        });
+
+        // Clear Results
+        document.getElementById('clearResults').addEventListener('click', () => {
+            document.querySelectorAll('.test-result').forEach(el => el.innerHTML = '');
+            Object.keys(testResults).forEach(key => {
+                testResults[key] = { status: 'pending', message: '', timestamp: null };
+            });
+            updateSummary();
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSummary();
+            skillPort.showAlert('🔧 Integration test page loaded. Click "Run All Tests" to start testing!', 'info');
+        });
+    </script>
+
+    <style>
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--radius-lg);
+        }
+
+        .test-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+        }
+
+        .test-header p {
+            margin: 0;
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .test-card h3 {
+            margin: 0 0 1rem 0;
+            color: var(--gray-900);
+            font-size: 1.25rem;
+        }
+
+        .test-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+        }
+
+        .test-result {
+            min-height: 60px;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .loading {
+            background-color: var(--gray-100);
+            color: var(--gray-600);
+            text-align: center;
+            font-style: italic;
+        }
+
+        .success {
+            background-color: var(--success-light);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .error {
+            background-color: var(--error-light);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .warning {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+        }
+
+        .test-summary {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .test-summary h3 {
+            margin: 0 0 1rem 0;
+            color: var(--gray-900);
+            font-size: 1.25rem;
+        }
+
+        .summary-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .summary-label {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+
+        .summary-value.pending {
+            background-color: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .summary-value.success {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .summary-value.error {
+            background-color: var(--error-light);
+            color: var(--error-color);
+        }
+
+        .summary-value.warning {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .test-actions {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

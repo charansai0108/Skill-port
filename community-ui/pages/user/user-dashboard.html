@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillPort Community User Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link href="../css/components.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            SkillPort
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="user-tasks.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="target" class="w-4 h-4"></i> Tasks
+          </a>
+          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Mentor Feedback
+          </a>
+          <a href="certificates.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="award" class="w-4 h-4"></i> Certificates
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">Welcome back, <span id="user-name">-</span>!</h1>
+      <p class="text-lg text-slate-600">Track your progress and participate in community contests.</p>
+    </div>
+
+    <!-- User Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="stat-card">
+        <div class="stat-card-icon bg-blue-100 text-blue-600">
+          <i data-lucide="target" class="w-6 h-6"></i>
+        </div>
+        <div class="stat-card-value" id="total-score">-</div>
+        <div class="stat-card-label">Total Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon bg-green-100 text-green-600">
+          <i data-lucide="check-circle" class="w-6 h-6"></i>
+        </div>
+        <div class="stat-card-value" id="problems-solved">-</div>
+        <div class="stat-card-label">Problems Solved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon bg-amber-100 text-amber-600">
+          <i data-lucide="trophy" class="w-6 h-6"></i>
+        </div>
+        <div class="stat-card-value" id="contests-won">-</div>
+        <div class="stat-card-label">Contests Won</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon bg-purple-100 text-purple-600">
+          <i data-lucide="trending-up" class="w-6 h-6"></i>
+        </div>
+        <div class="stat-card-value" id="accuracy">-</div>
+        <div class="stat-card-label">Accuracy</div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-12">
+      <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+      <p class="text-slate-600">Loading your dashboard...</p>
+    </div>
+
+    <!-- Dashboard Content (hidden until loaded) -->
+    <div id="dashboard-content" class="hidden">
+      <!-- Current Progress & Active Contests -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Current Progress -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Current Progress</h2>
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-slate-700">Contest #1</span>
+              <span class="text-sm text-slate-500">7/10 problems</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+              <div class="h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style="width: 70%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-slate-700">Contest #2</span>
+              <span class="text-sm text-slate-500">5/8 problems</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+              <div class="h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full" style="width: 62%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-slate-700">Weekly Tasks</span>
+              <span class="text-sm text-slate-500">8/12 completed</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+              <div class="h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full" style="width: 67%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Contests -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Active Contests</h2>
+        <div class="space-y-4">
+          <div class="border border-slate-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold text-slate-900">Contest #1</h3>
+              <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-3">Data Structures & Algorithms</p>
+            <div class="flex items-center justify-between text-sm mb-3">
+              <span class="text-slate-500">Ends in 2 days</span>
+              <span class="text-slate-500">Rank: #3</span>
+            </div>
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+              Continue Contest
+            </button>
+          </div>
+          <div class="border border-slate-200 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold text-slate-900">Contest #2</h3>
+              <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-3">Core Java Programming</p>
+            <div class="flex items-center justify-between text-sm mb-3">
+              <span class="text-slate-500">Ends in 5 days</span>
+              <span class="text-slate-500">Rank: #7</span>
+            </div>
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+              Continue Contest
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity & Leaderboard -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">Solved "Problem #1" problem</p>
+              <p class="text-xs text-slate-500">2 hours ago • Contest #1</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <i data-lucide="target" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">Completed weekly task</p>
+              <p class="text-xs text-slate-500">4 hours ago • Java Basics</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+              <i data-lucide="trophy" class="w-4 h-4 text-amber-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">Won C++ Contest</p>
+              <p class="text-xs text-slate-500">1 day ago • 1st Place</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-4 h-4 text-purple-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">Improved ranking</p>
+              <p class="text-xs text-slate-500">2 days ago • Moved to #3</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Preview -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Leaderboard</h2>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+              1
+            </div>
+            <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+              A
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">Student #1</p>
+              <p class="text-xs text-slate-500">892 points</p>
+            </div>
+            <div class="text-sm font-semibold text-green-600">+15%</div>
+          </div>
+          <div class="text-center py-4">
+            <p class="text-sm text-slate-500">No leaderboard data available</p>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View Full Leaderboard</a>
+        </div>
+      </div>
+    </div>
+    </div> <!-- End of dashboard-content -->
+
+    <!-- Available Tasks & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Available Tasks -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Available Tasks</h2>
+        <div class="text-center py-8">
+          <i data-lucide="clipboard-list" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+          <p class="text-sm text-slate-500">No tasks available</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <a href="#" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-4 rounded-lg text-center group cursor-pointer">
+            <i data-lucide="trophy" class="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-semibold mb-1">Join Contest</h3>
+            <p class="text-xs opacity-90">Participate in active contests</p>
+          </a>
+          <a href="#" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white p-4 rounded-lg text-center group cursor-pointer">
+            <i data-lucide="target" class="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-semibold mb-1">View Tasks</h3>
+            <p class="text-xs opacity-90">Browse available tasks</p>
+          </a>
+          <a href="#" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white p-4 rounded-lg text-center group cursor-pointer">
+            <i data-lucide="bar-chart-3" class="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-semibold mb-1">My Progress</h3>
+            <p class="text-xs opacity-90">Track your performance</p>
+          </a>
+          <a href="#" class="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white p-4 rounded-lg text-center group cursor-pointer">
+            <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform"></i>
+            <h3 class="font-semibold mb-1">Community</h3>
+            <p class="text-xs opacity-90">Connect with others</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load API and App scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script src="../js/breadcrumbs.js"></script>
+
+  <script>
+    lucide.createIcons();
+    
+    // User Dashboard Controller
+    class UserDashboard {
+      constructor() {
+        this.api = window.SkillPortAPI;
+        this.userData = null;
+        this.stats = null;
+        this.activeContests = [];
+        this.recentActivity = [];
+        this.leaderboard = [];
+        this.availableTasks = [];
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Check if user is authenticated
+          if (!this.api.isAuthenticated()) {
+            window.location.href = '/index.html';
+            return;
+          }
+
+          // Load dashboard data
+          await this.loadUserData();
+          await this.loadDashboardStats();
+          await this.loadActiveContests();
+          await this.loadRecentActivity();
+          await this.loadLeaderboard();
+          await this.loadAvailableTasks();
+          
+          // Show dashboard content
+          this.showDashboard();
+          
+        } catch (error) {
+          console.error('Dashboard initialization failed:', error);
+          this.showError('Failed to initialize dashboard');
+        }
+      }
+
+      async loadUserData() {
+        try {
+          const response = await this.api.getCurrentUser();
+          if (response.success) {
+            this.userData = response.data.user;
+            this.updateUserInfo();
+          }
+        } catch (error) {
+          console.error('Failed to load user data:', error);
+        }
+      }
+
+      async loadDashboardStats() {
+        try {
+          const response = await this.api.getUserStats();
+          if (response.success) {
+            this.stats = response.data.stats;
+            this.updateStats();
+          }
+        } catch (error) {
+          console.error('Failed to load user stats:', error);
+        }
+      }
+
+      async loadActiveContests() {
+        try {
+          const response = await this.api.getUserActiveContests();
+          if (response.success) {
+            this.activeContests = response.data.contests;
+            this.updateActiveContests();
+          }
+        } catch (error) {
+          console.error('Failed to load active contests:', error);
+        }
+      }
+
+      async loadRecentActivity() {
+        try {
+          const response = await this.api.getUserRecentActivity();
+          if (response.success) {
+            this.recentActivity = response.data.activities;
+            this.updateRecentActivity();
+          }
+        } catch (error) {
+          console.error('Failed to load recent activity:', error);
+        }
+      }
+
+      async loadLeaderboard() {
+        try {
+          const response = await this.api.getUserLeaderboard();
+          if (response.success) {
+            this.leaderboard = response.data.leaderboard;
+            this.updateLeaderboard();
+          }
+        } catch (error) {
+          console.error('Failed to load leaderboard:', error);
+        }
+      }
+
+      async loadAvailableTasks() {
+        try {
+          const response = await this.api.getAvailableTasks();
+          if (response.success) {
+            this.availableTasks = response.data.tasks;
+            this.updateAvailableTasks();
+          }
+        } catch (error) {
+          console.error('Failed to load available tasks:', error);
+        }
+      }
+
+      updateUserInfo() {
+        if (!this.userData) return;
+        
+        const nameElement = document.getElementById('user-name');
+        if (nameElement) {
+          nameElement.textContent = this.userData.firstName || this.userData.name || 'User';
+        }
+      }
+
+      updateStats() {
+        if (!this.stats) return;
+
+        if (this.stats.totalScore !== undefined) {
+          document.getElementById('total-score').textContent = this.stats.totalScore.toLocaleString();
+        }
+        if (this.stats.problemsSolved !== undefined) {
+          document.getElementById('problems-solved').textContent = this.stats.problemsSolved.toLocaleString();
+        }
+        if (this.stats.contestsWon !== undefined) {
+          document.getElementById('contests-won').textContent = this.stats.contestsWon.toLocaleString();
+        }
+        if (this.stats.accuracy !== undefined) {
+          document.getElementById('accuracy').textContent = `${this.stats.accuracy}%`;
+        }
+      }
+
+      updateActiveContests() {
+        // TODO: Implement dynamic contest display
+        console.log('Active contests:', this.activeContests);
+      }
+
+      updateRecentActivity() {
+        // TODO: Implement dynamic activity display
+        console.log('Recent activity:', this.recentActivity);
+      }
+
+      updateLeaderboard() {
+        // TODO: Implement dynamic leaderboard display
+        console.log('Leaderboard:', this.leaderboard);
+      }
+
+      updateAvailableTasks() {
+        // TODO: Implement dynamic tasks display
+        console.log('Available tasks:', this.availableTasks);
+      }
+
+      showDashboard() {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('dashboard-content').classList.remove('hidden');
+      }
+
+      showError(message) {
+        console.error(message);
+        // TODO: Implement proper error display
+      }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.userDashboard = new UserDashboard();
+    });
+  </script>
+</body>
+</html>

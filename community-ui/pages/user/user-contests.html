@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Contests - SkillPort Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            SkillPort
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="user-tasks.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="target" class="w-4 h-4"></i> Tasks
+          </a>
+          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Mentor Feedback
+          </a>
+          <a href="certificates.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="award" class="w-4 h-4"></i> Certificates
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">My Contests</h1>
+      <p class="text-lg text-slate-600">Participate in your assigned contests and track your performance.</p>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-12">
+      <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+      <p class="text-slate-600">Loading your contest data...</p>
+    </div>
+
+    <!-- Contests Content (hidden until loaded) -->
+    <div id="contests-content" class="hidden">
+      <!-- Contest Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+          <i data-lucide="trophy" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
+          <div class="text-2xl font-bold text-amber-600" id="active-contests">-</div>
+          <div class="text-sm text-slate-600">Active Contests</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+          <i data-lucide="check-circle" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+          <div class="text-2xl font-bold text-green-600" id="problems-solved">-</div>
+          <div class="text-sm text-slate-600">Problems Solved</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+          <i data-lucide="target" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+          <div class="text-2xl font-bold text-blue-600" id="success-rate">-</div>
+          <div class="text-sm text-slate-600">Success Rate</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+          <i data-lucide="medal" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
+          <div class="text-2xl font-bold text-purple-600" id="total-points">-</div>
+          <div class="text-sm text-slate-600">Total Points</div>
+        </div>
+      </div>
+
+    <!-- My Assigned Contests -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">My Assigned Contests</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Active Contest 1 -->
+        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Contest #1</h3>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
+          </div>
+          <div class="space-y-2 text-sm text-slate-600 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span>Ends: Dec 25, 2024</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+              <span>2 days remaining</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>5 problems • 3 solved</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <a href="contest-participation.html" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 text-center">
+              Continue
+            </a>
+            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Contest 2 -->
+        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Contest #2</h3>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
+          </div>
+          <div class="space-y-2 text-sm text-slate-600 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span>Ends: Dec 28, 2024</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+              <span>5 days remaining</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>8 problems • 6 solved</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700">
+              Continue
+            </button>
+            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Contest 3 -->
+        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Contest #3</h3>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
+          </div>
+          <div class="space-y-2 text-sm text-slate-600 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span>Ends: Dec 30, 2024</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+              <span>7 days remaining</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>6 problems • 3 solved</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700">
+              Continue
+            </button>
+            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Demo Contest -->
+        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Winter Coding Challenge 2024</h3>
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">Demo</span>
+          </div>
+          <div class="space-y-2 text-sm text-slate-600 mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span>Dec 20-25, 2024</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>156 participants</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>8 problems • 1000 points</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <a href="contest-demo.html" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 text-center">
+              View Demo
+            </a>
+            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
+              <i data-lucide="info" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contest Leaderboards -->
+    <div class="space-y-8">
+              <!-- Contest #1 Leaderboard -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-slate-900">Contest #1 - Leaderboard</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">Your Rank:</span>
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm font-semibold">#3</span>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">RANK</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NAME</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PROBLEMS SOLVED</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">FLAGGED QUESTIONS</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SCORE</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+              <tr class="bg-amber-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">P</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Priya Sharma</div>
+                      <div class="text-sm text-slate-500">@priyasharma</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">5/5</div>
+                  <div class="text-sm text-slate-500">100%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">2</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-amber-600">850</div>
+                </td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-slate-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-slate-400 to-gray-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">R</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Student #1</div>
+                      <div class="text-sm text-slate-500">@rahulkumar</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">5/5</div>
+                  <div class="text-sm text-slate-500">100%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">1</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-slate-600">820</div>
+                </td>
+              </tr>
+              <tr class="bg-blue-50 border-2 border-blue-200">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">A</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Student #2</div>
+                      <div class="text-sm text-slate-500">@student2</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">3/5</div>
+                  <div class="text-sm text-slate-500">60%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">0</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-blue-600">780</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 font-bold">4</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">N</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Student #3</div>
+                      <div class="text-sm text-slate-500">@student3</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">2/5</div>
+                  <div class="text-sm text-slate-500">40%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">1</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-slate-600">650</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+              <!-- Contest #2 Leaderboard -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-slate-900">Contest #2 - Leaderboard</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">Your Rank:</span>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-semibold">#1</span>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">RANK</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NAME</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PROBLEMS SOLVED</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">FLAGGED QUESTIONS</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SCORE</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+              <tr class="bg-green-50 border-2 border-green-200">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">A</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Student #2</div>
+                      <div class="text-sm text-slate-500">@student2</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">6/8</div>
+                  <div class="text-sm text-slate-500">75%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">0</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-green-600">920</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-slate-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">S</div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900">Suresh Kumar</div>
+                      <div class="text-sm text-slate-500">@sureshkumar</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-slate-900">5/8</div>
+                  <div class="text-sm text-slate-500">62.5%</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">1</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-slate-600">850</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    </div> <!-- End of contests-content -->
+  </main>
+
+  <!-- Load API and App scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+
+  <script>
+    lucide.createIcons();
+    
+    // User Contests Controller
+    class UserContests {
+      constructor() {
+        this.api = window.SkillPortAPI;
+        this.contestStats = null;
+        this.assignedContests = [];
+        this.contestLeaderboards = {};
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Check if user is authenticated
+          if (!this.api.isAuthenticated()) {
+            window.location.href = '/index.html';
+            return;
+          }
+
+          // Load contest data
+          await this.loadContestStats();
+          await this.loadAssignedContests();
+          await this.loadContestLeaderboards();
+          
+        } catch (error) {
+          console.error('User contests initialization failed:', error);
+          this.showError('Failed to initialize contests page');
+        }
+      }
+
+      async loadContestStats() {
+        try {
+          const response = await this.api.getUserContestStats();
+          if (response.success) {
+            this.contestStats = response.data.stats;
+            this.updateContestStats();
+          }
+        } catch (error) {
+          console.error('Failed to load contest stats:', error);
+        }
+      }
+
+      async loadAssignedContests() {
+        try {
+          const response = await this.api.getUserAssignedContests();
+          if (response.success) {
+            this.assignedContests = response.data.contests;
+            this.displayAssignedContests();
+          }
+        } catch (error) {
+          console.error('Failed to load assigned contests:', error);
+        }
+      }
+
+      async loadContestLeaderboards() {
+        try {
+          const response = await this.api.getUserContestLeaderboards();
+          if (response.success) {
+            this.contestLeaderboards = response.data.leaderboards;
+            this.displayContestLeaderboards();
+          }
+        } catch (error) {
+          console.error('Failed to load contest leaderboards:', error);
+        }
+      }
+
+      updateContestStats() {
+        if (!this.contestStats) return;
+
+        if (this.contestStats.activeContests !== undefined) {
+          document.getElementById('active-contests').textContent = this.contestStats.activeContests.toLocaleString();
+        }
+        if (this.contestStats.problemsSolved !== undefined) {
+          document.getElementById('problems-solved').textContent = this.contestStats.problemsSolved.toLocaleString();
+        }
+        if (this.contestStats.successRate !== undefined) {
+          document.getElementById('success-rate').textContent = `${this.contestStats.successRate}%`;
+        }
+        if (this.contestStats.totalPoints !== undefined) {
+          document.getElementById('total-points').textContent = this.contestStats.totalPoints.toLocaleString();
+        }
+      }
+
+      displayAssignedContests() {
+        const contestsGrid = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
+        if (!contestsGrid) return;
+
+        if (!this.assignedContests.length) {
+          contestsGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <i data-lucide="trophy" class="w-16 h-16 mx-auto mb-4 text-slate-400"></i>
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">No contests assigned</h3>
+              <p class="text-slate-600">You don't have any contests assigned to you yet</p>
+            </div>
+          `;
+          return;
+        }
+
+        contestsGrid.innerHTML = this.assignedContests.map(contest => `
+          <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-slate-900">${contest.name}</h3>
+              <span class="bg-${this.getContestStatusColor(contest.status)}-100 text-${this.getContestStatusColor(contest.status)}-700 px-2 py-1 rounded text-sm">${contest.status}</span>
+            </div>
+            <div class="space-y-2 text-sm text-slate-600 mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>Ends: ${new Date(contest.endDate).toLocaleDateString()}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span>${this.getTimeRemaining(contest.endDate)}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4"></i>
+                <span>${contest.totalProblems} problems • ${contest.solvedProblems || 0} solved</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <a href="code-editor.html?contest=${contest.id}" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors">
+                ${contest.status === 'Active' ? 'Continue Contest' : 'View Contest'}
+              </a>
+              <button onclick="userContests.viewLeaderboard('${contest.id}')" class="p-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        lucide.createIcons();
+      }
+
+      displayContestLeaderboards() {
+        // TODO: Implement dynamic leaderboard display
+        console.log('Contest leaderboards:', this.contestLeaderboards);
+      }
+
+      getContestStatusColor(status) {
+        const colors = {
+          'Active': 'green',
+          'Upcoming': 'blue',
+          'Completed': 'gray',
+          'Paused': 'yellow'
+        };
+        return colors[status] || 'gray';
+      }
+
+      getTimeRemaining(endDate) {
+        const now = new Date();
+        const end = new Date(endDate);
+        const diffTime = end - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return 'Ended';
+        if (diffDays === 0) return 'Ends today';
+        if (diffDays === 1) return '1 day remaining';
+        return `${diffDays} days remaining`;
+      }
+
+      viewLeaderboard(contestId) {
+        // TODO: Implement leaderboard view
+        console.log('Viewing leaderboard for contest:', contestId);
+      }
+
+      showContestsContent() {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('contests-content').classList.remove('hidden');
+      }
+
+      showError(message) {
+        console.error(message);
+        // TODO: Implement proper error display
+      }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.userContests = new UserContests();
+    });
+  </script>
+</body>
+</html> 

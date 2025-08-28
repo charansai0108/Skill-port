@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - SkillPort Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Josefin Sans', sans-serif; }
+    
+    .admin-dashboard {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #dbeafe 100%);
+      min-height: 100vh;
+    }
+    
+    .admin-navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-nav-container {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4rem;
+    }
+    
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #dc2626 0%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .admin-nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .admin-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s ease-in-out;
+    }
+    
+    .admin-nav-link.active {
+      background: rgba(254, 226, 226, 1);
+      color: #dc2626;
+    }
+    
+    .admin-nav-link:not(.active) {
+      color: #475569;
+    }
+    
+    .admin-nav-link:not(.active):hover {
+      color: #1e293b;
+      background: rgba(248, 250, 252, 1);
+    }
+    
+    .admin-main {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+      padding-top: 2.5rem;
+      padding-bottom: 2.5rem;
+    }
+    
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .admin-stat-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .admin-stat-icon {
+      width: 2rem;
+      height: 2rem;
+      margin: 0 auto 0.5rem;
+    }
+    
+    .admin-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .admin-stat-label {
+      font-size: 0.875rem;
+      color: #475569;
+    }
+    
+    .admin-stat-growth {
+      font-size: 0.75rem;
+      color: #059669;
+      margin-top: 0.25rem;
+    }
+    
+    .admin-content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .admin-content-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+    }
+    
+    .admin-content-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 1rem;
+    }
+    
+    .admin-header {
+      margin-bottom: 2rem;
+    }
+    
+    .admin-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .admin-subtitle {
+      font-size: 1.125rem;
+      color: #475569;
+    }
+    
+    .admin-brand-icon {
+      width: 2rem;
+      height: 2rem;
+      background: linear-gradient(135deg, #dc2626 0%, #ec4899 100%);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="admin-dashboard">
+  <!-- Navbar -->
+  <nav class="admin-navbar sticky top-0 z-50">
+    <div class="admin-nav-container">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">
+          <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+        </div>
+        <span>Community Admin</span>
+      </div>
+      <div class="admin-nav-menu">
+          <a href="admin-dashboard.html" class="admin-nav-link active">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="admin-users.html" class="admin-nav-link">
+            <i data-lucide="users" class="w-4 h-4"></i> Users
+          </a>
+          <a href="admin-mentors.html" class="admin-nav-link">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
+          </a>
+          <a href="admin-contests.html" class="admin-nav-link">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="admin-analytics.html" class="admin-nav-link">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+          </a>
+          <a href="admin-leaderboard.html" class="admin-nav-link">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="admin-settings.html" class="admin-nav-link">
+            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          </a>
+          <button onclick="logout()" class="admin-nav-link">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 class="admin-title">Admin Dashboard</h1>
+      <p class="admin-subtitle">Manage the entire SkillPort Community platform, users, mentors, and contests.</p>
+    </div>
+
+    <!-- System Stats Cards -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <i data-lucide="users" class="admin-stat-icon text-blue-600"></i>
+        <div class="admin-stat-value text-blue-600" id="total-users">-</div>
+        <div class="admin-stat-label">Total Users</div>
+        <div class="admin-stat-growth" id="users-growth">Loading...</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="graduation-cap" class="admin-stat-icon text-green-600"></i>
+        <div class="admin-stat-value text-green-600" id="active-mentors">-</div>
+        <div class="admin-stat-label">Active Mentors</div>
+        <div class="admin-stat-growth" id="mentors-growth">Loading...</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="trophy" class="admin-stat-icon text-amber-600"></i>
+        <div class="admin-stat-value text-amber-600" id="active-contests">-</div>
+        <div class="admin-stat-label">Active Contests</div>
+        <div class="admin-stat-growth" id="contests-growth">Loading...</div>
+      </div>
+      <div class="admin-stat-card">
+        <i data-lucide="target" class="admin-stat-icon text-purple-600"></i>
+        <div class="admin-stat-value text-purple-600" id="problems-solved">-</div>
+        <div class="admin-stat-label">Problems Solved</div>
+        <div class="admin-stat-growth" id="problems-growth">Loading...</div>
+      </div>
+    </div>
+
+    <!-- System Overview & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- System Overview -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">System Overview</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i>
+              <span class="text-sm font-medium text-slate-900">System Status</span>
+            </div>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs" id="system-status">Checking...</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="server" class="w-5 h-5 text-green-600"></i>
+              <span class="text-sm font-medium text-slate-900">Server Load</span>
+            </div>
+            <span class="text-sm text-slate-600" id="server-load">-</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="database" class="w-5 h-5 text-amber-600"></i>
+              <span class="text-sm font-medium text-slate-900">Database</span>
+            </div>
+            <span class="text-sm text-slate-600" id="database-status">-</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="clock" class="w-5 h-5 text-purple-600"></i>
+              <span class="text-sm font-medium text-slate-900">Uptime</span>
+            </div>
+            <span class="text-sm text-slate-600" id="uptime">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+        <div class="space-y-4" id="recent-activity">
+          <div class="text-center py-8">
+            <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
+            <p class="text-sm text-slate-500">Loading recent activity...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <a href="admin-users.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="user-plus" class="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Add New User</h3>
+          <p class="text-sm text-slate-600">Create user account with credentials</p>
+        </a>
+        <a href="admin-mentors.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="graduation-cap" class="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Add New Mentor</h3>
+          <p class="text-sm text-slate-600">Create mentor account and assign</p>
+        </a>
+        <a href="admin-contests.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="plus-circle" class="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Create Contest</h3>
+          <p class="text-sm text-slate-600">Set up new contest and assign mentor</p>
+        </a>
+        <a href="admin-analytics.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="bar-chart-3" class="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">View Analytics</h3>
+          <p class="text-sm text-slate-600">System-wide performance reports</p>
+        </a>
+        <a href="admin-leaderboard.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="award" class="w-12 h-12 text-indigo-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
+          <p class="text-sm text-slate-600">Overall system rankings</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Users & Mentors -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <!-- Recent Users -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Recent Users</h2>
+          <a href="admin-users.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+        </div>
+        <div class="space-y-3" id="recent-users">
+          <div class="text-center py-8">
+            <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
+            <p class="text-sm text-slate-500">Loading recent users...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Mentors -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Recent Mentors</h2>
+          <a href="admin-mentors.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+        </div>
+        <div class="space-y-3" id="recent-mentors">
+          <div class="text-center py-8">
+            <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
+            <p class="text-sm text-slate-500">Loading recent mentors...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Load Authentication Utility -->
+  <script src="../../js/auth-utils.js"></script>
+  
+  <script>
+    lucide.createIcons();
+    
+    // Admin Dashboard Controller
+    class AdminDashboard {
+      constructor() {
+        this.init();
+      }
+
+      async init() {
+        try {
+          // Check if user is admin using local storage auth
+          if (!window.SkillPortAuth.isAuthenticated() || !window.SkillPortAuth.isAdmin()) {
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // Load dashboard data
+          await this.loadDashboardData();
+          
+          // Setup real-time updates
+          this.setupRealTimeUpdates();
+          
+        } catch (error) {
+          console.error('Dashboard initialization failed:', error);
+          this.showError('Failed to initialize dashboard');
+        }
+      }
+
+      async loadDashboardData() {
+        try {
+          // Initialize empty dashboard data
+          const emptyStats = {
+            userStats: { total: 0, growth: 0 },
+            roleStats: { mentors: 0, mentorGrowth: 0 },
+            contestStats: { active: 0, growth: 0 },
+            submissionStats: { totalSolved: 0, growth: 0 }
+          };
+          
+          this.updateStats(emptyStats);
+
+          // Initialize empty user lists
+          this.updateRecentUsers([]);
+          this.updateRecentMentors([]);
+          this.updateRecentActivity([]);
+          this.loadSystemStatus();
+
+        } catch (error) {
+          console.error('Failed to load dashboard data:', error);
+          this.showError('Failed to load dashboard data');
+        }
+      }
+
+      updateStats(data) {
+        // Update statistics cards
+        const elements = {
+          totalUsers: document.querySelector('#total-users'),
+          activeMentors: document.querySelector('#active-mentors'),
+          activeContests: document.querySelector('#active-contests'),
+          problemsSolved: document.querySelector('#problems-solved')
+        };
+
+        if (elements.totalUsers) {
+          elements.totalUsers.textContent = data.userStats.total || 0;
+          const growth = data.userStats.growth || 0;
+          document.querySelector('#users-growth').textContent = growth >= 0 ? `+${growth} this week` : `${growth} this week`;
+          document.querySelector('#users-growth').className = `text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'} mt-1`;
+        }
+
+        if (elements.activeMentors) {
+          elements.activeMentors.textContent = data.roleStats.mentors || 0;
+          const growth = data.roleStats.mentorGrowth || 0;
+          document.querySelector('#mentors-growth').textContent = growth >= 0 ? `+${growth} this month` : `${growth} this month`;
+          document.querySelector('#mentors-growth').className = `text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'} mt-1`;
+        }
+
+        if (elements.activeContests) {
+          elements.activeContests.textContent = data.contestStats?.active || 0;
+          const growth = data.contestStats?.growth || 0;
+          document.querySelector('#contests-growth').textContent = growth >= 0 ? `+${growth} this month` : `${growth} this month`;
+          document.querySelector('#contests-growth').className = `text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'} mt-1`;
+        }
+
+        if (elements.problemsSolved) {
+          elements.problemsSolved.textContent = data.submissionStats?.totalSolved || 0;
+          const growth = data.submissionStats?.growth || 0;
+          document.querySelector('#problems-growth').textContent = growth >= 0 ? `+${growth} this week` : `${growth} this week`;
+          document.querySelector('#problems-growth').className = `text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'} mt-1`;
+        }
+      }
+
+      updateRecentUsers(users) {
+        const container = document.querySelector('#recent-users');
+        if (!container || !users.length) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">No recent users</p>';
+          return;
+        }
+
+        container.innerHTML = users.map(user => `
+          <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+              ${user.firstName.charAt(0)}
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">${user.firstName} ${user.lastName}</p>
+              <p class="text-xs text-slate-500">${user.email}</p>
+            </div>
+            <span class="text-xs text-slate-500">${this.formatTimeAgo(user.createdAt)}</span>
+          </div>
+        `).join('');
+      }
+
+      updateRecentMentors(mentors) {
+        const container = document.querySelector('#recent-mentors');
+        if (!container || !mentors.length) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">No recent mentors</p>';
+          return;
+        }
+
+        container.innerHTML = mentors.map(mentor => `
+          <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg">
+            <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+              ${mentor.firstName.charAt(0)}
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">${mentor.firstName} ${mentor.lastName}</p>
+              <p class="text-xs text-slate-500">${mentor.skills?.[0]?.name || 'Expert'} • ${mentor.contestPerformance?.problemsSolved || 0} students</p>
+            </div>
+            <span class="text-xs ${mentor.status === 'active' ? 'text-green-600' : 'text-slate-500'}">${mentor.status}</span>
+          </div>
+        `).join('');
+      }
+
+      loadRecentActivity() {
+        try {
+          // Initialize empty activity list
+          this.updateRecentActivity([]);
+        } catch (error) {
+          console.error('Failed to load recent activity:', error);
+          // Show default activity message
+          document.querySelector('#recent-activity').innerHTML = `
+            <div class="text-center py-4">
+              <p class="text-sm text-slate-500">No recent activity</p>
+            </div>
+          `;
+        }
+      }
+
+      updateRecentActivity(activities) {
+        const container = document.querySelector('#recent-activity');
+        if (!container || !activities.length) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">No recent activity</p>';
+          return;
+        }
+
+        container.innerHTML = activities.map(activity => `
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-${this.getActivityColor(activity.type)}-100 rounded-full flex items-center justify-center">
+              <i data-lucide="${this.getActivityIcon(activity.type)}" class="w-4 h-4 text-${this.getActivityColor(activity.type)}-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-slate-900">${activity.description}</p>
+              <p class="text-xs text-slate-500">${this.formatTimeAgo(activity.timestamp)}</p>
+            </div>
+          </div>
+        `).join('');
+
+        // Recreate icons
+        lucide.createIcons();
+      }
+
+      loadSystemStatus() {
+        try {
+          // Initialize system status
+          const statusElement = document.querySelector('#system-status');
+          if (statusElement) {
+            statusElement.textContent = 'Loading...';
+            statusElement.className = 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs';
+          }
+
+          // Initialize other system metrics
+          const serverLoadElement = document.querySelector('#server-load');
+          const databaseStatusElement = document.querySelector('#database-status');
+          const uptimeElement = document.querySelector('#uptime');
+          
+          if (serverLoadElement) serverLoadElement.textContent = 'Loading...';
+          if (databaseStatusElement) databaseStatusElement.textContent = 'Loading...';
+          if (uptimeElement) uptimeElement.textContent = 'Loading...';
+
+        } catch (error) {
+          console.error('Failed to load system status:', error);
+          const statusElement = document.querySelector('#system-status');
+          if (statusElement) {
+            statusElement.textContent = 'Status Unknown';
+            statusElement.className = 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs';
+          }
+        }
+      }
+
+      setupRealTimeUpdates() {
+        // Refresh dashboard data every 30 seconds
+        setInterval(() => {
+          this.loadDashboardData();
+        }, 30000);
+      }
+
+      // Utility methods
+      formatTimeAgo(timestamp) {
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+        
+        if (diffInMinutes < 60) {
+          return `${diffInMinutes} minutes ago`;
+        } else if (diffInMinutes < 1440) {
+          const hours = Math.floor(diffInMinutes / 60);
+          return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else {
+          const days = Math.floor(diffInMinutes / 1440);
+          return `${days} day${days > 1 ? 's' : ''} ago`;
+        }
+      }
+
+      getActivityColor(type) {
+        const colors = {
+          'user_created': 'green',
+          'contest_created': 'blue',
+          'mentor_assigned': 'purple',
+          'contest_completed': 'amber',
+          'submission_flagged': 'red'
+        };
+        return colors[type] || 'blue';
+      }
+
+      getActivityIcon(type) {
+        const icons = {
+          'user_created': 'user-plus',
+          'contest_created': 'trophy',
+          'mentor_assigned': 'graduation-cap',
+          'contest_completed': 'target',
+          'submission_flagged': 'flag'
+        };
+        return icons[type] || 'activity';
+      }
+
+      showError(message) {
+        if (this.api.showNotification) {
+          this.api.showNotification(message, 'error');
+        } else {
+          alert(message);
+        }
+      }
+    }
+
+    // Initialize dashboard when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new AdminDashboard();
+    });
+
+    // Logout function
+    function logout() {
+      if (window.SkillPortAuth) {
+        window.SkillPortAuth.logout();
+        window.location.href = '../../index.html';
+      } else {
+        // Fallback logout
+        localStorage.removeItem('skillport_token');
+        localStorage.removeItem('skillport_user');
+        localStorage.removeItem('skillport_is_authenticated');
+        window.location.href = '../../index.html';
+      }
+    }
+  </script>
+</body>
+</html> 

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Josefin Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .offline-container {
+            text-align: center;
+            width: 100%;
+            max-width: 28rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-container {
+            margin-bottom: 2rem;
+        }
+
+        .icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 6rem;
+            height: 6rem;
+            background-color: #fef2f2;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            border: 4px solid #fecaca;
+        }
+
+        .wifi-off-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #ef4444;
+        }
+
+        .wifi-off-icon::before {
+            content: "📶";
+            font-size: 3rem;
+            filter: grayscale(100%) brightness(0.7);
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .description {
+            font-size: 1.125rem;
+            color: #475569;
+            margin-bottom: 2rem;
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Josefin Sans', sans-serif;
+        }
+
+        .retry-button:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .refresh-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .refresh-icon::before {
+            content: "🔄";
+            font-size: 1.25rem;
+        }
+
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #64748b;
+            margin-top: 2rem;
+        }
+
+        .sparkles-icon::before {
+            content: "✨";
+            font-size: 1rem;
+        }
+
+        .brand-name {
+            font-weight: 600;
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            .offline-container {
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .description {
+                font-size: 1rem;
+            }
+            
+            .retry-button {
+                padding: 0.625rem 1.25rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="icon-container">
+            <div class="icon-circle">
+                <div class="wifi-off-icon"></div>
+            </div>
+            
+            <h1>You're Offline</h1>
+            <p class="description">
+                It seems you've lost your internet connection. Please check your network and try again.
+            </p>
+            
+            <button class="retry-button" onclick="handleRetry()">
+                <div class="refresh-icon"></div>
+                Retry Connection
+            </button>
+        </div>
+        
+        <div class="footer">
+            <div class="sparkles-icon"></div>
+            <span class="brand-name">SkillPort</span>
+        </div>
+    </div>
+
+    <script>
+        function handleRetry() {
+            window.location.reload();
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const retryButton = document.querySelector('.retry-button');
+            
+            // Add click animation
+            retryButton.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+
+            // Add hover sound effect (optional)
+            retryButton.addEventListener('mouseenter', function() {
+                // You can add a subtle hover sound here if needed
+                this.style.transition = 'all 0.2s ease';
+            });
+        });
+    </script>
+</body>
+</html>

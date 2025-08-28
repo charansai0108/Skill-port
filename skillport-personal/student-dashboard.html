@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard - SkillPort</title>
+    <link rel="stylesheet" href="../community-ui/css/main.css">
+    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
+    <link rel="stylesheet" href="../community-ui/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Josefin Sans', sans-serif; }
+        
+        .personal-dashboard {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+        }
+        
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .dashboard-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+        
+        .dashboard-brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .dashboard-nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .dashboard-nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .dashboard-nav-link:hover,
+        .dashboard-nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .dashboard-user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .dashboard-logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .dashboard-logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dashboard-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-welcome {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-welcome h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-welcome p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dashboard-stat-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dashboard-stat-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-stat-title {
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .dashboard-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-stat-change {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .dashboard-sections {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .dashboard-main-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .dashboard-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .dashboard-section-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dashboard-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .dashboard-sidebar-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .recent-activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .recent-activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recent-activity-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .recent-activity-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .recent-activity-content p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .quick-actions {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .quick-action-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .skill-progress {
+            margin-top: 1.5rem;
+        }
+        
+        .skill-item {
+            margin-bottom: 1rem;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .skill-level {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .skill-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+        
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            border-radius: 0.25rem;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dashboard-nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="personal-dashboard">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <nav class="dashboard-nav">
+            <div class="dashboard-brand">
+                <div class="dashboard-brand-icon">🎯</div>
+                <span class="dashboard-brand-text">SkillPort</span>
+            </div>
+            
+            <div class="dashboard-nav-menu">
+                <a href="student-dashboard.html" class="dashboard-nav-link active">Dashboard</a>
+                <a href="profile.html" class="dashboard-nav-link">Profile</a>
+                <a href="tracker.html" class="dashboard-nav-link">Tracker</a>
+                <a href="stats.html" class="dashboard-nav-link">Stats</a>
+                <a href="communities.html" class="dashboard-nav-link">Communities</a>
+                <a href="projects.html" class="dashboard-nav-link">Projects</a>
+                <a href="posts.html" class="dashboard-nav-link">Posts</a>
+            </div>
+            
+            <div class="dashboard-user-menu">
+                <div class="dashboard-user-avatar">JS</div>
+                <button class="dashboard-logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="dashboard-main">
+        <!-- Welcome Section -->
+        <div class="dashboard-welcome">
+            <h1>Welcome back, John! 👋</h1>
+            <p>Track your progress, join communities, and level up your skills</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="dashboard-stats-grid">
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-header">
+                    <div class="dashboard-stat-icon">🏆</div>
+                    <div class="dashboard-stat-title">Problems Solved</div>
+                </div>
+                <div class="dashboard-stat-value">247</div>
+                <div class="dashboard-stat-change">+12 this week</div>
+            </div>
+            
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-header">
+                    <div class="dashboard-stat-icon">⭐</div>
+                    <div class="dashboard-stat-title">Skill Rating</div>
+                </div>
+                <div class="dashboard-stat-value">1,850</div>
+                <div class="dashboard-stat-change">+45 this month</div>
+            </div>
+            
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-header">
+                    <div class="dashboard-stat-icon">👥</div>
+                    <div class="dashboard-stat-title">Communities</div>
+                </div>
+                <div class="dashboard-stat-value">8</div>
+                <div class="dashboard-stat-change">Active member</div>
+            </div>
+            
+            <div class="dashboard-stat-card">
+                <div class="dashboard-stat-header">
+                    <div class="dashboard-stat-icon">📊</div>
+                    <div class="dashboard-stat-title">Streak</div>
+                </div>
+                <div class="dashboard-stat-value">23 days</div>
+                <div class="dashboard-stat-change">Keep it up!</div>
+            </div>
+        </div>
+
+        <!-- Main Content Sections -->
+        <div class="dashboard-sections">
+            <!-- Main Section -->
+            <div class="dashboard-main-section">
+                <h2 class="dashboard-section-title">
+                    <div class="dashboard-section-icon">📈</div>
+                    Skill Progress
+                </h2>
+                
+                <div class="skill-progress">
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">Algorithms & Data Structures</span>
+                            <span class="skill-level">Intermediate</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">Web Development</span>
+                            <span class="skill-level">Advanced</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">System Design</span>
+                            <span class="skill-level">Beginner</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">
+                        <div class="skill-header">
+                            <span class="skill-name">Database Design</span>
+                            <span class="skill-level">Intermediate</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="dashboard-sidebar">
+                <!-- Recent Activity -->
+                <div class="dashboard-sidebar-card">
+                    <h3 class="dashboard-section-title">
+                        <div class="dashboard-section-icon">🕒</div>
+                        Recent Activity
+                    </h3>
+                    
+                    <div class="recent-activity-item">
+                        <div class="recent-activity-icon">✅</div>
+                        <div class="recent-activity-content">
+                            <h4>Solved LeetCode Problem</h4>
+                            <p>Two Sum - Easy</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity-item">
+                        <div class="recent-activity-icon">🏆</div>
+                        <div class="recent-activity-content">
+                            <h4>Won Weekly Contest</h4>
+                            <p>Ranked #15 out of 200</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity-item">
+                        <div class="recent-activity-icon">👥</div>
+                        <div class="recent-activity-content">
+                            <h4>Joined Community</h4>
+                            <p>Data Structures Masters</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity-item">
+                        <div class="recent-activity-icon">📚</div>
+                        <div class="recent-activity-content">
+                            <h4>Completed Course</h4>
+                            <p>Advanced JavaScript</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-sidebar-card">
+                    <h3 class="dashboard-section-title">
+                        <div class="dashboard-section-icon">⚡</div>
+                        Quick Actions
+                    </h3>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="location.href='tracker.html'">
+                            <div class="quick-action-icon">📝</div>
+                            <div>
+                                <div style="font-weight: 600;">Start Practice</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Solve problems</div>
+                            </div>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="location.href='communities.html'">
+                            <div class="quick-action-icon">👥</div>
+                            <div>
+                                <div style="font-weight: 600;">Join Contest</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Compete with others</div>
+                            </div>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="location.href='profile.html'">
+                            <div class="quick-action-icon">👤</div>
+                            <div>
+                                <div style="font-weight: 600;">Update Profile</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Showcase skills</div>
+                            </div>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="location.href='stats.html'">
+                            <div class="quick-action-icon">📊</div>
+                            <div>
+                                <div style="font-weight: 600;">View Analytics</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Track progress</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../community-ui/js/api.js"></script>
+    <script src="../community-ui/js/app.js"></script>
+    
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadUserData();
+        });
+
+        function checkAuthentication() {
+            const token = localStorage.getItem('skillport_token');
+            if (!token) {
+                window.location.href = '../community-ui/pages/auth/login.html';
+                return;
+            }
+            
+            // Verify token with backend
+            verifyToken(token);
+        }
+
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                
+                const data = await response.json();
+                if (data.user.role !== 'personal') {
+                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                localStorage.removeItem('skillport_token');
+                window.location.href = '../community-ui/pages/auth/login.html';
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const token = localStorage.getItem('skillport_token');
+                const response = await fetch('http://localhost:5001/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    updateDashboard(userData);
+                }
+            } catch (error) {
+                console.error('Failed to load user data:', error);
+            }
+        }
+
+        function updateDashboard(userData) {
+            // Update welcome message
+            const welcomeTitle = document.querySelector('.dashboard-welcome h1');
+            if (welcomeTitle && userData.firstName) {
+                welcomeTitle.textContent = `Welcome back, ${userData.firstName}! 👋`;
+            }
+            
+            // Update user avatar
+            const userAvatar = document.querySelector('.dashboard-user-avatar');
+            if (userAvatar && userData.firstName && userData.lastName) {
+                userAvatar.textContent = `${userData.firstName[0]}${userData.lastName[0]}`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('skillport_token');
+            window.location.href = '../community-ui/pages/auth/login.html';
+        }
+    </script>
+</body>
+</html>

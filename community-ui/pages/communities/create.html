@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Community - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="../../index.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-lg">✨</span>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">SkillPort</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="../dashboard.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="../communities.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Communities</a>
+                    <a href="../contests.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Contests</a>
+                    <a href="../profile.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gray-50 py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Create Community</h1>
+                        <p class="text-gray-600 mt-2">Build a new developer community and bring people together</p>
+                    </div>
+                    <a href="../communities.html" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+                        Back to Communities
+                    </a>
+                </div>
+            </div>
+
+            <!-- Creation Form -->
+            <div class="bg-white rounded-lg shadow-sm">
+                <form id="createCommunityForm" class="p-6 space-y-8">
+                    <!-- Basic Information -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Community Name *</label>
+                                <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., DSA Enthusiasts">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                <select name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select category</option>
+                                    <option value="algorithms">Algorithms & Data Structures</option>
+                                    <option value="web-development">Web Development</option>
+                                    <option value="mobile-development">Mobile Development</option>
+                                    <option value="machine-learning">Machine Learning</option>
+                                    <option value="cybersecurity">Cybersecurity</option>
+                                    <option value="cloud-computing">Cloud Computing</option>
+                                    <option value="database">Database Systems</option>
+                                    <option value="game-development">Game Development</option>
+                                    <option value="open-source">Open Source</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                            <textarea name="description" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your community, its purpose, and what members can expect..."></textarea>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tags (comma separated)</label>
+                            <input type="text" name="tags" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., algorithms, competitive-programming, leetcode">
+                        </div>
+                    </div>
+
+                    <!-- Community Settings -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Community Settings</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Privacy Level *</label>
+                                <select name="privacy" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="public">Public - Anyone can join</option>
+                                    <option value="invite-only">Invite Only - Requires invitation</option>
+                                    <option value="approval">Approval Required - Admin approval needed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Members</label>
+                                <input type="number" name="maxMembers" min="10" max="10000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Leave empty for unlimited">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Community Type</label>
+                            <select name="type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="learning">Learning & Study Group</option>
+                                <option value="competitive">Competitive Programming</option>
+                                <option value="project">Project Collaboration</option>
+                                <option value="mentorship">Mentorship & Guidance</option>
+                                <option value="networking">Professional Networking</option>
+                                <option value="hobby">Hobby & Interest</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Visual Identity -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Visual Identity</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                                <input type="color" name="primaryColor" value="#3B82F6" class="w-full h-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                                <input type="color" name="secondaryColor" value="#1E40AF" class="w-full h-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Community Logo URL</label>
+                            <input type="url" name="logoUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/logo.png">
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+                            <input type="url" name="coverImageUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/cover.jpg">
+                        </div>
+                    </div>
+
+                    <!-- Features & Rules -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Features & Rules</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="enableContests" id="enableContests" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="enableContests" class="ml-2 text-sm text-gray-700">Enable Contests & Challenges</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" name="enableDiscussions" id="enableDiscussions" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="enableDiscussions" class="ml-2 text-sm text-gray-700">Enable Discussions & Forums</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" name="enableResources" id="enableResources" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="enableResources" class="ml-2 text-sm text-gray-700">Enable Resource Sharing</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" name="enableMentorship" id="enableMentorship" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="enableMentorship" class="ml-2 text-sm text-gray-700">Enable Mentorship Program</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Community Rules</label>
+                            <textarea name="rules" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Set community guidelines and rules for members..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Social -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact & Social</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                                <input type="url" name="website" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://community-website.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Discord Server</label>
+                                <input type="url" name="discord" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://discord.gg/invite-code">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                            <input type="email" name="contactEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@community.com">
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex space-x-4 pt-6 border-t border-gray-200">
+                        <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                            Create Community
+                        </button>
+                        <button type="button" onclick="resetForm()" class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+                            Reset
+                        </button>
+                        <a href="../communities.html" class="bg-white text-gray-700 px-8 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Reset form
+        function resetForm() {
+            document.getElementById('createCommunityForm').reset();
+        }
+
+        // Form submission
+        document.getElementById('createCommunityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            console.log('Community creation data:', data);
+            
+            // Validate required fields
+            if (!data.name || !data.category || !data.description || !data.privacy) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Here you would typically send the data to your backend
+            // For now, just show a success message
+            alert('Community created successfully!');
+            
+            // Redirect to communities page
+            window.location.href = '../communities.html';
+        });
+
+        // Auto-generate description based on category
+        document.querySelector('select[name="category"]').addEventListener('change', function() {
+            const category = this.value;
+            const descriptionField = document.querySelector('textarea[name="description"]');
+            
+            if (category && !descriptionField.value) {
+                const descriptions = {
+                    'algorithms': 'A community focused on algorithms, data structures, and competitive programming. Share solutions, discuss approaches, and improve your problem-solving skills together.',
+                    'web-development': 'A community for web developers to share knowledge, discuss modern frameworks, and collaborate on projects. From frontend to backend, we cover it all.',
+                    'mobile-development': 'A community dedicated to mobile app development across iOS, Android, and cross-platform solutions. Share experiences, tips, and best practices.',
+                    'machine-learning': 'A community exploring machine learning, AI, and data science. Discuss algorithms, share projects, and stay updated with the latest developments.',
+                    'cybersecurity': 'A community focused on cybersecurity, ethical hacking, and information security. Share knowledge, discuss threats, and learn defensive techniques.',
+                    'cloud-computing': 'A community for cloud computing enthusiasts. Discuss AWS, Azure, GCP, and other cloud platforms. Share deployment strategies and best practices.',
+                    'database': 'A community for database administrators, developers, and architects. Discuss SQL, NoSQL, data modeling, and database optimization.',
+                    'game-development': 'A community for game developers to share ideas, discuss engines, and collaborate on projects. From indie to AAA, all are welcome.',
+                    'open-source': 'A community promoting open source development and collaboration. Share projects, contribute to others, and build amazing software together.',
+                    'other': 'A community for developers with diverse interests. Share knowledge, collaborate on projects, and grow together.'
+                };
+                
+                descriptionField.value = descriptions[category] || '';
+            }
+        });
+
+        // Auto-generate tags based on category
+        document.querySelector('select[name="category"]').addEventListener('change', function() {
+            const category = this.value;
+            const tagsField = document.querySelector('input[name="tags"]');
+            
+            if (category && !tagsField.value) {
+                const tags = {
+                    'algorithms': 'algorithms, data-structures, competitive-programming, leetcode, codeforces',
+                    'web-development': 'web-development, frontend, backend, javascript, react, nodejs',
+                    'mobile-development': 'mobile-development, ios, android, react-native, flutter',
+                    'machine-learning': 'machine-learning, ai, data-science, python, tensorflow, pytorch',
+                    'cybersecurity': 'cybersecurity, ethical-hacking, penetration-testing, network-security',
+                    'cloud-computing': 'cloud-computing, aws, azure, gcp, devops, kubernetes',
+                    'database': 'database, sql, nosql, mongodb, postgresql, data-modeling',
+                    'game-development': 'game-development, unity, unreal-engine, game-design, graphics',
+                    'open-source': 'open-source, github, collaboration, contribution, community',
+                    'other': 'development, programming, software-engineering, collaboration'
+                };
+                
+                tagsField.value = tags[category] || '';
+            }
+        });
+
+        // Page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Create community page loaded');
+        });
+    </script>
+</body>
+</html>

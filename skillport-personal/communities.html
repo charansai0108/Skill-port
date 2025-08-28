@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communities - SkillPort</title>
+    <link rel="stylesheet" href="../community-ui/css/main.css">
+    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
+    <link rel="stylesheet" href="../community-ui/css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Josefin Sans', sans-serif; }
+        
+        .communities-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .communities-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+        }
+        
+        .communities-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .communities-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+        
+        .communities-brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .communities-brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .communities-nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .communities-nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .communities-nav-link:hover,
+        .communities-nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .communities-back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .communities-back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .communities-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .communities-hero {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .communities-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .communities-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .communities-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .communities-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .communities-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .communities-stat-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .communities-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .communities-stat-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .communities-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .communities-main-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .communities-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .communities-section-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .communities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .community-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .community-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .community-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .community-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .community-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .community-info p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .community-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .community-stat {
+            text-align: center;
+        }
+        
+        .community-stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .community-stat-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        
+        .community-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .community-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .community-btn.primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .community-btn.primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .community-btn.secondary {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .community-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .communities-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .communities-sidebar-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .communities-search {
+            margin-bottom: 1.5rem;
+        }
+        
+        .communities-search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: white;
+            font-family: inherit;
+        }
+        
+        .communities-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .communities-filters {
+            margin-bottom: 1.5rem;
+        }
+        
+        .communities-filter-group {
+            margin-bottom: 1rem;
+        }
+        
+        .communities-filter-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .communities-filter-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            color: white;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+        
+        .communities-recommendations {
+            margin-top: 1.5rem;
+        }
+        
+        .communities-recommendation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .communities-recommendation:last-child {
+            margin-bottom: 0;
+        }
+        
+        .communities-recommendation-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .communities-recommendation-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .communities-recommendation-content p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .communities-recommendation-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+        
+        .communities-recommendation-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .communities-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .communities-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .communities-nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="communities-page">
+    <!-- Communities Header -->
+    <header class="communities-header">
+        <nav class="communities-nav">
+            <div class="communities-brand">
+                <div class="communities-brand-icon">🎯</div>
+                <span class="communities-brand-text">SkillPort</span>
+            </div>
+            
+            <div class="communities-nav-menu">
+                <a href="student-dashboard.html" class="communities-nav-link">Dashboard</a>
+                <a href="profile.html" class="communities-nav-link">Profile</a>
+                <a href="tracker.html" class="communities-nav-link">Tracker</a>
+                <a href="stats.html" class="communities-nav-link">Stats</a>
+                <a href="communities.html" class="communities-nav-link active">Communities</a>
+                <a href="projects.html" class="communities-nav-link">Projects</a>
+                <a href="posts.html" class="communities-nav-link">Posts</a>
+            </div>
+            
+            <button class="communities-back-btn" onclick="location.href='student-dashboard.html'">← Back to Dashboard</button>
+        </nav>
+    </header>
+
+    <!-- Main Communities Content -->
+    <main class="communities-main">
+        <!-- Communities Hero Section -->
+        <div class="communities-hero">
+            <h1>Join Communities</h1>
+            <p>Connect with like-minded learners and participate in coding challenges</p>
+        </div>
+
+        <!-- Communities Stats -->
+        <div class="communities-stats">
+            <div class="communities-stat-card">
+                <div class="communities-stat-icon">👥</div>
+                <div class="communities-stat-value">8</div>
+                <div class="communities-stat-label">Active Communities</div>
+            </div>
+            
+            <div class="communities-stat-card">
+                <div class="communities-stat-icon">🏆</div>
+                <div class="communities-stat-value">23</div>
+                <div class="communities-stat-label">Contests Won</div>
+            </div>
+            
+            <div class="communities-stat-card">
+                <div class="communities-stat-card">
+                    <div class="communities-stat-icon">📊</div>
+                    <div class="communities-stat-value">156</div>
+                    <div class="communities-stat-label">Total Members</div>
+                </div>
+            </div>
+            
+            <div class="communities-stat-card">
+                <div class="communities-stat-icon">⭐</div>
+                <div class="communities-stat-value">4.8</div>
+                <div class="communities-stat-label">Avg. Rating</div>
+            </div>
+        </div>
+
+        <!-- Communities Content -->
+        <div class="communities-content">
+            <!-- Main Communities Section -->
+            <div class="communities-main-section">
+                <h2 class="communities-section-title">
+                    <div class="communities-section-icon">🏢</div>
+                    My Communities
+                </h2>
+                
+                <div class="communities-grid">
+                    <!-- Community Card 1 -->
+                    <div class="community-card">
+                        <div class="community-header">
+                            <div class="community-icon">💻</div>
+                            <div class="community-info">
+                                <h3>Data Structures Masters</h3>
+                                <p>Advanced algorithms community</p>
+                            </div>
+                        </div>
+                        
+                        <div class="community-stats">
+                            <div class="community-stat">
+                                <div class="community-stat-value">45</div>
+                                <div class="community-stat-label">Members</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">12</div>
+                                <div class="community-stat-label">Contests</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">4.9</div>
+                                <div class="community-stat-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="community-actions">
+                            <button class="community-btn primary">View Community</button>
+                            <button class="community-btn secondary">Leave</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Community Card 2 -->
+                    <div class="community-card">
+                        <div class="community-header">
+                            <div class="community-icon">🌐</div>
+                            <div class="community-info">
+                                <h3>Web Development Hub</h3>
+                                <p>Full-stack development focus</p>
+                            </div>
+                        </div>
+                        
+                        <div class="community-stats">
+                            <div class="community-stat">
+                                <div class="community-stat-value">78</div>
+                                <div class="community-stat-label">Members</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">8</div>
+                                <div class="community-stat-label">Contests</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">4.7</div>
+                                <div class="community-stat-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="community-actions">
+                            <button class="community-btn primary">View Community</button>
+                            <button class="community-btn secondary">Leave</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Community Card 3 -->
+                    <div class="community-card">
+                        <div class="community-header">
+                            <div class="community-icon">🤖</div>
+                            <div class="community-info">
+                                <h3>AI & ML Enthusiasts</h3>
+                                <p>Machine learning community</p>
+                            </div>
+                        </div>
+                        
+                        <div class="community-stats">
+                            <div class="community-stat">
+                                <div class="community-stat-value">34</div>
+                                <div class="community-stat-label">Members</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">5</div>
+                                <div class="community-stat-label">Contests</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">4.8</div>
+                                <div class="community-stat-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="community-actions">
+                            <button class="community-btn primary">View Community</button>
+                            <button class="community-btn secondary">Leave</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Community Card 4 -->
+                    <div class="community-card">
+                        <div class="community-header">
+                            <div class="community-icon">🔒</div>
+                            <div class="community-info">
+                                <h3>Cybersecurity Warriors</h3>
+                                <p>Security & ethical hacking</p>
+                            </div>
+                        </div>
+                        
+                        <div class="community-stats">
+                            <div class="community-stat">
+                                <div class="community-stat-value">56</div>
+                                <div class="community-stat-label">Members</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">9</div>
+                                <div class="community-stat-label">Contests</div>
+                            </div>
+                            <div class="community-stat">
+                                <div class="community-stat-value">4.6</div>
+                                <div class="community-stat-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="community-actions">
+                            <button class="community-btn primary">View Community</button>
+                            <button class="community-btn secondary">Leave</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communities Sidebar -->
+            <div class="communities-sidebar">
+                <!-- Search & Filters -->
+                <div class="communities-sidebar-card">
+                    <h3 class="communities-section-title">
+                        <div class="communities-section-icon">🔍</div>
+                        Search & Filters
+                    </h3>
+                    
+                    <div class="communities-search">
+                        <input type="text" class="communities-search-input" placeholder="Search communities...">
+                    </div>
+                    
+                    <div class="communities-filters">
+                        <div class="communities-filter-group">
+                            <label class="communities-filter-label">Category</label>
+                            <select class="communities-filter-select">
+                                <option value="">All Categories</option>
+                                <option value="algorithms">Algorithms</option>
+                                <option value="web-dev">Web Development</option>
+                                <option value="ai-ml">AI & ML</option>
+                                <option value="cybersecurity">Cybersecurity</option>
+                                <option value="mobile">Mobile Development</option>
+                            </select>
+                        </div>
+                        
+                        <div class="communities-filter-group">
+                            <label class="communities-filter-label">Size</label>
+                            <select class="communities-filter-select">
+                                <option value="">All Sizes</option>
+                                <option value="small">Small (1-50)</option>
+                                <option value="medium">Medium (51-200)</option>
+                                <option value="large">Large (200+)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="communities-filter-group">
+                            <label class="communities-filter-label">Rating</label>
+                            <select class="communities-filter-select">
+                                <option value="">All Ratings</option>
+                                <option value="4.5+">4.5+ Stars</option>
+                                <option value="4.0+">4.0+ Stars</option>
+                                <option value="3.5+">3.5+ Stars</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended Communities -->
+                <div class="communities-sidebar-card">
+                    <h3 class="communities-section-title">
+                        <div class="communities-section-icon">💡</div>
+                        Recommended
+                    </h3>
+                    
+                    <div class="communities-recommendations">
+                        <div class="communities-recommendation">
+                            <div class="communities-recommendation-icon">🎮</div>
+                            <div class="communities-recommendation-content">
+                                <h4>Game Dev Studio</h4>
+                                <p>Unity & Unreal Engine</p>
+                            </div>
+                            <button class="communities-recommendation-btn">Join</button>
+                        </div>
+                        
+                        <div class="communities-recommendation">
+                            <div class="communities-recommendation-icon">📱</div>
+                            <div class="communities-recommendation-content">
+                                <h4>Mobile Coders</h4>
+                                <p>iOS & Android development</p>
+                            </div>
+                            <button class="communities-recommendation-btn">Join</button>
+                        </div>
+                        
+                        <div class="communities-recommendation">
+                            <div class="communities-recommendation-icon">☁️</div>
+                            <div class="communities-recommendation-content">
+                                <h4>Cloud Architects</h4>
+                                <p>AWS, Azure, GCP</p>
+                            </div>
+                            <button class="communities-recommendation-btn">Join</button>
+                        </div>
+                        
+                        <div class="communities-recommendation">
+                            <div class="communities-recommendation-icon">📊</div>
+                            <div class="communities-recommendation-content">
+                                <h4>Data Scientists</h4>
+                                <p>Python, R, SQL</p>
+                            </div>
+                            <button class="communities-recommendation-btn">Join</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../community-ui/js/api.js"></script>
+    <script src="../community-ui/js/app.js"></script>
+    
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadCommunitiesData();
+            setupEventListeners();
+        });
+
+        function checkAuthentication() {
+            const token = localStorage.getItem('skillport_token');
+            if (!token) {
+                window.location.href = '../community-ui/pages/auth/login.html';
+                return;
+            }
+            
+            // Verify token with backend
+            verifyToken(token);
+        }
+
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                
+                const data = await response.json();
+                if (data.user.role !== 'personal') {
+                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Token verification failed:', error);
+                localStorage.removeItem('skillport_token');
+                window.location.href = '../community-ui/pages/auth/login.html';
+            }
+        }
+
+        async function loadCommunitiesData() {
+            try {
+                const token = localStorage.getItem('skillport_token');
+                const response = await fetch('http://localhost:5001/api/users/communities', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const communitiesData = await response.json();
+                    updateCommunitiesDisplay(communitiesData);
+                }
+            } catch (error) {
+                console.error('Failed to load communities data:', error);
+            }
+        }
+
+        function updateCommunitiesDisplay(communitiesData) {
+            // Update communities grid
+            if (communitiesData.communities) {
+                // Update community cards
+            }
+            
+            // Update stats
+            if (communitiesData.stats) {
+                // Update statistics
+            }
+        }
+
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.querySelector('.communities-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    searchCommunities(e.target.value);
+                });
+            }
+            
+            // Filter functionality
+            const filterSelects = document.querySelectorAll('.communities-filter-select');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    applyFilters();
+                });
+            });
+            
+            // Community action buttons
+            const communityBtns = document.querySelectorAll('.community-btn');
+            communityBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    handleCommunityAction(e);
+                });
+            });
+            
+            // Recommendation buttons
+            const recommendationBtns = document.querySelectorAll('.communities-recommendation-btn');
+            recommendationBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    handleRecommendationAction(e);
+                });
+            });
+        }
+
+        function searchCommunities(query) {
+            // Implementation for community search
+            console.log('Searching for:', query);
+        }
+
+        function applyFilters() {
+            // Implementation for applying filters
+            console.log('Applying filters');
+        }
+
+        function handleCommunityAction(e) {
+            const btn = e.target;
+            const action = btn.textContent.toLowerCase();
+            const communityCard = btn.closest('.community-card');
+            
+            if (action === 'view community') {
+                // Navigate to community page
+                console.log('Viewing community');
+            } else if (action === 'leave') {
+                // Leave community
+                if (confirm('Are you sure you want to leave this community?')) {
+                    leaveCommunity(communityCard);
+                }
+            }
+        }
+
+        function handleRecommendationAction(e) {
+            const btn = e.target;
+            const recommendation = btn.closest('.communities-recommendation');
+            
+            if (btn.textContent === 'Join') {
+                joinCommunity(recommendation);
+                btn.textContent = 'Joined';
+                btn.style.background = 'rgba(34, 197, 94, 0.2)';
+                btn.style.borderColor = '#22c55e';
+            }
+        }
+
+        function leaveCommunity(communityCard) {
+            // Implementation for leaving community
+            communityCard.style.opacity = '0.5';
+            communityCard.style.pointerEvents = 'none';
+            
+            // Show success message
+            setTimeout(() => {
+                communityCard.remove();
+            }, 500);
+        }
+
+        function joinCommunity(recommendation) {
+            // Implementation for joining community
+            console.log('Joining community');
+        }
+    </script>
+</body>
+</html> 

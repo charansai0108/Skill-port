@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - SkillPort Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            Community Admin
+          </span>
+        </div>
+        <div class="hidden md:flex items-center gap-1">
+          <a href="admin-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="admin-users.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="users" class="w-4 h-4"></i> Users
+          </a>
+          <a href="admin-mentors.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
+          </a>
+          <a href="admin-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+          </a>
+          <a href="admin-analytics.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+          </a>
+          <a href="admin-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="admin-settings.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">Leaderboard Management</h1>
+      <p class="text-lg text-slate-600">Monitor and manage user rankings, achievements, and performance metrics.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Top Performers</p>
+            <p class="text-2xl font-bold text-slate-900">156</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="crown" class="w-6 h-6 text-blue-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Active Rankings</p>
+            <p class="text-2xl font-bold text-slate-900">2,847</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Avg. Score</p>
+            <p class="text-2xl font-bold text-slate-900">8.7</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="star" class="w-6 h-6 text-purple-600"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Contests Won</p>
+            <p class="text-2xl font-bold text-slate-900">89</p>
+          </div>
+          <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="trophy" class="w-6 h-6 text-yellow-600"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Filters Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">Filters</h3>
+          
+          <!-- Search -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Search Users</label>
+            <input type="text" placeholder="Search by name..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          
+          <!-- Category Filter -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">All Categories</option>
+              <option value="algorithms">Algorithms</option>
+              <option value="data-structures">Data Structures</option>
+              <option value="dynamic-programming">Dynamic Programming</option>
+              <option value="graph-theory">Graph Theory</option>
+              <option value="math">Mathematics</option>
+            </select>
+          </div>
+          
+          <!-- Time Period Filter -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Time Period</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all-time">All Time</option>
+              <option value="this-month">This Month</option>
+              <option value="this-week">This Week</option>
+              <option value="today">Today</option>
+            </select>
+          </div>
+          
+          <!-- Sort By Filter -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Sort By</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="score">Score</option>
+              <option value="problems-solved">Problems Solved</option>
+              <option value="contests-won">Contests Won</option>
+              <option value="accuracy">Accuracy</option>
+              <option value="streak">Streak</option>
+            </select>
+          </div>
+          
+          <!-- Clear Filters -->
+          <button class="w-full bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaderboard Table -->
+      <div class="lg:col-span-3">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-200">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold text-slate-900">Top Performers</h3>
+              <div class="flex gap-2">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <i data-lucide="download" class="w-4 h-4 inline mr-2"></i> Export
+                </button>
+                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                  <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2"></i> Refresh
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Rank</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">User</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Score</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Problems Solved</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Contests Won</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Accuracy</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-slate-200">
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-sm font-bold text-yellow-800">1</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <i data-lucide="user" class="w-5 h-5 text-blue-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-slate-900">Alex Johnson</div>
+                        <div class="text-sm text-slate-500">@alex_j</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-lg font-bold text-slate-900">9.8</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">156</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">12</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      98%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">View Profile</button>
+                    <button class="text-green-600 hover:text-green-900">Award</button>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-sm font-bold text-slate-800">2</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <i data-lucide="user" class="w-5 h-5 text-green-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-slate-900">Sarah Chen</div>
+                        <div class="text-sm text-slate-500">@sarah_c</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-lg font-bold text-slate-900">9.6</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">142</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">10</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      96%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">View Profile</button>
+                    <button class="text-green-600 hover:text-green-900">Award</button>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-sm font-bold text-orange-800">3</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                        <i data-lucide="user" class="w-5 h-5 text-purple-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-slate-900">Mike Rodriguez</div>
+                        <div class="text-sm text-slate-500">@mike_r</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-lg font-bold text-slate-900">9.4</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">138</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">8</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      94%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">View Profile</button>
+                    <button class="text-green-600 hover:text-green-900">Award</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-slate-200">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-slate-700">
+                Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">156</span> results
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                  Previous
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg">
+                  1
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                  2
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                  3
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html> 
