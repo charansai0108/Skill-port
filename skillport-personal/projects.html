@@ -4,964 +4,829 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - SkillPort</title>
-    <link rel="stylesheet" href="../community-ui/css/main.css">
-    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
-    <link rel="stylesheet" href="../community-ui/css/components.css">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        body { font-family: 'Josefin Sans', sans-serif; }
-        
-        .projects-page {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .projects-header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-        }
-        
-        .projects-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .projects-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
-        
-        .projects-brand-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .projects-brand-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .projects-nav-menu {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .projects-nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-        }
-        
-        .projects-nav-link:hover,
-        .projects-nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .projects-back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease;
         }
         
-        .projects-back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
         }
-        
-        .projects-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .projects-hero {
-            background: rgba(255, 255, 255, 0.1);
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-        }
-        
-        .projects-hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .projects-hero p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .projects-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .projects-stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
-            text-align: center;
             transition: all 0.3s ease;
         }
-        
-        .projects-stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .projects-stat-icon {
-            width: 3rem;
-            height: 3rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 1rem;
-        }
-        
-        .projects-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .projects-stat-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .projects-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-        
-        .projects-main-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 2rem;
-            color: white;
-        }
-        
-        .projects-section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .projects-section-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .project-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .project-image {
-            width: 100%;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            opacity: 0.7;
-        }
-        
-        .project-content {
-            padding: 1.5rem;
-        }
-        
-        .project-header {
-            margin-bottom: 1rem;
-        }
-        
-        .project-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .project-description {
-            font-size: 0.875rem;
-            opacity: 0.8;
-            line-height: 1.5;
-            margin-bottom: 1rem;
-        }
-        
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .project-tag {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .project-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .project-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
-        
-        .project-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .project-date {
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
-        
-        .project-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .project-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-        
-        .project-btn.primary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .project-btn.primary:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .project-btn.secondary {
-            background: transparent;
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .project-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .projects-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .projects-sidebar-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
-        }
-        
-        .projects-add-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 1rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-        
-        .projects-add-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+
+        .stat-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
-        
-        .projects-add-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .projects-filters {
-            margin-bottom: 1.5rem;
-        }
-        
-        .projects-filter-group {
-            margin-bottom: 1rem;
-        }
-        
-        .projects-filter-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .projects-filter-select {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            color: white;
-            font-family: inherit;
-            font-size: 0.875rem;
-        }
-        
-        .projects-categories {
-            margin-top: 1.5rem;
-        }
-        
-        .projects-category {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
+
+        .project-card {
+            transition: all 0.3s ease;
             cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .category-card {
             transition: all 0.2s ease;
+            cursor: pointer;
         }
-        
-        .projects-category:hover {
-            background: rgba(255, 255, 255, 0.15);
+
+        .category-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        .projects-category.active {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+
+        .action-button {
+            transition: all 0.3s ease;
         }
-        
-        .projects-category-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
-        
-        .projects-category-content h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
+
+        .page-header-icon {
+            transition: all 0.3s ease;
         }
-        
-        .projects-category-content p {
-            font-size: 0.75rem;
-            opacity: 0.8;
+
+        .page-header-icon:hover {
+            transform: rotate(5deg) scale(1.05);
         }
-        
-        .projects-category-count {
-            margin-left: auto;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 1rem;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 768px) {
-            .projects-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .projects-nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .projects-nav-menu {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+
+        .modal-overlay {
+            backdrop-filter: blur(8px);
         }
     </style>
 </head>
-<body class="projects-page">
-    <!-- Projects Header -->
-    <header class="projects-header">
-        <nav class="projects-nav">
-            <div class="projects-brand">
-                <div class="projects-brand-icon">🎯</div>
-                <span class="projects-brand-text">SkillPort</span>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+                        SkillPort Personal
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="student-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="projects.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+                        <i data-lucide="folder" class="w-4 h-4"></i> Projects
+                    </a>
+                    <a href="tracker.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="activity" class="w-4 h-4"></i> Tracker
+                    </a>
+                    <a href="stats.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Stats
+                    </a>
+                    <a href="communities.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="users" class="w-4 h-4"></i> Communities
+                    </a>
+                    <a href="profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+                    </a>
+                </div>
             </div>
-            
-            <div class="projects-nav-menu">
-                <a href="student-dashboard.html" class="projects-nav-link">Dashboard</a>
-                <a href="profile.html" class="projects-nav-link">Profile</a>
-                <a href="tracker.html" class="projects-nav-link">Tracker</a>
-                <a href="stats.html" class="projects-nav-link">Stats</a>
-                <a href="communities.html" class="projects-nav-link">Communities</a>
-                <a href="projects.html" class="projects-nav-link active">Projects</a>
-                <a href="posts.html" class="projects-nav-link">Posts</a>
-            </div>
-            
-            <button class="projects-back-btn" onclick="location.href='student-dashboard.html'">← Back to Dashboard</button>
         </nav>
     </header>
 
-    <!-- Main Projects Content -->
-    <main class="projects-main">
-        <!-- Projects Hero Section -->
-        <div class="projects-hero">
-            <h1>My Projects</h1>
-            <p>Showcase your work and build an impressive portfolio</p>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <!-- Page Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg page-header-icon">
+                <i data-lucide="folder" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 mb-1">Projects</h1>
+                <p class="text-sm text-slate-600">Showcase your coding projects and track progress</p>
+            </div>
         </div>
 
-        <!-- Projects Stats -->
-        <div class="projects-stats">
-            <div class="projects-stat-card">
-                <div class="projects-stat-icon">💼</div>
-                <div class="projects-stat-value">12</div>
-                <div class="projects-stat-label">Total Projects</div>
-            </div>
-            
-            <div class="projects-stat-card">
-                <div class="projects-stat-icon">⭐</div>
-                <div class="projects-stat-value">4.8</div>
-                <div class="projects-stat-label">Avg. Rating</div>
-            </div>
-            
-            <div class="projects-stat-card">
-                <div class="projects-stat-card">
-                    <div class="projects-stat-icon">👀</div>
-                    <div class="projects-stat-value">1,247</div>
-                    <div class="projects-stat-label">Total Views</div>
+        <!-- Stats Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
                 </div>
+                <h2 class="text-xl font-bold text-slate-800">Project Overview</h2>
             </div>
             
-            <div class="projects-stat-card">
-                <div class="projects-stat-icon">🔗</div>
-                <div class="projects-stat-value">8</div>
-                <div class="projects-stat-label">Live Demos</div>
-            </div>
-        </div>
-
-        <!-- Projects Content -->
-        <div class="projects-content">
-            <!-- Main Projects Section -->
-            <div class="projects-main-section">
-                <h2 class="projects-section-title">
-                    <div class="projects-section-icon">🚀</div>
-                    Featured Projects
-                </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="folder-open" class="w-5 h-5 text-blue-600"></i>
+                        <span class="text-2xl font-bold text-blue-600">12</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Total Projects</div>
+                    <div class="text-xs text-blue-600 mt-1">+2 this month</div>
+                </div>
                 
-                <div class="projects-grid">
-                    <!-- Project Card 1 -->
-                    <div class="project-card">
-                        <div class="project-image">🌐</div>
-                        <div class="project-content">
-                            <div class="project-header">
-                                <h3 class="project-title">E-Commerce Platform</h3>
-                                <p class="project-description">A full-stack e-commerce platform built with React, Node.js, and MongoDB. Features include user authentication, product management, shopping cart, and payment integration.</p>
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-2xl font-bold text-green-600">8</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Completed</div>
+                    <div class="text-xs text-green-600 mt-1">67% success rate</div>
+                </div>
+                
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+                        <span class="text-2xl font-bold text-amber-600">3</span>
+                    </div>
+                    <div class="text-sm text-slate-600">In Progress</div>
+                    <div class="text-xs text-amber-600 mt-1">Active development</div>
+                </div>
+                
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="star" class="w-5 h-5 text-purple-600"></i>
+                        <span class="text-2xl font-bold text-purple-600">4.8</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Avg. Rating</div>
+                    <div class="text-xs text-purple-600 mt-1">From 24 reviews</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Categories Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="layers" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Project Categories</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="category-card p-4 bg-blue-50 rounded-xl text-center" onclick="showProjectsByCategory('completed')">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <div class="text-lg font-bold text-slate-800 mb-1">Completed</div>
+                    <div class="text-sm text-slate-600">8 projects</div>
+                    <div class="text-xs text-blue-600 mt-1">View all →</div>
+                </div>
+                
+                <div class="category-card p-4 bg-amber-50 rounded-xl text-center" onclick="showProjectsByCategory('in-progress')">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="clock" class="w-6 h-6 text-amber-600"></i>
+                    </div>
+                    <div class="text-lg font-bold text-slate-800 mb-1">In Progress</div>
+                    <div class="text-sm text-slate-600">3 projects</div>
+                    <div class="text-xs text-amber-600 mt-1">View all →</div>
+                </div>
+                
+                <div class="category-card p-4 bg-purple-50 rounded-xl text-center" onclick="showProjectsByCategory('web-dev')">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="globe" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                    <div class="text-lg font-bold text-slate-800 mb-1">Web Development</div>
+                    <div class="text-sm text-slate-600">5 projects</div>
+                    <div class="text-xs text-purple-600 mt-1">View all →</div>
+                </div>
+                
+                <div class="category-card p-4 bg-green-50 rounded-xl text-center" onclick="showProjectsByCategory('mobile')">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="smartphone" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <div class="text-lg font-bold text-slate-800 mb-1">Mobile Apps</div>
+                    <div class="text-sm text-slate-600">3 projects</div>
+                    <div class="text-xs text-green-600 mt-1">View all →</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects List Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="folder-open" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Recent Projects</h2>
+                </div>
+                <button onclick="showCreateProjectModal()" class="action-button px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    New Project
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Completed Projects -->
+                <div class="project-card p-4 bg-green-50 rounded-xl" onclick="showProjectDetails('ecommerce')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="globe" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-semibold text-slate-800">E-Commerce Platform</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Completed</span>
                             </div>
-                            
-                            <div class="project-tags">
-                                <span class="project-tag">React</span>
-                                <span class="project-tag">Node.js</span>
-                                <span class="project-tag">MongoDB</span>
-                                <span class="project-tag">Stripe</span>
-                            </div>
-                            
-                            <div class="project-meta">
-                                <div class="project-stats">
-                                    <div class="project-stat">
-                                        <span>⭐</span>
-                                        <span>4.9</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>👀</span>
-                                        <span>156</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>💬</span>
-                                        <span>23</span>
-                                    </div>
-                                </div>
-                                <div class="project-date">2 weeks ago</div>
-                            </div>
-                            
-                            <div class="project-actions">
-                                <button class="project-btn primary">View Project</button>
-                                <button class="project-btn secondary">Edit</button>
-                            </div>
+                            <p class="text-sm text-slate-600">Full-stack e-commerce platform with React, Node.js, and MongoDB</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500">Completed 2 weeks ago</div>
+                            <div class="text-xs text-green-600">1.2k views</div>
                         </div>
                     </div>
-                    
-                    <!-- Project Card 2 -->
-                    <div class="project-card">
-                        <div class="project-image">🤖</div>
-                        <div class="project-content">
-                            <div class="project-header">
-                                <h3 class="project-title">AI Chatbot</h3>
-                                <p class="project-description">An intelligent chatbot powered by machine learning algorithms. Built with Python, TensorFlow, and natural language processing techniques.</p>
+                </div>
+                
+                <div class="project-card p-4 bg-green-50 rounded-xl" onclick="showProjectDetails('dashboard')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-semibold text-slate-800">Data Analytics Dashboard</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Completed</span>
                             </div>
-                            
-                            <div class="project-tags">
-                                <span class="project-tag">Python</span>
-                                <span class="project-tag">TensorFlow</span>
-                                <span class="project-tag">NLP</span>
-                                <span class="project-tag">Flask</span>
-                            </div>
-                            
-                            <div class="project-meta">
-                                <div class="project-stats">
-                                    <div class="project-stat">
-                                        <span>⭐</span>
-                                        <span>4.7</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>👀</span>
-                                        <span>89</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>💬</span>
-                                        <span>12</span>
-                                    </div>
-                                </div>
-                                <div class="project-date">1 month ago</div>
-                            </div>
-                            
-                            <div class="project-actions">
-                                <button class="project-btn primary">View Project</button>
-                                <button class="project-btn secondary">Edit</button>
-                            </div>
+                            <p class="text-sm text-slate-600">Interactive dashboard for visualizing business metrics</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500">Completed 1 month ago</div>
+                            <div class="text-xs text-green-600">856 views</div>
                         </div>
                     </div>
-                    
-                    <!-- Project Card 3 -->
-                    <div class="project-card">
-                        <div class="project-image">📱</div>
-                        <div class="project-content">
-                            <div class="project-header">
-                                <h3 class="project-title">Task Manager App</h3>
-                                <p class="project-description">A cross-platform task management application built with React Native. Features include task creation, reminders, progress tracking, and team collaboration.</p>
+                </div>
+                
+                <!-- In Progress Projects -->
+                <div class="project-card p-4 bg-amber-50 rounded-xl" onclick="showProjectDetails('task-app')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="smartphone" class="w-6 h-6 text-amber-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-semibold text-slate-800">Task Management App</h3>
+                                <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded">In Progress</span>
                             </div>
-                            
-                            <div class="project-tags">
-                                <span class="project-tag">React Native</span>
-                                <span class="project-tag">Firebase</span>
-                                <span class="project-tag">Redux</span>
-                                <span class="project-tag">Push Notifications</span>
-                            </div>
-                            
-                            <div class="project-meta">
-                                <div class="project-stats">
-                                    <div class="project-stat">
-                                        <span>⭐</span>
-                                        <span>4.6</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>👀</span>
-                                        <span>67</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>💬</span>
-                                        <span>8</span>
-                                    </div>
-                                </div>
-                                <div class="project-date">3 weeks ago</div>
-                            </div>
-                            
-                            <div class="project-actions">
-                                <button class="project-btn primary">View Project</button>
-                                <button class="project-btn secondary">Edit</button>
-                            </div>
+                            <p class="text-sm text-slate-600">Mobile task management app with React Native</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500">Started 1 month ago</div>
+                            <div class="text-xs text-amber-600">65% complete</div>
                         </div>
                     </div>
-                    
-                    <!-- Project Card 4 -->
-                    <div class="project-card">
-                        <div class="project-image">🎮</div>
-                        <div class="project-content">
-                            <div class="project-header">
-                                <h3 class="project-title">2D Platformer Game</h3>
-                                <p class="project-description">A 2D platformer game built with Unity and C#. Features include multiple levels, power-ups, enemy AI, and smooth controls.</p>
+                </div>
+                
+                <div class="project-card p-4 bg-blue-50 rounded-xl" onclick="showProjectDetails('ml-classifier')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="brain" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-semibold text-slate-800">ML Image Classifier</h3>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">On Hold</span>
                             </div>
-                            
-                            <div class="project-tags">
-                                <span class="project-tag">Unity</span>
-                                <span class="project-tag">C#</span>
-                                <span class="project-tag">Game Development</span>
-                                <span class="project-tag">2D Graphics</span>
-                            </div>
-                            
-                            <div class="project-meta">
-                                <div class="project-stats">
-                                    <div class="project-stat">
-                                        <span>⭐</span>
-                                        <span>4.8</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>👀</span>
-                                        <span>134</span>
-                                    </div>
-                                    <div class="project-stat">
-                                        <span>💬</span>
-                                        <span>19</span>
-                                    </div>
-                                </div>
-                                <div class="project-date">2 months ago</div>
-                            </div>
-                            
-                            <div class="project-actions">
-                                <button class="project-btn primary">View Project</button>
-                                <button class="project-btn secondary">Edit</button>
-                            </div>
+                            <p class="text-sm text-slate-600">Machine learning model for image classification</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500">Paused 2 weeks ago</div>
+                            <div class="text-xs text-blue-600">92% accuracy</div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Projects Sidebar -->
-            <div class="projects-sidebar">
-                <!-- Add New Project -->
-                <div class="projects-sidebar-card">
-                    <button class="projects-add-btn" onclick="addNewProject()">
-                        <div class="projects-add-icon">➕</div>
-                        <span>Add New Project</span>
-                    </button>
-                    
-                    <h3 class="projects-section-title">
-                        <div class="projects-section-icon">🔍</div>
-                        Filters
-                    </h3>
-                    
-                    <div class="projects-filters">
-                        <div class="projects-filter-group">
-                            <label class="projects-filter-label">Technology</label>
-                            <select class="projects-filter-select">
-                                <option value="">All Technologies</option>
-                                <option value="react">React</option>
-                                <option value="node">Node.js</option>
-                                <option value="python">Python</option>
-                                <option value="unity">Unity</option>
-                            </select>
-                        </div>
-                        
-                        <div class="projects-filter-group">
-                            <label class="projects-filter-label">Category</label>
-                            <select class="projects-filter-select">
-                                <option value="">All Categories</option>
-                                <option value="web">Web Development</option>
-                                <option value="mobile">Mobile Development</option>
-                                <option value="ai">AI & ML</option>
-                                <option value="game">Game Development</option>
-                            </select>
-                        </div>
-                        
-                        <div class="projects-filter-group">
-                            <label class="projects-filter-label">Sort By</label>
-                            <select class="projects-filter-select">
-                                <option value="recent">Most Recent</option>
-                                <option value="rating">Highest Rating</option>
-                                <option value="views">Most Views</option>
-                                <option value="name">Name A-Z</option>
-                            </select>
-                        </div>
-                    </div>
+        <!-- Quick Actions Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                 </div>
-
-                <!-- Project Categories -->
-                <div class="projects-sidebar-card">
-                    <h3 class="projects-section-title">
-                        <div class="projects-section-icon">📂</div>
-                        Categories
-                    </h3>
-                    
-                    <div class="projects-categories">
-                        <div class="projects-category active" data-category="all">
-                            <div class="projects-category-icon">📁</div>
-                            <div class="projects-category-content">
-                                <h4>All Projects</h4>
-                                <p>View all projects</p>
-                            </div>
-                            <div class="projects-category-count">12</div>
-                        </div>
-                        
-                        <div class="projects-category" data-category="web">
-                            <div class="projects-category-icon">🌐</div>
-                            <div class="projects-category-content">
-                                <h4>Web Development</h4>
-                                <p>Web applications</p>
-                            </div>
-                            <div class="projects-category-count">5</div>
-                        </div>
-                        
-                        <div class="projects-category" data-category="mobile">
-                            <div class="projects-category-icon">📱</div>
-                            <div class="projects-category-content">
-                                <h4>Mobile Development</h4>
-                                <p>Mobile applications</p>
-                            </div>
-                            <div class="projects-category-count">3</div>
-                        </div>
-                        
-                        <div class="projects-category" data-category="ai">
-                            <div class="projects-category-icon">🤖</div>
-                            <div class="projects-category-content">
-                                <h4>AI & ML</h4>
-                                <p>Machine learning projects</p>
-                            </div>
-                            <div class="projects-category-count">2</div>
-                        </div>
-                        
-                        <div class="projects-category" data-category="game">
-                            <div class="projects-category-icon">🎮</div>
-                            <div class="projects-category-content">
-                                <h4>Game Development</h4>
-                                <p>Games and simulations</p>
-                            </div>
-                            <div class="projects-category-count">2</div>
-                        </div>
+                <h2 class="text-xl font-bold text-slate-800">Quick Actions</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button class="action-button w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left flex items-center gap-3 transition-colors">
+                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i data-lucide="download" class="w-5 h-5 text-blue-600"></i>
                     </div>
-                </div>
+                    <div>
+                        <div class="font-semibold text-slate-800">Import Project</div>
+                        <div class="text-xs text-slate-600">Import from GitHub/GitLab</div>
+                    </div>
+                </button>
+                
+                <button class="action-button w-full p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl text-left flex items-center gap-3 transition-colors">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                        <i data-lucide="upload" class="w-5 h-5 text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-slate-800">Export Portfolio</div>
+                        <div class="text-xs text-slate-600">Generate PDF portfolio</div>
+                    </div>
+                </button>
+                
+                <button class="action-button w-full p-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-left flex items-center gap-3 transition-colors">
+                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                        <i data-lucide="share-2" class="w-5 h-5 text-amber-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-slate-800">Share Portfolio</div>
+                        <div class="text-xs text-slate-600">Share with potential employers</div>
+                    </div>
+                </button>
             </div>
         </div>
     </main>
 
-    <script src="../community-ui/js/api.js"></script>
-    <script src="../community-ui/js/app.js"></script>
-    
-    <script>
-        // Check authentication on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            loadProjectsData();
-            setupEventListeners();
-        });
+    <!-- Project Details Modal -->
+    <div id="projectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-slate-800" id="modalProjectTitle">Project Details</h3>
+                <button onclick="closeProjectModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="modalProjectContent">
+                <!-- Project content will be loaded here -->
+            </div>
+        </div>
+    </div>
 
-        function checkAuthentication() {
-            const token = localStorage.getItem('skillport_token');
-            if (!token) {
-                window.location.href = '../community-ui/pages/auth/login.html';
+    <!-- Create Project Modal -->
+    <div id="createProjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <i data-lucide="plus" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800">Create New Project</h3>
+                            <p class="text-slate-600">Add a new project to your portfolio</p>
+                        </div>
+                    </div>
+                    <button onclick="closeCreateProjectModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-white rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Form Content -->
+            <div class="space-y-6">
+                <!-- Basic Information -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
+                        Basic Information
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Project Name *</label>
+                            <input type="text" id="projectName" placeholder="Enter project name..." 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Description *</label>
+                            <textarea id="projectDescription" rows="4" placeholder="Describe your project, its purpose, and key features..." 
+                                      class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Details -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-purple-600"></i>
+                        Project Details
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                            <select id="projectCategory" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="web-dev">🌐 Web Development</option>
+                                <option value="mobile">📱 Mobile Apps</option>
+                                <option value="ml">🤖 Machine Learning</option>
+                                <option value="data-science">📊 Data Science</option>
+                                <option value="other">🔧 Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                            <select id="projectStatus" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="planning">📋 Planning</option>
+                                <option value="in-progress">⏳ In Progress</option>
+                                <option value="completed">✅ Completed</option>
+                                <option value="on-hold">⏸️ On Hold</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technologies -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="code" class="w-5 h-5 text-green-600"></i>
+                        Technologies Used
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Technologies</label>
+                            <input type="text" id="projectTechnologies" placeholder="React, Node.js, MongoDB, Express..." 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <p class="text-xs text-slate-500 mt-1">Separate technologies with commas</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">GitHub Repository (Optional)</label>
+                            <input type="url" id="projectGithub" placeholder="https://github.com/username/project" 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Live Demo URL (Optional)</label>
+                            <input type="url" id="projectDemo" placeholder="https://your-project.com" 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h4 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-5 h-5 text-amber-600"></i>
+                        Additional Information
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Start Date</label>
+                            <input type="date" id="projectStartDate" 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Expected Completion</label>
+                            <input type="date" id="projectEndDate" 
+                                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Key Features</label>
+                        <textarea id="projectFeatures" rows="3" placeholder="List the main features of your project..." 
+                                  class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl p-6 mt-6">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="closeCreateProjectModal()" class="flex-1 px-6 py-3 text-slate-600 border border-slate-300 rounded-xl hover:bg-white font-medium transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                        Cancel
+                    </button>
+                    <button onclick="createNewProject()" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        Create Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Project data
+        const projects = {
+            'ecommerce': {
+                title: 'E-Commerce Platform',
+                status: 'Completed',
+                description: 'A full-stack e-commerce platform built with React, Node.js, and MongoDB. Features include user authentication, product management, shopping cart, and payment integration.',
+                technologies: ['React', 'Node.js', 'MongoDB', 'Express', 'Stripe'],
+                category: 'Web Development',
+                completionDate: '2 weeks ago',
+                views: '1.2k',
+                rating: 4.9,
+                github: 'https://github.com/username/ecommerce-platform',
+                liveDemo: 'https://ecommerce-demo.com',
+                features: ['User Authentication', 'Product Management', 'Shopping Cart', 'Payment Integration', 'Admin Dashboard'],
+                challenges: 'Implementing real-time inventory management and payment processing',
+                solutions: 'Used WebSocket for real-time updates and integrated Stripe for secure payments'
+            },
+            'dashboard': {
+                title: 'Data Analytics Dashboard',
+                status: 'Completed',
+                description: 'An interactive dashboard for visualizing business metrics using D3.js and React. Includes charts, graphs, and real-time data updates.',
+                technologies: ['React', 'D3.js', 'Node.js', 'PostgreSQL', 'Chart.js'],
+                category: 'Data Science',
+                completionDate: '1 month ago',
+                views: '856',
+                rating: 4.7,
+                github: 'https://github.com/username/analytics-dashboard',
+                liveDemo: 'https://dashboard-demo.com',
+                features: ['Real-time Charts', 'Data Visualization', 'Export Reports', 'User Management', 'Custom Dashboards'],
+                challenges: 'Handling large datasets and creating responsive visualizations',
+                solutions: 'Implemented data pagination and used Web Workers for heavy computations'
+            },
+            'task-app': {
+                title: 'Task Management App',
+                status: 'In Progress',
+                description: 'A mobile task management application built with React Native. Features include task creation, priority levels, due dates, and team collaboration.',
+                technologies: ['React Native', 'Firebase', 'Redux', 'Expo', 'AsyncStorage'],
+                category: 'Mobile Apps',
+                progress: 65,
+                startDate: '1 month ago',
+                dueDate: '2 weeks',
+                github: 'https://github.com/username/task-app',
+                features: ['Task Creation', 'Priority Levels', 'Due Dates', 'Team Collaboration', 'Push Notifications'],
+                challenges: 'Implementing offline functionality and real-time sync',
+                solutions: 'Used AsyncStorage for offline data and Firebase for real-time synchronization'
+            },
+            'ml-classifier': {
+                title: 'ML Image Classifier',
+                status: 'On Hold',
+                description: 'A machine learning model for image classification using TensorFlow and Python. The model can classify images into 10 different categories with 92% accuracy.',
+                technologies: ['Python', 'TensorFlow', 'OpenCV', 'NumPy', 'Pandas'],
+                category: 'Machine Learning',
+                accuracy: '92%',
+                pauseDate: '2 weeks ago',
+                github: 'https://github.com/username/ml-classifier',
+                features: ['Image Classification', 'Model Training', 'API Endpoint', 'Batch Processing', 'Accuracy Metrics'],
+                challenges: 'Achieving high accuracy with limited training data',
+                solutions: 'Used data augmentation and transfer learning with pre-trained models'
+            }
+        };
+
+        function showProjectsByCategory(category) {
+            // Filter and display projects by category
+            console.log('Showing projects for category:', category);
+            // Implementation for filtering projects
+        }
+
+        function showProjectDetails(projectId) {
+            const project = projects[projectId];
+            if (!project) return;
+
+            document.getElementById('modalProjectTitle').textContent = project.title;
+            
+            const content = `
+                <div class="space-y-8">
+                    <!-- Project Header -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+                        <div class="flex items-center gap-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <i data-lucide="folder" class="w-10 h-10 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-4 mb-3">
+                                    <h4 class="text-2xl font-bold text-slate-800">${project.title}</h4>
+                                    <span class="px-4 py-2 bg-${getStatusColor(project.status)}-100 text-${getStatusColor(project.status)}-700 text-sm font-semibold rounded-full shadow-sm">
+                                        <i data-lucide="${getStatusIcon(project.status)}" class="w-4 h-4 inline mr-2"></i>
+                                        ${project.status}
+                                    </span>
+                                </div>
+                                <p class="text-slate-600 text-lg leading-relaxed">${project.description}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="layers" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="text-sm text-slate-600">Category</div>
+                            <div class="font-semibold text-slate-800">${project.category}</div>
+                        </div>
+                        
+                        ${project.completionDate ? `<div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="calendar" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="text-sm text-slate-600">Completed</div>
+                            <div class="font-semibold text-slate-800">${project.completionDate}</div>
+                        </div>` : ''}
+                        
+                        ${project.views ? `<div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="eye" class="w-5 h-5 text-purple-600"></i>
+                            </div>
+                            <div class="text-sm text-slate-600">Views</div>
+                            <div class="font-semibold text-slate-800">${project.views}</div>
+                        </div>` : ''}
+                        
+                        ${project.rating ? `<div class="bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="star" class="w-5 h-5 text-amber-600"></i>
+                            </div>
+                            <div class="text-sm text-slate-600">Rating</div>
+                            <div class="font-semibold text-slate-800">${project.rating}/5</div>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- Technologies -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h5 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="code" class="w-5 h-5 text-blue-600"></i>
+                            Technologies Used
+                        </h5>
+                        <div class="flex flex-wrap gap-2">
+                            ${project.technologies.map(tech => `
+                                <span class="px-3 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200">
+                                    <i data-lucide="zap" class="w-3 h-3 inline mr-1"></i>
+                                    ${tech}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h5 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            Key Features
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${project.features.map(feature => `
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-slate-700">${feature}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    ${project.challenges ? `
+                    <!-- Challenges & Solutions -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                            <h5 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
+                                Challenges Faced
+                            </h5>
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <p class="text-sm text-slate-700 leading-relaxed">${project.challenges}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                            <h5 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                                <i data-lucide="lightbulb" class="w-5 h-5 text-amber-600"></i>
+                                Solutions Implemented
+                            </h5>
+                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                <p class="text-sm text-slate-700 leading-relaxed">${project.solutions}</p>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Action Buttons -->
+                    <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl p-6">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            ${project.github ? `<a href="${project.github}" target="_blank" class="flex-1 px-6 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 text-center font-medium transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="github" class="w-5 h-5"></i>
+                                View Code
+                            </a>` : ''}
+                            ${project.liveDemo ? `<a href="${project.liveDemo}" target="_blank" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-center font-medium transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="external-link" class="w-5 h-5"></i>
+                                Live Demo
+                            </a>` : ''}
+                            <button onclick="editProject('${projectId}')" class="flex-1 px-6 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 font-medium transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="edit" class="w-5 h-5"></i>
+                                Edit Project
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalProjectContent').innerHTML = content;
+            document.getElementById('projectModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').classList.add('hidden');
+        }
+
+        function showCreateProjectModal() {
+            document.getElementById('createProjectModal').classList.remove('hidden');
+        }
+
+        function closeCreateProjectModal() {
+            document.getElementById('createProjectModal').classList.add('hidden');
+        }
+
+        function createNewProject() {
+            const name = document.getElementById('projectName').value;
+            const description = document.getElementById('projectDescription').value;
+            const category = document.getElementById('projectCategory').value;
+            const status = document.getElementById('projectStatus').value;
+            const technologies = document.getElementById('projectTechnologies').value;
+            const github = document.getElementById('projectGithub').value;
+            const demo = document.getElementById('projectDemo').value;
+            const startDate = document.getElementById('projectStartDate').value;
+            const endDate = document.getElementById('projectEndDate').value;
+            const features = document.getElementById('projectFeatures').value;
+
+            if (!name || !description) {
+                alert('Please fill in all required fields (Project Name and Description)');
                 return;
             }
+
+            // Here you would typically save the project to your backend
+            const projectData = {
+                name,
+                description,
+                category,
+                status,
+                technologies: technologies.split(',').map(tech => tech.trim()).filter(tech => tech),
+                github,
+                demo,
+                startDate,
+                endDate,
+                features: features.split(',').map(feature => feature.trim()).filter(feature => feature)
+            };
             
-            // Verify token with backend
-            verifyToken(token);
+            console.log('Creating new project:', projectData);
+            
+            closeCreateProjectModal();
+            alert('Project created successfully!');
         }
 
-        async function verifyToken(token) {
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-                
-                const data = await response.json();
-                if (data.user.role !== 'personal') {
-                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
-                }
-                
-            } catch (error) {
-                console.error('Token verification failed:', error);
-                localStorage.removeItem('skillport_token');
-                window.location.href = '../community-ui/pages/auth/login.html';
+        function editProject(projectId) {
+            console.log('Editing project:', projectId);
+            // Implementation for editing project
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Completed': return 'green';
+                case 'In Progress': return 'amber';
+                case 'On Hold': return 'blue';
+                default: return 'gray';
             }
         }
 
-        async function loadProjectsData() {
-            try {
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/projects', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const projectsData = await response.json();
-                    updateProjectsDisplay(projectsData);
-                }
-            } catch (error) {
-                console.error('Failed to load projects data:', error);
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'Completed': return 'check-circle';
+                case 'In Progress': return 'clock';
+                case 'On Hold': return 'pause';
+                default: return 'circle';
             }
         }
 
-        function updateProjectsDisplay(projectsData) {
-            // Update projects grid
-            if (projectsData.projects) {
-                // Update project cards
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeProjectModal();
+                closeCreateProjectModal();
             }
-            
-            // Update stats
-            if (projectsData.stats) {
-                // Update statistics
-            }
-        }
-
-        function setupEventListeners() {
-            // Filter functionality
-            const filterSelects = document.querySelectorAll('.projects-filter-select');
-            filterSelects.forEach(select => {
-                select.addEventListener('change', function() {
-                    applyFilters();
-                });
-            });
-            
-            // Category selection
-            const categoryItems = document.querySelectorAll('.projects-category');
-            categoryItems.forEach(category => {
-                category.addEventListener('click', function() {
-                    selectCategory(category);
-                });
-            });
-            
-            // Project action buttons
-            const projectBtns = document.querySelectorAll('.project-btn');
-            projectBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    handleProjectAction(e);
-                });
-            });
-        }
-
-        function applyFilters() {
-            // Implementation for applying filters
-            console.log('Applying filters');
-        }
-
-        function selectCategory(selectedCategory) {
-            // Remove active class from all categories
-            document.querySelectorAll('.projects-category').forEach(category => {
-                category.classList.remove('active');
-            });
-            
-            // Add active class to selected category
-            selectedCategory.classList.add('active');
-            
-            // Filter projects by category
-            const category = selectedCategory.getAttribute('data-category');
-            filterProjectsByCategory(category);
-        }
-
-        function filterProjectsByCategory(category) {
-            // Implementation for filtering projects by category
-            console.log('Filtering by category:', category);
-        }
-
-        function handleProjectAction(e) {
-            const btn = e.target;
-            const action = btn.textContent.toLowerCase();
-            const projectCard = btn.closest('.project-card');
-            
-            if (action === 'view project') {
-                // Navigate to project details page
-                console.log('Viewing project');
-            } else if (action === 'edit') {
-                // Edit project
-                console.log('Editing project');
-            }
-        }
-
-        function addNewProject() {
-            // Implementation for adding new project
-            alert('Add new project functionality will be implemented here');
-        }
+        });
     </script>
 </body>
 </html>

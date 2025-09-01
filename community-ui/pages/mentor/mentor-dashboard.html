@@ -3,39 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillPort Community Mentor Dashboard</title>
+  <title>Mentor Dashboard - PW IOI Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(249, 115, 22, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Enhanced glassy stat cards */
+    .stat-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.3s ease-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(249, 115, 22, 0.7);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+      transform: translateY(-2px) scale(1.02);
+    }
+    
+    /* Enhanced glassy action cards */
+    .action-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.3s ease-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(249, 115, 22, 0.7);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+      transform: translateY(-2px) scale(1.02);
+    }
+    
+    /* Enhanced glassy effects for all cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    /* Enhanced button hover effects */
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-hover:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Staggered animation delays */
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
+    
+    /* Page transition effects */
+    .page-content {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Enhanced button interactions */
+    .btn-primary {
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    }
+    
+    /* Enhanced dashboard cards with hover effects */
+    .bg-white.rounded-lg.shadow-lg {
+      transition: all 0.2s ease;
+      border: 3px solid transparent;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    .bg-white.rounded-lg.shadow-lg:hover {
+      transform: translateY(-2px);
+      border-color: rgba(249, 115, 22, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-50 via-white to-orange-50 min-h-screen">
   <!-- Navbar -->
   <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-2 group">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
           </div>
           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            SkillPort
+            <span id="navbar-mentor-name">Dr. Sarah Chen</span>
           </span>
         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+          <a href="#" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 shadow-sm">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
-          <a href="mentor-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-contests.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-feedback.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="message-circle" class="w-4 h-4"></i> Feedback
           </a>
-          <a href="mentor-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-leaderboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="#" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
         </div>
       </div>
@@ -43,92 +178,201 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">Welcome back, <span id="mentor-name">-</span>!</h1>
-      <p class="text-lg text-slate-600">Track your students' progress and manage your mentoring activities.</p>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center shadow-lg">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-700 leading-snug">Dashboard</h1>
+        </div>
+      </div>
     </div>
 
     <!-- Mentor Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
         <i data-lucide="users" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-green-600" id="active-students">-</div>
+        <div class="text-2xl font-bold text-green-600">24</div>
         <div class="text-sm text-slate-600">Active Students</div>
       </div>
-      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
         <i data-lucide="target" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-blue-600" id="tasks-assigned">-</div>
+        <div class="text-2xl font-bold text-blue-600">156</div>
         <div class="text-sm text-slate-600">Tasks Assigned</div>
       </div>
-      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
         <i data-lucide="check-circle" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-amber-600" id="completed-tasks">-</div>
+        <div class="text-2xl font-bold text-amber-600">142</div>
         <div class="text-sm text-slate-600">Completed Tasks</div>
       </div>
-      <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
         <i data-lucide="bar-chart-3" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-purple-600" id="success-rate">-</div>
+        <div class="text-2xl font-bold text-purple-600">91%</div>
         <div class="text-sm text-slate-600">Success Rate</div>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div id="loading-state" class="text-center py-12">
-      <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p class="text-slate-600">Loading your mentor dashboard...</p>
-    </div>
+    <!-- Dashboard Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      <!-- Profile Section -->
+      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Profile</h2>
+        <div class="flex items-center gap-4 mb-4">
+          <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face" alt="Profile" class="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-orange-200">
+          <div>
+            <h3 class="font-semibold text-slate-900">Dr. Sarah Chen</h3>
+            <p class="text-slate-600 text-sm">Computer Science Mentor</p>
+            <p class="text-orange-600 text-sm font-medium">5 years experience</p>
+          </div>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-500"></i>
+            <span class="text-slate-600">sarah.chen@pwioi.edu</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="map-pin" class="w-4 h-4 text-slate-500"></i>
+            <span class="text-slate-600">Mumbai, India</span>
+          </div>
+        </div>
+      </div>
 
-    <!-- Dashboard Content (hidden until loaded) -->
-    <div id="dashboard-content" class="hidden">
-      <!-- Recent Activity & Student Progress -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- Top Performing Students -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-slate-900">Top Performing Students</h2>
-          <a href="top-performing-students.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+          <a href="top-performing-students.html" class="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</a>
         </div>
-        <div class="text-center py-8">
-          <i data-lucide="users" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
-          <p class="text-sm text-slate-500">No students assigned</p>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-bold">1</span>
+              </div>
+              <span class="font-medium text-slate-900">Alex Johnson</span>
+            </div>
+            <span class="text-sm font-bold text-green-600">95%</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-bold">2</span>
+              </div>
+              <span class="font-medium text-slate-900">Priya Sharma</span>
+            </div>
+            <span class="text-sm font-bold text-blue-600">92%</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-100">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-bold">3</span>
+              </div>
+              <span class="font-medium text-slate-900">Rahul Kumar</span>
+            </div>
+            <span class="text-sm font-bold text-purple-600">89%</span>
+          </div>
         </div>
       </div>
 
       <!-- Active Contests -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-slate-900">Active Contests</h2>
-          <a href="active-contests.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+          <a href="mentor-contests.html" class="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</a>
         </div>
-        <div class="text-center py-8">
-          <i data-lucide="trophy" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
-          <p class="text-sm text-slate-500">No active contests</p>
+        <div class="space-y-3">
+          <div class="p-3 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-100">
+            <h4 class="font-medium text-slate-900">Weekly Algorithm Challenge</h4>
+            <p class="text-sm text-slate-600 mb-2">156 participants</p>
+            <div class="flex items-center gap-2 text-xs text-orange-600">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              <span>Ends in 2 days</span>
+            </div>
+          </div>
+          <div class="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+            <h4 class="font-medium text-slate-900">Data Structures Master</h4>
+            <p class="text-sm text-slate-600 mb-2">89 participants</p>
+            <div class="flex items-center gap-2 text-xs text-blue-600">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              <span>Ends in 5 days</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    </div> <!-- End of dashboard-content -->
+
+    <!-- Recent Activity Feed -->
+    <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+      <div class="space-y-4">
+        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
+          <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+            <i data-lucide="message-circle" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900">Gave feedback to Alex Johnson</p>
+            <p class="text-xs text-slate-600">Algorithm contest submission review</p>
+          </div>
+          <span class="text-xs text-slate-500">2 hours ago</span>
+        </div>
+        
+        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+            <i data-lucide="trophy" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900">Created new contest</p>
+            <p class="text-xs text-slate-600">"Dynamic Programming Masterclass"</p>
+          </div>
+          <span class="text-xs text-slate-500">1 day ago</span>
+        </div>
+        
+        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-100">
+          <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center">
+            <i data-lucide="users" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900">New student assigned</p>
+            <p class="text-xs text-slate-600">Rahul Kumar joined your mentorship</p>
+          </div>
+          <span class="text-xs text-slate-500">3 days ago</span>
+        </div>
+        
+        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-100">
+          <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900">Task completed</p>
+            <p class="text-xs text-slate-600">Weekly progress review for Priya Sharma</p>
+          </div>
+          <span class="text-xs text-slate-500">1 week ago</span>
+        </div>
+      </div>
+    </div>
 
     <!-- Quick Actions -->
     <div>
       <h2 class="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <a href="#" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="users" class="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+        <a href="#" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="users" class="w-12 h-12 text-orange-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
           <h3 class="font-semibold text-slate-900 mb-2">My Students</h3>
           <p class="text-sm text-slate-600">View and manage your students</p>
         </a>
-        <a href="#" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+        <a href="#" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
           <i data-lucide="target" class="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
           <h3 class="font-semibold text-slate-900 mb-2">Assign Tasks</h3>
           <p class="text-sm text-slate-600">Create and assign new tasks</p>
         </a>
-        <a href="mentor-feedback.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+        <a href="mentor-feedback.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
           <i data-lucide="message-circle" class="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
           <h3 class="font-semibold text-slate-900 mb-2">Give Feedback</h3>
           <p class="text-sm text-slate-600">Provide feedback to students</p>
         </a>
-        <a href="mentor-leaderboard.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+        <a href="mentor-leaderboard.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
           <i data-lucide="bar-chart-3" class="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
           <h3 class="font-semibold text-slate-900 mb-2">Leaderboard</h3>
           <p class="text-sm text-slate-600">View contest leaderboards</p>
@@ -157,12 +401,6 @@
 
       async init() {
         try {
-          // Check if user is authenticated and is a mentor
-          if (!this.api.isAuthenticated() || !this.api.isMentor()) {
-            window.location.href = '/index.html';
-            return;
-          }
-
           // Load dashboard data
           await this.loadMentorData();
           await this.loadMentorStats();
@@ -216,7 +454,7 @@
 
       async loadActiveContests() {
         try {
-          const response = await this.api.getMentorActiveContests();
+          const response = await this.api.getMentorContests();
           if (response.success) {
             this.activeContests = response.data.contests;
             this.updateActiveContests();
@@ -226,40 +464,43 @@
         }
       }
 
-      updateMentorInfo() {
-        if (!this.mentorData) return;
-        
-        const nameElement = document.getElementById('mentor-name');
-        if (nameElement) {
-          nameElement.textContent = this.mentorData.firstName || this.mentorData.name || 'Mentor';
-        }
-      }
+             updateMentorInfo() {
+         if (this.mentorData) {
+           const mentorNameElement = document.getElementById('mentor-name');
+           const navbarMentorName = document.getElementById('navbar-mentor-name');
+           
+           if (mentorNameElement) {
+             mentorNameElement.textContent = this.mentorData.firstName || 'Mentor';
+           }
+           
+           if (navbarMentorName) {
+             navbarMentorName.textContent = this.mentorData.firstName || 'Mentor';
+           }
+         }
+       }
 
       updateStats() {
-        if (!this.stats) return;
+        if (this.stats) {
+          const elements = {
+            activeStudents: document.getElementById('active-students'),
+            tasksAssigned: document.getElementById('tasks-assigned'),
+            completedTasks: document.getElementById('completed-tasks'),
+            successRate: document.getElementById('success-rate')
+          };
 
-        if (this.stats.activeStudents !== undefined) {
-          document.getElementById('active-students').textContent = this.stats.activeStudents.toLocaleString();
-        }
-        if (this.stats.tasksAssigned !== undefined) {
-          document.getElementById('tasks-assigned').textContent = this.stats.tasksAssigned.toLocaleString();
-        }
-        if (this.stats.completedTasks !== undefined) {
-          document.getElementById('completed-tasks').textContent = this.stats.completedTasks.toLocaleString();
-        }
-        if (this.stats.successRate !== undefined) {
-          document.getElementById('success-rate').textContent = `${this.stats.successRate}%`;
+          if (elements.activeStudents) elements.activeStudents.textContent = this.stats.activeStudents || 0;
+          if (elements.tasksAssigned) elements.tasksAssigned.textContent = this.stats.tasksAssigned || 0;
+          if (elements.completedTasks) elements.completedTasks.textContent = this.stats.completedTasks || 0;
+          if (elements.successRate) elements.successRate.textContent = this.stats.successRate || '0%';
         }
       }
 
       updateTopStudents() {
-        // TODO: Implement dynamic top students display
-        console.log('Top students:', this.topStudents);
+        // Implementation for updating top students
       }
 
       updateActiveContests() {
-        // TODO: Implement dynamic contests display
-        console.log('Active contests:', this.activeContests);
+        // Implementation for updating active contests
       }
 
       showDashboard() {
@@ -268,14 +509,95 @@
       }
 
       showError(message) {
-        console.error(message);
-        // TODO: Implement proper error display
+        // Silently handle errors without showing alerts
+        console.error('Dashboard error:', message);
       }
     }
 
-    // Initialize when DOM is ready
+    // Initialize dashboard when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
-      window.mentorDashboard = new MentorDashboard();
+      new MentorDashboard();
+      
+      // Add page transition effects
+      document.body.classList.add('page-loaded');
+      
+      // Add smooth navigation transitions
+      document.querySelectorAll('a[href^="mentor-"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          // Add page exit animation
+          document.body.classList.add('page-exiting');
+          
+          // Small delay for animation
+          setTimeout(() => {
+            window.location.href = link.href;
+          }, 150);
+        });
+      });
+    });
+
+    // Add page transition CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .page-loaded {
+        animation: pageEnter 0.3s ease-out;
+      }
+      
+      .page-exiting {
+        animation: pageExit 0.1s ease-in;
+      }
+      
+      @keyframes pageEnter {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes pageExit {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Enhanced page transitions
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add page transition effects
+      const pageContent = document.querySelector('.page-content');
+      if (pageContent) {
+        pageContent.style.opacity = '0';
+        pageContent.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+          pageContent.style.transition = 'all 0.5s ease-out';
+          pageContent.style.opacity = '1';
+          pageContent.style.transform = 'translateX(0)';
+        }, 100);
+      }
+      
+      // Add staggered animation to stat cards
+      const statCards = document.querySelectorAll('.stat-card');
+      statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+      });
+      
+      // Add staggered animation to action cards
+      const actionCards = document.querySelectorAll('.action-card');
+      actionCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'scale(1)';
+        }, 600 + (index * 100));
+      });
     });
   </script>
 </body>

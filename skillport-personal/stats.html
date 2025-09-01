@@ -4,673 +4,530 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistics - SkillPort</title>
-    <link rel="stylesheet" href="../community-ui/css/main.css">
-    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
-    <link rel="stylesheet" href="../community-ui/css/components.css">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        body { font-family: 'Josefin Sans', sans-serif; }
-        
-        .stats-page {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .stats-header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-        }
-        
-        .stats-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .stats-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
-        
-        .stats-brand-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .stats-brand-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .stats-nav-menu {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .stats-nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-        }
-        
-        .stats-nav-link:hover,
-        .stats-nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .stats-back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .stats-back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .stats-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .stats-hero {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-        }
-        
-        .stats-hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stats-hero p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .stats-overview {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stats-overview-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
-            text-align: center;
+        /* Enhanced glassy effects */
+        .glassy-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
             transition: all 0.3s ease;
         }
         
-        .stats-overview-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        .glassy-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.12);
+            transform: translateY(-2px);
         }
         
-        .stats-overview-icon {
-            width: 3rem;
-            height: 3rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 1rem;
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
         
-        .stats-overview-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
         }
         
-        .stats-overview-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
+        /* Progress bars */
+        .progress-bar {
+            background: rgba(226, 232, 240, 0.6);
+            backdrop-filter: blur(5px);
         }
         
-        .stats-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
         
-        .stats-main-section {
-            background: rgba(255, 255, 255, 0.1);
+        /* Smooth page transitions */
+        .page-content {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Enhanced hover effects */
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        /* Chart containers */
+        .chart-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 1.5rem;
+        }
+        
+        /* Skill badges */
+        .skill-badge {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 2rem;
-            color: white;
-            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
         }
         
-        .stats-section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .skill-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
         
-        .stats-section-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .stats-chart-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .stats-chart-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .stats-chart-placeholder {
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            opacity: 0.7;
-        }
-        
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        
-        .stats-table th,
-        .stats-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stats-table th {
-            font-weight: 600;
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .stats-table td {
-            font-size: 0.875rem;
-        }
-        
-        .stats-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .stats-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .stats-sidebar-card {
-            background: rgba(255, 255, 255, 0.1);
+        /* Quick action buttons */
+        .quick-action-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.2s ease;
         }
         
-        .stats-achievement {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .stats-achievement:last-child {
-            margin-bottom: 0;
-        }
-        
-        .stats-achievement-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        
-        .stats-achievement-content h4 {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .stats-achievement-content p {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .stats-ranking {
-            margin-top: 1.5rem;
-        }
-        
-        .stats-ranking-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .stats-ranking-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .stats-ranking-position {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
-        .stats-ranking-position.top-3 {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        }
-        
-        .stats-ranking-content h4 {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .stats-ranking-content p {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .stats-ranking-score {
-            margin-left: auto;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        @media (max-width: 768px) {
-            .stats-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .stats-nav-menu {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+        .quick-action-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.1));
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="stats-page">
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
     <!-- Stats Header -->
-    <header class="stats-header">
-        <nav class="stats-nav">
-            <div class="stats-brand">
-                <div class="stats-brand-icon">🎯</div>
-                <span class="stats-brand-text">SkillPort</span>
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-lg font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+                        SkillPort Personal
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="student-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="projects.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="folder" class="w-4 h-4"></i> Projects
+                    </a>
+                    <a href="tracker.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="activity" class="w-4 h-4"></i> Tracker
+                    </a>
+                    <a href="stats.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Stats
+                    </a>
+                    <a href="communities.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="users" class="w-4 h-4"></i> Communities
+                    </a>
+                    <a href="profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+                    </a>
+                </div>
             </div>
-            
-            <div class="stats-nav-menu">
-                <a href="student-dashboard.html" class="stats-nav-link">Dashboard</a>
-                <a href="profile.html" class="stats-nav-link">Profile</a>
-                <a href="tracker.html" class="stats-nav-link">Tracker</a>
-                <a href="stats.html" class="stats-nav-link active">Stats</a>
-                <a href="communities.html" class="stats-nav-link">Communities</a>
-                <a href="projects.html" class="stats-nav-link">Projects</a>
-                <a href="posts.html" class="stats-nav-link">Posts</a>
-            </div>
-            
-            <button class="stats-back-btn" onclick="location.href='student-dashboard.html'">← Back to Dashboard</button>
         </nav>
     </header>
 
     <!-- Main Stats Content -->
-    <main class="stats-main">
-        <!-- Stats Hero Section -->
-        <div class="stats-hero">
-            <h1>Your Statistics</h1>
-            <p>Track your progress and analyze your performance across all platforms</p>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-content">
+        <!-- Stats Header -->
+        <div class="mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 mb-2">Your Statistics</h1>
+                    <p class="text-base text-slate-600">Track your learning progress and performance metrics</p>
+                </div>
+            </div>
         </div>
 
         <!-- Stats Overview -->
-        <div class="stats-overview">
-            <div class="stats-overview-card">
-                <div class="stats-overview-icon">🏆</div>
-                <div class="stats-overview-value">247</div>
-                <div class="stats-overview-label">Total Problems</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div class="stat-card rounded-2xl p-6 text-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                </div>
+                <div class="text-2xl font-bold text-blue-600 mb-1">247</div>
+                <div class="text-sm text-slate-600 font-medium">Problems Solved</div>
             </div>
             
-            <div class="stats-overview-card">
-                <div class="stats-overview-icon">📊</div>
-                <div class="stats-overview-value">1,850</div>
-                <div class="stats-overview-label">Skill Rating</div>
+            <div class="stat-card rounded-2xl p-6 text-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+                <div class="text-2xl font-bold text-emerald-600 mb-1">1,850</div>
+                <div class="text-sm text-slate-600 font-medium">Skill Rating</div>
             </div>
             
-            <div class="stats-overview-card">
-                <div class="stats-overview-icon">🔥</div>
-                <div class="stats-overview-value">23</div>
-                <div class="stats-overview-label">Day Streak</div>
+            <div class="stat-card rounded-2xl p-6 text-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i data-lucide="calendar" class="w-6 h-6 text-white"></i>
+                </div>
+                <div class="text-2xl font-bold text-purple-600 mb-1">23</div>
+                <div class="text-sm text-slate-600 font-medium">Day Streak</div>
             </div>
             
-            <div class="stats-overview-card">
-                <div class="stats-overview-icon">⭐</div>
-                <div class="stats-overview-value">89%</div>
-                <div class="stats-overview-label">Success Rate</div>
+            <div class="stat-card rounded-2xl p-6 text-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i data-lucide="award" class="w-6 h-6 text-white"></i>
+                </div>
+                <div class="text-2xl font-bold text-amber-600 mb-1">8</div>
+                <div class="text-sm text-slate-600 font-medium">Achievements</div>
             </div>
         </div>
 
-        <!-- Stats Content -->
-        <div class="stats-content">
-            <!-- Main Stats Section -->
-            <div class="stats-main-section">
-                <h2 class="stats-section-title">
-                    <div class="stats-section-icon">📈</div>
-                    Performance Analytics
-                </h2>
-                
-                <div class="stats-chart-container">
-                    <div class="stats-chart-title">Problems Solved Over Time</div>
-                    <div class="stats-chart-placeholder">
-                        Chart visualization will be implemented here
+        <!-- Main Stats Section -->
+        <div class="space-y-6 mb-10">
+            <!-- Performance Chart -->
+            <div class="glassy-card rounded-2xl p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
                     </div>
+                    <h2 class="text-xl font-bold text-slate-800">Performance Over Time</h2>
                 </div>
                 
-                <div class="stats-chart-container">
-                    <div class="stats-chart-title">Difficulty Distribution</div>
-                    <div class="stats-chart-placeholder">
-                        Pie chart will be implemented here
+                <div class="chart-container h-72 flex items-center justify-center p-8">
+                    <div class="text-center">
+                        <i data-lucide="bar-chart-3" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+                        <p class="text-slate-600 font-medium">Performance chart will be displayed here</p>
+                        <p class="text-sm text-slate-500">Showing your progress over the last 30 days</p>
                     </div>
                 </div>
-                
-                <h3 class="stats-section-title" style="margin-top: 2rem;">
-                    <div class="stats-section-icon">📋</div>
-                    Platform Breakdown
-                </h3>
-                
-                <table class="stats-table">
-                    <thead>
-                        <tr>
-                            <th>Platform</th>
-                            <th>Problems Solved</th>
-                            <th>Success Rate</th>
-                            <th>Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>LeetCode</td>
-                            <td>156</td>
-                            <td>92%</td>
-                            <td>1,750</td>
-                        </tr>
-                        <tr>
-                            <td>HackerRank</td>
-                            <td>45</td>
-                            <td>87%</td>
-                            <td>1,650</td>
-                        </tr>
-                        <tr>
-                            <td>GFG</td>
-                            <td>32</td>
-                            <td>84%</td>
-                            <td>1,600</td>
-                        </tr>
-                        <tr>
-                            <td>Codeforces</td>
-                            <td>14</td>
-                            <td>79%</td>
-                            <td>1,450</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
 
-            <!-- Stats Sidebar -->
-            <div class="stats-sidebar">
-                <!-- Recent Achievements -->
-                <div class="stats-sidebar-card">
-                    <h3 class="stats-section-title">
-                        <div class="stats-section-icon">🏆</div>
-                        Recent Achievements
-                    </h3>
+            <!-- Problem Difficulty Distribution -->
+            <div class="glassy-card rounded-2xl p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="pie-chart" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Problem Difficulty Distribution</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-xl font-bold text-green-600">45</span>
+                        </div>
+                        <div class="text-base font-semibold text-slate-800 mb-1">Easy</div>
+                        <div class="text-sm text-slate-600">90% Success Rate</div>
+                    </div>
                     
-                    <div class="stats-achievement">
-                        <div class="stats-achievement-icon">🥇</div>
-                        <div class="stats-achievement-content">
-                            <h4>Problem Solver</h4>
-                            <p>Solved 100+ problems</p>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-xl font-bold text-amber-600">23</span>
+                        </div>
+                        <div class="text-base font-semibold text-slate-800 mb-1">Medium</div>
+                        <div class="text-sm text-slate-600">75% Success Rate</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-xl font-bold text-red-600">8</span>
+                        </div>
+                        <div class="text-base font-semibold text-slate-800 mb-1">Hard</div>
+                        <div class="text-sm text-slate-600">60% Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section - Side by Side -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Weekly Progress -->
+            <div class="glassy-card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="calendar-days" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Weekly Progress</h3>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-slate-700">Monday</span>
+                            <span class="text-sm text-slate-600">5/5</span>
+                        </div>
+                        <div class="progress-bar rounded-full h-2 overflow-hidden">
+                            <div class="progress-fill h-full rounded-full" style="width: 100%"></div>
                         </div>
                     </div>
                     
-                    <div class="stats-achievement">
-                        <div class="stats-achievement-icon">🔥</div>
-                        <div class="stats-achievement-content">
-                            <h4>Streak Master</h4>
-                            <p>20+ day streak</p>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-slate-700">Tuesday</span>
+                            <span class="text-sm text-slate-600">4/5</span>
+                        </div>
+                        <div class="progress-bar rounded-full h-2 overflow-hidden">
+                            <div class="progress-fill h-full rounded-full" style="width: 80%"></div>
                         </div>
                     </div>
                     
-                    <div class="stats-achievement">
-                        <div class="stats-achievement-icon">⭐</div>
-                        <div class="stats-achievement-content">
-                            <h4>Skill Champion</h4>
-                            <p>Advanced level reached</p>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-slate-700">Wednesday</span>
+                            <span class="text-sm text-slate-600">3/5</span>
+                        </div>
+                        <div class="progress-bar rounded-full h-2 overflow-hidden">
+                            <div class="progress-fill h-full rounded-full" style="width: 60%"></div>
                         </div>
                     </div>
                     
-                    <div class="stats-achievement">
-                        <div class="stats-achievement-icon">📊</div>
-                        <div class="stats-achievement-content">
-                            <h4>Analytics Expert</h4>
-                            <p>Tracked 30+ days</p>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-slate-700">Thursday</span>
+                            <span class="text-sm text-slate-600">5/5</span>
+                        </div>
+                        <div class="progress-bar rounded-full h-2 overflow-hidden">
+                            <div class="progress-fill h-full rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-slate-700">Friday</span>
+                            <span class="text-sm text-slate-600">2/5</span>
+                        </div>
+                        <div class="progress-bar rounded-full h-2 overflow-hidden">
+                            <div class="progress-fill h-full rounded-full" style="width: 40%"></div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Community Ranking -->
-                <div class="stats-sidebar-card">
-                    <h3 class="stats-section-title">
-                        <div class="stats-section-icon">👥</div>
-                        Community Ranking
-                    </h3>
-                    
-                    <div class="stats-ranking">
-                        <div class="stats-ranking-item">
-                            <div class="stats-ranking-position top-3">1</div>
-                            <div class="stats-ranking-content">
-                                <h4>You</h4>
-                                <p>Personal User</p>
-                            </div>
-                            <div class="stats-ranking-score">1,850</div>
-                        </div>
-                        
-                        <div class="stats-ranking-item">
-                            <div class="stats-ranking-position top-3">2</div>
-                            <div class="stats-ranking-content">
-                                <h4>Sarah Chen</h4>
-                                <p>Personal User</p>
-                            </div>
-                            <div class="stats-ranking-score">1,720</div>
-                        </div>
-                        
-                        <div class="stats-ranking-item">
-                            <div class="stats-ranking-position top-3">3</div>
-                            <div class="stats-ranking-content">
-                                <h4>Alex Kumar</h4>
-                                <p>Personal User</p>
-                            </div>
-                            <div class="stats-ranking-score">1,680</div>
-                        </div>
-                        
-                        <div class="stats-ranking-item">
-                            <div class="stats-ranking-position">4</div>
-                            <div class="stats-ranking-content">
-                                <h4>Mike Johnson</h4>
-                                <p>Personal User</p>
-                            </div>
-                            <div class="stats-ranking-score">1,620</div>
-                        </div>
-                        
-                        <div class="stats-ranking-item">
-                            <div class="stats-ranking-position">5</div>
-                            <div class="stats-ranking-content">
-                                <h4>Lisa Wang</h4>
-                                <p>Personal User</p>
-                            </div>
-                            <div class="stats-ranking-score">1,580</div>
-                        </div>
+            <!-- Top Skills -->
+            <div class="glassy-card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="star" class="w-4 h-4 text-white"></i>
                     </div>
+                    <h3 class="text-lg font-bold text-slate-800">Top Skills</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="skill-badge flex items-center justify-between p-3 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="code" class="w-3 h-3 text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-slate-800 text-sm">Algorithms</span>
+                        </div>
+                        <span class="text-sm font-semibold text-blue-600">95%</span>
+                    </div>
+                    
+                    <div class="skill-badge flex items-center justify-between p-3 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="globe" class="w-3 h-3 text-emerald-600"></i>
+                            </div>
+                            <span class="font-medium text-slate-800 text-sm">Web Development</span>
+                        </div>
+                        <span class="text-sm font-semibold text-emerald-600">88%</span>
+                    </div>
+                    
+                    <div class="skill-badge flex items-center justify-between p-3 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="database" class="w-3 h-3 text-purple-600"></i>
+                            </div>
+                            <span class="font-medium text-slate-800 text-sm">Database</span>
+                        </div>
+                        <span class="text-sm font-semibold text-purple-600">82%</span>
+                    </div>
+                    
+                    <div class="skill-badge flex items-center justify-between p-3 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="smartphone" class="w-3 h-3 text-amber-600"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-slate-800">Mobile Dev</span>
+                        </div>
+                        <span class="text-sm font-semibold text-amber-600">75%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glassy-card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Quick Actions</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <button class="quick-action-btn w-full p-3 rounded-xl text-left flex items-center gap-3 group" onclick="exportStats()">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="download" class="w-4 h-4 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800 text-sm">Export Stats</div>
+                            <div class="text-xs text-slate-600">Download detailed report</div>
+                        </div>
+                    </button>
+                    
+                    <button class="quick-action-btn w-full p-3 rounded-xl text-left flex items-center gap-3 group" onclick="shareStats()">
+                        <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="share-2" class="w-4 h-4 text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800 text-sm">Share Progress</div>
+                            <div class="text-xs text-slate-600">Share with friends</div>
+                        </div>
+                    </button>
+                    
+                    <button class="quick-action-btn w-full p-3 rounded-xl text-left flex items-center gap-3 group" onclick="setGoals()">
+                        <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="target" class="w-4 h-4 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800 text-sm">Set Goals</div>
+                            <div class="text-xs text-slate-600">Define new targets</div>
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="../community-ui/js/api.js"></script>
-    <script src="../community-ui/js/app.js"></script>
-    
     <script>
-        // Check authentication on page load
+        lucide.createIcons();
+        
+        // Load stats data on page load
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
             loadStatsData();
-        });
-
-        function checkAuthentication() {
-            const token = localStorage.getItem('skillport_token');
-            if (!token) {
-                window.location.href = '../community-ui/pages/auth/login.html';
-                return;
-            }
             
-            // Verify token with backend
-            verifyToken(token);
-        }
-
-        async function verifyToken(token) {
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-                
-                const data = await response.json();
-                if (data.user.role !== 'personal') {
-                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
-                }
-                
-            } catch (error) {
-                console.error('Token verification failed:', error);
-                localStorage.removeItem('skillport_token');
-                window.location.href = '../community-ui/pages/auth/login.html';
-            }
-        }
+            // Add page transition effects
+            document.body.classList.add('page-loaded');
+        });
 
         async function loadStatsData() {
             try {
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/stats', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Load sample stats data for development
+                const sampleData = {
+                    problemsSolved: 247,
+                    skillRating: 1850,
+                    dayStreak: 23,
+                    achievements: 8,
+                    weeklyProgress: {
+                        monday: 5,
+                        tuesday: 4,
+                        wednesday: 3,
+                        thursday: 5,
+                        friday: 2
+                    },
+                    topSkills: [
+                        { name: 'Algorithms', percentage: 95 },
+                        { name: 'Web Development', percentage: 88 },
+                        { name: 'Database', percentage: 82 },
+                        { name: 'Mobile Development', percentage: 75 }
+                    ]
+                };
                 
-                if (response.ok) {
-                    const statsData = await response.json();
-                    updateStatsDisplay(statsData);
-                }
+                updateStatsDisplay(sampleData);
             } catch (error) {
                 console.error('Failed to load stats data:', error);
             }
         }
 
         function updateStatsDisplay(statsData) {
-            // Update overview stats
-            if (statsData.overview) {
-                // Update overview values
+            // Update main stats
+            if (statsData.problemsSolved) {
+                // Update problems solved count
             }
             
-            // Update charts
-            if (statsData.charts) {
-                // Update chart data
+            if (statsData.skillRating) {
+                // Update skill rating
             }
             
-            // Update platform breakdown
-            if (statsData.platforms) {
-                // Update platform table
+            if (statsData.dayStreak) {
+                // Update day streak
+            }
+            
+            if (statsData.achievements) {
+                // Update achievements count
             }
         }
+
+        function exportStats() {
+            // Implementation for exporting stats
+            alert('Export functionality will be implemented here');
+        }
+
+        function shareStats() {
+            // Implementation for sharing stats
+            alert('Share functionality will be implemented here');
+        }
+
+        function setGoals() {
+            // Implementation for setting goals
+            alert('Goal setting functionality will be implemented here');
+        }
+
+        // Add smooth navigation transitions
+        document.querySelectorAll('a[href^=""]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Add page exit animation
+                document.body.classList.add('page-exiting');
+                
+                // Small delay for animation
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 150);
+            });
+        });
+
+        // Add page transition CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .page-loaded {
+                animation: pageEnter 0.5s ease-out;
+            }
+            
+            .page-exiting {
+                animation: pageExit 0.15s ease-in;
+            }
+            
+            @keyframes pageEnter {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes pageExit {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html> 

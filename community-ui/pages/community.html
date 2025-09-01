@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - SkillPort</title>
+    <title>Community - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -16,11 +16,10 @@
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
             transition: all 0.3s ease;
         }
-        .content-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        .hero-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
         }
         .btn-primary {
             background: linear-gradient(135deg, #ef4444, #dc2626);
@@ -61,96 +60,59 @@
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
-                Terms of
-                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Service</span>
+                Join Our
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Community</span>
             </h1>
             <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-                Please read these terms carefully before using SkillPort services.
+                Connect with fellow developers, share knowledge, and grow together in our vibrant learning community.
             </p>
-            <div class="text-sm text-slate-500">
-                Last updated: January 15, 2025
+        </div>
+
+        <!-- Community Features -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div class="hero-card rounded-2xl p-8">
+                <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="message-circle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Discussion Forums</h3>
+                <p class="text-slate-600">Join discussions on algorithms, problem-solving techniques, and programming best practices.</p>
+            </div>
+            
+            <div class="hero-card rounded-2xl p-8">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Study Groups</h3>
+                <p class="text-slate-600">Form study groups with like-minded learners and tackle challenges together.</p>
+            </div>
+            
+            <div class="hero-card rounded-2xl p-8">
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="trophy" class="w-6 h-6 text-green-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Contest Discussions</h3>
+                <p class="text-slate-600">Discuss contest problems, share solutions, and learn from others' approaches.</p>
+            </div>
+            
+            <div class="hero-card rounded-2xl p-8">
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="graduation-cap" class="w-6 h-6 text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Mentorship</h3>
+                <p class="text-slate-600">Connect with experienced developers who can guide you on your learning journey.</p>
             </div>
         </div>
 
-        <!-- Terms Content -->
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">1. Acceptance of Terms</h2>
-            <p class="text-slate-700 mb-4">
-                By accessing and using SkillPort, you accept and agree to be bound by the terms and provision of this agreement.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">2. Use License</h2>
-            <p class="text-slate-700 mb-4">
-                Permission is granted to temporarily download one copy of the materials (information or software) on SkillPort's website for personal, non-commercial transitory viewing only.
-            </p>
-            <p class="text-slate-700 mb-4">This is the grant of a license, not a transfer of title, and under this license you may not:</p>
-            <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
-                <li>modify or copy the materials</li>
-                <li>use the materials for any commercial purpose or for any public display</li>
-                <li>attempt to reverse engineer any software contained on SkillPort's website</li>
-                <li>remove any copyright or other proprietary notations from the materials</li>
-            </ul>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">3. User Accounts</h2>
-            <p class="text-slate-700 mb-4">
-                When you create an account with us, you must provide information that is accurate, complete, and current at all times.
-            </p>
-            <p class="text-slate-700 mb-4">You are responsible for safeguarding the password and for all activities that occur under your account.</p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">4. Acceptable Use</h2>
-            <p class="text-slate-700 mb-4">You agree not to use the service to:</p>
-            <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
-                <li>Violate any applicable laws or regulations</li>
-                <li>Infringe upon the rights of others</li>
-                <li>Transmit harmful, offensive, or inappropriate content</li>
-                <li>Attempt to gain unauthorized access to our systems</li>
-            </ul>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">5. Intellectual Property</h2>
-            <p class="text-slate-700 mb-4">
-                The service and its original content, features, and functionality are and will remain the exclusive property of SkillPort and its licensors.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">6. Termination</h2>
-            <p class="text-slate-700 mb-4">
-                We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">7. Limitation of Liability</h2>
-            <p class="text-slate-700 mb-4">
-                In no event shall SkillPort, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">8. Changes to Terms</h2>
-            <p class="text-slate-700 mb-4">
-                We reserve the right to modify or replace these terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect.
-            </p>
-        </div>
-
-        <!-- Contact -->
+        <!-- Join Community -->
         <div class="hero-card rounded-2xl p-8 text-center">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Questions About Terms?</h2>
-            <p class="text-slate-600 mb-6">If you have any questions about these terms, please contact us.</p>
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Ready to Join?</h2>
+            <p class="text-slate-600 mb-6">Create an account and start connecting with the SkillPort community today.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="contact.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
-                    Contact Us
+                <a href="auth/register.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
+                    Join Community
                 </a>
-                <a href="privacy.html" class="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-slate-200 transition-colors">
-                    Privacy Policy
+                <a href="contact.html" class="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-slate-200 transition-colors">
+                    Learn More
                 </a>
             </div>
         </div>

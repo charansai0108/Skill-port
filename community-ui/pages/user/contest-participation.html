@@ -3,45 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contest #1 - SkillPort Community</title>
+  <title>Contest #1 - PW IOI Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
+    
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Enhanced glassy cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .page-content {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
   <!-- Navbar -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+  <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-2 group">
           <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+            <i data-lucide="user" class="w-5 h-5 text-white"></i>
           </div>
           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            SkillPort
+            <span id="navbar-student-name">Student</span>
           </span>
         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
           <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="user-tasks.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="target" class="w-4 h-4"></i> Tasks
+          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
           </a>
-          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <i data-lucide="message-square" class="w-4 h-4"></i> Mentor Feedback
           </a>
-          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Mentor Feedback
-          </a>
-          <a href="certificates.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="award" class="w-4 h-4"></i> Certificates
+          <a href="user-profile.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
         </div>
       </div>
@@ -49,20 +100,15 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <!-- Contest Header -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-content">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">Contest #1</h1>
+      <p class="text-slate-600">Data Structures and Algorithms Challenge</p>
+    </div>
+    
+    <!-- Contest Stats -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h1 class="text-3xl font-bold text-slate-900 mb-2">Contest #1</h1>
-          <p class="text-slate-600">Data Structures and Algorithms Challenge</p>
-        </div>
-        <div class="text-right">
-          <div class="text-2xl font-bold text-red-600 mb-1" id="countdown">02:14:35</div>
-          <div class="text-sm text-slate-600">Time Remaining</div>
-        </div>
-      </div>
-      
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-blue-50 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-blue-600">5</div>
@@ -78,167 +124,135 @@
         </div>
         <div class="bg-purple-50 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-purple-600">780</div>
-          <div class="text-sm text-slate-600">Current Score</div>
+          <div class="text-sm text-slate-600">Points</div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Problems List -->
-      <div class="lg:col-span-2">
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Problems List - Left Side (75%) -->
+      <div class="lg:col-span-3">
         <div class="bg-white rounded-lg shadow-lg p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Contest Problems</h2>
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-slate-600">Filter by topic:</span>
-              <div class="flex gap-2">
-                <button class="topic-filter px-3 py-1 rounded-full text-sm border border-slate-300 hover:bg-slate-50 active" data-topic="all">
-                  All
-                </button>
-                <button class="topic-filter px-3 py-1 rounded-full text-sm border border-slate-300 hover:bg-slate-50" data-topic="arrays">
-                  Arrays
-                </button>
-                <button class="topic-filter px-3 py-1 rounded-full text-sm border border-slate-300 hover:bg-slate-50" data-topic="strings">
-                  Strings
-                </button>
-                <button class="topic-filter px-3 py-1 rounded-full text-sm border border-slate-300 hover:bg-slate-50" data-topic="linked-lists">
-                  Linked Lists
-                </button>
-                <button class="topic-filter px-3 py-1 rounded-full text-sm border border-slate-300 hover:bg-slate-50" data-topic="dynamic-programming">
-                  DP
-                </button>
-              </div>
-            </div>
-          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Problems</h2>
           
-          <div class="space-y-4" id="problems-container">
-            <!-- Problem 1 - Solved -->
-            <div class="problem-card border border-green-200 rounded-lg p-4 bg-green-50" data-topics="arrays,hash-table">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
+          <div class="space-y-4">
+            <!-- Problem 1 -->
+            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                  </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900">Problem #1</h3>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                      <span class="bg-green-100 text-green-700 px-2 py-1 rounded">Easy</span>
-                      <span>• 200 points</span>
-                    </div>
-                    <div class="flex gap-1">
-                      <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Arrays</span>
-                      <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">Hash Table</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900">Two Sum</h3>
+                    <p class="text-slate-600">Easy • 100 points</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Solved</span>
-                  <a href="https://leetcode.com/problems/two-sum/" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                    <i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>Solve
-                  </a>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Solved</div>
+                    <div class="text-sm font-medium text-green-600">+100 pts</div>
+                  </div>
+                  <button onclick="solveProblem('Two Sum')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i data-lucide="code" class="w-4 h-4 inline mr-2"></i> Solve Again
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Problem 2 - Solved -->
-            <div class="problem-card border border-green-200 rounded-lg p-4 bg-green-50" data-topics="linked-lists,math">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">2</div>
+            <!-- Problem 2 -->
+            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                  </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900">Add Two Numbers</h3>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                      <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Medium</span>
-                      <span>• 300 points</span>
-                    </div>
-                    <div class="flex gap-1">
-                      <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs">Linked Lists</span>
-                      <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">Math</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900">Reverse Linked List</h3>
+                    <p class="text-slate-600">Medium • 200 points</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Solved</span>
-                  <a href="https://leetcode.com/problems/add-two-numbers/" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                    <i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>Solve
-                  </a>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Solved</div>
+                    <div class="text-sm font-medium text-green-600">+200 pts</div>
+                  </div>
+                  <button onclick="solveProblem('Reverse Linked List')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i data-lucide="code" class="w-4 h-4 inline mr-2"></i> Solve Again
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Problem 3 - Solved -->
-            <div class="problem-card border border-green-200 rounded-lg p-4 bg-green-50" data-topics="strings,sliding-window">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
+            <!-- Problem 3 -->
+            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                  </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900">Longest Substring Without Repeating Characters</h3>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                      <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Medium</span>
-                      <span>• 300 points</span>
-                    </div>
-                    <div class="flex gap-1">
-                      <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Strings</span>
-                      <span class="bg-teal-100 text-teal-700 px-2 py-1 rounded text-xs">Sliding Window</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900">Binary Tree Traversal</h3>
+                    <p class="text-slate-600">Medium • 200 points</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Solved</span>
-                  <a href="https://leetcode.com/problems/longest-substring-without-repeating-characters/" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                    <i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>Solve
-                  </a>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Solved</div>
+                    <div class="text-sm font-medium text-green-600">+200 pts</div>
+                  </div>
+                  <button onclick="solveProblem('Binary Tree Traversal')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i data-lucide="code" class="w-4 h-4 inline mr-2"></i> Solve Again
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Problem 4 - Attempted -->
-            <div class="problem-card border border-orange-200 rounded-lg p-4 bg-orange-50" data-topics="arrays,binary-search,divide-and-conquer">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold">4</div>
+            <!-- Problem 4 -->
+            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="clock" class="w-5 h-5 text-orange-600"></i>
+                  </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900">Problem #2</h3>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                      <span class="bg-red-100 text-red-700 px-2 py-1 rounded">Hard</span>
-                      <span>• 400 points</span>
-                    </div>
-                    <div class="flex gap-1">
-                      <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Arrays</span>
-                      <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Binary Search</span>
-                      <span class="bg-pink-100 text-pink-700 px-2 py-1 rounded text-xs">Divide & Conquer</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900">Dynamic Programming</h3>
+                    <p class="text-slate-600">Hard • 300 points</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm">Attempted</span>
-                  <a href="https://leetcode.com/problems/median-of-two-sorted-arrays/" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                    <i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>Solve
-                  </a>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Attempted</div>
+                    <div class="text-sm font-medium text-orange-600">0 pts</div>
+                  </div>
+                  <button onclick="solveProblem('Dynamic Programming')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    <i data-lucide="code" class="w-4 h-4 inline mr-2"></i> Solve
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Problem 5 - Not Attempted -->
-            <div class="problem-card border border-slate-200 rounded-lg p-4 bg-white" data-topics="strings,dynamic-programming">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-slate-400 rounded-full flex items-center justify-center text-white font-bold">5</div>
+            <!-- Problem 5 -->
+            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="circle" class="w-5 h-5 text-slate-600"></i>
+                  </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900">Regular Expression Matching</h3>
-                    <div class="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                      <span class="bg-red-100 text-red-700 px-2 py-1 rounded">Hard</span>
-                      <span>• 400 points</span>
-                    </div>
-                    <div class="flex gap-1">
-                      <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Strings</span>
-                      <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Dynamic Programming</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900">Graph Algorithms</h3>
+                    <p class="text-slate-600">Hard • 300 points</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-sm">Not Attempted</span>
-                  <a href="https://leetcode.com/problems/regular-expression-matching/" target="_blank" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-                    <i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>Solve
-                  </a>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">Not Started</div>
+                    <div class="text-sm font-medium text-slate-600">0 pts</div>
+                  </div>
+                  <button onclick="solveProblem('Graph Algorithms')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    <i data-lucide="code" class="w-4 h-4 inline mr-2"></i> Solve
+                  </button>
                 </div>
               </div>
             </div>
@@ -246,370 +260,101 @@
         </div>
       </div>
 
-      <!-- Live Leaderboard -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">Live Leaderboard</h2>
-          
-          <div class="space-y-3">
-            <!-- Rank 1 -->
-            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
-                <div>
-                  <div class="font-medium text-slate-900">Priya Sharma</div>
-                  <div class="text-sm text-slate-600">5/5 solved</div>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-amber-600">850</div>
-                <div class="text-xs text-slate-500">points</div>
-              </div>
-            </div>
-
-            <!-- Rank 2 -->
-            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-500 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
-                <div>
-                  <div class="font-medium text-slate-900">Student #1</div>
-                  <div class="text-sm text-slate-600">5/5 solved</div>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-slate-600">820</div>
-                <div class="text-xs text-slate-500">points</div>
-              </div>
-            </div>
-
-            <!-- Rank 3 - Current User -->
-            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border-2 border-blue-300">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
-                <div>
-                  <div class="font-medium text-slate-900">Student #2</div>
-                  <div class="text-sm text-slate-600">3/5 solved</div>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-blue-600">780</div>
-                <div class="text-xs text-slate-500">points</div>
-              </div>
-            </div>
-
-            <!-- Rank 4 -->
-            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 font-bold text-sm">4</div>
-                <div>
-                  <div class="font-medium text-slate-900">Student #3</div>
-                  <div class="text-sm text-slate-600">2/5 solved</div>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-slate-600">650</div>
-                <div class="text-xs text-slate-500">points</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-4 pt-4 border-t border-slate-200">
-            <div class="text-center">
-              <div class="text-sm text-slate-600 mb-2">Your Progress</div>
-              <div class="w-full bg-slate-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div>
-              </div>
-              <div class="text-sm text-slate-600 mt-2">3 of 5 problems solved</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Submission Instructions -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">How to Submit Solutions</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="text-center">
-          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <i data-lucide="external-link" class="w-6 h-6 text-blue-600"></i>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">1. Click Solve</h3>
-          <p class="text-sm text-slate-600">Click the "Solve" button next to any problem to open it on the external platform</p>
-        </div>
-        <div class="text-center">
-          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <i data-lucide="code" class="w-6 h-6 text-green-600"></i>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">2. Solve on Platform</h3>
-          <p class="text-sm text-slate-600">Use the external platform's code editor to solve the problem</p>
-        </div>
-        <div class="text-center">
-          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <i data-lucide="check-circle" class="w-6 h-6 text-purple-600"></i>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">3. Submit Solution</h3>
-          <p class="text-sm text-slate-600">Submit your solution on the external platform. Your progress will be updated here automatically</p>
-        </div>
-      </div>
+             <!-- Recent Submissions - Right Side (25%) -->
+       <div class="lg:col-span-1">
+         <div class="bg-white rounded-lg shadow-lg p-6">
+           <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Submissions</h2>
+           
+           <div class="space-y-3">
+             <!-- Two Sum -->
+             <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+               <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                 <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+               </div>
+               <div class="flex-1">
+                 <div class="text-sm font-semibold text-green-900">Two Sum</div>
+                 <div class="text-xs text-green-600">Accepted • 2h ago</div>
+               </div>
+             </div>
+             
+             <!-- Reverse Linked List -->
+             <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+               <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                 <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+               </div>
+               <div class="flex-1">
+                 <div class="text-sm font-semibold text-green-900">Reverse Linked List</div>
+                 <div class="text-xs text-green-600">Accepted • 4h ago</div>
+               </div>
+             </div>
+             
+             <!-- Binary Tree Traversal -->
+             <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+               <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                 <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+               </div>
+               <div class="flex-1">
+                 <div class="text-sm font-semibold text-green-900">Binary Tree Traversal</div>
+                 <div class="text-xs text-green-600">Accepted • 6h ago</div>
+               </div>
+             </div>
+             
+             <!-- Dynamic Programming -->
+             <div class="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+               <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                 <i data-lucide="clock" class="w-4 h-4 text-orange-600"></i>
+               </div>
+               <div class="flex-1">
+                 <div class="text-sm font-semibold text-orange-900">Dynamic Programming</div>
+                 <div class="text-xs text-orange-600">Attempted • 1d ago</div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
     </div>
   </main>
-
-  <!-- Load API and App scripts -->
-  <script src="../js/api.js"></script>
-  <script src="../js/app.js"></script>
 
   <script>
     lucide.createIcons();
     
-    // Contest Participation Controller
-    class ContestParticipation {
-      constructor() {
-        this.api = window.SkillPortAPI;
-        this.contestId = null;
-        this.contestData = null;
-        this.problems = [];
-        this.userProgress = null;
-        this.countdownInterval = null;
-        this.init();
-      }
-
-      async init() {
-        try {
-          // Check if user is authenticated
-          if (!this.api.isAuthenticated()) {
-            window.location.href = '../index.html';
-            return;
-          }
-
-          // Get contest ID from URL parameters
-          this.contestId = new URLSearchParams(window.location.search).get('contest');
-          if (!this.contestId) {
-            this.showError('No contest ID provided');
-            return;
-          }
-
-          // Load contest data
-          await this.loadContestData();
-          await this.loadProblems();
-          await this.loadUserProgress();
-          
-          // Setup event listeners
-          this.setupEventListeners();
-          
-          // Start countdown
-          this.startCountdown();
-          
-        } catch (error) {
-          console.error('Contest participation initialization failed:', error);
-          this.showError('Failed to initialize contest participation page');
-        }
-      }
-
-      async loadContestData() {
-        try {
-          const response = await this.api.getContestDetails(this.contestId);
-          if (response.success) {
-            this.contestData = response.data;
-            this.updateContestDisplay();
-          }
-        } catch (error) {
-          console.error('Failed to load contest data:', error);
-          this.showError('Failed to load contest information');
-        }
-      }
-
-      async loadProblems() {
-        try {
-          const response = await this.api.getContestProblems(this.contestId);
-          if (response.success) {
-            this.problems = response.data.problems;
-            this.updateProblemsDisplay();
-          }
-        } catch (error) {
-          console.error('Failed to load contest problems:', error);
-          this.showError('Failed to load contest problems');
-        }
-      }
-
-      async loadUserProgress() {
-        try {
-          const response = await this.api.getUserContestProgress(this.contestId);
-          if (response.success) {
-            this.userProgress = response.data.progress;
-            this.updateProgressDisplay();
-          }
-        } catch (error) {
-          console.error('Failed to load user progress:', error);
-        }
-      }
-
-      updateContestDisplay() {
-        if (!this.contestData) return;
-
-        const elements = {
-          title: document.querySelector('h1'),
-          description: document.querySelector('p.text-slate-600'),
-          totalProblems: document.querySelector('.bg-blue-50 .text-2xl'),
-          solved: document.querySelector('.bg-green-50 .text-2xl'),
-          attempted: document.querySelector('.bg-orange-50 .text-2xl'),
-          currentScore: document.querySelector('.bg-purple-50 .text-2xl')
-        };
-
-        if (elements.title) elements.title.textContent = this.contestData.name || 'Contest';
-        if (elements.description) elements.description.textContent = this.contestData.description || '';
-        
-        if (this.userProgress) {
-          if (elements.totalProblems) elements.totalProblems.textContent = this.problems.length || 0;
-          if (elements.solved) elements.solved.textContent = this.userProgress.solved || 0;
-          if (elements.attempted) elements.attempted.textContent = this.userProgress.attempted || 0;
-          if (elements.currentScore) elements.currentScore.textContent = this.userProgress.currentScore || 0;
-        }
-      }
-
-      updateProblemsDisplay() {
-        // TODO: Implement dynamic problems display
-        console.log('Problems data:', this.problems);
-      }
-
-      updateProgressDisplay() {
-        // TODO: Implement dynamic progress display
-        console.log('User progress:', this.userProgress);
-      }
-
-      setupEventListeners() {
-        // Topic Filtering Functionality
-        const filterButtons = document.querySelectorAll('.topic-filter');
-        const problemCards = document.querySelectorAll('.problem-card');
-
-        filterButtons.forEach(button => {
-          button.addEventListener('click', (e) => {
-            const selectedTopic = e.target.getAttribute('data-topic');
-            this.filterProblemsByTopic(selectedTopic, filterButtons, problemCards);
-          });
-        });
-      }
-
-      filterProblemsByTopic(selectedTopic, filterButtons, problemCards) {
-        // Update active button state
-        filterButtons.forEach(btn => {
-          btn.classList.remove('active', 'bg-blue-600', 'text-white');
-          btn.classList.add('border-slate-300', 'hover:bg-slate-50');
-        });
-        
-        const activeButton = Array.from(filterButtons).find(btn => btn.getAttribute('data-topic') === selectedTopic);
-        if (activeButton) {
-          activeButton.classList.add('active', 'bg-blue-600', 'text-white');
-          activeButton.classList.remove('border-slate-300', 'hover:bg-slate-50');
-        }
-
-        // Filter problem cards
-        problemCards.forEach(card => {
-          const cardTopics = card.getAttribute('data-topics')?.split(',') || [];
-          
-          if (selectedTopic === 'all' || cardTopics.includes(selectedTopic)) {
-            card.style.display = 'block';
-            card.style.opacity = '1';
-          } else {
-            card.style.display = 'none';
-            card.style.opacity = '0';
-          }
-        });
-
-        // Update problem numbers for visible cards
-        let visibleIndex = 1;
-        problemCards.forEach(card => {
-          if (card.style.display !== 'none') {
-            const numberElement = card.querySelector('.w-8.h-8');
-            if (numberElement) {
-              numberElement.textContent = visibleIndex;
-            }
-            visibleIndex++;
-          }
-        });
-      }
-
-      startCountdown() {
-        if (!this.contestData || !this.contestData.endTime) return;
-
-        this.countdownInterval = setInterval(() => {
-          this.updateCountdown();
-        }, 1000);
-        
-        this.updateCountdown(); // Initial update
-      }
-
-      updateCountdown() {
-        if (!this.contestData || !this.contestData.endTime) return;
-
-        const now = new Date().getTime();
-        const endTime = new Date(this.contestData.endTime).getTime();
-        const timeLeft = endTime - now;
-
-        const countdownElement = document.getElementById('countdown');
-        if (!countdownElement) return;
-
-        if (timeLeft > 0) {
-          const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-          const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-          countdownElement.textContent = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        } else {
-          countdownElement.textContent = '00:00:00';
-          this.stopCountdown();
-          this.showNotification('Contest has ended!', 'info');
-        }
-      }
-
-      stopCountdown() {
-        if (this.countdownInterval) {
-          clearInterval(this.countdownInterval);
-          this.countdownInterval = null;
-        }
-      }
-
-      async solveProblem(problemId) {
-        try {
-          // Redirect to code editor with problem context
-          window.location.href = `../code-editor.html?problem=${problemId}&contest=${this.contestId}`;
-        } catch (error) {
-          console.error('Failed to open problem:', error);
-          this.showError('Failed to open problem');
-        }
-      }
-
-      // Utility functions
-      showSuccess(message) {
-        this.showNotification(message, 'success');
-      }
-
-      showError(message) {
-        this.showNotification(message, 'error');
-      }
-
-      showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
-          type === 'success' ? 'bg-green-500 text-white' :
-          type === 'error' ? 'bg-red-500 text-white' :
-          'bg-blue-500 text-white'
-        }`;
-        notification.textContent = message;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-          notification.remove();
-        }, 3000);
-      }
-    }
-
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      window.contestParticipation = new ContestParticipation();
+    // Set student name in navbar
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('navbar-student-name').textContent = 'Alex Johnson';
     });
+    
+    // Function to handle solving problems
+    function solveProblem(problemName) {
+      // You can customize this to redirect to different platforms
+      const platform = 'leetcode'; // Options: 'leetcode', 'hackerrank', 'codeforces', etc.
+      
+      let redirectUrl = '';
+      
+      switch(platform) {
+        case 'leetcode':
+          // Convert problem name to LeetCode URL format
+          const leetcodeSlug = problemName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          redirectUrl = `https://leetcode.com/problems/${leetcodeSlug}/`;
+          break;
+        case 'hackerrank':
+          redirectUrl = `https://www.hackerrank.com/challenges/${problemName.toLowerCase().replace(/\s+/g, '-')}`;
+          break;
+        case 'codeforces':
+          redirectUrl = `https://codeforces.com/problemset/problem/${problemName}`;
+          break;
+        default:
+          // Default to a custom coding platform
+          redirectUrl = `https://your-coding-platform.com/problems/${encodeURIComponent(problemName)}`;
+      }
+      
+      // Open in new tab
+      window.open(redirectUrl, '_blank');
+      
+      // Or redirect in same tab
+      // window.location.href = redirectUrl;
+    }
+    
+
   </script>
 </body>
 </html> 

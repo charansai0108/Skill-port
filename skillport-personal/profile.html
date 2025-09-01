@@ -3,619 +3,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - SkillPort</title>
-    <link rel="stylesheet" href="../community-ui/css/main.css">
-    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
-    <link rel="stylesheet" href="../community-ui/css/components.css">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Profile - SkillPort Personal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        body { font-family: 'Josefin Sans', sans-serif; }
-        
-        .profile-page {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .profile-header {
-            background: rgba(255, 255, 255, 0.1);
+        /* Enhanced glassy effects */
+        .glassy-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glassy-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .glassy-button {
+            background: rgba(59, 130, 246, 0.15);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-        }
-        
-        .profile-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .profile-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
-        
-        .profile-brand-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .profile-brand-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .profile-nav-menu {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .profile-nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-        }
-        
-        .profile-nav-link:hover,
-        .profile-nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .profile-back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: rgb(37, 99, 235);
             transition: all 0.2s ease;
         }
         
-        .profile-back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .glassy-button:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
         }
         
-        .profile-main {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
+        /* Sidebar navigation styling */
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
         }
         
-        .profile-hero {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1.5rem;
-            padding: 3rem;
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
         }
         
-        .profile-avatar-section {
-            margin-bottom: 2rem;
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 4px solid #3b82f6;
+            color: #1d4ed8;
         }
         
-        .profile-avatar {
-            width: 8rem;
-            height: 8rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 700;
-            border: 4px solid rgba(255, 255, 255, 0.3);
+        /* Content section animations */
+        .content-section {
+            animation: fadeIn 0.3s ease-in-out;
         }
         
-        .profile-avatar-upload {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Form input styling */
+        .form-input {
             transition: all 0.2s ease;
-            margin-top: 1rem;
+            border: 2px solid transparent;
         }
         
-        .profile-avatar-upload:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .form-input:focus {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
         }
         
-        .profile-name {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        /* Button hover effects */
+        .btn-primary {
+            transition: all 0.3s ease;
         }
         
-        .profile-username {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            margin-bottom: 1rem;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
-        .profile-bio {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
+        /* Profile image hover effect */
+        .profile-image-container:hover .profile-image-overlay {
+            opacity: 1;
         }
         
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
+        .profile-image-overlay {
+            transition: opacity 0.3s ease;
+            opacity: 0;
         }
         
-        .profile-stat {
-            text-align: center;
+        /* Smooth page transitions */
+        .page-content {
+            animation: fadeInUp 0.4s ease-out;
         }
         
-        .profile-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        
-        .profile-stat-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .profile-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-        
-        .profile-main-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 2rem;
-            color: white;
-        }
-        
-        .profile-section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .profile-section-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .profile-form {
-            display: grid;
-            gap: 1.5rem;
-        }
-        
-        .profile-form-group {
-            display: grid;
-            gap: 0.5rem;
-        }
-        
-        .profile-form-label {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
-        .profile-form-input {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            color: white;
-            font-family: inherit;
-        }
-        
-        .profile-form-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .profile-form-select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            color: white;
-            font-family: inherit;
-        }
-        
-        .profile-form-textarea {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            color: white;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .profile-form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .profile-save-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-        
-        .profile-save-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .profile-cancel-btn {
-            background: transparent;
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .profile-cancel-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .profile-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .profile-sidebar-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
-        }
-        
-        .profile-links {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .profile-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            text-decoration: none;
-            color: white;
-            transition: all 0.2s ease;
-        }
-        
-        .profile-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-        
-        .profile-link-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .profile-link-content h4 {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .profile-link-content p {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .profile-achievements {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .profile-achievement {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-        }
-        
-        .profile-achievement-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        
-        .profile-achievement-content h4 {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .profile-achievement-content p {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        @media (max-width: 768px) {
-            .profile-content {
-                grid-template-columns: 1fr;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-            
-            .profile-nav {
-                flex-direction: column;
-                gap: 1rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            
-            .profile-nav-menu {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+        }
+        
+        /* Enhanced hover effects */
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="profile-page">
-    <!-- Profile Header -->
-    <header class="profile-header">
-        <nav class="profile-nav">
-            <div class="profile-brand">
-                <div class="profile-brand-icon">🎯</div>
-                <span class="profile-brand-text">SkillPort</span>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <!-- Dashboard Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                        <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+                        SkillPort Personal
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="student-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="projects.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="folder" class="w-4 h-4"></i> Projects
+                    </a>
+                    <a href="tracker.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="activity" class="w-4 h-4"></i> Tracker
+                    </a>
+                    <a href="stats.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Stats
+                    </a>
+                    <a href="communities.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="users" class="w-4 h-4"></i> Communities
+                    </a>
+                    <a href="profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+                    </a>
+                </div>
             </div>
-            
-            <div class="profile-nav-menu">
-                <a href="student-dashboard.html" class="profile-nav-link">Dashboard</a>
-                <a href="profile.html" class="profile-nav-link active">Profile</a>
-                <a href="tracker.html" class="profile-nav-link">Tracker</a>
-                <a href="stats.html" class="profile-nav-link">Stats</a>
-                <a href="communities.html" class="profile-nav-link">Communities</a>
-                <a href="projects.html" class="profile-nav-link">Projects</a>
-                <a href="posts.html" class="profile-nav-link">Posts</a>
-            </div>
-            
-            <button class="profile-back-btn" onclick="location.href='student-dashboard.html'">← Back to Dashboard</button>
         </nav>
     </header>
 
-    <!-- Main Profile Content -->
-    <main class="profile-main">
-        <!-- Profile Hero Section -->
-        <div class="profile-hero">
-            <div class="profile-avatar-section">
-                <div class="profile-avatar" id="profileAvatar">JS</div>
-                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                <button class="profile-avatar-upload" onclick="document.getElementById('avatarUpload').click()">
-                    Change Photo
-                </button>
-            </div>
-            
-            <h1 class="profile-name" id="profileName">John Smith</h1>
-            <p class="profile-username" id="profileUsername">@johnsmith</p>
-            <p class="profile-bio" id="profileBio">Passionate software developer with expertise in algorithms and web development. Always learning and growing!</p>
-            
-            <div class="profile-stats">
-                <div class="profile-stat">
-                    <div class="profile-stat-value">247</div>
-                    <div class="profile-stat-label">Problems Solved</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">1,850</div>
-                    <div class="profile-stat-label">Skill Rating</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">8</div>
-                    <div class="profile-stat-label">Communities</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">23</div>
-                    <div class="profile-stat-label">Day Streak</div>
-                </div>
-            </div>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">My Profile</h1>
+            <p class="text-slate-600">Manage your profile, settings, and learning preferences</p>
         </div>
 
-        <!-- Profile Content -->
-        <div class="profile-content">
-            <!-- Main Profile Section -->
-            <div class="profile-main-section">
-                <h2 class="profile-section-title">
-                    <div class="profile-section-icon">✏️</div>
-                    Edit Profile
-                </h2>
-                
-                <form class="profile-form" id="profileForm">
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">First Name</label>
-                        <input type="text" class="profile-form-input" id="firstName" name="firstName" placeholder="Enter first name">
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Last Name</label>
-                        <input type="text" class="profile-form-input" id="lastName" name="lastName" placeholder="Enter last name">
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Username</label>
-                        <input type="text" class="profile-form-input" id="username" name="username" placeholder="Enter username">
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Bio</label>
-                        <textarea class="profile-form-textarea" id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Primary Interest</label>
-                        <select class="profile-form-select" id="primaryInterest" name="primaryInterest">
-                            <option value="">Select primary interest</option>
-                            <option value="algorithms">Algorithms & Data Structures</option>
-                            <option value="web-development">Web Development</option>
-                            <option value="mobile-development">Mobile Development</option>
-                            <option value="data-science">Data Science & ML</option>
-                            <option value="system-design">System Design</option>
-                            <option value="cybersecurity">Cybersecurity</option>
-                            <option value="game-development">Game Development</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Skill Level</label>
-                        <select class="profile-form-select" id="skillLevel" name="skillLevel">
-                            <option value="">Select skill level</option>
-                            <option value="beginner">Beginner (0-2 years)</option>
-                            <option value="intermediate">Intermediate (2-5 years)</option>
-                            <option value="advanced">Advanced (5+ years)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="profile-form-group">
-                        <label class="profile-form-label">Education Level</label>
-                        <select class="profile-form-select" id="educationLevel" name="educationLevel">
-                            <option value="">Select education level</option>
-                            <option value="high-school">High School</option>
-                            <option value="bachelor">Bachelor's Degree</option>
-                            <option value="master">Master's Degree</option>
-                            <option value="phd">PhD</option>
-                            <option value="self-taught">Self-Taught</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="profile-form-actions">
-                        <button type="submit" class="profile-save-btn">Save Changes</button>
-                        <button type="button" class="profile-cancel-btn" onclick="resetForm()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Profile Sidebar -->
-            <div class="profile-sidebar">
-                <!-- Quick Links -->
-                <div class="profile-sidebar-card">
-                    <h3 class="profile-section-title">
-                        <div class="profile-section-icon">🔗</div>
-                        Quick Links
+        <!-- Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="lg:col-span-1">
+                <div class="glassy-card rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
+                        Settings
                     </h3>
                     
-                    <div class="profile-links">
-                        <a href="tracker.html" class="profile-link">
-                            <div class="profile-link-icon">📝</div>
-                            <div class="profile-link-content">
-                                <h4>Practice Tracker</h4>
-                                <p>Track your daily progress</p>
-                            </div>
-                        </a>
+                    <nav class="space-y-2">
+                        <button onclick="showSection('profile')" class="nav-item active w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-slate-700">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            Profile
+                        </button>
                         
-                        <a href="stats.html" class="profile-link">
-                            <div class="profile-link-icon">📊</div>
-                            <div class="profile-link-content">
-                                <h4>View Statistics</h4>
-                                <p>Analyze your performance</p>
-                            </div>
-                        </a>
+                        <button onclick="showSection('learning')" class="nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-slate-600">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                            Learning Goals
+                        </button>
                         
-                        <a href="communities.html" class="profile-link">
-                            <div class="profile-link-icon">👥</div>
-                            <div class="profile-link-content">
-                                <h4>Join Communities</h4>
-                                <p>Connect with others</p>
-                            </div>
-                        </a>
+
                         
-                        <a href="projects.html" class="profile-link">
-                            <div class="profile-link-icon">💼</div>
-                            <div class="profile-link-content">
-                                <h4>Showcase Projects</h4>
-                                <p>Display your work</p>
+                        <button onclick="showSection('password')" class="nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-slate-600">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                            Password
+                        </button>
+                        
+                        <button onclick="showSection('preferences')" class="nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-slate-600">
+                            <i data-lucide="sliders" class="w-4 h-4"></i>
+                            Preferences
+                        </button>
+                        
+                        <div class="pt-4 border-t border-slate-200">
+                            <button onclick="showSection('export')" class="nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-emerald-600">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                Export Data
+                            </button>
+                            
+                            <button onclick="showSection('logout')" class="nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium text-red-600">
+                                <i data-lucide="log-out" class="w-4 h-4"></i>
+                                Logout
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="lg:col-span-3">
+                <!-- Profile Section -->
+                <div id="profile-section" class="content-section">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="user" class="w-6 h-6 text-blue-600"></i>
+                            Profile Information
+                        </h2>
+                        
+                        <!-- Profile Image -->
+                        <div class="text-center mb-8">
+                            <div class="profile-image-container relative inline-block mb-4">
+                                <img id="profileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" 
+                                     alt="Student Profile" class="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-white">
+                                <div class="profile-image-overlay absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                                    <label for="imageUpload" class="cursor-pointer text-white">
+                                        <i data-lucide="camera" class="w-8 h-8"></i>
+                                    </label>
+                                </div>
                             </div>
-                        </a>
+                            <input type="file" id="imageUpload" accept="image/*" class="hidden" onchange="updateProfileImage(this)">
+                            <p class="text-sm text-slate-500">Click on the image to change profile picture</p>
+                        </div>
+                        
+                        <!-- Profile Form -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                                <input type="text" id="firstName" value="John" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                                <input type="text" id="lastName" value="Smith" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                            <input type="text" id="username" value="johnsmith" 
+                                   class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Bio</label>
+                            <textarea id="bio" rows="4" 
+                                      class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all resize-none">Passionate software developer with expertise in algorithms and web development. Always learning and growing!</textarea>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button onclick="saveProfileInfo()" class="btn-primary bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg font-semibold">
+                                <i data-lucide="save" class="w-5 h-5 inline mr-2"></i>
+                                Save Profile
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Recent Achievements -->
-                <div class="profile-sidebar-card">
-                    <h3 class="profile-section-title">
-                        <div class="profile-section-icon">🏆</div>
-                        Recent Achievements
-                    </h3>
-                    
-                    <div class="profile-achievements">
-                        <div class="profile-achievement">
-                            <div class="profile-achievement-icon">🥇</div>
-                            <div class="profile-achievement-content">
-                                <h4>Problem Solver</h4>
-                                <p>Solved 100+ problems</p>
+                <!-- Learning Goals Section -->
+                <div id="learning-section" class="content-section hidden">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+                            Learning Goals & Progress
+                        </h2>
+                        
+                        <!-- Current Goals -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Current Learning Goals</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-semibold text-slate-800">Master Data Structures</h4>
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">75%</span>
+                                    </div>
+                                    <div class="w-full bg-blue-200 rounded-full h-2 mb-2">
+                                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <p class="text-sm text-slate-600">Target: Complete 50 problems by end of month</p>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-semibold text-slate-800">Web Development</h4>
+                                        <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full">60%</span>
+                                    </div>
+                                    <div class="w-full bg-emerald-200 rounded-full h-2 mb-2">
+                                        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                    <p class="text-sm text-slate-600">Target: Build 3 full-stack projects</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="profile-achievement">
-                            <div class="profile-achievement-icon">🔥</div>
-                            <div class="profile-achievement-content">
-                                <h4>Streak Master</h4>
-                                <p>20+ day streak</p>
+                        <!-- Add New Goal -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Add New Learning Goal</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Goal Title</label>
+                                    <input type="text" id="newGoalTitle" placeholder="e.g., Master React" 
+                                           class="form-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                                    <select id="newGoalCategory" class="form-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                                        <option value="">Choose category...</option>
+                                        <option value="algorithms">Algorithms</option>
+                                        <option value="web-development">Web Development</option>
+                                        <option value="mobile-development">Mobile Development</option>
+                                        <option value="data-science">Data Science</option>
+                                        <option value="system-design">System Design</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="flex items-end">
+                                    <button onclick="addNewGoal()" class="btn-primary bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-6 py-2 rounded-lg font-semibold w-full">
+                                        <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+                                        Add Goal
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Password Section -->
+                <div id="password-section" class="content-section hidden">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="lock" class="w-6 h-6 text-purple-600"></i>
+                            Change Password
+                        </h2>
+                        
+                        <div class="space-y-4 max-w-md">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Current Password</label>
+                                <input type="password" id="currentPassword" placeholder="Enter current password" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">New Password</label>
+                                <input type="password" id="newPassword" placeholder="Enter new password" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
                             </div>
                         </div>
                         
-                        <div class="profile-achievement">
-                            <div class="profile-achievement-icon">⭐</div>
-                            <div class="profile-achievement-content">
-                                <h4>Skill Champion</h4>
-                                <p>Advanced level reached</p>
+                        <div class="mt-6">
+                            <button onclick="changePassword()" class="btn-primary bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 rounded-lg font-semibold">
+                                <i data-lucide="key" class="w-5 h-5 inline mr-2"></i>
+                                Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Section -->
+                <div id="preferences-section" class="content-section hidden">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="sliders" class="w-6 h-6 text-green-600"></i>
+                            Learning Preferences
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800 mb-4">Difficulty Level</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="radio" name="difficulty" value="beginner" class="w-4 h-4 text-blue-600" checked>
+                                        <span class="text-slate-700">Beginner</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="radio" name="difficulty" value="intermediate" class="w-4 h-4 text-blue-600">
+                                        <span class="text-slate-700">Intermediate</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="radio" name="difficulty" value="advanced" class="w-4 h-4 text-blue-600">
+                                        <span class="text-slate-700">Advanced</span>
+                                    </label>
+                                </div>
                             </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800 mb-4">Learning Style</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="learningStyle" value="visual" class="w-4 h-4 text-blue-600" checked>
+                                        <span class="text-slate-700">Visual Learning</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="learningStyle" value="practical" class="w-4 h-4 text-blue-600" checked>
+                                        <span class="text-slate-700">Practical Exercises</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" name="learningStyle" value="theory" class="w-4 h-4 text-blue-600">
+                                        <span class="text-slate-700">Theory & Concepts</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4">Daily Goal</h3>
+                            <div class="max-w-md">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Problems to solve per day</label>
+                                <input type="number" id="dailyGoal" value="5" min="1" max="20" 
+                                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all">
+                                <p class="text-sm text-slate-500 mt-2">Set a realistic daily goal to maintain consistency</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button onclick="savePreferences()" class="btn-primary bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-lg font-semibold">
+                                <i data-lucide="save" class="w-5 h-5 inline mr-2"></i>
+                                Save Preferences
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Data Section -->
+                <div id="export-section" class="content-section hidden">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="download" class="w-6 h-6 text-emerald-600"></i>
+                            Export Your Data
+                        </h2>
+                        
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="info" class="w-6 h-6 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-emerald-900 mb-2">Export Your Learning Data</h4>
+                                    <p class="text-emerald-700">Download your progress, achievements, and learning history in various formats for backup or analysis.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-white border border-slate-200 rounded-lg p-4 text-center hover:shadow-md transition-all cursor-pointer" onclick="exportData('progress')">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="bar-chart-3" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <h4 class="font-semibold text-slate-800 mb-2">Progress Report</h4>
+                                <p class="text-sm text-slate-600">Your learning progress and statistics</p>
+                            </div>
+                            
+                            <div class="bg-white border border-slate-200 rounded-lg p-4 text-center hover:shadow-md transition-all cursor-pointer" onclick="exportData('achievements')">
+                                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="award" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <h4 class="font-semibold text-slate-800 mb-2">Achievements</h4>
+                                <p class="text-sm text-slate-600">All your badges and milestones</p>
+                            </div>
+                            
+                            <div class="bg-white border border-slate-200 rounded-lg p-4 text-center hover:shadow-md transition-all cursor-pointer" onclick="exportData('history')">
+                                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                    <i data-lucide="history" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <h4 class="font-semibold text-slate-800 mb-2">Learning History</h4>
+                                <p class="text-sm text-slate-600">Complete activity timeline</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="exportAllData()" class="btn-primary bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-8 py-4 rounded-lg font-semibold">
+                                <i data-lucide="download" class="w-6 h-6 inline mr-2"></i>
+                                Export All Data (ZIP)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logout Section -->
+                <div id="logout-section" class="content-section hidden">
+                    <div class="glassy-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <i data-lucide="log-out" class="w-6 h-6 text-red-600"></i>
+                            Logout
+                        </h2>
+                        
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-red-900 mb-2">Logout from SkillPort Personal</h4>
+                                    <p class="text-red-700">You will be logged out and redirected to the home page. All unsaved changes will be lost.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="logout()" class="btn-primary bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-lg font-semibold">
+                                <i data-lucide="log-out" class="w-6 h-6 inline mr-2"></i>
+                                Logout from SkillPort Personal
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -623,175 +544,222 @@
         </div>
     </main>
 
-    <script src="../community-ui/js/api.js"></script>
-    <script src="../community-ui/js/app.js"></script>
-    
-    <script>
-        // Check authentication on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            loadProfileData();
-            setupAvatarUpload();
-        });
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-        function checkAuthentication() {
-            const token = localStorage.getItem('skillport_token');
-            if (!token) {
-                window.location.href = '../community-ui/pages/auth/login.html';
+    <script>
+        lucide.createIcons();
+        
+        // Show section function
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            const selectedSection = document.getElementById(sectionName + '-section');
+            if (selectedSection) {
+                selectedSection.classList.remove('hidden');
+            }
+            
+            // Update active navigation state
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the clicked nav item
+            const clickedButton = event.target.closest('button');
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+        }
+        
+        // Update profile image
+        function updateProfileImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                    showToast('Profile image updated successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Save profile information
+        function saveProfileInfo() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const username = document.getElementById('username').value;
+            const bio = document.getElementById('bio').value;
+            
+            if (!firstName || !lastName || !username) {
+                showToast('Please fill in all required fields', 'error');
                 return;
             }
             
-            // Verify token with backend
-            verifyToken(token);
+            // Simulate API call
+            setTimeout(() => {
+                showToast('Profile information saved successfully!', 'success');
+            }, 1000);
         }
-
-        async function verifyToken(token) {
-            try {
-                const response = await fetch('http://localhost:5001/api/auth/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+        
+        // Add new learning goal
+        function addNewGoal() {
+            const title = document.getElementById('newGoalTitle').value.trim();
+            const category = document.getElementById('newGoalCategory').value;
+            
+            if (!title || !category) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast(`Learning goal "${title}" added successfully!`, 'success');
+                document.getElementById('newGoalTitle').value = '';
+                document.getElementById('newGoalCategory').value = '';
+            }, 1000);
+        }
+        
+        // Change password
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showToast('Please fill in all password fields', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast('Password changed successfully!', 'success');
+                // Clear password fields
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }, 1000);
+        }
+        
+        // Save preferences
+        function savePreferences() {
+            const dailyGoal = document.getElementById('dailyGoal').value;
+            
+            if (!dailyGoal || dailyGoal < 1 || dailyGoal > 20) {
+                showToast('Please set a valid daily goal (1-20)', 'error');
+                return;
+            }
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast('Preferences saved successfully!', 'success');
+            }, 1000);
+        }
+        
+        // Export data functions
+        function exportData(type) {
+            showToast(`Exporting ${type} data...`, 'info');
+            // Simulate export
+            setTimeout(() => {
+                showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`, 'success');
+            }, 2000);
+        }
+        
+        function exportAllData() {
+            showToast('Preparing complete data export...', 'info');
+            // Simulate export
+            setTimeout(() => {
+                showToast('All data exported successfully! Check your downloads.', 'success');
+            }, 3000);
+        }
+        
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout? All unsaved changes will be lost.')) {
+                // Clear any stored data
+                localStorage.removeItem('userToken');
+                sessionStorage.clear();
+                
+                // Show logout message
+                showToast('Logging out...', 'info');
+                
+                // Redirect to home page after a short delay
+                setTimeout(() => {
+                    window.location.href = '../../index.html';
+                }, 1500);
+            }
+        }
+        
+        // Toast notification system
+        function showToast(message, type = 'success', duration = 4000) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            const icons = {
+                success: 'check-circle',
+                error: 'x-circle',
+                warning: 'alert-triangle',
+                info: 'info'
+            };
+            
+            toast.className = `${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 flex items-center gap-3`;
+            toast.innerHTML = `
+                <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-auto text-white/80 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
                     }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-                
-                const data = await response.json();
-                if (data.user.role !== 'personal') {
-                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
-                }
-                
-            } catch (error) {
-                console.error('Token verification failed:', error);
-                localStorage.removeItem('skillport_token');
-                window.location.href = '../community-ui/pages/auth/login.html';
-            }
-        }
-
-        async function loadProfileData() {
-            try {
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const userData = await response.json();
-                    populateProfileForm(userData);
-                    updateProfileDisplay(userData);
-                }
-            } catch (error) {
-                console.error('Failed to load profile data:', error);
-            }
-        }
-
-        function populateProfileForm(userData) {
-            document.getElementById('firstName').value = userData.firstName || '';
-            document.getElementById('lastName').value = userData.lastName || '';
-            document.getElementById('username').value = userData.username || '';
-            document.getElementById('bio').value = userData.bio || '';
-            document.getElementById('primaryInterest').value = userData.primaryInterest || '';
-            document.getElementById('skillLevel').value = userData.skillLevel || '';
-            document.getElementById('educationLevel').value = userData.educationLevel || '';
-        }
-
-        function updateProfileDisplay(userData) {
-            // Update profile display
-            if (userData.firstName && userData.lastName) {
-                document.getElementById('profileName').textContent = `${userData.firstName} ${userData.lastName}`;
-                document.getElementById('profileAvatar').textContent = `${userData.firstName[0]}${userData.lastName[0]}`;
-            }
+                }, 300);
+            }, duration);
             
-            if (userData.username) {
-                document.getElementById('profileUsername').textContent = `@${userData.username}`;
-            }
-            
-            if (userData.bio) {
-                document.getElementById('profileBio').textContent = userData.bio;
-            }
+            // Recreate icons
+            lucide.createIcons();
         }
-
-        function setupAvatarUpload() {
-            const avatarUpload = document.getElementById('avatarUpload');
-            avatarUpload.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    uploadAvatar(file);
-                }
-            });
-        }
-
-        async function uploadAvatar(file) {
-            try {
-                const formData = new FormData();
-                formData.append('avatar', file);
-                
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/avatar', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    // Update avatar display
-                    const profileAvatar = document.getElementById('profileAvatar');
-                    profileAvatar.style.backgroundImage = `url(${data.avatarUrl})`;
-                    profileAvatar.textContent = '';
-                }
-            } catch (error) {
-                console.error('Failed to upload avatar:', error);
-            }
-        }
-
-        // Handle form submission
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            try {
-                const formData = new FormData(e.target);
-                const profileData = {
-                    firstName: formData.get('firstName'),
-                    lastName: formData.get('lastName'),
-                    username: formData.get('username'),
-                    bio: formData.get('bio'),
-                    primaryInterest: formData.get('primaryInterest'),
-                    skillLevel: formData.get('skillLevel'),
-                    educationLevel: formData.get('educationLevel')
-                };
-                
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/profile', {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(profileData)
-                });
-                
-                if (response.ok) {
-                    const updatedData = await response.json();
-                    updateProfileDisplay(updatedData);
-                    alert('Profile updated successfully!');
-                } else {
-                    throw new Error('Failed to update profile');
-                }
-            } catch (error) {
-                console.error('Profile update failed:', error);
-                alert('Failed to update profile. Please try again.');
-            }
+        
+        // Load user profile on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add page transition effects
+            document.body.classList.add('page-loaded');
         });
-
-        function resetForm() {
-            loadProfileData();
-        }
     </script>
 </body>
 </html> 

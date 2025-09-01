@@ -4,339 +4,318 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - SkillPort Community</title>
-  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../css/main.css">
-  <link rel="stylesheet" href="../../css/dashboard.css">
-  <link rel="stylesheet" href="../../css/components.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
-    body { font-family: 'Josefin Sans', sans-serif; }
-    
-    .admin-dashboard {
-      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #dbeafe 100%);
-      min-height: 100vh;
+    body { 
+      font-family: 'Inter', sans-serif; 
     }
     
-    .admin-navbar {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
     }
     
-    .admin-nav-container {
-      max-width: 80rem;
-      margin: 0 auto;
-      padding: 0 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 4rem;
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px);
     }
     
-    .admin-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 700;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, #dc2626 0%, #ec4899 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* Enhanced minimal glassy stat cards - same as Quick Actions */
+    .stat-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.3s ease-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .admin-nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
+    .stat-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(59, 130, 246, 0.7);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+      transform: translateY(-2px) scale(1.02);
     }
     
-    .admin-nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.15s ease-in-out;
+    /* Enhanced minimal glassy action cards - ONLY for Quick Actions */
+    .action-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.3s ease-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .admin-nav-link.active {
-      background: rgba(254, 226, 226, 1);
-      color: #dc2626;
+    .action-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(59, 130, 246, 0.7);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+      transform: translateY(-2px) scale(1.02);
     }
     
-    .admin-nav-link:not(.active) {
-      color: #475569;
+    /* Enhanced glassy effects for all cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .admin-nav-link:not(.active):hover {
-      color: #1e293b;
-      background: rgba(248, 250, 252, 1);
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
     }
     
-    .admin-main {
-      max-width: 80rem;
-      margin: 0 auto;
-      padding: 0 1rem;
-      padding-top: 2.5rem;
-      padding-bottom: 2.5rem;
+    /* Enhanced button hover effects */
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
     }
     
-    .admin-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    .btn-hover:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
     
-    .admin-stat-card {
-      background: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      text-align: center;
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
-    .admin-stat-icon {
-      width: 2rem;
-      height: 2rem;
-      margin: 0 auto 0.5rem;
+    /* Staggered animation delays - FASTER */
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
+    
+    /* Page transition effects - FASTER */
+    .page-content {
+      animation: slideIn 0.3s ease-out;
     }
     
-    .admin-stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     
-    .admin-stat-label {
-      font-size: 0.875rem;
-      color: #475569;
+    /* Enhanced button interactions */
+    .btn-primary {
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
     
-    .admin-stat-growth {
-      font-size: 0.75rem;
-      color: #059669;
-      margin-top: 0.25rem;
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
     }
     
-    .admin-content-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
+    /* Enhanced dashboard cards with hover effects */
+    .bg-white.rounded-lg.shadow-lg {
+      transition: all 0.2s ease;
+      border: 3px solid transparent;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
     }
     
-    .admin-content-card {
-      background: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
+    .bg-white.rounded-lg.shadow-lg:hover {
+      transform: translateY(-2px);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
-    .admin-content-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 1rem;
+    /* Loading states */
+    .loading-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     
-    .admin-header {
-      margin-bottom: 2rem;
-    }
-    
-    .admin-title {
-      font-size: 1.875rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 0.5rem;
-    }
-    
-    .admin-subtitle {
-      font-size: 1.125rem;
-      color: #475569;
-    }
-    
-    .admin-brand-icon {
-      width: 2rem;
-      height: 2rem;
-      background: linear-gradient(135deg, #dc2626 0%, #ec4899 100%);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
   </style>
 </head>
-<body class="admin-dashboard">
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
   <!-- Navbar -->
-  <nav class="admin-navbar sticky top-0 z-50">
-    <div class="admin-nav-container">
-      <div class="admin-brand">
-        <div class="admin-brand-icon">
-          <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-2 group">
+          <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+            PW IOI
+          </span>
         </div>
-        <span>Community Admin</span>
-      </div>
-      <div class="admin-nav-menu">
-          <a href="admin-dashboard.html" class="admin-nav-link active">
+        <div class="hidden md:flex items-center gap-1">
+          <a href="admin-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
-          <a href="admin-users.html" class="admin-nav-link">
-            <i data-lucide="users" class="w-4 h-4"></i> Users
+          <a href="admin-users.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="users" class="w-4 h-4"></i> Students
           </a>
-          <a href="admin-mentors.html" class="admin-nav-link">
+          <a href="admin-mentors.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
           </a>
-          <a href="admin-contests.html" class="admin-nav-link">
+          <a href="admin-contests.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="admin-analytics.html" class="admin-nav-link">
+          <a href="admin-analytics.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
           </a>
-          <a href="admin-leaderboard.html" class="admin-nav-link">
+          <a href="admin-leaderboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
           </a>
-          <a href="admin-settings.html" class="admin-nav-link">
-            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          <a href="admin-profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
-          <button onclick="logout()" class="admin-nav-link">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-          </button>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <main class="admin-main">
-    <div class="admin-header">
-      <h1 class="admin-title">Admin Dashboard</h1>
-      <p class="admin-subtitle">Manage the entire SkillPort Community platform, users, mentors, and contests.</p>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
+    <div class="mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-700 leading-snug">Dashboard</h1>
+        </div>
+      </div>
     </div>
 
     <!-- System Stats Cards -->
-    <div class="admin-stats-grid">
-      <div class="admin-stat-card">
-        <i data-lucide="users" class="admin-stat-icon text-blue-600"></i>
-        <div class="admin-stat-value text-blue-600" id="total-users">-</div>
-        <div class="admin-stat-label">Total Users</div>
-        <div class="admin-stat-growth" id="users-growth">Loading...</div>
-      </div>
-      <div class="admin-stat-card">
-        <i data-lucide="graduation-cap" class="admin-stat-icon text-green-600"></i>
-        <div class="admin-stat-value text-green-600" id="active-mentors">-</div>
-        <div class="admin-stat-label">Active Mentors</div>
-        <div class="admin-stat-growth" id="mentors-growth">Loading...</div>
-      </div>
-      <div class="admin-stat-card">
-        <i data-lucide="trophy" class="admin-stat-icon text-amber-600"></i>
-        <div class="admin-stat-value text-amber-600" id="active-contests">-</div>
-        <div class="admin-stat-label">Active Contests</div>
-        <div class="admin-stat-growth" id="contests-growth">Loading...</div>
-      </div>
-      <div class="admin-stat-card">
-        <i data-lucide="target" class="admin-stat-icon text-purple-600"></i>
-        <div class="admin-stat-value text-purple-600" id="problems-solved">-</div>
-        <div class="admin-stat-label">Problems Solved</div>
-        <div class="admin-stat-growth" id="problems-growth">Loading...</div>
-      </div>
-    </div>
-
-    <!-- System Overview & Quick Actions -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <!-- System Overview -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-bold text-slate-900 mb-4">System Overview</h2>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i>
-              <span class="text-sm font-medium text-slate-900">System Status</span>
-            </div>
-            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs" id="system-status">Checking...</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Total Users</p>
+            <p class="text-2xl font-bold text-slate-900" id="total-users">-</p>
+            <p class="text-sm text-green-600" id="users-growth">Loading...</p>
           </div>
-          <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <i data-lucide="server" class="w-5 h-5 text-green-600"></i>
-              <span class="text-sm font-medium text-slate-900">Server Load</span>
-            </div>
-            <span class="text-sm text-slate-600" id="server-load">-</span>
-          </div>
-          <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <i data-lucide="database" class="w-5 h-5 text-amber-600"></i>
-              <span class="text-sm font-medium text-slate-900">Database</span>
-            </div>
-            <span class="text-sm text-slate-600" id="database-status">-</span>
-          </div>
-          <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <i data-lucide="clock" class="w-5 h-5 text-purple-600"></i>
-              <span class="text-sm font-medium text-slate-900">Uptime</span>
-            </div>
-            <span class="text-sm text-slate-600" id="uptime">-</span>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
           </div>
         </div>
       </div>
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Active Mentors</p>
+            <p class="text-2xl font-bold text-slate-900" id="active-mentors">-</p>
+            <p class="text-sm text-green-600" id="mentors-growth">Loading...</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="graduation-cap" class="w-6 h-6 text-green-600"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Active Contests</p>
+            <p class="text-2xl font-bold text-slate-900" id="active-contests">-</p>
+            <p class="text-sm text-green-600" id="contests-growth">Loading...</p>
+          </div>
+          <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="trophy" class="w-6 h-6 text-amber-600"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600">Problems Solved</p>
+            <p class="text-2xl font-bold text-slate-600" id="problems-solved">-</p>
+            <p class="text-sm text-green-600" id="problems-growth">Loading...</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+          </div>
+        </div>
+      </div>
+    </div>
 
+        <!-- Recent Activity & Community Insights -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- Recent Activity -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80">
         <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
-        <div class="space-y-4" id="recent-activity">
+        <div class="space-y-4 h-64 overflow-y-auto" id="recent-activity">
           <div class="text-center py-8">
             <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
             <p class="text-sm text-slate-500">Loading recent activity...</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div>
-      <h2 class="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <a href="admin-users.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="user-plus" class="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">Add New User</h3>
-          <p class="text-sm text-slate-600">Create user account with credentials</p>
-        </a>
-        <a href="admin-mentors.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="graduation-cap" class="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">Add New Mentor</h3>
-          <p class="text-sm text-slate-600">Create mentor account and assign</p>
-        </a>
-        <a href="admin-contests.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="plus-circle" class="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">Create Contest</h3>
-          <p class="text-sm text-slate-600">Set up new contest and assign mentor</p>
-        </a>
-        <a href="admin-analytics.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="bar-chart-3" class="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">View Analytics</h3>
-          <p class="text-sm text-slate-600">System-wide performance reports</p>
-        </a>
-        <a href="admin-leaderboard.html" class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="award" class="w-12 h-12 text-indigo-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
-          <p class="text-sm text-slate-600">Overall system rankings</p>
-        </a>
+      <!-- Community Insights -->
+      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">Community Insights</h2>
+        <div class="space-y-4 h-64 overflow-y-auto">
+          <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="trending-up" class="w-5 h-5 text-blue-600"></i>
+              <span class="text-sm font-medium text-slate-900">Active Users Today</span>
+            </div>
+            <span class="text-sm font-semibold text-blue-600" id="active-users-today">-</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+              <span class="text-sm font-medium text-slate-900">New Registrations</span>
+            </div>
+            <span class="text-sm font-semibold text-green-600" id="new-registrations">-</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="message-circle" class="w-5 h-5 text-amber-600"></i>
+              <span class="text-sm font-medium text-slate-900">Community Posts</span>
+            </div>
+            <span class="text-sm font-semibold text-amber-600" id="community-posts">-</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="award" class="w-5 h-5 text-purple-600"></i>
+              <span class="text-sm font-medium text-slate-900">Contest Submissions</span>
+            </div>
+            <span class="text-sm font-semibold text-purple-600" id="contest-submissions">-</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Recent Users & Mentors -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- Recent Users -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-slate-900">Recent Users</h2>
           <a href="admin-users.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
         </div>
-        <div class="space-y-3" id="recent-users">
+        <div class="space-y-3 h-64 overflow-y-auto" id="recent-users">
           <div class="text-center py-8">
             <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
             <p class="text-sm text-slate-500">Loading recent users...</p>
@@ -345,12 +324,12 @@
       </div>
 
       <!-- Recent Mentors -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold text-slate-900">Recent Mentors</h2>
           <a href="admin-mentors.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
         </div>
-        <div class="space-y-3" id="recent-mentors">
+        <div class="space-y-3 h-64 overflow-y-auto" id="recent-mentors">
           <div class="text-center py-8">
             <i data-lucide="loader" class="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin"></i>
             <p class="text-sm text-slate-500">Loading recent mentors...</p>
@@ -358,11 +337,185 @@
         </div>
       </div>
     </div>
+
+    <!-- Quick Actions -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <a href="admin-users.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="user-plus" class="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Add New User</h3>
+          <p class="text-sm text-slate-600">Create user account with credentials</p>
+        </a>
+        <a href="admin-mentors.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="graduation-cap" class="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Add New Mentor</h3>
+          <p class="text-sm text-slate-600">Create mentor account and assign</p>
+        </a>
+        <a href="admin-contests.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="plus-circle" class="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">Create Contest</h3>
+          <p class="text-sm text-slate-600">Set up new contest and assign mentor</p>
+        </a>
+        <a href="admin-analytics.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="bar-chart-3" class="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">View Analytics</h3>
+          <p class="text-sm text-slate-600">System-wide performance reports</p>
+        </a>
+        <a href="admin-leaderboard.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
+          <i data-lucide="award" class="w-12 h-12 text-indigo-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
+          <h3 class="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
+          <p class="text-sm text-slate-600">Overall system rankings</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Alerts & Contest Management -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Alerts & Notifications -->
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Alerts & Notifications</h2>
+          <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium" id="alert-count">3</span>
+        </div>
+        <div class="space-y-3 h-64 overflow-y-auto" id="alerts-container">
+          <div class="flex items-center gap-3 p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+            <i data-lucide="flag" class="w-5 h-5 text-red-600"></i>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-red-900">Flagged Submission</p>
+              <p class="text-xs text-red-600">Contest: "Array Problems" - User: john_doe</p>
+            </div>
+            <button class="text-red-600 hover:text-red-800 text-xs">Review</button>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+            <i data-lucide="user-check" class="w-5 h-5 text-yellow-600"></i>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-yellow-900">Pending Mentor</p>
+              <p class="text-xs text-yellow-600">Sarah Wilson - Algorithms Expert</p>
+            </div>
+            <button class="text-yellow-600 hover:text-yellow-800 text-xs">Approve</button>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-blue-600"></i>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-blue-900">System Alert</p>
+              <p class="text-xs text-blue-600">High contest participation detected</p>
+            </div>
+            <button class="text-blue-600 hover:text-blue-800 text-xs">View</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contest Management -->
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Contest Management</h2>
+          <a href="admin-contests.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+        </div>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center p-3 bg-green-50 rounded-lg">
+              <div class="text-2xl font-bold text-green-600" id="active-contests-count">5</div>
+              <div class="text-xs text-green-600">Active Contests</div>
+            </div>
+            <div class="text-center p-3 bg-blue-50 rounded-lg">
+              <div class="text-2xl font-bold text-blue-600" id="pending-contests-count">2</div>
+              <div class="text-xs text-blue-600">Pending Start</div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-2 bg-amber-50 rounded-lg border-l-4 border-amber-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="user-check" class="w-4 h-4 text-amber-600"></i>
+                <span class="text-xs font-medium text-amber-900">Contests needing mentors</span>
+              </div>
+              <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-bold" id="contests-needing-mentors">1</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                <span class="text-xs font-medium text-blue-900">Total participants today</span>
+              </div>
+              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-bold" id="total-participants">127</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-purple-600"></i>
+                <span class="text-xs font-medium text-purple-900">Submissions pending review</span>
+              </div>
+              <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-bold" id="pending-submissions">23</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance & Community Health -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Performance Metrics -->
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Performance Metrics</h2>
+          <a href="admin-analytics.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View Details</a>
+        </div>
+        <div class="space-y-4 h-64 overflow-y-auto">
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="target" class="w-5 h-5 text-green-600"></i>
+              <span class="text-sm font-medium text-slate-900">Contest Success Rate</span>
+            </div>
+            <span class="text-sm font-semibold text-green-600">87%</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="clock" class="w-5 h-5 text-blue-600"></i>
+              <span class="text-sm font-medium text-slate-900">Avg Mentor Response</span>
+            </div>
+            <span class="text-sm font-semibold text-blue-600">2.3 hrs</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
+              <span class="text-sm font-medium text-slate-900">User Engagement</span>
+            </div>
+            <span class="text-sm font-semibold text-purple-600">73%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Health -->
+      <div class="bg-white rounded-lg shadow-lg p-6 h-80">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Community Health</h2>
+          <a href="admin-analytics.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View Details</a>
+        </div>
+        <div class="space-y-4 h-64 overflow-y-auto">
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
+              <span class="text-sm font-medium text-slate-900">Weekly Growth</span>
+            </div>
+            <span class="text-sm font-semibold text-green-600">+12%</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="message-circle" class="w-5 h-5 text-blue-600"></i>
+              <span class="text-sm font-medium text-slate-900">Active Discussions</span>
+            </div>
+            <span class="text-sm font-semibold text-blue-600">18</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div class="flex items-center gap-3">
+              <i data-lucide="award" class="w-5 h-5 text-amber-600"></i>
+              <span class="text-sm font-medium text-slate-900">Top Contributors</span>
+            </div>
+            <span class="text-sm font-semibold text-amber-600">24</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
-  <!-- Load Authentication Utility -->
-  <script src="../../js/auth-utils.js"></script>
-  
   <script>
     lucide.createIcons();
     
@@ -374,12 +527,6 @@
 
       async init() {
         try {
-          // Check if user is admin using local storage auth
-          if (!window.SkillPortAuth.isAuthenticated() || !window.SkillPortAuth.isAdmin()) {
-            window.location.href = '../../index.html';
-            return;
-          }
-
           // Load dashboard data
           await this.loadDashboardData();
           
@@ -408,7 +555,11 @@
           this.updateRecentUsers([]);
           this.updateRecentMentors([]);
           this.updateRecentActivity([]);
-          this.loadSystemStatus();
+          this.loadCommunityInsights();
+          this.loadAlertsAndNotifications();
+          this.loadContestManagement();
+          this.loadPerformanceMetrics();
+          this.loadCommunityHealth();
 
         } catch (error) {
           console.error('Failed to load dashboard data:', error);
@@ -534,31 +685,23 @@
         lucide.createIcons();
       }
 
-      loadSystemStatus() {
+      loadCommunityInsights() {
         try {
-          // Initialize system status
-          const statusElement = document.querySelector('#system-status');
-          if (statusElement) {
-            statusElement.textContent = 'Loading...';
-            statusElement.className = 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs';
-          }
-
-          // Initialize other system metrics
-          const serverLoadElement = document.querySelector('#server-load');
-          const databaseStatusElement = document.querySelector('#database-status');
-          const uptimeElement = document.querySelector('#uptime');
+          // Initialize community insights with sample data
+          const elements = {
+            activeUsersToday: document.querySelector('#active-users-today'),
+            newRegistrations: document.querySelector('#new-registrations'),
+            communityPosts: document.querySelector('#community-posts'),
+            contestSubmissions: document.querySelector('#contest-submissions')
+          };
           
-          if (serverLoadElement) serverLoadElement.textContent = 'Loading...';
-          if (databaseStatusElement) databaseStatusElement.textContent = 'Loading...';
-          if (uptimeElement) uptimeElement.textContent = 'Loading...';
+          if (elements.activeUsersToday) elements.activeUsersToday.textContent = '24';
+          if (elements.newRegistrations) elements.newRegistrations.textContent = '8';
+          if (elements.communityPosts) elements.communityPosts.textContent = '12';
+          if (elements.contestSubmissions) elements.contestSubmissions.textContent = '45';
 
         } catch (error) {
-          console.error('Failed to load system status:', error);
-          const statusElement = document.querySelector('#system-status');
-          if (statusElement) {
-            statusElement.textContent = 'Status Unknown';
-            statusElement.className = 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs';
-          }
+          console.error('Failed to load community insights:', error);
         }
       }
 
@@ -620,21 +763,90 @@
     // Initialize dashboard when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
       new AdminDashboard();
+      
+      // Add page transition effects
+      document.body.classList.add('page-loaded');
+      
+      // Add smooth navigation transitions
+      document.querySelectorAll('a[href^="admin-"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          // Add page exit animation
+          document.body.classList.add('page-exiting');
+          
+          // Small delay for animation
+          setTimeout(() => {
+            window.location.href = link.href;
+          }, 150);
+        });
+      });
     });
 
-    // Logout function
-    function logout() {
-      if (window.SkillPortAuth) {
-        window.SkillPortAuth.logout();
-        window.location.href = '../../index.html';
-      } else {
-        // Fallback logout
-        localStorage.removeItem('skillport_token');
-        localStorage.removeItem('skillport_user');
-        localStorage.removeItem('skillport_is_authenticated');
-        window.location.href = '../../index.html';
+    // Add page transition CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .page-loaded {
+        animation: pageEnter 0.3s ease-out;
       }
-    }
+      
+      .page-exiting {
+        animation: pageExit 0.1s ease-in;
+      }
+      
+      @keyframes pageEnter {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes pageExit {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Enhanced page transitions
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add page transition effects
+      const pageContent = document.querySelector('.page-content');
+      if (pageContent) {
+        pageContent.style.opacity = '0';
+        pageContent.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+          pageContent.style.transition = 'all 0.5s ease-out';
+          pageContent.style.opacity = '1';
+          pageContent.style.transform = 'translateX(0)';
+        }, 100);
+      }
+      
+      // Add staggered animation to stat cards
+      const statCards = document.querySelectorAll('.stat-card');
+      statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+      });
+      
+      // Add staggered animation to action cards
+      const actionCards = document.querySelectorAll('.action-card');
+      actionCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'scale(1)';
+        }, 600 + (index * 100));
+      });
+    });
+
+
   </script>
 </body>
 </html> 

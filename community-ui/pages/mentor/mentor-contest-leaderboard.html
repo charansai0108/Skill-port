@@ -3,43 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mentor Contest Leaderboard - SkillPort Community</title>
+  <title>Mentor Contest Leaderboard - PW IOI Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     .modal-bg { background: rgba(30, 41, 59, 0.7); }
-    .badge-gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
-    .badge-silver { background: linear-gradient(135deg, #C0C0C0, #A9A9A9); }
-    .badge-bronze { background: linear-gradient(135deg, #CD7F32, #B8860B); }
+    
+    /* Enhanced glassy effects for all cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    /* Enhanced button hover effects */
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-hover:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Table row hover effects */
+    .table-row-hover {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .table-row-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    /* Glassy button effects */
+    .glass-btn {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+    
+    .glass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
+    }
+    
+    /* Page transition effects */
+    .page-content {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-50 via-white to-orange-50 min-h-screen">
   <!-- Navbar -->
   <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-2 group">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
           </div>
           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            SkillPort
+            <span id="navbar-mentor-name">Mentor</span>
           </span>
         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="mentor-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
-          <a href="mentor-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+          <a href="mentor-contests.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-feedback.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="message-circle" class="w-4 h-4"></i> Feedback
           </a>
-          <a href="mentor-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-leaderboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          </a>
+          <a href="mentor-profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
         </div>
       </div>
@@ -47,29 +112,21 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h1 class="text-3xl font-bold text-slate-900 mb-2">Contest #1 - Leaderboard</h1>
-          <p class="text-lg text-slate-600">Mentor view: Review participant performance, flagged questions, and problem details.</p>
-        </div>
-        <div class="text-right">
-          <div class="text-2xl font-bold text-blue-600">156</div>
-          <div class="text-sm text-slate-600">Participants</div>
-        </div>
-      </div>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-content">
+         <div class="bg-white rounded-lg shadow-lg p-6 mb-8 dashboard-card">
+       <div class="flex items-center justify-between mb-4">
+         <div>
+           <h1 class="text-3xl font-bold text-slate-900 mb-2">Weekly Algorithm Challenge - Leaderboard</h1>
+           <p class="text-lg text-slate-600">Track your students' progress and manage contest performance.</p>
+         </div>
+         <div class="text-right">
+           <div class="text-2xl font-bold text-orange-600">156</div>
+           <div class="text-sm text-slate-600">Participants</div>
+         </div>
+       </div>
+     </div>
 
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-slate-600 to-slate-800 p-6 text-white">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold mb-2">Contest Rankings</h2>
-            <p class="text-slate-300">Mentor can click user names or flagged counts for details</p>
-          </div>
-        </div>
-      </div>
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden dashboard-card">
       <div class="p-6">
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -77,125 +134,94 @@
               <tr>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Rank</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Name</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">User ID</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Problems Solved</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Flagged</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Success Rate</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Score</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Submission Time</th>
                 <th class="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
-              <!-- Top 1 - Gold -->
-              <tr class="bg-gradient-to-r from-yellow-50 to-amber-50 hover:bg-yellow-100">
+              <!-- Top 1 -->
+              <tr class="bg-gradient-to-r from-yellow-50 to-amber-50 hover:bg-yellow-100 table-row-hover">
                 <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 badge-gold rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
-                    <i data-lucide="crown" class="w-5 h-5 text-yellow-600"></i>
-                  </div>
+                  <div class="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
                 </td>
-                <td class="px-6 py-4 cursor-pointer hover:underline" onclick="showUserProblemsModal('Alex Smith')">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">AS</div>
-                    <div>
-                      <div class="font-semibold text-slate-900">Alex Smith</div>
-                      <div class="text-sm text-slate-600">@alexsmith</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-slate-600">U101</td>
+                                 <td class="px-6 py-4 cursor-pointer" onclick="showUserProblemsModal('Alex Smith')">
+                   <div class="flex items-center gap-3">
+                     <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-semibold">AS</div>
+                     <div class="font-semibold text-slate-900">Alex Smith</div>
+                   </div>
+                 </td>
                 <td class="px-6 py-4 font-semibold text-slate-900">11/12</td>
                 <td class="px-6 py-4">
                   <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs cursor-pointer" onclick="showFlaggedModal('Alex Smith')">2</span>
                 </td>
                 <td class="px-6 py-4 text-green-700 font-semibold">91.7%</td>
                 <td class="px-6 py-4 font-bold text-amber-600">1,180</td>
-                <td class="px-6 py-4 text-sm text-slate-600">2 hours ago</td>
                 <td class="px-6 py-4">
                   <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
                 </td>
               </tr>
-              <!-- Top 2 - Silver -->
-              <tr class="bg-gradient-to-r from-slate-50 to-gray-50 hover:bg-slate-100">
+              <!-- Top 2 -->
+              <tr class="bg-gradient-to-r from-slate-50 to-gray-50 hover:bg-slate-100 table-row-hover">
                 <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 badge-silver rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
-                    <i data-lucide="medal" class="w-5 h-5 text-slate-600"></i>
-                  </div>
+                  <div class="w-8 h-8 bg-gradient-to-br from-slate-400 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
                 </td>
-                <td class="px-6 py-4 cursor-pointer hover:underline" onclick="showUserProblemsModal('Maria Johnson')">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">MJ</div>
-                    <div>
-                      <div class="font-semibold text-slate-900">Maria Johnson</div>
-                      <div class="text-sm text-slate-600">@mariaj</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-slate-600">U102</td>
+                                 <td class="px-6 py-4 cursor-pointer" onclick="showUserProblemsModal('Maria Johnson')">
+                   <div class="flex items-center gap-3">
+                     <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">MJ</div>
+                     <div class="font-semibold text-slate-900">Maria Johnson</div>
+                   </div>
+                 </td>
                 <td class="px-6 py-4 font-semibold text-slate-900">10/12</td>
                 <td class="px-6 py-4">
                   <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs cursor-pointer" onclick="showFlaggedModal('Maria Johnson')">1</span>
                 </td>
                 <td class="px-6 py-4 text-green-700 font-semibold">83.3%</td>
                 <td class="px-6 py-4 font-bold text-slate-600">1,145</td>
-                <td class="px-6 py-4 text-sm text-slate-600">4 hours ago</td>
                 <td class="px-6 py-4">
                   <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
                 </td>
               </tr>
-              <!-- Top 3 - Bronze -->
-              <tr class="bg-gradient-to-r from-amber-50 to-orange-50 hover:bg-orange-100">
+              <!-- Top 3 -->
+              <tr class="bg-gradient-to-r from-orange-50 to-amber-50 hover:bg-orange-100 table-row-hover">
                 <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 badge-bronze rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
-                    <i data-lucide="award" class="w-5 h-5 text-amber-600"></i>
-                  </div>
+                  <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
                 </td>
-                <td class="px-6 py-4 cursor-pointer hover:underline" onclick="showUserProblemsModal('Robert Kim')">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">RK</div>
-                    <div>
-                      <div class="font-semibold text-slate-900">Robert Kim</div>
-                      <div class="text-sm text-slate-600">@robertk</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-slate-600">U103</td>
+                                 <td class="px-6 py-4 cursor-pointer" onclick="showUserProblemsModal('Robert Kim')">
+                   <div class="flex items-center gap-3">
+                     <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">RK</div>
+                     <div class="font-semibold text-slate-900">Robert Kim</div>
+                   </div>
+                 </td>
                 <td class="px-6 py-4 font-semibold text-slate-900">10/12</td>
                 <td class="px-6 py-4">
                   <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs cursor-pointer" onclick="showFlaggedModal('Robert Kim')">0</span>
                 </td>
                 <td class="px-6 py-4 text-green-700 font-semibold">83.3%</td>
                 <td class="px-6 py-4 font-bold text-orange-600">1,120</td>
-                <td class="px-6 py-4 text-sm text-slate-600">6 hours ago</td>
                 <td class="px-6 py-4">
                   <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
                 </td>
               </tr>
               <!-- More participants... -->
-              <tr class="hover:bg-slate-50">
+              <tr class="hover:bg-slate-50 table-row-hover">
                 <td class="px-6 py-4">
                   <div class="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold text-sm">4</div>
                 </td>
-                <td class="px-6 py-4 cursor-pointer hover:underline" onclick="showUserProblemsModal('Sarah Lee')">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">SL</div>
-                    <div>
-                      <div class="font-semibold text-slate-900">Sarah Lee</div>
-                      <div class="text-sm text-slate-600">@sarahlee</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-slate-600">U104</td>
+                                 <td class="px-6 py-4 cursor-pointer" onclick="showUserProblemsModal('Sarah Lee')">
+                   <div class="flex items-center gap-3">
+                     <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">SL</div>
+                     <div class="font-semibold text-slate-900">Sarah Lee</div>
+                   </div>
+                 </td>
                 <td class="px-6 py-4 font-semibold text-slate-900">8/12</td>
                 <td class="px-6 py-4">
-                  <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs cursor-pointer" onclick="showFlaggedModal('Sarah Lee')">0</span>
+                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs cursor-pointer" onclick="showFlaggedModal('Sarah Lee')">0</span>
                 </td>
                 <td class="px-6 py-4 text-green-700 font-semibold">66.7%</td>
                 <td class="px-6 py-4 font-bold text-slate-600">950</td>
-                <td class="px-6 py-4 text-sm text-slate-600">2 days ago</td>
                 <td class="px-6 py-4">
                   <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-sm">Inactive</span>
                 </td>
@@ -206,122 +232,151 @@
       </div>
     </div>
 
-    <!-- Flagged Submissions Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold text-slate-900">Flagged Submissions</h3>
-        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium" id="flagged-count">0</span>
-      </div>
-      <p class="text-slate-600 mb-4">Review submissions flagged by the system for potential academic integrity issues.</p>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-slate-200">
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Student</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Platform</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Problem</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Difficulty</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Time</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Status</th>
-              <th class="text-left py-3 px-4 font-semibold text-slate-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="flagged-submissions-table">
-            <!-- Flagged submissions will be loaded here -->
-          </tbody>
-        </table>
-      </div>
-      
-      <div id="no-flagged" class="text-center py-8 text-slate-500 hidden">
-        <i data-lucide="shield-check" class="w-12 h-12 mx-auto mb-4 text-green-500"></i>
-        <p class="text-lg font-medium">No flagged submissions</p>
-        <p class="text-sm">All submissions are currently clean</p>
-      </div>
-    </div>
+
 
     <!-- User Problems Modal (hidden by default) -->
     <div id="userProblemsModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
-      <div class="bg-white rounded-xl shadow-2xl p-0 max-w-lg w-full relative overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex items-center gap-4">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-xl font-bold">AS</div>
-          <div>
-            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-              <i data-lucide="user" class="w-5 h-5"></i> User Problems - <span id="modalUserProblemsName" class="ml-1">Alex Smith</span>
-            </h3>
-            <div class="text-sm text-indigo-100">All problems for this user in the contest</div>
+      <div class="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full relative">
+        <button onclick="closeUserProblemsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center text-white font-semibold">AS</div>
+            <div>
+              <h3 class="text-2xl font-bold text-slate-900">User Problems</h3>
+              <p class="text-slate-600"><span id="modalUserProblemsName" class="font-semibold text-orange-600">Alex Smith</span> - All problems in this contest</p>
+            </div>
           </div>
-          <button onclick="closeUserProblemsModal()" class="ml-auto text-white hover:text-indigo-200">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
         </div>
-        <div class="p-6">
-          <table class="w-full mb-4">
-            <thead>
-              <tr>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Title</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Platform</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Solved</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Flagged</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="bg-gradient-to-r from-blue-50 to-cyan-50">
-                <td class="px-4 py-2 font-semibold text-slate-900">Problem #1</td>
-                <td class="px-4 py-2 text-slate-700">LeetCode</td>
-                <td class="px-4 py-2"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Solved</span></td>
-                <td class="px-4 py-2"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">No</span></td>
-              </tr>
-              <tr class="bg-gradient-to-r from-purple-50 to-pink-50">
-                <td class="px-4 py-2 font-semibold text-slate-900">Reverse Linked List</td>
-                <td class="px-4 py-2 text-slate-700">Codeforces</td>
-                <td class="px-4 py-2"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Not Solved</span></td>
-                <td class="px-4 py-2"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Yes</span></td>
-              </tr>
-              <!-- More problems can be added here -->
-            </tbody>
-          </table>
+        
+        <div class="space-y-3">
+          <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-4 border border-orange-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Solved</span>
+                <div>
+                  <div class="font-semibold text-slate-900">Two Sum</div>
+                  <div class="text-sm text-slate-600">LeetCode • Arrays</div>
+                </div>
+              </div>
+              <div class="text-sm text-red-600 font-semibold">Flagged</div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Solved</span>
+                <div>
+                  <div class="font-semibold text-slate-900">Reverse Linked List</div>
+                  <div class="text-sm text-slate-600">Codeforces • Linked List</div>
+                </div>
+              </div>
+              <div class="text-sm text-green-600 font-semibold">Clean</div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Solved</span>
+                <div>
+                  <div class="font-semibold text-slate-900">Binary Tree Traversal</div>
+                  <div class="text-sm text-slate-600">HackerRank • Trees</div>
+                </div>
+              </div>
+              <div class="text-sm text-green-600 font-semibold">Clean</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Flagged Questions Modal (hidden by default) -->
-    <div id="flaggedModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
-      <div class="bg-white rounded-xl shadow-2xl p-0 max-w-lg w-full relative overflow-hidden">
-        <div class="bg-gradient-to-r from-red-500 to-pink-500 p-6 flex items-center gap-4">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-xl font-bold">N</div>
-          <div>
-            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-              <i data-lucide="flag" class="w-5 h-5"></i> Flagged Questions - <span id="modalFlaggedUser" class="ml-1">Student #3</span>
-            </h3>
-            <div class="text-sm text-pink-100">Review flagged problems and user code</div>
+    <!-- Flagged Questions Summary Modal (hidden by default) -->
+    <div id="flaggedSummaryModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
+      <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full relative">
+        <button onclick="closeFlaggedSummaryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
+              <i data-lucide="flag" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-slate-900">Flagged Questions Summary</h3>
+              <p class="text-slate-600">Review flagged problems for <span id="modalFlaggedUser" class="font-semibold text-orange-600">Student #3</span></p>
+            </div>
           </div>
-          <button onclick="closeFlaggedModal()" class="ml-auto text-white hover:text-pink-200">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
         </div>
-        <div class="p-6">
-          <table class="w-full mb-4">
-            <thead>
-              <tr>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Problem No</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Problem</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Topic</th>
-                <th class="px-4 py-2 text-left text-xs font-semibold text-slate-900">Code</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="bg-gradient-to-r from-pink-50 to-red-50">
-                <td class="px-4 py-2 font-semibold text-red-600">2</td>
-                <td class="px-4 py-2 font-medium text-slate-900">Reverse Linked List</td>
-                <td class="px-4 py-2 text-pink-700">Linked List</td>
-                <td class="px-4 py-2">
-                  <button class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700 focus:outline-none" onclick="showCodeModal('Alex Smith', 'Reverse Linked List', `function reverseList(head) {\n  let prev = null;\n  let curr = head;\n  while (curr) {\n    let next = curr.next;\n    curr.next = prev;\n    prev = curr;\n    curr = next;\n  }\n  return prev;\n}`)">View Code</button>
-                </td>
-              </tr>
-              <!-- More flagged questions can be added here -->
-            </tbody>
-          </table>
+        
+        <div class="mb-6">
+          <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-200">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-red-600" id="flaggedCount">2</div>
+              <div class="text-slate-600">Total Flagged Questions</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <h4 class="text-lg font-semibold text-slate-900 mb-3">Flagged Questions:</h4>
+          
+          <!-- Question 1 -->
+          <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-200 hover:bg-orange-100 cursor-pointer transition-colors" onclick="openFlaggedDetailModal(1)">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">#1</span>
+                <div>
+                  <div class="font-semibold text-slate-900">Reverse Linked List</div>
+                  <div class="text-sm text-slate-600">Problem 2 • Linked List</div>
+                </div>
+              </div>
+              <div class="text-sm text-slate-500">2 hours ago</div>
+            </div>
+          </div>
+          
+          <!-- Question 2 -->
+          <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-200 hover:bg-orange-100 cursor-pointer transition-colors" onclick="openFlaggedDetailModal(2)">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">#2</span>
+                <div>
+                  <div class="font-semibold text-slate-900">Two Sum</div>
+                  <div class="text-sm text-slate-600">Problem 1 • Arrays</div>
+                </div>
+              </div>
+              <div class="text-sm text-slate-500">1 hour ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flagged Question Detail Modal (hidden by default) -->
+    <div id="flaggedDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
+      <div class="bg-white rounded-xl shadow-2xl p-8 max-w-4xl w-full relative">
+        <button onclick="closeFlaggedDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
+              <i data-lucide="flag" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-slate-900">Flagged Question Details</h3>
+              <p class="text-slate-600">Reviewing <span id="detailQuestionName" class="font-semibold text-orange-600">Question</span> for <span id="detailUserName" class="font-semibold text-orange-600">Student</span></p>
+            </div>
+          </div>
+        </div>
+        
+        <div id="flaggedQuestionContent" class="space-y-4">
+          <!-- Content will be dynamically loaded -->
         </div>
       </div>
     </div>
@@ -329,15 +384,15 @@
     <!-- Code View Modal (hidden by default) -->
     <div id="codeModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
       <div class="bg-white rounded-xl shadow-2xl p-0 max-w-lg w-full relative overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 flex items-center gap-4">
+        <div class="bg-gradient-to-r from-orange-700 to-amber-700 p-6 flex items-center gap-4">
           <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-xl font-bold"><i data-lucide="file-code-2"></i></div>
           <div>
             <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
               <i data-lucide="file-code-2" class="w-5 h-5"></i> User Code - <span id="modalCodeUser" class="ml-1">Alex Smith</span>
             </h3>
-            <div class="text-sm text-indigo-100">Problem: <span id="modalCodeProblem">Reverse Linked List</span></div>
+            <div class="text-sm text-orange-100">Problem: <span id="modalCodeProblem">Reverse Linked List</span></div>
           </div>
-          <button onclick="closeCodeModal()" class="ml-auto text-white hover:text-indigo-200">
+          <button onclick="closeCodeModal()" class="ml-auto text-white hover:text-orange-200">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -347,12 +402,239 @@
       </div>
     </div>
   </main>
+
+  <script>
+    lucide.createIcons();
+    
+    // Simple page functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set mentor name in navbar
+      const navbarMentorName = document.getElementById('navbar-mentor-name');
+      if (navbarMentorName) {
+        navbarMentorName.textContent = 'Dr. Sarah Chen';
+      }
+    });
+
+    // Modal functions
+    function showUserProblemsModal(userName) {
+      document.getElementById('modalUserProblemsName').textContent = userName;
+      document.getElementById('userProblemsModal').classList.remove('hidden');
+      document.getElementById('userProblemsModal').classList.add('flex');
+    }
+
+    function closeUserProblemsModal() {
+      document.getElementById('userProblemsModal').classList.add('hidden');
+      document.getElementById('userProblemsModal').classList.remove('flex');
+    }
+
+    function showFlaggedModal(userName) {
+      document.getElementById('modalFlaggedUser').textContent = userName;
+      setTimeout(() => {
+        document.getElementById('flaggedSummaryModal').classList.remove('hidden');
+        document.getElementById('flaggedSummaryModal').classList.add('flex');
+      }, 200);
+    }
+
+    function closeFlaggedSummaryModal() {
+      document.getElementById('flaggedSummaryModal').classList.add('hidden');
+      document.getElementById('flaggedSummaryModal').classList.remove('flex');
+    }
+
+    function openFlaggedDetailModal(questionId) {
+      // Close summary modal
+      closeFlaggedSummaryModal();
+      
+      // Set question details
+      const questionData = getQuestionData(questionId);
+      document.getElementById('detailQuestionName').textContent = questionData.name;
+      document.getElementById('detailUserName').textContent = document.getElementById('modalFlaggedUser').textContent;
+      
+      // Load question content
+      loadQuestionContent(questionId);
+      
+      // Show detail modal
+      setTimeout(() => {
+        document.getElementById('flaggedDetailModal').classList.remove('hidden');
+        document.getElementById('flaggedDetailModal').classList.add('flex');
+      }, 200);
+    }
+
+    function closeFlaggedDetailModal() {
+      document.getElementById('flaggedDetailModal').classList.add('hidden');
+      document.getElementById('flaggedDetailModal').classList.remove('flex');
+    }
+
+    function getQuestionData(questionId) {
+      const questions = {
+        1: {
+          name: 'Reverse Linked List',
+          problemNo: 2,
+          topic: 'Linked List',
+          submitted: '2 hours ago',
+          code: `function reverseList(head) {
+    let prev = null;
+    let current = head;
+    
+    while (current !== null) {
+        let next = current.next;
+        current.next = prev;
+        prev = current;
+        current = next;
+    }
+    
+    return prev;
+}`
+        },
+        2: {
+          name: 'Two Sum',
+          problemNo: 1,
+          topic: 'Arrays',
+          submitted: '1 hour ago',
+          code: `function twoSum(nums, target) {
+    const map = new Map();
+    
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
+        }
+        map.set(nums[i], i);
+    }
+    
+    return [];
+}`
+        }
+      };
+      return questions[questionId] || {};
+    }
+
+    function loadQuestionContent(questionId) {
+      const questionData = getQuestionData(questionId);
+      const contentContainer = document.getElementById('flaggedQuestionContent');
+      
+      contentContainer.innerHTML = `
+        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-6 border border-orange-200">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">Flagged #${questionId}</span>
+              <span class="text-slate-600">•</span>
+              <span class="text-slate-600">Problem ${questionData.problemNo}</span>
+            </div>
+            <div class="text-sm text-slate-500">Submitted ${questionData.submitted}</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-red-600">${questionData.problemNo}</div>
+              <div class="text-sm text-slate-600">Problem No</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-semibold text-slate-900">${questionData.name}</div>
+              <div class="text-sm text-slate-600">Problem Name</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-semibold text-orange-700">${questionData.topic}</div>
+              <div class="text-sm text-slate-600">Topic</div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Submitted Code:</label>
+            <div class="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+              <pre class="text-green-400 text-sm font-mono">${questionData.code}</pre>
+            </div>
+          </div>
+          
+          <div class="flex gap-3">
+            <button class="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+              <i data-lucide="check" class="w-4 h-4 inline mr-2"></i>Approve
+            </button>
+            <button class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+              <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>Reject
+            </button>
+            <button class="flex-1 bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
+              <i data-lucide="message-circle" class="w-4 h-4 inline mr-2"></i>Comment
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function showCodeModal(userName, problemTitle, code) {
+      document.getElementById('modalCodeUser').textContent = userName;
+      document.getElementById('modalCodeProblem').textContent = problemTitle;
+      document.getElementById('modalCodeContent').textContent = code;
+      document.getElementById('codeModal').classList.remove('hidden');
+      document.getElementById('codeModal').classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeCodeModal() {
+      document.getElementById('codeModal').classList.add('hidden');
+      document.getElementById('codeModal').classList.remove('flex');
+    }
+
+    function reviewSubmission(submissionId) {
+      console.log('Reviewing submission:', submissionId);
+      // TODO: Implement submission review functionality
+    }
+
+    function viewCode(submissionId) {
+      console.log('Viewing code for submission:', submissionId);
+      // TODO: Implement code viewing functionality
+    }
+  </script>
+</body>
+</html> 
+
+    <div id="codeModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
+
+      <div class="bg-white rounded-xl shadow-2xl p-0 max-w-lg w-full relative overflow-hidden">
+
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 flex items-center gap-4">
+
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-xl font-bold"><i data-lucide="file-code-2"></i></div>
+
+          <div>
+
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+
+              <i data-lucide="file-code-2" class="w-5 h-5"></i> User Code - <span id="modalCodeUser" class="ml-1">Alex Smith</span>
+
+            </h3>
+
+            <div class="text-sm text-indigo-100">Problem: <span id="modalCodeProblem">Reverse Linked List</span></div>
+
+          </div>
+
+          <button onclick="closeCodeModal()" class="ml-auto text-white hover:text-indigo-200">
+
+            <i data-lucide="x" class="w-5 h-5"></i>
+
+          </button>
+
+        </div>
+
+        <div class="p-6">
+
+          <pre id="modalCodeContent" class="bg-slate-900 text-green-400 rounded-lg p-3 text-xs overflow-x-auto">// User's submitted code here</pre>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
   <!-- Load API and App scripts -->
   <script src="../js/api.js"></script>
   <script src="../js/app.js"></script>
 
   <script>
+
     lucide.createIcons();
+
     
     // Mentor Contest Leaderboard Controller
     class MentorContestLeaderboard {
@@ -367,12 +649,6 @@
 
       async init() {
         try {
-          // Check if user is authenticated and is a mentor
-          if (!this.api.isAuthenticated() || !this.api.isMentor()) {
-            window.location.href = '../index.html';
-            return;
-          }
-
           // Get contest ID from URL parameters
           this.contestId = new URLSearchParams(window.location.search).get('contest');
           if (!this.contestId) {
@@ -552,40 +828,64 @@
 
       // Modal functions (retained for compatibility)
       showUserProblemsModal(userName) {
-        document.getElementById('modalUserProblemsName').textContent = userName;
-        document.getElementById('userProblemsModal').classList.remove('hidden');
-        document.getElementById('userProblemsModal').classList.add('flex');
-      }
+      document.getElementById('modalUserProblemsName').textContent = userName;
+
+      document.getElementById('userProblemsModal').classList.remove('hidden');
+
+      document.getElementById('userProblemsModal').classList.add('flex');
+
+    }
+
 
       closeUserProblemsModal() {
-        document.getElementById('userProblemsModal').classList.add('hidden');
-        document.getElementById('userProblemsModal').classList.remove('flex');
-      }
+      document.getElementById('userProblemsModal').classList.add('hidden');
+
+      document.getElementById('userProblemsModal').classList.remove('flex');
+
+    }
+
 
       showFlaggedModal(userName) {
-        document.getElementById('modalFlaggedUser').textContent = userName;
-        document.getElementById('flaggedModal').classList.remove('hidden');
-        document.getElementById('flaggedModal').classList.add('flex');
-      }
+      document.getElementById('modalFlaggedUser').textContent = userName;
+
+      document.getElementById('flaggedModal').classList.remove('hidden');
+
+      document.getElementById('flaggedModal').classList.add('flex');
+
+    }
+
 
       closeFlaggedModal() {
-        document.getElementById('flaggedModal').classList.add('hidden');
-        document.getElementById('flaggedModal').classList.remove('flex');
-      }
+      document.getElementById('flaggedModal').classList.add('hidden');
+
+      document.getElementById('flaggedModal').classList.remove('flex');
+
+    }
+
 
       showCodeModal(userName, problemTitle, code) {
-        document.getElementById('modalCodeUser').textContent = userName;
-        document.getElementById('modalCodeProblem').textContent = problemTitle;
-        document.getElementById('modalCodeContent').textContent = code;
-        document.getElementById('codeModal').classList.remove('hidden');
-        document.getElementById('codeModal').classList.add('flex');
-        lucide.createIcons();
-      }
+      document.getElementById('modalCodeUser').textContent = userName;
+
+      document.getElementById('modalCodeProblem').textContent = problemTitle;
+
+      document.getElementById('modalCodeContent').textContent = code;
+
+      document.getElementById('codeModal').classList.remove('hidden');
+
+      document.getElementById('codeModal').classList.add('flex');
+
+      lucide.createIcons();
+
+    }
+
 
       closeCodeModal() {
-        document.getElementById('codeModal').classList.add('hidden');
-        document.getElementById('codeModal').classList.remove('flex');
-      }
+      document.getElementById('codeModal').classList.add('hidden');
+
+      document.getElementById('codeModal').classList.remove('flex');
+
+    }
+
 
       // Utility functions
       showSuccess(message) {
@@ -618,5 +918,7 @@
       window.mentorContestLeaderboard = new MentorContestLeaderboard();
     });
   </script>
+
 </body>
+
 </html> 

@@ -3,256 +3,341 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mentor Contests - SkillPort Community</title>
+  <title>Mentor Contests - PW IOI Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(249, 115, 22, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Enhanced glassy stat cards */
+    .stat-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.3s ease-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(249, 115, 22, 0.7);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+      transform: translateY(-2px) scale(1.02);
+    }
+    
+    /* Enhanced glassy effects for all cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    /* Enhanced button hover effects */
+    .btn-hover {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-hover:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Staggered animation delays */
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
+    
+    /* Page transition effects */
+    .page-content {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Enhanced button interactions */
+    .btn-primary {
+      
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    }
+    
+         /* Enhanced dashboard cards with hover effects */
+     .bg-white.rounded-lg.shadow-lg {
+       transition: all 0.2s ease;
+       border: 3px solid transparent;
+       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+     }
+     
+     .bg-white.rounded-lg.shadow-lg:hover {
+       transform: translateY(-2px);
+       border-color: rgba(59, 130, 246, 0.4);
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+     }
+     
+           /* Contest cards hover effects with orange palette */
+      .contest-card {
+        transition: all 0.3s ease-in-out;
+        border: 3px solid transparent;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+      
+      .contest-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        border-color: rgba(249, 115, 22, 0.6);
+        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+      }
+      
+             /* Ensure contest descriptions stay on single line and don't overflow */
+       .contest-card .text-slate-500 {
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         max-width: 100%;
+         width: 100%;
+       }
+       
+       /* Ensure the description container doesn't overflow */
+       .contest-card .flex.items-center.gap-4 > div:last-child {
+         min-width: 0;
+         flex: 1;
+       }
+       
+       .contest-card .flex.items-center.gap-4 > div:last-child .text-slate-500 {
+         max-width: 100%;
+         overflow: hidden;
+         text-overflow: ellipsis;
+       }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-white to-orange-50 min-h-screen">
   <!-- Navbar -->
   <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <div class="flex items-center gap-2 group">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
-          </div>
-          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            SkillPort
-          </span>
-        </div>
+                 <div class="flex items-center gap-2 group">
+           <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+             <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
+           </div>
+           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+             <span id="navbar-mentor-name">Mentor</span>
+           </span>
+         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="mentor-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
-          <a href="mentor-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
-            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
-          </a>
-          <a href="mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+                     <a href="mentor-contests.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 shadow-sm">
+             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
+           </a>
+          <a href="mentor-feedback.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="message-circle" class="w-4 h-4"></i> Feedback
           </a>
-          <a href="mentor-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="mentor-leaderboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
           </a>
+                     <a href="mentor-profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+             <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+           </a>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">My Assigned Contests</h1>
-      <p class="text-lg text-slate-600">Manage your assigned contests, add problems, and view leaderboards.</p>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
 
-    <!-- Loading State -->
-    <div id="loading-state" class="text-center py-12">
-      <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p class="text-slate-600">Loading your assigned contests...</p>
-    </div>
 
-    <!-- Contests Content (hidden until loaded) -->
-    <div id="contests-content" class="hidden">
-      <!-- Mentor Assigned Contests as Cards -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Assigned Contests</h2>
-        
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Contest Card Example -->
-        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">DSA</div>
-                          <div>
-                <h2 class="text-xl font-bold text-slate-900">Contest #1</h2>
-                <div class="text-sm text-slate-500">No date • 0 Problems</div>
+     <!-- Contests Content -->
+     <div id="contests-content">
+       <div class="mb-8">
+         <h2 class="text-2xl font-bold text-slate-900">Assigned Contests</h2>
+       </div>
+       
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <!-- Weekly Algorithm Challenge Card -->
+           <div class="contest-card bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">A</div>
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">Weekly Algorithm Challenge</h2>
+                <div class="text-sm text-slate-500">Weekly competitive programming contest focusing on algorithms and problem-solving skills.</div>
               </div>
-          </div>
-          <div class="flex-1 text-slate-700 text-sm mt-2">Advanced data structures and algorithms contest for all levels. Includes arrays, trees, graphs, and more.</div>
-          <div class="flex items-center gap-3 mt-4">
-            <a href="mentor-contest-manage.html?contest=DSA5" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700">
-              <i data-lucide="settings" class="w-4 h-4"></i> Manage
-            </a>
-            <a href="mentor-contest-leaderboard.html?contest=DSA5" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50" title="View Leaderboard">
-              <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
-            </a>
-          </div>
-        </div>
-        <!-- Add more contest cards as needed -->
-        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">SQL</div>
-                          <div>
-                <h2 class="text-xl font-bold text-slate-900">Contest #2</h2>
-                <div class="text-sm text-slate-500">No date • 0 Problems</div>
-              </div>
-          </div>
-          <div class="flex-1 text-slate-700 text-sm mt-2">Test your SQL skills with real-world database challenges. Focus on queries, joins, and optimization.</div>
-          <div class="flex items-center gap-3 mt-4">
-            <a href="mentor-contest-manage.html?contest=SQLMAY" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700">
-              <i data-lucide="settings" class="w-4 h-4"></i> Manage
-            </a>
-            <a href="mentor-contest-leaderboard.html?contest=SQLMAY" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50" title="View Leaderboard">
-              <i data-lucide="bar-chart-3" class="w-5 h-5 text-green-600"></i>
-            </a>
-          </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center text-white text-2xl font-bold">WEB</div>
-            <div>
-              <h2 class="text-xl font-bold text-slate-900">Web Dev Challenge</h2>
-              <div class="text-sm text-slate-500">April 2024 • 10 Problems</div>
             </div>
+                         <div class="grid grid-cols-2 gap-4 mb-5">
+               <!-- Category -->
+               <div class="bg-gradient-to-br from-blue-50/80 to-blue-100/60 backdrop-blur-sm rounded-lg p-3 border border-blue-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="tag" class="w-4 h-4 text-blue-600"></i>
+                   <span class="text-xs font-medium text-blue-700 uppercase tracking-wide">Category</span>
+                 </div>
+                 <span class="text-sm font-semibold text-blue-900">Algorithms</span>
+               </div>
+               
+               <!-- Batch -->
+               <div class="bg-gradient-to-br from-yellow-50/80 to-yellow-100/60 backdrop-blur-sm rounded-lg p-3 border border-yellow-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="users" class="w-4 h-4 text-yellow-600"></i>
+                   <span class="text-xs font-medium text-yellow-700 uppercase tracking-wide">Batch</span>
+                 </div>
+                 <span class="text-sm font-semibold text-yellow-900">2024-25</span>
+               </div>
+               
+               <!-- Participants -->
+               <div class="bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-sm rounded-lg p-3 border border-green-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="users" class="w-4 h-4 text-green-600"></i>
+                   <span class="text-xs font-medium text-green-700 uppercase tracking-wide">Participants</span>
+                 </div>
+                 <span class="text-sm font-semibold text-green-900">156</span>
+               </div>
+               
+               <!-- Start Date -->
+               <div class="bg-gradient-to-br from-purple-50/80 to-purple-100/60 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+                   <span class="text-xs font-medium text-purple-700 uppercase tracking-wide">Start Date</span>
+                 </div>
+                 <span class="text-sm font-semibold text-purple-900">Jan 15, 2025</span>
+               </div>
+             </div>
+                         <div class="flex items-center justify-between mt-4">
+                <a href="mentor-contest-manage.html?contest=ALGO" class="glass-btn bg-blue-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700/90 hover:scale-105 transition-all duration-300 border border-blue-500/30 shadow-lg">
+                  <i data-lucide="settings" class="w-4 h-4"></i> Manage
+                </a>
+                <a href="mentor-contest-leaderboard.html?contest=ALGO" class="glass-btn p-2 rounded-lg border border-slate-200/50 hover:bg-slate-50/80 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-md" title="View Leaderboard">
+                  <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
+                </a>
+              </div>
           </div>
-          <div class="flex-1 text-slate-700 text-sm mt-2">Frontend and backend web development tasks. HTML, CSS, JS, APIs, and more.</div>
-          <div class="flex items-center gap-3 mt-4">
-            <a href="mentor-contest-manage.html?contest=WEBAPR" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700">
-              <i data-lucide="settings" class="w-4 h-4"></i> Manage
-            </a>
-            <a href="mentor-contest-leaderboard.html?contest=WEBAPR" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50" title="View Leaderboard">
-              <i data-lucide="bar-chart-3" class="w-5 h-5 text-orange-500"></i>
-            </a>
+         
+                             <!-- SQL Contest Card -->
+           <div class="contest-card bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">S</div>
+              <div>
+                <h2 class="text-xl font-bold text-slate-900">SQL Database Master</h2>
+                <div class="text-sm text-slate-500">Advanced contest focusing on database design and SQL optimization.</div>
+              </div>
+            </div>
+                         <div class="grid grid-cols-2 gap-4 mb-5">
+               <!-- Category -->
+               <div class="bg-gradient-to-br from-blue-50/80 to-blue-100/60 backdrop-blur-sm rounded-lg p-3 border border-blue-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="tag" class="w-4 h-4 text-blue-600"></i>
+                   <span class="text-xs font-medium text-blue-700 uppercase tracking-wide">Category</span>
+                 </div>
+                 <span class="text-sm font-semibold text-blue-900">Database</span>
+               </div>
+               
+               <!-- Batch -->
+               <div class="bg-gradient-to-br from-yellow-50/80 to-yellow-100/60 backdrop-blur-sm rounded-lg p-3 border border-yellow-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="users" class="w-4 h-4 text-yellow-600"></i>
+                   <span class="text-xs font-medium text-yellow-700 uppercase tracking-wide">Batch</span>
+                 </div>
+                 <span class="text-sm font-semibold text-yellow-900">Spring 2025</span>
+               </div>
+               
+               <!-- Participants -->
+               <div class="bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-sm rounded-lg p-3 border border-green-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="users" class="w-4 h-4 text-green-600"></i>
+                   <span class="text-xs font-medium text-green-700 uppercase tracking-wide">Participants</span>
+                 </div>
+                 <span class="text-sm font-semibold text-green-900">89</span>
+               </div>
+               
+               <!-- Start Date -->
+               <div class="bg-gradient-to-br from-purple-50/80 to-purple-100/60 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30">
+                 <div class="flex items-center gap-2 mb-1">
+                   <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+                   <span class="text-xs font-medium text-purple-700 uppercase tracking-wide">Start Date</span>
+                 </div>
+                 <span class="text-sm font-semibold text-purple-900">Jan 22, 2025</span>
+               </div>
+             </div>
+                         <div class="flex items-center justify-between mt-4">
+                <a href="mentor-contest-manage.html?contest=SQLMAY" class="glass-btn bg-blue-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700/90 hover:scale-105 transition-all duration-300 border border-blue-500/30 shadow-lg">
+                  <i data-lucide="settings" class="w-4 h-4"></i> Manage
+                </a>
+                <a href="mentor-contest-leaderboard.html?contest=SQLMAY" class="glass-btn p-2 rounded-lg border border-slate-200/50 hover:bg-slate-50/80 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-md" title="View Leaderboard">
+                  <i data-lucide="bar-chart-3" class="w-5 h-5 text-green-600"></i>
+                </a>
+              </div>
           </div>
-        </div>
-      </div>
-    </div>
-    </div> <!-- End of contests-content -->
+         
+                   
+       </div>
+     </div> <!-- End of contests-content -->
   </main>
   <!-- Load API and App scripts -->
   <script src="../js/api.js"></script>
   <script src="../js/app.js"></script>
 
-  <script>
-    lucide.createIcons();
-    
-    // Mentor Contests Controller
-    class MentorContests {
-      constructor() {
-        this.api = window.SkillPortAPI;
-        this.assignedContests = [];
-        this.init();
-      }
-
-      async init() {
-        try {
-          // Check if user is authenticated and is a mentor
-          if (!this.api.isAuthenticated() || !this.api.isMentor()) {
-            window.location.href = '/index.html';
-            return;
-          }
-
-          // Load assigned contests
-          await this.loadAssignedContests();
-          
-        } catch (error) {
-          console.error('Mentor contests initialization failed:', error);
-          this.showError('Failed to initialize mentor contests page');
-        }
-      }
-
-      async loadAssignedContests() {
-        try {
-          const response = await this.api.getMentorAssignedContests();
-          if (response.success) {
-            this.assignedContests = response.data.contests;
-            this.displayContests();
-          } else {
-            this.showEmptyState();
-          }
-        } catch (error) {
-          console.error('Failed to load assigned contests:', error);
-          this.showError('Failed to load assigned contests');
-        }
-      }
-
-      displayContests() {
-        const loadingState = document.getElementById('loading-state');
-        const contestsContent = document.getElementById('contests-content');
-        const contestsGrid = contestsContent.querySelector('.grid');
-
-        if (!this.assignedContests.length) {
-          this.showEmptyState();
-          return;
-        }
-
-        // Hide loading, show content
-        loadingState.classList.add('hidden');
-        contestsContent.classList.remove('hidden');
-
-        // Clear existing content and render contests
-        contestsGrid.innerHTML = this.assignedContests.map(contest => `
-          <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
-            <div class="flex items-center gap-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-${this.getContestColor(contest.category)} rounded-lg flex items-center justify-center text-white text-2xl font-bold">
-                ${contest.category.substring(0, 3).toUpperCase()}
-              </div>
-              <div>
-                <h2 class="text-xl font-bold text-slate-900">${contest.name}</h2>
-                <div class="text-sm text-slate-500">${new Date(contest.startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • ${contest.problemCount || 0} Problems</div>
-              </div>
-            </div>
-            <div class="flex-1 text-slate-700 text-sm mt-2">${contest.description || 'No description available'}</div>
-            <div class="flex items-center gap-3 mt-4">
-              <a href="mentor-contest-manage.html?contest=${contest.id}" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700">
-                <i data-lucide="settings" class="w-4 h-4"></i> Manage
-              </a>
-              <a href="mentor-contest-leaderboard.html?contest=${contest.id}" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50" title="View Leaderboard">
-                <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
-              </a>
-            </div>
-          </div>
-        `).join('');
-
-        lucide.createIcons();
-      }
-
-      getContestColor(category) {
-        const colors = {
-          'DSA': 'blue-600 to-indigo-600',
-          'SQL': 'green-500 to-emerald-600',
-          'Web Development': 'orange-500 to-yellow-500',
-          'Java': 'red-500 to-pink-600',
-          'Python': 'purple-500 to-pink-600',
-          'C++': 'cyan-500 to-blue-600'
-        };
-        return colors[category] || 'blue-600 to-indigo-600';
-      }
-
-      showEmptyState() {
-        const loadingState = document.getElementById('loading-state');
-        const contestsContent = document.getElementById('contests-content');
-        
-        loadingState.classList.add('hidden');
-        contestsContent.classList.remove('hidden');
-        
-        contestsContent.innerHTML = `
-          <div class="text-center py-12">
-            <i data-lucide="trophy" class="w-16 h-16 mx-auto mb-4 text-slate-400"></i>
-            <h3 class="text-lg font-semibold text-slate-900 mb-2">No contests assigned</h3>
-            <p class="text-slate-600 mb-4">You don't have any contests assigned to you yet</p>
-            <a href="mentor-dashboard.html" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-              Back to Dashboard
-            </a>
-          </div>
-        `;
-      }
-
-      showError(message) {
-        console.error(message);
-        // TODO: Implement proper error display
-      }
-    }
-
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      window.mentorContests = new MentorContests();
-    });
-  </script>
+     <script>
+     lucide.createIcons();
+     
+     // Simple page functionality
+     document.addEventListener('DOMContentLoaded', () => {
+       // Set mentor name in navbar
+       const navbarMentorName = document.getElementById('navbar-mentor-name');
+       if (navbarMentorName) {
+         navbarMentorName.textContent = 'Dr. Sarah Chen';
+       }
+     });
+   </script>
 </body>
 </html> 

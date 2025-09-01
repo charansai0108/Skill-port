@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .hero-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+                        SkillPort
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="../index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Home</a>
+                    <a href="auth/login.html" class="btn-primary px-4 py-2 rounded-lg text-white">Login</a>
+                    <a href="auth/register.html" class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="hero-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+                Powerful Features for
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Skill Development</span>
+            </h1>
+            <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+                Discover the comprehensive tools and features that make SkillPort the ultimate platform for learning, competing, and growing your programming skills.
+            </p>
+        </div>
+
+        <!-- Core Features -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">Core Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="target" class="w-6 h-6 text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Skill Tracking</h3>
+                    <p class="text-slate-600">Monitor your progress across different skill categories and track your improvement over time with detailed analytics.</p>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Community Learning</h3>
+                    <p class="text-slate-600">Join a vibrant community of learners, share knowledge, and collaborate on projects with fellow developers.</p>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="trophy" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Contest Participation</h3>
+                    <p class="text-slate-600">Compete in coding contests, challenge yourself, and climb the leaderboards to prove your skills.</p>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Analytics & Insights</h3>
+                    <p class="text-slate-600">Get detailed analytics about your performance and personalized recommendations for improvement.</p>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Mentor Support</h3>
+                    <p class="text-slate-600">Connect with experienced mentors who can guide you through your learning journey and provide expert advice.</p>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4">
+                        <i data-lucide="smartphone" class="w-6 h-6 text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2">Mobile First</h3>
+                    <p class="text-slate-600">Learn on the go with our mobile-optimized platform that works seamlessly on all devices.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Features -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">Advanced Features</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="feature-card rounded-2xl p-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="code" class="w-6 h-6 text-red-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-slate-900">Code Editor</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">Advanced code editor with syntax highlighting, auto-completion, and real-time collaboration features.</p>
+                    <ul class="space-y-2 text-slate-600">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Multiple language support
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Real-time debugging
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Code execution environment
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card rounded-2xl p-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="brain" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-slate-900">AI-Powered Learning</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4">Intelligent learning paths and personalized recommendations based on your skill level and goals.</p>
+                    <ul class="space-y-2 text-slate-600">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Adaptive difficulty
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Smart problem recommendations
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                            Performance analysis
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="text-center">
+            <div class="hero-card rounded-2xl p-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Ready to Start Your Journey?</h2>
+                <p class="text-slate-600 mb-8 max-w-2xl mx-auto">
+                    Join thousands of developers who are already using SkillPort to improve their programming skills and advance their careers.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="auth/register.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
+                        Get Started Free
+                    </a>
+                    <a href="../index.html" class="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-slate-200 transition-colors">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">SkillPort</span>
+                    </div>
+                    <p class="text-slate-400">
+                        Empowering learners, building communities, tracking progress, achieving excellence!
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Platform</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="features.html" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="pricing.html" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="api.html" class="hover:text-white transition-colors">API</a></li>
+                        <li><a href="documentation.html" class="hover:text-white transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="help-center.html" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="community.html" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="status.html" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="gdpr.html" class="hover:text-white transition-colors">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+                <p>&copy; 2025 SkillPort. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

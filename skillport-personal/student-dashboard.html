@@ -4,656 +4,586 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Dashboard - SkillPort</title>
-    <link rel="stylesheet" href="../community-ui/css/main.css">
-    <link rel="stylesheet" href="../community-ui/css/dashboard.css">
-    <link rel="stylesheet" href="../community-ui/css/components.css">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        body { font-family: 'Josefin Sans', sans-serif; }
-        
-        .personal-dashboard {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .dashboard-header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-        }
-        
-        .dashboard-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        .dashboard-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
-        
-        .dashboard-brand-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .dashboard-brand-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .dashboard-nav-menu {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .dashboard-nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-        }
-        
-        .dashboard-nav-link:hover,
-        .dashboard-nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .dashboard-user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .dashboard-user-avatar {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-        
-        .dashboard-logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease;
         }
         
-        .dashboard-logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
         }
-        
-        .dashboard-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .dashboard-welcome {
-            text-align: center;
-            color: white;
-            margin-bottom: 3rem;
-        }
-        
-        .dashboard-welcome h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .dashboard-welcome p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .dashboard-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-        
-        .dashboard-stat-card {
-            background: rgba(255, 255, 255, 0.1);
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
             transition: all 0.3s ease;
         }
-        
-        .dashboard-stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
-        
-        .dashboard-stat-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .dashboard-stat-icon {
-            width: 3rem;
-            height: 3rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .dashboard-stat-title {
-            font-size: 1rem;
-            font-weight: 600;
-            opacity: 0.9;
-        }
-        
-        .dashboard-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .dashboard-stat-change {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-        
-        .dashboard-sections {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-        
-        .dashboard-main-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 2rem;
-            color: white;
-        }
-        
-        .dashboard-section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .dashboard-section-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .dashboard-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .dashboard-sidebar-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            color: white;
-        }
-        
-        .recent-activity-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .recent-activity-item:last-child {
-            border-bottom: none;
-        }
-        
-        .recent-activity-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-        
-        .recent-activity-content h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .recent-activity-content p {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-        
-        .quick-actions {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .quick-action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 1rem;
-            border-radius: 0.75rem;
+
+        .goal-card {
+            transition: all 0.3s ease;
             cursor: pointer;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .activity-item {
             transition: all 0.2s ease;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
         }
-        
-        .quick-action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
+
+        .activity-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        .quick-action-icon {
-            width: 2rem;
-            height: 2rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .action-button {
+            transition: all 0.3s ease;
         }
-        
-        .skill-progress {
-            margin-top: 1.5rem;
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
-        
-        .skill-item {
-            margin-bottom: 1rem;
+
+        .page-header-icon {
+            transition: all 0.3s ease;
         }
-        
-        .skill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
+
+        .page-header-icon:hover {
+            transform: rotate(5deg) scale(1.05);
         }
-        
-        .skill-name {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
-        .skill-level {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-        
-        .skill-bar {
-            width: 100%;
-            height: 0.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.25rem;
+
+        .progress-bar {
+            background: rgba(226, 232, 240, 0.4);
+            border-radius: 9999px;
             overflow: hidden;
         }
         
-        .skill-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4ade80, #22c55e);
-            border-radius: 0.25rem;
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            border-radius: 9999px;
             transition: width 0.3s ease;
         }
-        
-        @media (max-width: 768px) {
-            .dashboard-sections {
-                grid-template-columns: 1fr;
-            }
-            
-            .dashboard-nav {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .dashboard-nav-menu {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+
+        .achievement-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
-<body class="personal-dashboard">
-    <!-- Dashboard Header -->
-    <header class="dashboard-header">
-        <nav class="dashboard-nav">
-            <div class="dashboard-brand">
-                <div class="dashboard-brand-icon">🎯</div>
-                <span class="dashboard-brand-text">SkillPort</span>
-            </div>
-            
-            <div class="dashboard-nav-menu">
-                <a href="student-dashboard.html" class="dashboard-nav-link active">Dashboard</a>
-                <a href="profile.html" class="dashboard-nav-link">Profile</a>
-                <a href="tracker.html" class="dashboard-nav-link">Tracker</a>
-                <a href="stats.html" class="dashboard-nav-link">Stats</a>
-                <a href="communities.html" class="dashboard-nav-link">Communities</a>
-                <a href="projects.html" class="dashboard-nav-link">Projects</a>
-                <a href="posts.html" class="dashboard-nav-link">Posts</a>
-            </div>
-            
-            <div class="dashboard-user-menu">
-                <div class="dashboard-user-avatar">JS</div>
-                <button class="dashboard-logout-btn" onclick="logout()">Logout</button>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+                        SkillPort Personal
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="student-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="projects.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="folder" class="w-4 h-4"></i> Projects
+                    </a>
+                    <a href="tracker.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="activity" class="w-4 h-4"></i> Tracker
+                    </a>
+                    <a href="stats.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Stats
+                    </a>
+                    <a href="communities.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <i data-lucide="users" class="w-4 h-4"></i> Communities
+                    </a>
+                    <a href="profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
 
-    <!-- Main Dashboard Content -->
-    <main class="dashboard-main">
-        <!-- Welcome Section -->
-        <div class="dashboard-welcome">
-            <h1>Welcome back, John! 👋</h1>
-            <p>Track your progress, join communities, and level up your skills</p>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="dashboard-stats-grid">
-            <div class="dashboard-stat-card">
-                <div class="dashboard-stat-header">
-                    <div class="dashboard-stat-icon">🏆</div>
-                    <div class="dashboard-stat-title">Problems Solved</div>
-                </div>
-                <div class="dashboard-stat-value">247</div>
-                <div class="dashboard-stat-change">+12 this week</div>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <!-- Page Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg page-header-icon">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
             </div>
-            
-            <div class="dashboard-stat-card">
-                <div class="dashboard-stat-header">
-                    <div class="dashboard-stat-icon">⭐</div>
-                    <div class="dashboard-stat-title">Skill Rating</div>
-                </div>
-                <div class="dashboard-stat-value">1,850</div>
-                <div class="dashboard-stat-change">+45 this month</div>
-            </div>
-            
-            <div class="dashboard-stat-card">
-                <div class="dashboard-stat-header">
-                    <div class="dashboard-stat-icon">👥</div>
-                    <div class="dashboard-stat-title">Communities</div>
-                </div>
-                <div class="dashboard-stat-value">8</div>
-                <div class="dashboard-stat-change">Active member</div>
-            </div>
-            
-            <div class="dashboard-stat-card">
-                <div class="dashboard-stat-header">
-                    <div class="dashboard-stat-icon">📊</div>
-                    <div class="dashboard-stat-title">Streak</div>
-                </div>
-                <div class="dashboard-stat-value">23 days</div>
-                <div class="dashboard-stat-change">Keep it up!</div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 mb-1">Dashboard</h1>
+                <p class="text-sm text-slate-600">Welcome back! Here's your learning overview</p>
             </div>
         </div>
 
-        <!-- Main Content Sections -->
-        <div class="dashboard-sections">
-            <!-- Main Section -->
-            <div class="dashboard-main-section">
-                <h2 class="dashboard-section-title">
-                    <div class="dashboard-section-icon">📈</div>
-                    Skill Progress
-                </h2>
+        <!-- Stats Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Learning Overview</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="trophy" class="w-5 h-5 text-blue-600"></i>
+                        <span class="text-2xl font-bold text-blue-600">247</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Problems Solved</div>
+                    <div class="text-xs text-blue-600 mt-1">+12 this week</div>
+                </div>
                 
-                <div class="skill-progress">
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <span class="skill-name">Algorithms & Data Structures</span>
-                            <span class="skill-level">Intermediate</span>
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="star" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-2xl font-bold text-green-600">1,850</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Skill Rating</div>
+                    <div class="text-xs text-green-600 mt-1">+45 this month</div>
+                </div>
+                
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
+                        <span class="text-2xl font-bold text-purple-600">8</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Communities</div>
+                    <div class="text-xs text-purple-600 mt-1">Active member</div>
+                </div>
+                
+                <div class="stat-card rounded-xl p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
+                        <span class="text-2xl font-bold text-orange-600">23</span>
+                    </div>
+                    <div class="text-sm text-slate-600">Day Streak</div>
+                    <div class="text-xs text-orange-600 mt-1">Keep it up!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Goals Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Today's Goals</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="goal-card p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="edit-3" class="w-4 h-4 text-blue-600"></i>
                         </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 75%"></div>
+                        <span class="font-semibold text-slate-800">Solve Problems</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600">Progress</span>
+                        <span class="text-sm font-semibold text-blue-600">3/5</span>
+                    </div>
+                    <div class="progress-bar rounded-full h-2 overflow-hidden">
+                        <div class="progress-fill h-full rounded-full" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <div class="goal-card p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-4 h-4 text-green-600"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800">Learn New Topic</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600">Progress</span>
+                        <span class="text-sm font-semibold text-green-600">1/1</span>
+                    </div>
+                    <div class="progress-bar rounded-full h-2 overflow-hidden">
+                        <div class="progress-fill h-full rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="goal-card p-4 bg-purple-50 rounded-xl border border-purple-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="users" class="w-4 h-4 text-purple-600"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800">Join Contest</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600">Progress</span>
+                        <span class="text-sm font-semibold text-purple-600">0/1</span>
+                    </div>
+                    <div class="progress-bar rounded-full h-2 overflow-hidden">
+                        <div class="progress-fill h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Progress Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Skill Progress</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="code" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800">Algorithms</h3>
+                            <p class="text-sm text-blue-600">Intermediate</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Problems Solved</span>
+                        <span class="text-sm font-bold text-blue-600">156</span>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="globe" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800">Web Dev</h3>
+                            <p class="text-sm text-green-600">Advanced</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Projects Built</span>
+                        <span class="text-sm font-bold text-green-600">12</span>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="layout" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800">System Design</h3>
+                            <p class="text-sm text-amber-600">Beginner</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Concepts Learned</span>
+                        <span class="text-sm font-bold text-amber-600">8</span>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="database" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800">Database</h3>
+                            <p class="text-sm text-purple-600">Intermediate</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-600">Queries Mastered</span>
+                        <span class="text-sm font-bold text-purple-600">45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Recent Activity -->
+            <div class="card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="clock" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Recent Activity</h3>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-green-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Solved LeetCode Problem</h4>
+                            <p class="text-xs text-slate-600">Two Sum - Easy • 2 hours ago</p>
                         </div>
                     </div>
                     
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <span class="skill-name">Web Development</span>
-                            <span class="skill-level">Advanced</span>
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-amber-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i>
                         </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 90%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <span class="skill-name">System Design</span>
-                            <span class="skill-level">Beginner</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 30%"></div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Won Weekly Contest</h4>
+                            <p class="text-xs text-slate-600">Ranked #15 out of 200 • 1 day ago</p>
                         </div>
                     </div>
                     
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <span class="skill-name">Database Design</span>
-                            <span class="skill-level">Intermediate</span>
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-purple-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
                         </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 65%"></div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Joined Community</h4>
+                            <p class="text-xs text-slate-600">Data Structures Masters • 2 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-blue-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Completed Course</h4>
+                            <p class="text-xs text-slate-600">Advanced JavaScript • 3 days ago</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="dashboard-sidebar">
-                <!-- Recent Activity -->
-                <div class="dashboard-sidebar-card">
-                    <h3 class="dashboard-section-title">
-                        <div class="dashboard-section-icon">🕒</div>
-                        Recent Activity
-                    </h3>
-                    
-                    <div class="recent-activity-item">
-                        <div class="recent-activity-icon">✅</div>
-                        <div class="recent-activity-content">
-                            <h4>Solved LeetCode Problem</h4>
-                            <p>Two Sum - Easy</p>
+            <!-- Upcoming Contests -->
+            <div class="card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="calendar" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Upcoming Contests</h3>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <span class="font-semibold text-slate-800 text-sm">Weekly Algorithm Challenge</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">Test your problem-solving skills</p>
+                        <div class="flex items-center gap-2 text-xs text-blue-600">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            <span>Tomorrow at 2:00 PM</span>
                         </div>
                     </div>
                     
-                    <div class="recent-activity-item">
-                        <div class="recent-activity-icon">🏆</div>
-                        <div class="recent-activity-content">
-                            <h4>Won Weekly Contest</h4>
-                            <p>Ranked #15 out of 200</p>
+                    <div class="p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="code" class="w-4 h-4 text-green-600"></i>
+                            </div>
+                            <span class="font-semibold text-slate-800 text-sm">Code Sprint</span>
                         </div>
-                    </div>
-                    
-                    <div class="recent-activity-item">
-                        <div class="recent-activity-icon">👥</div>
-                        <div class="recent-activity-content">
-                            <h4>Joined Community</h4>
-                            <p>Data Structures Masters</p>
-                        </div>
-                    </div>
-                    
-                    <div class="recent-activity-item">
-                        <div class="recent-activity-icon">📚</div>
-                        <div class="recent-activity-content">
-                            <h4>Completed Course</h4>
-                            <p>Advanced JavaScript</p>
+                        <p class="text-xs text-slate-600 mb-2">Fast-paced coding competition</p>
+                        <div class="flex items-center gap-2 text-xs text-green-600">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            <span>Saturday at 10:00 AM</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Quick Actions -->
-                <div class="dashboard-sidebar-card">
-                    <h3 class="dashboard-section-title">
-                        <div class="dashboard-section-icon">⚡</div>
-                        Quick Actions
-                    </h3>
-                    
-                    <div class="quick-actions">
-                        <button class="quick-action-btn" onclick="location.href='tracker.html'">
-                            <div class="quick-action-icon">📝</div>
-                            <div>
-                                <div style="font-weight: 600;">Start Practice</div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;">Solve problems</div>
-                            </div>
-                        </button>
-                        
-                        <button class="quick-action-btn" onclick="location.href='communities.html'">
-                            <div class="quick-action-icon">👥</div>
-                            <div>
-                                <div style="font-weight: 600;">Join Contest</div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;">Compete with others</div>
-                            </div>
-                        </button>
-                        
-                        <button class="quick-action-btn" onclick="location.href='profile.html'">
-                            <div class="quick-action-icon">👤</div>
-                            <div>
-                                <div style="font-weight: 600;">Update Profile</div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;">Showcase skills</div>
-                            </div>
-                        </button>
-                        
-                        <button class="quick-action-btn" onclick="location.href='stats.html'">
-                            <div class="quick-action-icon">📊</div>
-                            <div>
-                                <div style="font-weight: 600;">View Analytics</div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;">Track progress</div>
-                            </div>
-                        </button>
+            <!-- Quick Actions -->
+            <div class="card rounded-2xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                     </div>
+                    <h3 class="text-xl font-bold text-slate-800">Quick Actions</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <button class="action-button w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='tracker.html'">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="edit-3" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">Start Practice</div>
+                            <div class="text-xs text-slate-600">Solve problems</div>
+                        </div>
+                    </button>
+                    
+                    <button class="action-button w-full p-4 bg-purple-50 hover:bg-purple-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='communities.html'">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">Join Contest</div>
+                            <div class="text-xs text-slate-600">Compete with others</div>
+                        </div>
+                    </button>
+                    
+                    <button class="action-button w-full p-4 bg-green-50 hover:bg-green-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='projects.html'">
+                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="folder" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">View Projects</div>
+                            <div class="text-xs text-slate-600">Showcase your work</div>
+                        </div>
+                    </button>
+                    
+                    <button class="action-button w-full p-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='stats.html'">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">View Analytics</div>
+                            <div class="text-xs text-slate-600">Track progress</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Achievements Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="award" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Recent Achievements</h2>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+                <span class="achievement-badge">🏆 Problem Solver</span>
+                <span class="achievement-badge">🔥 7-Day Streak</span>
+                <span class="achievement-badge">⭐ Top 10%</span>
+                <span class="achievement-badge">🚀 Speed Demon</span>
+                <span class="achievement-badge">📚 Course Master</span>
+                <span class="achievement-badge">👥 Community Leader</span>
+            </div>
+        </div>
+
+        <!-- Learning Recommendations -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Recommended for You</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="book" class="w-4 h-4 text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Dynamic Programming</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2">Master advanced algorithms</p>
+                    <button class="text-xs text-indigo-600 font-medium hover:text-indigo-700" onclick="location.href='tracker.html'">Start Learning →</button>
+                </div>
+                
+                <div class="p-4 bg-pink-50 rounded-xl border border-pink-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="globe" class="w-4 h-4 text-pink-600"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">System Design</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2">Build scalable applications</p>
+                    <button class="text-xs text-pink-600 font-medium hover:text-pink-700" onclick="location.href='tracker.html'">Start Learning →</button>
+                </div>
+                
+                <div class="p-4 bg-cyan-50 rounded-xl border border-cyan-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="database" class="w-4 h-4 text-cyan-600"></i>
+                        </div>
+                        <span class="font-semibold text-slate-800 text-sm">Database Optimization</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2">Improve query performance</p>
+                    <button class="text-xs text-cyan-600 font-medium hover:text-cyan-700" onclick="location.href='tracker.html'">Start Learning →</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="../community-ui/js/api.js"></script>
-    <script src="../community-ui/js/app.js"></script>
-    
     <script>
-        // Check authentication on page load
+        lucide.createIcons();
+
+        // Dashboard functionality
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            loadUserData();
+            loadDashboardData();
         });
 
-        function checkAuthentication() {
-            const token = localStorage.getItem('skillport_token');
-            if (!token) {
-                window.location.href = '../community-ui/pages/auth/login.html';
-                return;
-            }
-            
-            // Verify token with backend
-            verifyToken(token);
-        }
-
-        async function verifyToken(token) {
+        async function loadDashboardData() {
             try {
-                const response = await fetch('http://localhost:5001/api/auth/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Load sample data for development
+                const sampleData = {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'john@example.com',
+                    progress: 75,
+                    skills: ['JavaScript', 'Python', 'React'],
+                    recentActivity: [
+                        { type: 'Problem Solved', title: 'Two Sum', date: '2024-01-15' },
+                        { type: 'Contest Joined', title: 'Weekly Challenge', date: '2024-01-14' },
+                        { type: 'Skill Updated', title: 'React', date: '2024-01-13' }
+                    ]
+                };
                 
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-                
-                const data = await response.json();
-                if (data.user.role !== 'personal') {
-                    window.location.href = '../community-ui/pages/admin/admin-dashboard.html';
-                }
-                
+                updateDashboard(sampleData);
             } catch (error) {
-                console.error('Token verification failed:', error);
-                localStorage.removeItem('skillport_token');
-                window.location.href = '../community-ui/pages/auth/login.html';
-            }
-        }
-
-        async function loadUserData() {
-            try {
-                const token = localStorage.getItem('skillport_token');
-                const response = await fetch('http://localhost:5001/api/users/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const userData = await response.json();
-                    updateDashboard(userData);
-                }
-            } catch (error) {
-                console.error('Failed to load user data:', error);
+                console.error('Failed to load dashboard data:', error);
             }
         }
 
         function updateDashboard(userData) {
-            // Update welcome message
-            const welcomeTitle = document.querySelector('.dashboard-welcome h1');
-            if (welcomeTitle && userData.firstName) {
-                welcomeTitle.textContent = `Welcome back, ${userData.firstName}! 👋`;
-            }
-            
-            // Update user avatar
-            const userAvatar = document.querySelector('.dashboard-user-avatar');
-            if (userAvatar && userData.firstName && userData.lastName) {
-                userAvatar.textContent = `${userData.firstName[0]}${userData.lastName[0]}`;
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('skillport_token');
-            window.location.href = '../community-ui/pages/auth/login.html';
+            // Update dashboard with user data
+            console.log('Dashboard updated with:', userData);
         }
     </script>
 </body>

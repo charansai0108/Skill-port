@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline - SkillPort</title>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,9 +14,9 @@
         }
 
         body {
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+            background: linear-gradient(135deg, #fef2f2 0%, #fdf2f8 50%, #fff7ed 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -27,6 +28,22 @@
             width: 100%;
             max-width: 28rem;
             animation: fadeInUp 0.5s ease-out;
+        }
+
+        .offline-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border-radius: 2rem;
+            padding: 3rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .offline-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
         }
 
         @keyframes fadeInUp {
@@ -50,22 +67,11 @@
             justify-content: center;
             width: 6rem;
             height: 6rem;
-            background-color: #fef2f2;
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
             border-radius: 50%;
             margin-bottom: 1.5rem;
             border: 4px solid #fecaca;
-        }
-
-        .wifi-off-icon {
-            width: 3rem;
-            height: 3rem;
-            color: #ef4444;
-        }
-
-        .wifi-off-icon::before {
-            content: "📶";
-            font-size: 3rem;
-            filter: grayscale(100%) brightness(0.7);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2);
         }
 
         h1 {
@@ -82,40 +88,30 @@
         }
 
         .retry-button {
-            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
             font-size: 1.125rem;
             font-weight: 600;
-            border-radius: 0.5rem;
+            border-radius: 1rem;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .retry-button:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4);
         }
 
         .retry-button:active {
             transform: translateY(0);
-        }
-
-        .refresh-icon {
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-
-        .refresh-icon::before {
-            content: "🔄";
-            font-size: 1.25rem;
         }
 
         .footer {
@@ -127,13 +123,12 @@
             margin-top: 2rem;
         }
 
-        .sparkles-icon::before {
-            content: "✨";
-            font-size: 1rem;
-        }
-
         .brand-name {
             font-weight: 600;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* Responsive design */
@@ -159,29 +154,33 @@
 </head>
 <body>
     <div class="offline-container">
-        <div class="icon-container">
-            <div class="icon-circle">
-                <div class="wifi-off-icon"></div>
+        <div class="offline-card">
+            <div class="icon-container">
+                <div class="icon-circle">
+                    <i data-lucide="wifi-off" class="w-12 h-12 text-red-600"></i>
+                </div>
+                
+                <h1>You're Offline</h1>
+                <p class="description">
+                    It seems you've lost your internet connection. Please check your network and try again.
+                </p>
+                
+                <button class="retry-button" onclick="handleRetry()">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    Retry Connection
+                </button>
             </div>
             
-            <h1>You're Offline</h1>
-            <p class="description">
-                It seems you've lost your internet connection. Please check your network and try again.
-            </p>
-            
-            <button class="retry-button" onclick="handleRetry()">
-                <div class="refresh-icon"></div>
-                Retry Connection
-            </button>
-        </div>
-        
-        <div class="footer">
-            <div class="sparkles-icon"></div>
-            <span class="brand-name">SkillPort</span>
+            <div class="footer">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span class="brand-name">SkillPort</span>
+            </div>
         </div>
     </div>
 
     <script>
+        lucide.createIcons();
+        
         function handleRetry() {
             window.location.reload();
         }

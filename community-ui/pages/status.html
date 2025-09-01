@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - SkillPort</title>
+    <title>System Status - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -16,21 +16,9 @@
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
             transition: all 0.3s ease;
         }
-        .content-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-        }
+        .status-operational { color: #10b981; }
+        .status-degraded { color: #f59e0b; }
+        .status-outage { color: #ef4444; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen">
@@ -50,7 +38,7 @@
                     <a href="../index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Home</a>
                     <a href="features.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
                     <a href="pricing.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Pricing</a>
-                    <a href="auth/login.html" class="btn-primary px-4 py-2 rounded-lg text-white">Login</a>
+                    <a href="auth/login.html" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Login</a>
                     <a href="auth/register.html" class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">Get Started</a>
                 </div>
             </div>
@@ -61,97 +49,94 @@
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
-                Terms of
-                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Service</span>
+                System
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Status</span>
             </h1>
             <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-                Please read these terms carefully before using SkillPort services.
+                Real-time status of SkillPort services and infrastructure.
             </p>
-            <div class="text-sm text-slate-500">
-                Last updated: January 15, 2025
+        </div>
+
+        <!-- Overall Status -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">Overall System Status</h2>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-green-600 font-semibold">All Systems Operational</span>
+                </div>
+            </div>
+            <p class="text-slate-600">All SkillPort services are running normally. No issues reported.</p>
+        </div>
+
+        <!-- Service Status -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Service Status</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Web Application</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">API Services</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Database</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Code Execution Engine</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
             </div>
         </div>
 
-        <!-- Terms Content -->
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">1. Acceptance of Terms</h2>
-            <p class="text-slate-700 mb-4">
-                By accessing and using SkillPort, you accept and agree to be bound by the terms and provision of this agreement.
-            </p>
+        <!-- Uptime -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Uptime</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.9%</div>
+                    <div class="text-slate-600">Last 30 Days</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.8%</div>
+                    <div class="text-slate-600">Last 90 Days</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.7%</div>
+                    <div class="text-slate-600">Last 12 Months</div>
+                </div>
+            </div>
         </div>
 
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">2. Use License</h2>
-            <p class="text-slate-700 mb-4">
-                Permission is granted to temporarily download one copy of the materials (information or software) on SkillPort's website for personal, non-commercial transitory viewing only.
-            </p>
-            <p class="text-slate-700 mb-4">This is the grant of a license, not a transfer of title, and under this license you may not:</p>
-            <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
-                <li>modify or copy the materials</li>
-                <li>use the materials for any commercial purpose or for any public display</li>
-                <li>attempt to reverse engineer any software contained on SkillPort's website</li>
-                <li>remove any copyright or other proprietary notations from the materials</li>
-            </ul>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">3. User Accounts</h2>
-            <p class="text-slate-700 mb-4">
-                When you create an account with us, you must provide information that is accurate, complete, and current at all times.
-            </p>
-            <p class="text-slate-700 mb-4">You are responsible for safeguarding the password and for all activities that occur under your account.</p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">4. Acceptable Use</h2>
-            <p class="text-slate-700 mb-4">You agree not to use the service to:</p>
-            <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
-                <li>Violate any applicable laws or regulations</li>
-                <li>Infringe upon the rights of others</li>
-                <li>Transmit harmful, offensive, or inappropriate content</li>
-                <li>Attempt to gain unauthorized access to our systems</li>
-            </ul>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">5. Intellectual Property</h2>
-            <p class="text-slate-700 mb-4">
-                The service and its original content, features, and functionality are and will remain the exclusive property of SkillPort and its licensors.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">6. Termination</h2>
-            <p class="text-slate-700 mb-4">
-                We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">7. Limitation of Liability</h2>
-            <p class="text-slate-700 mb-4">
-                In no event shall SkillPort, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.
-            </p>
-        </div>
-
-        <div class="content-card rounded-2xl p-8 mb-12">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6">8. Changes to Terms</h2>
-            <p class="text-slate-700 mb-4">
-                We reserve the right to modify or replace these terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect.
-            </p>
-        </div>
-
-        <!-- Contact -->
-        <div class="hero-card rounded-2xl p-8 text-center">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Questions About Terms?</h2>
-            <p class="text-slate-600 mb-6">If you have any questions about these terms, please contact us.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="contact.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
-                    Contact Us
-                </a>
-                <a href="privacy.html" class="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-slate-200 transition-colors">
-                    Privacy Policy
-                </a>
+        <!-- Incident History -->
+        <div class="hero-card rounded-2xl p-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Recent Incidents</h2>
+            <div class="space-y-4">
+                <div class="border-l-4 border-green-500 pl-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-slate-900">No Recent Incidents</h3>
+                        <span class="text-sm text-slate-500">All systems operational</span>
+                    </div>
+                    <p class="text-slate-600">No incidents reported in the last 30 days.</p>
+                </div>
             </div>
         </div>
     </main>

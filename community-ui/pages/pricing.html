@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .hero-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+        }
+        
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .pricing-card.featured {
+            border-color: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 12px 40px rgba(239, 68, 68, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            transform: translateY(-2px);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+                        SkillPort
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="../index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Home</a>
+                    <a href="features.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
+                    <a href="auth/login.html" class="btn-primary px-4 py-2 rounded-lg text-white">Login</a>
+                    <a href="auth/register.html" class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="hero-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+                Simple, Transparent
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Pricing</span>
+            </h1>
+            <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+                Choose the perfect plan for your learning journey. Start free and upgrade as you grow.
+            </p>
+        </div>
+
+        <!-- Pricing Toggle -->
+        <div class="flex justify-center mb-12">
+            <div class="bg-white rounded-2xl p-2 shadow-lg">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-slate-600 px-4 py-2">Monthly</span>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium">Yearly</button>
+                    <span class="text-xs text-green-600 font-medium px-2">Save 20%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+            <!-- Free Plan -->
+            <div class="pricing-card rounded-2xl p-8">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Free</h3>
+                    <div class="text-4xl font-bold text-slate-900 mb-2">$0</div>
+                    <p class="text-slate-600">Perfect for getting started</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Access to basic problems</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Community forums</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Basic progress tracking</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Mobile app access</span>
+                    </li>
+                </ul>
+                
+                <button class="btn-secondary w-full py-3 px-6 rounded-xl font-semibold">
+                    Get Started Free
+                </button>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="pricing-card featured rounded-2xl p-8 relative">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span class="bg-red-600 text-white px-4 py-1 rounded-full text-sm font-medium">Most Popular</span>
+                </div>
+                
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Pro</h3>
+                    <div class="text-4xl font-bold text-slate-900 mb-2">$19</div>
+                    <p class="text-slate-600">For serious learners</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Everything in Free</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Unlimited problem access</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Advanced analytics</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Priority support</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Contest participation</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Mentor access</span>
+                    </li>
+                </ul>
+                
+                <button class="btn-primary w-full py-3 px-6 rounded-xl font-semibold text-white">
+                    Start Pro Trial
+                </button>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card rounded-2xl p-8">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Enterprise</h3>
+                    <div class="text-4xl font-bold text-slate-900 mb-2">Custom</div>
+                    <p class="text-slate-600">For teams & organizations</p>
+                </div>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Everything in Pro</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Team management</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Custom integrations</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Dedicated support</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">API access</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i data-lucide="check" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-slate-700">Custom branding</span>
+                    </li>
+                </ul>
+                
+                <button class="btn-secondary w-full py-3 px-6 rounded-xl font-semibold">
+                    Contact Sales
+                </button>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="hero-card rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Can I cancel anytime?</h3>
+                    <p class="text-slate-600">Yes, you can cancel your subscription at any time. No long-term contracts or hidden fees.</p>
+                </div>
+                
+                <div class="hero-card rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Is there a free trial?</h3>
+                    <p class="text-slate-600">Yes! All paid plans come with a 7-day free trial. No credit card required to start.</p>
+                </div>
+                
+                <div class="hero-card rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">What payment methods do you accept?</h3>
+                    <p class="text-slate-600">We accept all major credit cards, PayPal, and bank transfers for enterprise plans.</p>
+                </div>
+                
+                <div class="hero-card rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Do you offer refunds?</h3>
+                    <p class="text-slate-600">We offer a 30-day money-back guarantee for all paid subscriptions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="text-center">
+            <div class="hero-card rounded-2xl p-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Ready to Start Learning?</h2>
+                <p class="text-slate-600 mb-8 max-w-2xl mx-auto">
+                    Join thousands of developers who are already using SkillPort to improve their programming skills and advance their careers.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="auth/register.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
+                        Start Free Trial
+                    </a>
+                    <a href="contact.html" class="btn-secondary px-8 py-3 rounded-xl text-lg font-semibold">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">SkillPort</span>
+                    </div>
+                    <p class="text-slate-400">
+                        Empowering learners, building communities, tracking progress, achieving excellence!
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Platform</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="features.html" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="pricing.html" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="api.html" class="hover:text-white transition-colors">API</a></li>
+                        <li><a href="documentation.html" class="hover:text-white transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="help-center.html" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="community.html" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="status.html" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="gdpr.html" class="hover:text-white transition-colors">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+                <p>&copy; 2025 SkillPort. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

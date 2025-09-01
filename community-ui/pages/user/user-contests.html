@@ -3,45 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Contests - SkillPort Community</title>
+  <title>My Contests - PW IOI Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
+    
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Enhanced glassy cards */
+    .dashboard-card {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    /* Contest cards hover effects with blue palette */
+    .contest-card {
+      transition: all 0.3s ease-in-out;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(59, 130, 246, 0.05);
+    }
+    
+    .contest-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: rgba(59, 130, 246, 0.6);
+      border-width: 3px;
+      box-shadow: 
+        0 8px 25px rgba(59, 130, 246, 0.2),
+        0 0 0 2px rgba(59, 130, 246, 0.2);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+         /* Info grid styling - no enhanced effects */
+     .contest-card .bg-gradient-to-br {
+       transition: all 0.3s ease-in-out;
+     }
+    
+    /* Ensure contest descriptions stay on single line and don't overflow */
+    .contest-card .text-slate-500 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      width: 100%;
+    }
+    
+    /* Ensure the description container doesn't overflow */
+    .contest-card .flex.items-center.gap-4 > div:last-child {
+      min-width: 0;
+      flex: 1;
+    }
+    
+    .contest-card .flex.items-center.gap-4 > div:last-child .text-slate-500 {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Glass button styling */
+    .glass-btn {
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+    
+    .glass-btn:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .page-content {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
   <!-- Navbar -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+  <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-2 group">
           <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+            <i data-lucide="user" class="w-5 h-5 text-white"></i>
           </div>
           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            SkillPort
+            <span id="navbar-student-name">Student</span>
           </span>
         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-          </a>
           <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="user-tasks.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="target" class="w-4 h-4"></i> Tasks
+          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
           </a>
-          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
+          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <i data-lucide="message-square" class="w-4 h-4"></i> Mentor Feedback
           </a>
-          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Mentor Feedback
-          </a>
-          <a href="certificates.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="award" class="w-4 h-4"></i> Certificates
+          <a href="user-profile.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
         </div>
       </div>
@@ -49,384 +156,213 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">My Contests</h1>
-      <p class="text-lg text-slate-600">Participate in your assigned contests and track your performance.</p>
-    </div>
-
-    <!-- Loading State -->
-    <div id="loading-state" class="text-center py-12">
-      <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p class="text-slate-600">Loading your contest data...</p>
-    </div>
-
-    <!-- Contests Content (hidden until loaded) -->
-    <div id="contests-content" class="hidden">
-      <!-- Contest Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <i data-lucide="trophy" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
-          <div class="text-2xl font-bold text-amber-600" id="active-contests">-</div>
-          <div class="text-sm text-slate-600">Active Contests</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <i data-lucide="check-circle" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
-          <div class="text-2xl font-bold text-green-600" id="problems-solved">-</div>
-          <div class="text-sm text-slate-600">Problems Solved</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <i data-lucide="target" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
-          <div class="text-2xl font-bold text-blue-600" id="success-rate">-</div>
-          <div class="text-sm text-slate-600">Success Rate</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-          <i data-lucide="medal" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
-          <div class="text-2xl font-bold text-purple-600" id="total-points">-</div>
-          <div class="text-sm text-slate-600">Total Points</div>
-        </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-content">
+    <!-- Contests Content -->
+    <div id="contests-content">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-900">My Assigned Contests</h2>
       </div>
-
-    <!-- My Assigned Contests -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <h2 class="text-2xl font-bold text-slate-900 mb-6">My Assigned Contests</h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Active Contest 1 -->
-        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-900">Contest #1</h3>
-            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
-          </div>
-          <div class="space-y-2 text-sm text-slate-600 mb-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4"></i>
-              <span>Ends: Dec 25, 2024</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="clock" class="w-4 h-4"></i>
-              <span>2 days remaining</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="target" class="w-4 h-4"></i>
-              <span>5 problems • 3 solved</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Weekly Algorithm Challenge Card -->
+        <div class="contest-card bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">A</div>
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">Weekly Algorithm Challenge</h2>
+              <div class="text-sm text-slate-500">Weekly competitive programming contest focusing on algorithms and problem-solving skills.</div>
             </div>
           </div>
-          <div class="flex gap-2">
-            <a href="contest-participation.html" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 text-center">
-              Continue
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <!-- Category -->
+            <div class="bg-gradient-to-br from-blue-50/80 to-blue-100/60 backdrop-blur-sm rounded-lg p-3 border border-blue-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="tag" class="w-4 h-4 text-blue-600"></i>
+                <span class="text-xs font-medium text-blue-700 uppercase tracking-wide">Category</span>
+              </div>
+              <span class="text-sm font-semibold text-blue-900">Algorithms</span>
+            </div>
+            
+            <!-- Batch -->
+            <div class="bg-gradient-to-br from-yellow-50/80 to-yellow-100/60 backdrop-blur-sm rounded-lg p-3 border border-yellow-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-yellow-600"></i>
+                <span class="text-xs font-medium text-yellow-700 uppercase tracking-wide">Batch</span>
+              </div>
+              <span class="text-sm font-semibold text-yellow-900">2024-25</span>
+            </div>
+            
+            <!-- Participants -->
+            <div class="bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-sm rounded-lg p-3 border border-green-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-green-600"></i>
+                <span class="text-xs font-medium text-green-700 uppercase tracking-wide">Participants</span>
+              </div>
+              <span class="text-sm font-semibold text-green-900">156</span>
+            </div>
+            
+            <!-- Start Date -->
+            <div class="bg-gradient-to-br from-purple-50/80 to-purple-100/60 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+                <span class="text-xs font-medium text-purple-700 uppercase tracking-wide">Start Date</span>
+              </div>
+              <span class="text-sm font-semibold text-purple-900">Jan 15, 2025</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <a href="contest-participation.html" class="glass-btn bg-blue-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700/90 hover:scale-105 transition-all duration-300 border border-blue-500/30 shadow-lg">
+              <i data-lucide="play" class="w-4 h-4"></i> Participate
             </a>
-            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
-              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            <button onclick="openContestLeaderboardModal('Weekly Algorithm Challenge')" class="glass-btn p-2 rounded-lg border border-slate-200/50 hover:bg-slate-50/80 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-md" title="View Leaderboard">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
             </button>
-          </div>
-        </div>
-
-        <!-- Active Contest 2 -->
-        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-900">Contest #2</h3>
-            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
-          </div>
-          <div class="space-y-2 text-sm text-slate-600 mb-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4"></i>
-              <span>Ends: Dec 28, 2024</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="clock" class="w-4 h-4"></i>
-              <span>5 days remaining</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="target" class="w-4 h-4"></i>
-              <span>8 problems • 6 solved</span>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700">
-              Continue
-            </button>
-            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
-              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Active Contest 3 -->
-        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-900">Contest #3</h3>
-            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Active</span>
-          </div>
-          <div class="space-y-2 text-sm text-slate-600 mb-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4"></i>
-              <span>Ends: Dec 30, 2024</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="clock" class="w-4 h-4"></i>
-              <span>7 days remaining</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="target" class="w-4 h-4"></i>
-              <span>6 problems • 3 solved</span>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700">
-              Continue
-            </button>
-            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
-              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Demo Contest -->
-        <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-slate-900">Winter Coding Challenge 2024</h3>
-            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">Demo</span>
-          </div>
-          <div class="space-y-2 text-sm text-slate-600 mb-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4"></i>
-              <span>Dec 20-25, 2024</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="users" class="w-4 h-4"></i>
-              <span>156 participants</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="target" class="w-4 h-4"></i>
-              <span>8 problems • 1000 points</span>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <a href="contest-demo.html" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 text-center">
-              View Demo
-            </a>
-            <button class="px-3 py-2 border border-slate-300 rounded-lg text-sm hover:bg-slate-50">
-              <i data-lucide="info" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contest Leaderboards -->
-    <div class="space-y-8">
-              <!-- Contest #1 Leaderboard -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-slate-900">Contest #1 - Leaderboard</h2>
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-slate-600">Your Rank:</span>
-            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm font-semibold">#3</span>
           </div>
         </div>
         
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">RANK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NAME</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PROBLEMS SOLVED</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">FLAGGED QUESTIONS</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SCORE</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-slate-200">
-              <tr class="bg-amber-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold">1</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">P</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Priya Sharma</div>
-                      <div class="text-sm text-slate-500">@priyasharma</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">5/5</div>
-                  <div class="text-sm text-slate-500">100%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">2</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-amber-600">850</div>
-                </td>
-              </tr>
-              <tr class="bg-slate-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-slate-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-slate-400 to-gray-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">R</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Student #1</div>
-                      <div class="text-sm text-slate-500">@rahulkumar</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">5/5</div>
-                  <div class="text-sm text-slate-500">100%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">1</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-slate-600">820</div>
-                </td>
-              </tr>
-              <tr class="bg-blue-50 border-2 border-blue-200">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">A</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Student #2</div>
-                      <div class="text-sm text-slate-500">@student2</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">3/5</div>
-                  <div class="text-sm text-slate-500">60%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">0</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-blue-600">780</div>
-                </td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 font-bold">4</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">N</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Student #3</div>
-                      <div class="text-sm text-slate-500">@student3</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">2/5</div>
-                  <div class="text-sm text-slate-500">40%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">1</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-slate-600">650</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-              <!-- Contest #2 Leaderboard -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-slate-900">Contest #2 - Leaderboard</h2>
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-slate-600">Your Rank:</span>
-            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-semibold">#1</span>
+        <!-- SQL Contest Card -->
+        <div class="contest-card bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">S</div>
+            <div>
+              <h2 class="text-xl font-bold text-slate-900">SQL Database Master</h2>
+              <div class="text-sm text-slate-500">Advanced contest focusing on database design and SQL optimization.</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <!-- Category -->
+            <div class="bg-gradient-to-br from-blue-50/80 to-blue-100/60 backdrop-blur-sm rounded-lg p-3 border border-blue-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="tag" class="w-4 h-4 text-blue-600"></i>
+                <span class="text-xs font-medium text-blue-700 uppercase tracking-wide">Category</span>
+              </div>
+              <span class="text-sm font-semibold text-blue-900">Database</span>
+            </div>
+            
+            <!-- Batch -->
+            <div class="bg-gradient-to-br from-yellow-50/80 to-yellow-100/60 backdrop-blur-sm rounded-lg p-3 border border-yellow-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-yellow-600"></i>
+                <span class="text-xs font-medium text-yellow-700 uppercase tracking-wide">Batch</span>
+              </div>
+              <span class="text-sm font-semibold text-yellow-900">Spring 2025</span>
+            </div>
+            
+            <!-- Participants -->
+            <div class="bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-sm rounded-lg p-3 border border-green-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="users" class="w-4 h-4 text-green-600"></i>
+                <span class="text-xs font-medium text-green-700 uppercase tracking-wide">Participants</span>
+              </div>
+              <span class="text-sm font-semibold text-green-900">89</span>
+            </div>
+            
+            <!-- Start Date -->
+            <div class="bg-gradient-to-br from-purple-50/80 to-purple-100/60 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+                <span class="text-xs font-medium text-purple-700 uppercase tracking-wide">Start Date</span>
+              </div>
+              <span class="text-sm font-semibold text-purple-900">Jan 22, 2025</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <a href="contest-participation.html" class="glass-btn bg-blue-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-700/90 hover:scale-105 transition-all duration-300 border border-blue-500/30 shadow-lg">
+              <i data-lucide="play" class="w-4 h-4"></i> Participate
+            </a>
+            <button onclick="openContestLeaderboardModal('SQL Database Master')" class="glass-btn p-2 rounded-lg border border-slate-200/50 hover:bg-slate-50/80 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-md" title="View Leaderboard">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 text-green-600"></i>
+            </button>
+            </div>
           </div>
         </div>
-        
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">RANK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NAME</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PROBLEMS SOLVED</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">FLAGGED QUESTIONS</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SCORE</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-slate-200">
-              <tr class="bg-green-50 border-2 border-green-200">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">A</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Student #2</div>
-                      <div class="text-sm text-slate-500">@student2</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">6/8</div>
-                  <div class="text-sm text-slate-500">75%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">0</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-green-600">920</div>
-                </td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-slate-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">S</div>
-                    <div>
-                      <div class="text-sm font-medium text-slate-900">Suresh Kumar</div>
-                      <div class="text-sm text-slate-500">@sureshkumar</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-slate-900">5/8</div>
-                  <div class="text-sm text-slate-500">62.5%</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">1</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-slate-600">850</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
-    </div>
+      
+
     </div> <!-- End of contests-content -->
+    
+    <!-- Contest Leaderboard Modal -->
+    <div id="contest-leaderboard-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold" id="modal-contest-title">Contest Leaderboard</h3>
+            <button onclick="closeContestLeaderboardModal()" class="text-white hover:text-blue-100 transition-colors">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                     <!-- Your Performance Highlight - Moved to Top -->
+           <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+             <div class="flex items-center justify-between">
+               <div class="flex items-center gap-3">
+                 <i data-lucide="award" class="w-6 h-6 text-blue-600"></i>
+                 <span class="text-lg font-semibold text-blue-900">Your Performance</span>
+               </div>
+               <div class="text-right">
+                 <div class="text-2xl font-bold text-blue-600" id="modal-your-rank">#3</div>
+                 <div class="text-sm text-blue-700">Current Rank</div>
+               </div>
+             </div>
+           </div>
+           
+           <!-- Contest Info -->
+           <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+             <div class="flex items-center justify-between">
+               <div>
+                 <h4 class="text-lg font-semibold text-blue-900" id="modal-contest-name">Contest Name</h4>
+                 <p class="text-sm text-blue-700" id="modal-contest-desc">Contest description</p>
+               </div>
+               <div class="text-right">
+                 <div class="text-2xl font-bold text-blue-600" id="modal-total-participants">156</div>
+                 <div class="text-sm text-blue-700">Participants</div>
+               </div>
+             </div>
+           </div>
+           
+           <!-- Search Bar -->
+           <div class="mb-6">
+             <div class="relative">
+               <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+               <input type="text" id="leaderboard-search" placeholder="Search students..." class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+             </div>
+           </div>
+           
+           <!-- Leaderboard Table -->
+           <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+             <table class="w-full">
+               <thead class="bg-slate-50">
+                 <tr>
+                   <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-16">RANK</th>
+                   <th class="pl-4 pr-2 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-48">STUDENT</th>
+                   <th class="pl-1 pr-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-32">PROBLEMS SOLVED</th>
+                   <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-24">SCORE</th>
+                   <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-24">TIME</th>
+                 </tr>
+               </thead>
+               <tbody id="modal-leaderboard-body" class="bg-white divide-y divide-slate-200">
+                 <!-- Dynamic content will be loaded here -->
+               </tbody>
+             </table>
+           </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3">
+          <button onclick="closeContestLeaderboardModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors">
+            Close
+          </button>
+          <button onclick="exportContestLeaderboard()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Load API and App scripts -->
@@ -436,183 +372,208 @@
   <script>
     lucide.createIcons();
     
-    // User Contests Controller
-    class UserContests {
-      constructor() {
-        this.api = window.SkillPortAPI;
-        this.contestStats = null;
-        this.assignedContests = [];
-        this.contestLeaderboards = {};
-        this.init();
-      }
-
-      async init() {
-        try {
-          // Check if user is authenticated
-          if (!this.api.isAuthenticated()) {
-            window.location.href = '/index.html';
-            return;
-          }
-
-          // Load contest data
-          await this.loadContestStats();
-          await this.loadAssignedContests();
-          await this.loadContestLeaderboards();
-          
-        } catch (error) {
-          console.error('User contests initialization failed:', error);
-          this.showError('Failed to initialize contests page');
-        }
-      }
-
-      async loadContestStats() {
-        try {
-          const response = await this.api.getUserContestStats();
-          if (response.success) {
-            this.contestStats = response.data.stats;
-            this.updateContestStats();
-          }
-        } catch (error) {
-          console.error('Failed to load contest stats:', error);
-        }
-      }
-
-      async loadAssignedContests() {
-        try {
-          const response = await this.api.getUserAssignedContests();
-          if (response.success) {
-            this.assignedContests = response.data.contests;
-            this.displayAssignedContests();
-          }
-        } catch (error) {
-          console.error('Failed to load assigned contests:', error);
-        }
-      }
-
-      async loadContestLeaderboards() {
-        try {
-          const response = await this.api.getUserContestLeaderboards();
-          if (response.success) {
-            this.contestLeaderboards = response.data.leaderboards;
-            this.displayContestLeaderboards();
-          }
-        } catch (error) {
-          console.error('Failed to load contest leaderboards:', error);
-        }
-      }
-
-      updateContestStats() {
-        if (!this.contestStats) return;
-
-        if (this.contestStats.activeContests !== undefined) {
-          document.getElementById('active-contests').textContent = this.contestStats.activeContests.toLocaleString();
-        }
-        if (this.contestStats.problemsSolved !== undefined) {
-          document.getElementById('problems-solved').textContent = this.contestStats.problemsSolved.toLocaleString();
-        }
-        if (this.contestStats.successRate !== undefined) {
-          document.getElementById('success-rate').textContent = `${this.contestStats.successRate}%`;
-        }
-        if (this.contestStats.totalPoints !== undefined) {
-          document.getElementById('total-points').textContent = this.contestStats.totalPoints.toLocaleString();
-        }
-      }
-
-      displayAssignedContests() {
-        const contestsGrid = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
-        if (!contestsGrid) return;
-
-        if (!this.assignedContests.length) {
-          contestsGrid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-              <i data-lucide="trophy" class="w-16 h-16 mx-auto mb-4 text-slate-400"></i>
-              <h3 class="text-lg font-semibold text-slate-900 mb-2">No contests assigned</h3>
-              <p class="text-slate-600">You don't have any contests assigned to you yet</p>
-            </div>
-          `;
-          return;
-        }
-
-        contestsGrid.innerHTML = this.assignedContests.map(contest => `
-          <div class="border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-slate-900">${contest.name}</h3>
-              <span class="bg-${this.getContestStatusColor(contest.status)}-100 text-${this.getContestStatusColor(contest.status)}-700 px-2 py-1 rounded text-sm">${contest.status}</span>
-            </div>
-            <div class="space-y-2 text-sm text-slate-600 mb-4">
-              <div class="flex items-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
-                <span>Ends: ${new Date(contest.endDate).toLocaleDateString()}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i data-lucide="clock" class="w-4 h-4"></i>
-                <span>${this.getTimeRemaining(contest.endDate)}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i data-lucide="target" class="w-4 h-4"></i>
-                <span>${contest.totalProblems} problems • ${contest.solvedProblems || 0} solved</span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <a href="code-editor.html?contest=${contest.id}" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors">
-                ${contest.status === 'Active' ? 'Continue Contest' : 'View Contest'}
-              </a>
-              <button onclick="userContests.viewLeaderboard('${contest.id}')" class="p-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        `).join('');
-
-        lucide.createIcons();
-      }
-
-      displayContestLeaderboards() {
-        // TODO: Implement dynamic leaderboard display
-        console.log('Contest leaderboards:', this.contestLeaderboards);
-      }
-
-      getContestStatusColor(status) {
-        const colors = {
-          'Active': 'green',
-          'Upcoming': 'blue',
-          'Completed': 'gray',
-          'Paused': 'yellow'
-        };
-        return colors[status] || 'gray';
-      }
-
-      getTimeRemaining(endDate) {
-        const now = new Date();
-        const end = new Date(endDate);
-        const diffTime = end - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+         // Contest leaderboard data
+     const contestData = {
+       'Weekly Algorithm Challenge': {
+         name: 'Weekly Algorithm Challenge',
+         description: 'Weekly competitive programming contest focusing on algorithms and problem-solving skills.',
+         participants: 156,
+         yourRank: 3,
+         leaderboard: [
+           { rank: 1, name: 'Priya Sharma', problemsSolved: '5/5', percentage: '100%', score: 850, time: '2h 15m' },
+           { rank: 2, name: 'Rahul Kumar', problemsSolved: '5/5', percentage: '100%', score: 820, time: '2h 45m' },
+           { rank: 3, name: 'Alex Johnson', problemsSolved: '3/5', percentage: '60%', score: 780, time: '3h 20m' },
+           { rank: 4, name: 'Suresh Kumar', problemsSolved: '2/5', percentage: '40%', score: 650, time: '4h 10m' },
+           { rank: 5, name: 'Priya Patel', problemsSolved: '1/5', percentage: '20%', score: 450, time: '5h 30m' },
+           { rank: 6, name: 'Amit Singh', problemsSolved: '1/5', percentage: '20%', score: 420, time: '5h 45m' },
+           { rank: 7, name: 'Neha Gupta', problemsSolved: '0/5', percentage: '0%', score: 380, time: '6h 20m' },
+           { rank: 8, name: 'Vikram Malhotra', problemsSolved: '0/5', percentage: '0%', score: 350, time: '6h 45m' },
+           { rank: 9, name: 'Anjali Desai', problemsSolved: '0/5', percentage: '0%', score: 320, time: '7h 10m' },
+           { rank: 10, name: 'Rajesh Verma', problemsSolved: '0/5', percentage: '0%', score: 290, time: '7h 35m' },
+           { rank: 11, name: 'Meera Iyer', problemsSolved: '0/5', percentage: '0%', score: 260, time: '8h 0m' },
+           { rank: 12, name: 'Arjun Reddy', problemsSolved: '0/5', percentage: '0%', score: 230, time: '8h 25m' },
+           { rank: 13, name: 'Kavya Nair', problemsSolved: '0/5', percentage: '0%', score: 200, time: '8h 50m' },
+           { rank: 14, name: 'Dev Patel', problemsSolved: '0/5', percentage: '0%', score: 170, time: '9h 15m' },
+           { rank: 15, name: 'Zara Khan', problemsSolved: '0/5', percentage: '0%', score: 140, time: '9h 40m' },
+           { rank: 16, name: 'Rohan Mehta', problemsSolved: '0/5', percentage: '0%', score: 110, time: '10h 5m' },
+           { rank: 17, name: 'Ishita Sharma', problemsSolved: '0/5', percentage: '0%', score: 80, time: '10h 30m' },
+           { rank: 18, name: 'Aditya Joshi', problemsSolved: '0/5', percentage: '0%', score: 50, time: '10h 55m' },
+           { rank: 19, name: 'Tanvi Agarwal', problemsSolved: '0/5', percentage: '0%', score: 20, time: '11h 20m' },
+           { rank: 20, name: 'Krishna Rao', problemsSolved: '0/5', percentage: '0%', score: 0, time: '12h 0m' }
+         ]
+       },
+       'SQL Database Master': {
+         name: 'SQL Database Master',
+         description: 'Advanced contest focusing on database design and SQL optimization.',
+         participants: 89,
+         yourRank: 1,
+         leaderboard: [
+           { rank: 1, name: 'Alex Johnson', problemsSolved: '6/8', percentage: '75%', score: 920, time: '1h 55m' },
+           { rank: 2, name: 'Suresh Kumar', problemsSolved: '5/8', percentage: '62.5%', score: 850, time: '2h 30m' },
+           { rank: 3, name: 'Priya Sharma', problemsSolved: '4/8', percentage: '50%', score: 720, time: '3h 15m' },
+           { rank: 4, name: 'Rahul Kumar', problemsSolved: '3/8', percentage: '37.5%', score: 580, time: '4h 20m' },
+           { rank: 5, name: 'Priya Patel', problemsSolved: '2/8', percentage: '25%', score: 420, time: '5h 45m' },
+           { rank: 6, name: 'Amit Singh', problemsSolved: '2/8', percentage: '25%', score: 400, time: '6h 10m' },
+           { rank: 7, name: 'Neha Gupta', problemsSolved: '1/8', percentage: '12.5%', score: 350, time: '6h 35m' },
+           { rank: 8, name: 'Vikram Malhotra', problemsSolved: '1/8', percentage: '12.5%', score: 320, time: '7h 0m' },
+           { rank: 9, name: 'Anjali Desai', problemsSolved: '0/8', percentage: '0%', score: 280, time: '7h 25m' },
+           { rank: 10, name: 'Rajesh Verma', problemsSolved: '0/8', percentage: '0%', score: 240, time: '7h 50m' },
+           { rank: 11, name: 'Meera Iyer', problemsSolved: '0/8', percentage: '0%', score: 200, time: '8h 15m' },
+           { rank: 12, name: 'Arjun Reddy', problemsSolved: '0/8', percentage: '0%', score: 160, time: '8h 40m' },
+           { rank: 13, name: 'Kavya Nair', problemsSolved: '0/8', percentage: '0%', score: 120, time: '9h 5m' },
+           { rank: 14, name: 'Dev Patel', problemsSolved: '0/8', percentage: '0%', score: 80, time: '9h 30m' },
+           { rank: 15, name: 'Zara Khan', problemsSolved: '0/8', percentage: '0%', score: 40, time: '9h 55m' },
+           { rank: 16, name: 'Rohan Mehta', problemsSolved: '0/8', percentage: '0%', score: 0, time: '10h 20m' }
+         ]
+       }
+     };
+    
+    // Open contest leaderboard modal
+    function openContestLeaderboardModal(contestName) {
+      const modal = document.getElementById('contest-leaderboard-modal');
+      const contest = contestData[contestName];
+      
+      if (contest) {
+        // Update modal content
+        document.getElementById('modal-contest-title').textContent = `${contestName} - Leaderboard`;
+        document.getElementById('modal-contest-name').textContent = contest.name;
+        document.getElementById('modal-contest-desc').textContent = contest.description;
+        document.getElementById('modal-total-participants').textContent = contest.participants;
+        document.getElementById('modal-your-rank').textContent = `#${contest.yourRank}`;
         
-        if (diffDays < 0) return 'Ended';
-        if (diffDays === 0) return 'Ends today';
-        if (diffDays === 1) return '1 day remaining';
-        return `${diffDays} days remaining`;
-      }
-
-      viewLeaderboard(contestId) {
-        // TODO: Implement leaderboard view
-        console.log('Viewing leaderboard for contest:', contestId);
-      }
-
-      showContestsContent() {
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('contests-content').classList.remove('hidden');
-      }
-
-      showError(message) {
-        console.error(message);
-        // TODO: Implement proper error display
+        // Populate leaderboard table
+        const tbody = document.getElementById('modal-leaderboard-body');
+        tbody.innerHTML = '';
+        
+                 // Store original leaderboard data for search functionality
+         window.currentLeaderboard = contest.leaderboard;
+         
+         contest.leaderboard.forEach((entry, index) => {
+           const row = document.createElement('tr');
+           const isCurrentUser = entry.name === 'Alex Johnson';
+           const rowClass = isCurrentUser ? 'bg-blue-50 border-2 border-blue-200' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+           
+           row.className = rowClass;
+           row.innerHTML = `
+             <td class="px-4 py-4 whitespace-nowrap w-16">
+               <div class="w-8 h-8 ${entry.rank <= 3 ? 'bg-amber-500' : 'bg-slate-500'} rounded-full flex items-center justify-center text-white font-bold">${entry.rank}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-48">
+               <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold">${entry.name.charAt(0)}</div>
+                 <div>
+                   <div class="text-sm font-medium text-slate-900">${entry.name}</div>
+                 </div>
+               </div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-32">
+               <div class="text-sm font-medium text-slate-900">${entry.problemsSolved}</div>
+               <div class="text-xs text-slate-500">${entry.percentage}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-24">
+               <div class="text-sm font-bold ${entry.rank <= 3 ? 'text-amber-600' : 'text-slate-600'}">${entry.score}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-24">
+               <div class="text-xs text-slate-500">${entry.time}</div>
+             </td>
+           `;
+           tbody.appendChild(row);
+         });
+         
+         // Add search functionality
+         const searchInput = document.getElementById('leaderboard-search');
+         if (searchInput) {
+           searchInput.addEventListener('input', filterLeaderboard);
+         }
+        
+        // Show modal
+        modal.classList.remove('hidden');
       }
     }
-
-    // Initialize when DOM is ready
+    
+    // Close contest leaderboard modal
+    function closeContestLeaderboardModal() {
+      const modal = document.getElementById('contest-leaderboard-modal');
+      modal.classList.add('hidden');
+    }
+    
+         // Export contest leaderboard
+     function exportContestLeaderboard() {
+       // Simple export functionality - could be enhanced with actual CSV export
+       alert('Leaderboard export functionality would be implemented here');
+     }
+     
+     // Filter leaderboard based on search
+     function filterLeaderboard() {
+       const searchTerm = document.getElementById('leaderboard-search').value.toLowerCase();
+       const tbody = document.getElementById('modal-leaderboard-body');
+       const originalData = window.currentLeaderboard;
+       
+       if (!originalData) return;
+       
+       // Filter data based on search term
+       const filteredData = originalData.filter(entry => 
+         entry.name.toLowerCase().includes(searchTerm)
+       );
+       
+       // Clear and repopulate table
+       tbody.innerHTML = '';
+       
+                filteredData.forEach((entry, index) => {
+           const row = document.createElement('tr');
+           const isCurrentUser = entry.name === 'Alex Johnson';
+           const rowClass = isCurrentUser ? 'bg-blue-50 border-2 border-blue-200' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+           
+           row.className = rowClass;
+           row.innerHTML = `
+             <td class="px-4 py-4 whitespace-nowrap w-16">
+               <div class="w-8 h-8 ${entry.rank <= 3 ? 'bg-amber-500' : 'bg-slate-500'} rounded-full flex items-center justify-center text-white font-bold">${entry.rank}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-48">
+               <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold">${entry.name.charAt(0)}</div>
+                 <div>
+                   <div class="text-sm font-medium text-slate-900">${entry.name}</div>
+                 </div>
+               </div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-32">
+               <div class="text-sm font-medium text-slate-900">${entry.problemsSolved}</div>
+               <div class="text-xs text-slate-500">${entry.percentage}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-24">
+               <div class="text-sm font-bold ${entry.rank <= 3 ? 'text-amber-600' : 'text-slate-600'}">${entry.score}</div>
+             </td>
+             <td class="px-4 py-4 whitespace-nowrap w-24">
+               <div class="text-xs text-slate-500">${entry.time}</div>
+             </td>
+           `;
+           tbody.appendChild(row);
+         });
+     }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('contest-leaderboard-modal');
+      if (e.target === modal) {
+        closeContestLeaderboardModal();
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeContestLeaderboardModal();
+      }
+    });
+    
+    // Simple page functionality
     document.addEventListener('DOMContentLoaded', () => {
-      window.userContests = new UserContests();
+      // Set student name in navbar
+      const navbarStudentName = document.getElementById('navbar-student-name');
+      if (navbarStudentName) {
+        navbarStudentName.textContent = 'Alex Johnson';
+      }
     });
   </script>
 </body>

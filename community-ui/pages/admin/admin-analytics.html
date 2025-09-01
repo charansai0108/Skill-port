@@ -9,12 +9,179 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    /* Enhanced transitions and animations */
+    .nav-link {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .nav-link:hover {
+      transform: translateY(-2px);
+    }
+    
+    .analytics-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .analytics-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .stat-card {
+      transition: all 0.3s ease-in-out;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .action-button {
+      transition: all 0.3s ease-in-out;
+    }
+    
+    .action-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Staggered animation delays */
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    /* Page transition effects */
+    .page-content {
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Enhanced form styling */
+    .form-input:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Analytics card hover effects - SAME border style as contest page */
+    .analytics-card {
+      transition: all 0.2s ease !important;
+      border: 3px solid transparent !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    }
+    
+    .analytics-card:hover {
+      transform: translateY(-2px) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Stats cards hover effects - SAME border style as contest page */
+    .stat-card {
+      transition: all 0.2s ease !important;
+      border: 3px solid transparent !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Chart container hover effects */
+    .chart-container {
+      transition: all 0.2s ease !important;
+      border: 3px solid transparent !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    }
+    
+    .chart-container:hover {
+      transform: translateY(-2px) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Loading states */
+    .loading-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Mobile menu */
+    .mobile-menu {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    
+    /* Better mobile touch targets */
+    @media (max-width: 768px) {
+      .mobile-touch-target {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
+  <!-- Mobile Menu Button -->
+  <div class="lg:hidden fixed top-4 left-4 z-50">
+    <button id="mobileMenuBtn" class="bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-slate-200">
+      <i data-lucide="menu" class="w-5 h-5 text-slate-700"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Sidebar -->
+  <div id="mobileSidebar" class="mobile-menu lg:hidden fixed inset-0 z-40 bg-white shadow-2xl">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200">
+      <h3 class="text-lg font-semibold text-slate-900">Admin Navigation</h3>
+      <button id="closeMobileMenu" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      <nav class="space-y-3" id="mobileNav">
+        <!-- Mobile navigation items will be populated by JavaScript -->
+      </nav>
+    </div>
+  </div>
+
   <!-- Navbar -->
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+  <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-2 group">
@@ -22,30 +189,30 @@
             <i data-lucide="shield" class="w-5 h-5 text-white"></i>
           </div>
           <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            Community Admin
+            PW IOI
           </span>
         </div>
         <div class="hidden md:flex items-center gap-1">
-          <a href="admin-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="admin-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
           </a>
-          <a href="admin-users.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="users" class="w-4 h-4"></i> Users
+          <a href="admin-users.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <i data-lucide="users" class="w-4 h-4"></i> Students
           </a>
-          <a href="admin-mentors.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="admin-mentors.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="graduation-cap" class="w-4 h-4"></i> Mentors
           </a>
-          <a href="admin-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="admin-contests.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="trophy" class="w-4 h-4"></i> Contests
           </a>
-          <a href="admin-analytics.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm">
+          <a href="admin-analytics.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
           </a>
-          <a href="admin-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+          <a href="admin-leaderboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
             <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
           </a>
-          <a href="admin-settings.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-            <i data-lucide="settings" class="w-4 h-4"></i> Settings
+          <a href="admin-profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
           </a>
         </div>
       </div>
@@ -53,15 +220,21 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">Analytics Dashboard</h1>
-      <p class="text-lg text-slate-600">Monitor platform performance, user engagement, and growth metrics.</p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+        </div>
+                    <div>
+              <h1 class="text-xl font-semibold text-slate-700">Analytics Dashboard</h1>
+            </div>
+      </div>
     </div>
 
     <!-- Key Metrics -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6 border border-slate-200/50">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-600">Total Users</p>
@@ -74,7 +247,7 @@
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-600">Active Sessions</p>
@@ -87,7 +260,7 @@
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-600">Contest Participation</p>
@@ -100,7 +273,7 @@
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="stat-card bg-white rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-600">Avg. Response Time</p>
@@ -117,13 +290,13 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- User Growth Chart -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="chart-container bg-white rounded-lg shadow-lg p-6">
         <h3 class="text-lg font-semibold text-slate-900 mb-4">User Growth</h3>
         <canvas id="userGrowthChart" width="400" height="200"></canvas>
       </div>
       
       <!-- Contest Participation Chart -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
+      <div class="chart-container bg-white rounded-lg shadow-lg p-6">
         <h3 class="text-lg font-semibold text-slate-900 mb-4">Contest Participation</h3>
         <canvas id="contestParticipationChart" width="400" height="200"></canvas>
       </div>
@@ -132,98 +305,282 @@
     <!-- Detailed Analytics -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Top Performing Categories -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-slate-900 mb-4">Top Categories</h3>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Algorithms</span>
-            <div class="flex items-center gap-2">
-              <div class="w-20 bg-slate-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+      <div class="chart-container bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900">Top Categories</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="code" class="w-4 h-4 text-blue-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Algorithms</span>
               </div>
-              <span class="text-sm font-medium text-slate-900">85%</span>
+              <span class="text-lg font-bold text-blue-600">85%</span>
             </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Data Structures</span>
-            <div class="flex items-center gap-2">
-              <div class="w-20 bg-slate-200 rounded-full h-2">
-                <div class="bg-green-600 h-2 rounded-full" style="width: 72%"></div>
+          
+          <div class="group hover:bg-green-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="database" class="w-4 h-4 text-green-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Data Structures</span>
               </div>
-              <span class="text-sm font-medium text-slate-900">72%</span>
+              <span class="text-lg font-bold text-green-600">72%</span>
             </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Dynamic Programming</span>
-            <div class="flex items-center gap-2">
-              <div class="w-20 bg-slate-200 rounded-full h-2">
-                <div class="bg-purple-600 h-2 rounded-full" style="width: 68%"></div>
+          
+          <div class="group hover:bg-purple-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="zap" class="w-4 h-4 text-purple-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Dynamic Programming</span>
               </div>
-              <span class="text-sm font-medium text-slate-900">68%</span>
+              <span class="text-lg font-bold text-purple-600">68%</span>
             </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Graph Theory</span>
-            <div class="flex items-center gap-2">
-              <div class="w-20 bg-slate-200 rounded-full h-2">
-                <div class="bg-yellow-600 h-2 rounded-full" style="width: 55%"></div>
+          
+          <div class="group hover:bg-yellow-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="network" class="w-4 h-4 text-yellow-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Graph Theory</span>
               </div>
-              <span class="text-sm font-medium text-slate-900">55%</span>
+              <span class="text-lg font-bold text-yellow-600">55%</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- User Activity -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-slate-900 mb-4">User Activity</h3>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Daily Active Users</span>
-            <span class="text-sm font-medium text-slate-900">1,234</span>
+      <!-- Student Activity -->
+      <div class="chart-container bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="users" class="w-5 h-5 text-white"></i>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Weekly Active Users</span>
-            <span class="text-sm font-medium text-slate-900">2,156</span>
+          <h3 class="text-lg font-semibold text-slate-900">Student Activity</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Daily Active Users</span>
+              </div>
+              <span class="text-lg font-bold text-blue-600">1,234</span>
+            </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Monthly Active Users</span>
-            <span class="text-sm font-medium text-slate-900">2,847</span>
+          
+          <div class="group hover:bg-green-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="calendar-days" class="w-4 h-4 text-green-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Weekly Active Users</span>
+              </div>
+              <span class="text-lg font-bold text-green-600">2,156</span>
+            </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Avg. Session Duration</span>
-            <span class="text-sm font-medium text-slate-900">24m 32s</span>
+          
+          <div class="group hover:bg-purple-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="calendar-range" class="w-4 h-4 text-purple-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Monthly Active Users</span>
+              </div>
+              <span class="text-lg font-bold text-purple-600">2,847</span>
+            </div>
+          </div>
+          
+          <div class="group hover:bg-yellow-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="clock" class="w-4 h-4 text-yellow-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Avg. Session Duration</span>
+              </div>
+              <span class="text-lg font-bold text-yellow-600">24m 32s</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Performance Metrics -->
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-slate-900 mb-4">Performance</h3>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Page Load Time</span>
-            <span class="text-sm font-medium text-slate-900">1.2s</span>
+      <!-- Mentor Activity -->
+      <div class="chart-container bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">API Response Time</span>
-            <span class="text-sm font-medium text-slate-900">180ms</span>
+          <h3 class="text-lg font-semibold text-slate-900">Mentor Activity</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="group hover:bg-blue-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Active Mentors</span>
+              </div>
+              <span class="text-lg font-bold text-blue-600">24</span>
+            </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Uptime</span>
-            <span class="text-sm font-medium text-slate-900">99.9%</span>
+          
+          <div class="group hover:bg-green-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="message-circle" class="w-4 h-4 text-green-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Avg. Response Time</span>
+              </div>
+              <span class="text-lg font-bold text-green-600">2.3h</span>
+            </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-600">Error Rate</span>
-            <span class="text-sm font-medium text-slate-900">0.1%</span>
+          
+          <div class="group hover:bg-purple-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="target" class="w-4 h-4 text-purple-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Students Helped</span>
+              </div>
+              <span class="text-lg font-bold text-purple-600">156</span>
+            </div>
+          </div>
+          
+          <div class="group hover:bg-yellow-50 p-3 rounded-lg transition-all duration-200 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="award" class="w-4 h-4 text-yellow-600"></i>
+                </div>
+                <span class="font-medium text-slate-900">Contests Created</span>
+              </div>
+              <span class="text-lg font-bold text-yellow-600">12</span>
+            </div>
           </div>
         </div>
       </div>
+
+
     </div>
   </main>
 
   <script>
     lucide.createIcons();
+    
+    // Mobile navigation functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const closeMobileMenu = document.getElementById('closeMobileMenu');
+    const mobileNav = document.getElementById('mobileNav');
+
+    // Populate mobile navigation
+    function populateMobileNav() {
+      const navItems = [
+        { href: 'admin-dashboard.html', icon: 'layout-dashboard', label: 'Dashboard' },
+        { href: 'admin-users.html', icon: 'users', label: 'Users' },
+        { href: 'admin-mentors.html', icon: 'graduation-cap', label: 'Mentors' },
+        { href: 'admin-contests.html', icon: 'trophy', label: 'Contests' },
+        { href: 'admin-analytics.html', icon: 'bar-chart-3', label: 'Analytics' },
+        { href: 'admin-leaderboard.html', icon: 'award', label: 'Leaderboard' },
+        { href: 'admin-profile.html', icon: 'user', label: 'Profile' }
+      ];
+
+      mobileNav.innerHTML = navItems.map(item => `
+        <a href="${item.href}" class="mobile-touch-target w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
+          <i data-lucide="${item.icon}" class="w-4 h-4 inline mr-3"></i> ${item.label}
+        </a>
+      `).join('');
+
+      // Recreate icons for mobile nav
+      lucide.createIcons();
+    }
+
+    // Mobile menu functions
+    function openMobileMenu() {
+      mobileSidebar.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileMenuFunc() {
+      mobileSidebar.classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Event listeners
+    mobileMenuBtn.addEventListener('click', openMobileMenu);
+    closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+
+    // Close mobile menu when clicking outside
+    mobileSidebar.addEventListener('click', (e) => {
+      if (e.target === mobileSidebar) {
+        closeMobileMenuFunc();
+      }
+    });
+
+    // Initialize mobile navigation
+    populateMobileNav();
+    
+    // Add page transition effects
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('page-loaded');
+      
+      // Add smooth navigation transitions
+      document.querySelectorAll('a[href^="admin-"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          // Add page exit animation
+          document.body.classList.add('page-exiting');
+          
+          // Small delay for animation
+          setTimeout(() => {
+            window.location.href = link.href;
+          }, 150);
+        });
+      });
+    });
+
+    // Add page transition CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .page-loaded {
+        animation: pageEnter 0.6s ease-out;
+      }
+      
+      .page-exiting {
+        animation: pageExit 0.15s ease-in;
+      }
+      
+      @keyframes pageEnter {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes pageExit {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
     
     // User Growth Chart
     const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
