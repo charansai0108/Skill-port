@@ -1,852 +1,574 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, query } = require('express-validator');
+const asyncHandler = require('../middleware/async');
+const { authorize, checkUserAccess } = require('../middleware/auth');
+const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Community = require('../models/Community');
-const Contest = require('../models/Contest');
-const Submission = require('../models/Submission');
-const Analytics = require('../models/Analytics');
-const { auth, admin } = require('../middleware/auth');
+const Progress = require('../models/Progress');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 
-// @route   GET /api/users/profile
-// @desc    Get current user profile
+// @desc    Get user profile
+// @route   GET /api/v1/users/profile
 // @access  Private
-router.get('/profile', auth, async (req, res) => {
-  try {
+router.get('/profile', asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id)
-      .populate('communities.community', 'name description category privacy')
-      .populate('assignedContests.contest', 'name description startDate endDate')
-      .select('-password -emailVerificationToken -emailVerificationExpires');
+        .populate('community')
+        .select('-password');
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    // Get user analytics
-    let analytics = await Analytics.findOne({ user: req.user.id });
-    if (!analytics) {
-      // Create analytics if doesn't exist
-      analytics = new Analytics({ user: req.user.id });
-      await analytics.save();
-    }
-
-    // Get user's communities
-    const userCommunities = await Community.find({
-      'members.user': req.user.id,
-      'members.isActive': true
-    }).select('name description category privacy memberCount');
-
-    // Get user's contest participations
-    const userContests = await Contest.find({
-      'participants.user': req.user.id
-    }).select('name description status startDate endDate');
-
-    const profileData = {
-      ...user.toObject(),
-      analytics: analytics,
-      communities: userCommunities,
-      contests: userContests
-    };
-
-    res.json({
-      success: true,
-      data: profileData
+    res.status(200).json({
+        success: true,
+        data: { user }
     });
+}));
 
-  } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching profile'
-    });
-  }
-});
-
-// @route   PUT /api/users/profile
-// @desc    Update current user profile
+// @desc    Update user profile
+// @route   PUT /api/v1/users/profile
 // @access  Private
 router.put('/profile', [
-  auth,
-  body('firstName').optional().trim().isLength({ min: 2, max: 50 }).withMessage('First name must be between 2 and 50 characters'),
-  body('lastName').optional().trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be between 2 and 50 characters'),
-  body('bio').optional().trim().isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters'),
-  body('phoneNumber').optional().isMobilePhone().withMessage('Invalid phone number'),
-  body('profilePicture').optional().isURL().withMessage('Invalid profile picture URL'),
-  body('skills').optional().isArray().withMessage('Skills must be an array'),
-  body('preferences').optional().isObject().withMessage('Preferences must be an object')
-], async (req, res) => {
-  try {
-    // Check for validation errors
+    body('firstName').optional().trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
+    body('lastName').optional().trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
+    body('bio').optional().isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters'),
+    body('phoneNumber').optional().matches(/^\+?[\d\s-()]+$/).withMessage('Invalid phone number format'),
+    body('dateOfBirth').optional().isISO8601().withMessage('Invalid date format')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { 
-      firstName, 
-      lastName, 
-      bio, 
-      phoneNumber, 
-      profilePicture, 
-      skills, 
-      preferences 
-    } = req.body;
-
-    // Build update object
+    const allowedFields = ['firstName', 'lastName', 'bio', 'phoneNumber', 'dateOfBirth'];
     const updateData = {};
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (bio) updateData.bio = bio;
-    if (phoneNumber) updateData.phoneNumber = phoneNumber;
-    if (profilePicture) updateData.profilePicture = profilePicture;
-    if (skills) updateData.skills = skills;
-    if (preferences) updateData.preferences = preferences;
+
+    allowedFields.forEach(field => {
+        if (req.body[field] !== undefined) {
+            updateData[field] = req.body[field];
+        }
+    });
 
     const user = await User.findByIdAndUpdate(
-      req.user.id,
-      updateData,
-      { new: true, runValidators: true }
-    ).select('-password -emailVerificationToken -emailVerificationExpires');
+        req.user.id,
+        updateData,
+        { new: true, runValidators: true }
+    ).populate('community');
 
-    res.json({
-      success: true,
-      message: 'Profile updated successfully',
-      data: user
+    res.status(200).json({
+        success: true,
+        data: { user }
     });
+}));
 
-  } catch (error) {
-    console.error('Update profile error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating profile'
-    });
-  }
-});
-
-// @route   GET /api/users/:id
-// @desc    Get user by ID (public profile)
-// @access  Public
-router.get('/:id', async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id)
-      .populate('communities.community', 'name description category')
-      .select('-password -emailVerificationToken -emailVerificationExpires -phoneNumber -preferences');
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    // Check privacy settings
-    if (user.preferences?.privacy?.profileVisibility === 'private') {
-      return res.status(403).json({
-        success: false,
-        message: 'Profile is private'
-      });
-    }
-
-    // Get public analytics
-    const analytics = await Analytics.findOne({ user: req.params.id })
-      .select('contestStats.problemsSolved contestStats.contestsWon communityStats.communitiesJoined skillProgress achievements');
-
-    // Get public communities
-    const publicCommunities = await Community.find({
-      'members.user': req.params.id,
-      'members.isActive': true,
-      privacy: 'public'
-    }).select('name description category memberCount');
-
-    const publicProfile = {
-      ...user.toObject(),
-      analytics: analytics,
-      communities: publicCommunities
-    };
-
-    res.json({
-      success: true,
-      data: publicProfile
-    });
-
-  } catch (error) {
-    console.error('Get user error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching user'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/stats
-// @desc    Get user statistics
-// @access  Public
-router.get('/:id/stats', async (req, res) => {
-  try {
-    const analytics = await Analytics.findOne({ user: req.params.id });
-    
-    if (!analytics) {
-      return res.status(404).json({
-        success: false,
-        message: 'User statistics not found'
-      });
-    }
-
-    // Get contest participation
-    const contestStats = await Contest.aggregate([
-      {
-        $match: {
-          'participants.user': req.params.id
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalContests: { $sum: 1 },
-          contestsWon: {
-            $sum: {
-              $cond: [
-                { $eq: ['$participants.rank', 1] },
-                1,
-                0
-              ]
-            }
-          },
-          averageRank: { $avg: '$participants.rank' },
-          totalScore: { $sum: '$participants.score' }
-        }
-      }
-    ]);
-
-    // Get community participation
-    const communityStats = await Community.aggregate([
-      {
-        $match: {
-          'members.user': req.params.id,
-          'members.isActive': true
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalCommunities: { $sum: 1 },
-          adminCommunities: {
-            $sum: {
-              $cond: [
-                { $eq: ['$members.role', 'admin'] },
-                1,
-                0
-              ]
-            }
-          }
-        }
-      }
-    ]);
-
-    const stats = {
-      analytics: analytics,
-      contests: contestStats[0] || {
-        totalContests: 0,
-        contestsWon: 0,
-        averageRank: 0,
-        totalScore: 0
-      },
-      communities: communityStats[0] || {
-        totalCommunities: 0,
-        adminCommunities: 0
-      }
-    };
-
-    res.json({
-      success: true,
-      data: stats
-    });
-
-  } catch (error) {
-    console.error('Get user stats error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching user statistics'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/contests
-// @desc    Get user's contest history
-// @access  Public
-router.get('/:id/contests', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const contests = await Contest.find({
-      'participants.user': req.params.id
-    })
-    .populate('createdBy', 'firstName lastName username')
-    .populate('community', 'name description')
-    .select('name description status startDate endDate participants')
-    .sort({ startDate: -1 })
-    .skip(skip)
-    .limit(limit);
-
-    // Add user's participation details
-    const contestsWithParticipation = contests.map(contest => {
-      const contestObj = contest.toObject();
-      const participation = contest.participants.find(participant => 
-        participant.user.toString() === req.params.id
-      );
-      
-      contestObj.userParticipation = {
-        score: participation ? participation.score : 0,
-        rank: participation ? participation.rank : null,
-        problemsSolved: participation ? participation.problemsSolved : 0,
-        joinedAt: participation ? participation.joinedAt : null
-      };
-      
-      return contestObj;
-    });
-
-    const total = await Contest.countDocuments({
-      'participants.user': req.params.id
-    });
-
-    res.json({
-      success: true,
-      data: {
-        contests: contestsWithParticipation,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalContests: total,
-          contestsPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get user contests error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching user contests'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/communities
-// @desc    Get user's communities
-// @access  Public
-router.get('/:id/communities', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const communities = await Community.find({
-      'members.user': req.params.id,
-      'members.isActive': true
-    })
-    .populate('createdBy', 'firstName lastName username')
-    .select('name description category privacy memberCount postCount')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-    // Add user's role in each community
-    const communitiesWithRole = communities.map(community => {
-      const communityObj = community.toObject();
-      const membership = community.members.find(member => 
-        member.user.toString() === req.params.id
-      );
-      
-      communityObj.userRole = membership ? membership.role : 'member';
-      communityObj.joinedAt = membership ? membership.joinedAt : null;
-      
-      return communityObj;
-    });
-
-    const total = await Community.countDocuments({
-      'members.user': req.params.id,
-      'members.isActive': true
-    });
-
-    res.json({
-      success: true,
-      data: {
-        communities: communitiesWithRole,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalCommunities: total,
-          communitiesPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get user communities error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching user communities'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/submissions
-// @desc    Get user's submission history
-// @access  Private (own submissions) / Public (if profile is public)
-router.get('/:id/submissions', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    // Check if user can access submissions
-    let canAccess = false;
-    
-    if (req.params.id === req.user?.id) {
-      canAccess = true; // Own submissions
-    } else {
-      // Check if profile is public
-      const user = await User.findById(req.params.id).select('preferences');
-      if (user && user.preferences?.privacy?.profileVisibility === 'public') {
-        canAccess = true;
-      }
-    }
-
-    if (!canAccess) {
-      return res.status(403).json({
-        success: false,
-        message: 'You do not have access to these submissions'
-      });
-    }
-
-    const submissions = await Submission.find({
-      user: req.params.id
-    })
-    .populate('contest', 'name')
-    .populate('problem', 'title difficulty category')
-    .select('status score executionTime memoryUsed submittedAt language')
-    .sort({ submittedAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-    const total = await Submission.countDocuments({
-      user: req.params.id
-    });
-
-    res.json({
-      success: true,
-      data: {
-        submissions,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalSubmissions: total,
-          submissionsPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get user submissions error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching user submissions'
-    });
-  }
-});
-
-// @route   POST /api/users/:id/follow
-// @desc    Follow a user
+// @desc    Update user preferences
+// @route   PUT /api/v1/users/preferences
 // @access  Private
-router.post('/:id/follow', auth, async (req, res) => {
-  try {
-    // Check if trying to follow self
-    if (req.params.id === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot follow yourself'
-      });
-    }
+router.put('/preferences', asyncHandler(async (req, res, next) => {
+    const { preferences } = req.body;
 
-    const targetUser = await User.findById(req.params.id);
-    if (!targetUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { preferences },
+        { new: true, runValidators: true }
+    ).populate('community');
 
-    // Check if already following
-    const isFollowing = req.user.following && req.user.following.includes(req.params.id);
-    if (isFollowing) {
-      return res.status(400).json({
-        success: false,
-        message: 'Already following this user'
-      });
-    }
-
-    // Add to following
-    await User.findByIdAndUpdate(req.user.id, {
-      $push: { following: req.params.id }
+    res.status(200).json({
+        success: true,
+        data: { user }
     });
+}));
 
-    // Add to followers
-    await User.findByIdAndUpdate(req.params.id, {
-      $push: { followers: req.user.id }
-    });
-
-    res.json({
-      success: true,
-      message: 'Successfully followed user'
-    });
-
-  } catch (error) {
-    console.error('Follow user error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while following user'
-    });
-  }
-});
-
-// @route   POST /api/users/:id/unfollow
-// @desc    Unfollow a user
+// @desc    Update user coding platforms
+// @route   PUT /api/v1/users/platforms
 // @access  Private
-router.post('/:id/unfollow', auth, async (req, res) => {
-  try {
-    // Check if trying to unfollow self
-    if (req.params.id === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot unfollow yourself'
-      });
-    }
-
-    const targetUser = await User.findById(req.params.id);
-    if (!targetUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    // Check if following
-    const isFollowing = req.user.following && req.user.following.includes(req.params.id);
-    if (!isFollowing) {
-      return res.status(400).json({
-        success: false,
-        message: 'Not following this user'
-      });
-    }
-
-    // Remove from following
-    await User.findByIdAndUpdate(req.user.id, {
-      $pull: { following: req.params.id }
-    });
-
-    // Remove from followers
-    await User.findByIdAndUpdate(req.params.id, {
-      $pull: { followers: req.user.id }
-    });
-
-    res.json({
-      success: true,
-      message: 'Successfully unfollowed user'
-    });
-
-  } catch (error) {
-    console.error('Unfollow user error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while unfollowing user'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/following
-// @desc    Get users that this user is following
-// @access  Public
-router.get('/:id/following', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
-
-    const user = await User.findById(req.params.id).select('following');
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    const following = await User.find({
-      _id: { $in: user.following }
-    })
-    .select('firstName lastName username profilePicture bio')
-    .skip(skip)
-    .limit(limit);
-
-    const total = user.following.length;
-
-    res.json({
-      success: true,
-      data: {
-        following,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalFollowing: total,
-          followingPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get following error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching following'
-    });
-  }
-});
-
-// @route   GET /api/users/:id/followers
-// @desc    Get users following this user
-// @access  Public
-router.get('/:id/followers', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
-
-    const user = await User.findById(req.params.id).select('followers');
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    const followers = await User.find({
-      _id: { $in: user.followers }
-    })
-    .select('firstName lastName username profilePicture bio')
-    .skip(skip)
-    .limit(limit);
-
-    const total = user.followers.length;
-
-    res.json({
-      success: true,
-      data: {
-        followers,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalFollowers: total,
-          followersPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get followers error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching followers'
-    });
-  }
-});
-
-// @route   POST /api/users/add-email
-// @desc    Add additional email to user profile
-// @access  Private
-router.post('/add-email', [
-  auth,
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('label').isIn(['college', 'university', 'company', 'other']).withMessage('Invalid email label')
-], async (req, res) => {
-  try {
+router.put('/platforms', [
+    body('platforms.leetcode').optional().trim().isLength({ min: 1, max: 50 }).withMessage('LeetCode username must be 1-50 characters'),
+    body('platforms.geeksforgeeks').optional().trim().isLength({ min: 1, max: 50 }).withMessage('GeeksforGeeks username must be 1-50 characters'),
+    body('platforms.hackerrank').optional().trim().isLength({ min: 1, max: 50 }).withMessage('HackerRank username must be 1-50 characters'),
+    body('platforms.interviewbit').optional().trim().isLength({ min: 1, max: 50 }).withMessage('InterviewBit username must be 1-50 characters'),
+    body('platforms.github').optional().trim().isLength({ min: 1, max: 50 }).withMessage('GitHub username must be 1-50 characters')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { email, label } = req.body;
-    const userId = req.user.id;
+    const { platforms } = req.body;
 
-    // Find user
-    const user = await User.findById(userId);
+    // Validate username format (alphanumeric, underscore, hyphen)
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+    
+    for (const [platform, username] of Object.entries(platforms)) {
+        if (username && !usernameRegex.test(username)) {
+            return next(new ErrorResponse(`Invalid ${platform} username format. Use only letters, numbers, underscore, and hyphen.`, 400));
+        }
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { platforms },
+        { new: true, runValidators: true }
+    ).populate('community');
+
+    res.status(200).json({
+        success: true,
+        message: 'Coding platforms updated successfully',
+        data: { user }
+    });
+}));
+
+// @desc    Get user dashboard data
+// @route   GET /api/v1/users/dashboard
+// @access  Private
+router.get('/dashboard', asyncHandler(async (req, res, next) => {
+    const user = req.user;
+    
+    // Get user's overall progress
+    const overallProgress = await Progress.getUserOverallProgress(user.id);
+    
+    // Get recent progress (last 30 days)
+    const recentProgress = await Progress.find({
+        user: user.id,
+        lastActivity: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+    }).sort({ lastActivity: -1 }).limit(10);
+    
+    // Get user's rank in community (if applicable)
+    let communityRank = null;
+    if (user.community) {
+        const leaderboard = await Progress.getLeaderboard(user.community._id, 100);
+        const userRankData = leaderboard.find(entry => entry._id.toString() === user.id.toString());
+        communityRank = userRankData ? leaderboard.indexOf(userRankData) + 1 : null;
+    }
+    
+    // Get current streak
+    const currentStreak = user.streak || 0;
+    
+    // Get weekly goals progress
+    const thisWeek = new Date();
+    const weekStart = new Date(thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay()));
+    const weeklyProgress = await Progress.find({
+        user: user.id,
+        lastActivity: { $gte: weekStart }
+    });
+    
+    const weeklyStats = {
+        problemsSolved: weeklyProgress.reduce((sum, p) => sum + (p.solvedProblems || 0), 0),
+        timeSpent: weeklyProgress.reduce((sum, p) => sum + (p.timeSpent || 0), 0),
+        pointsEarned: weeklyProgress.reduce((sum, p) => sum + (p.weeklyPoints || 0), 0)
+    };
+
+    res.status(200).json({
+        success: true,
+        data: {
+            user: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                avatar: user.avatar,
+                level: user.level,
+                totalPoints: user.totalPoints,
+                streak: currentStreak,
+                community: user.community
+            },
+            progress: {
+                overall: overallProgress,
+                recent: recentProgress,
+                weekly: weeklyStats,
+                rank: communityRank
+            }
+        }
+    });
+}));
+
+// @desc    Get all users (Admin/Mentor only)
+// @route   GET /api/v1/users
+// @access  Private (Admin/Mentor)
+router.get('/', authorize('community-admin', 'mentor'), [
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('role').optional().isIn(['student', 'mentor']).withMessage('Invalid role filter'),
+    query('batch').optional().isString().withMessage('Batch must be a string'),
+    query('status').optional().isIn(['active', 'inactive', 'suspended', 'pending']).withMessage('Invalid status filter')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const startIndex = (page - 1) * limit;
+
+    // Build query
+    const query = { community: req.user.community._id };
+    
+    if (req.query.role) {
+        query.role = req.query.role;
+    }
+    
+    if (req.query.batch) {
+        query.batch = req.query.batch;
+    }
+    
+    if (req.query.status) {
+        query.status = req.query.status;
+    }
+    
+    if (req.query.search) {
+        query.$or = [
+            { firstName: { $regex: req.query.search, $options: 'i' } },
+            { lastName: { $regex: req.query.search, $options: 'i' } },
+            { email: { $regex: req.query.search, $options: 'i' } }
+        ];
+    }
+
+    // Execute query
+    const users = await User.find(query)
+        .select('-password')
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(startIndex)
+        .populate('community', 'name code');
+
+    const total = await User.countDocuments(query);
+
+    // Pagination result
+    const pagination = {};
+
+    if (startIndex + limit < total) {
+        pagination.next = {
+            page: page + 1,
+            limit
+        };
+    }
+
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page - 1,
+            limit
+        };
+    }
+
+    res.status(200).json({
+        success: true,
+        count: users.length,
+        total,
+        pagination,
+        data: { users }
+    });
+}));
+
+// @desc    Get specific user
+// @route   GET /api/v1/users/:id
+// @access  Private
+router.get('/:id', checkUserAccess, asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.params.id)
+        .select('-password')
+        .populate('community');
+
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+        return next(new ErrorResponse('User not found', 404));
     }
 
-    // Check if email already exists (primary or additional)
-    const existingUser = await User.findByAnyEmail(email);
-    if (existingUser && existingUser._id.toString() !== userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'This email is already registered with another account'
-      });
+    res.status(200).json({
+        success: true,
+        data: { user }
+    });
+}));
+
+// @desc    Create mentor (Admin only)
+// @route   POST /api/v1/users/mentors
+// @access  Private (Admin)
+router.post('/mentors', authorize('community-admin'), [
+    body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
+    body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('expertise').optional().isArray().withMessage('Expertise must be an array'),
+    body('yearsOfExperience').optional().isInt({ min: 0 }).withMessage('Years of experience must be a positive integer')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    // Check if email is already in additional emails
-    const emailExists = user.additionalEmails.some(ae => ae.email === email.toLowerCase());
-    if (emailExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'This email is already added to your profile'
-      });
+    const { firstName, lastName, email, expertise, yearsOfExperience } = req.body;
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return next(new ErrorResponse('Email is already registered', 400));
     }
 
-    // Add new email
-    user.additionalEmails.push({
-      email: email.toLowerCase(),
-      label: label || 'other',
-      isVerified: false,
-      addedAt: new Date()
+    // Check community mentor limit
+    const community = await Community.findById(req.user.community._id);
+    if (!community.canAddMentor()) {
+        return next(new ErrorResponse('Maximum number of mentors reached for this community', 400));
+    }
+
+    // Generate temporary password
+    const tempPassword = Math.random().toString(36).slice(-8);
+
+    // Create mentor
+    const mentor = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: tempPassword,
+        role: 'mentor',
+        community: req.user.community._id,
+        expertise: expertise || [],
+        yearsOfExperience: yearsOfExperience || 0,
+        status: 'active',
+        isEmailVerified: true,
+        isTemporaryPassword: true
     });
 
+    // Update community stats
+    await community.updateStats();
+
+    // Send invitation email
+    try {
+        const loginUrl = `${process.env.FRONTEND_URL}/community-ui/pages/auth/login.html`;
+        await emailService.sendMentorInvitationEmail(
+            mentor.email,
+            tempPassword,
+            community.name,
+            loginUrl,
+            mentor.firstName
+        );
+    } catch (emailError) {
+        console.error('Mentor invitation email failed:', emailError);
+    }
+
+    res.status(201).json({
+        success: true,
+        message: 'Mentor created successfully. Invitation email sent.',
+        data: {
+            mentor: {
+                id: mentor._id,
+                firstName: mentor.firstName,
+                lastName: mentor.lastName,
+                email: mentor.email,
+                role: mentor.role,
+                expertise: mentor.expertise,
+                yearsOfExperience: mentor.yearsOfExperience
+            }
+        }
+    });
+}));
+
+// @desc    Add students to batch (Admin only)
+// @route   POST /api/v1/users/students/batch
+// @access  Private (Admin)
+router.post('/students/batch', authorize('community-admin'), [
+    body('emails').isArray({ min: 1 }).withMessage('Emails array is required'),
+    body('emails.*').isEmail().withMessage('All emails must be valid'),
+    body('batchCode').notEmpty().withMessage('Batch code is required')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { emails, batchCode } = req.body;
+    const community = await Community.findById(req.user.community._id);
+    
+    // Check if batch exists
+    const batch = community.getBatchByCode(batchCode);
+    if (!batch) {
+        return next(new ErrorResponse('Batch not found', 404));
+    }
+
+    const results = {
+        success: [],
+        failed: [],
+        existing: []
+    };
+
+    for (const email of emails) {
+        try {
+            // Check if user already exists
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                results.existing.push({ email, reason: 'Email already registered' });
+                continue;
+            }
+
+            // Check community student limit
+            if (!community.canAddStudent()) {
+                results.failed.push({ email, reason: 'Community student limit reached' });
+                continue;
+            }
+
+            // Create student with pending status (they need to complete registration)
+            const student = await User.create({
+                firstName: 'Student', // Will be updated during registration
+                lastName: 'User',
+                email,
+                role: 'student',
+                community: community._id,
+                batch: batchCode,
+                status: 'pending',
+                isEmailVerified: false
+            });
+
+            results.success.push({
+                email,
+                studentId: student.studentId,
+                batch: batchCode
+            });
+
+        } catch (error) {
+            results.failed.push({ email, reason: error.message });
+        }
+    }
+
+    // Update community stats
+    await community.updateStats();
+
+    res.status(200).json({
+        success: true,
+        message: `Processed ${emails.length} emails`,
+        data: {
+            results,
+            summary: {
+                total: emails.length,
+                successful: results.success.length,
+                failed: results.failed.length,
+                existing: results.existing.length
+            }
+        }
+    });
+}));
+
+// @desc    Get user progress
+// @route   GET /api/v1/users/:id/progress
+// @access  Private
+router.get('/:id/progress', checkUserAccess, asyncHandler(async (req, res, next) => {
+    const progress = await Progress.find({ user: req.params.id })
+        .sort({ lastActivity: -1 });
+
+    const overallProgress = await Progress.getUserOverallProgress(req.params.id);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            progress,
+            overall: overallProgress
+        }
+    });
+}));
+
+// @desc    Update user status (Admin only)
+// @route   PUT /api/v1/users/:id/status
+// @access  Private (Admin)
+router.put('/:id/status', authorize('community-admin'), [
+    body('status').isIn(['active', 'inactive', 'suspended']).withMessage('Invalid status')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { status } = req.body;
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+
+    // Check if user belongs to the same community
+    if (user.community.toString() !== req.user.community._id.toString()) {
+        return next(new ErrorResponse('Not authorized to update this user', 403));
+    }
+
+    user.status = status;
     await user.save();
 
-    res.json({
-      success: true,
-      message: 'Additional email added successfully',
-      data: {
-        additionalEmails: user.additionalEmails
-      }
+    res.status(200).json({
+        success: true,
+        message: `User status updated to ${status}`,
+        data: { user }
     });
+}));
 
-  } catch (error) {
-    console.error('Add email error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while adding email'
-    });
-  }
-});
-
-// @route   DELETE /api/users/remove-email
-// @desc    Remove additional email from user profile
-// @access  Private
-router.delete('/remove-email/:emailId', auth, async (req, res) => {
-  try {
-    const { emailId } = req.params;
-    const userId = req.user.id;
-
-    // Find user
-    const user = await User.findById(userId);
+// @desc    Delete user (Admin only)
+// @route   DELETE /api/v1/users/:id
+// @access  Private (Admin)
+router.delete('/:id', authorize('community-admin'), asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.params.id);
+    
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+        return next(new ErrorResponse('User not found', 404));
     }
 
-    // Remove email
-    user.additionalEmails = user.additionalEmails.filter(ae => ae._id.toString() !== emailId);
-    await user.save();
+    // Check if user belongs to the same community
+    if (user.community.toString() !== req.user.community._id.toString()) {
+        return next(new ErrorResponse('Not authorized to delete this user', 403));
+    }
 
-    res.json({
-      success: true,
-      message: 'Email removed successfully',
-      data: {
-        additionalEmails: user.additionalEmails
-      }
+    // Cannot delete community admin
+    if (user.role === 'community-admin') {
+        return next(new ErrorResponse('Cannot delete community admin', 400));
+    }
+
+    // Delete user's progress data
+    await Progress.deleteMany({ user: user._id });
+
+    // Remove user
+    await user.deleteOne();
+
+    // Update community stats
+    const community = await Community.findById(req.user.community._id);
+    await community.updateStats();
+
+    res.status(200).json({
+        success: true,
+        message: 'User deleted successfully',
+        data: {}
     });
+}));
 
-  } catch (error) {
-    console.error('Remove email error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while removing email'
-    });
-  }
-});
-
-// @route   DELETE /api/users/profile
-// @desc    Delete current user account
+// @desc    Get community leaderboard
+// @route   GET /api/v1/users/leaderboard
 // @access  Private
-router.delete('/profile', auth, async (req, res) => {
-  try {
-    // Check if user has active communities as admin
-    const adminCommunities = await Community.find({
-      'members.user': req.user.id,
-      'members.role': 'admin',
-      'members.isActive': true
-    });
-
-    if (adminCommunities.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot delete account while being admin of active communities'
-      });
-    }
-
-    // Check if user has active contests as creator
-    const createdContests = await Contest.find({
-      createdBy: req.user.id,
-      status: { $in: ['draft', 'published', 'active'] }
-    });
-
-    if (createdContests.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot delete account while having active contests'
-      });
-    }
-
-    // Remove user from all communities
-    await Community.updateMany(
-      { 'members.user': req.user.id },
-      { $pull: { members: { user: req.user.id } } }
+router.get('/leaderboard/community', asyncHandler(async (req, res, next) => {
+    const limit = parseInt(req.query.limit, 10) || 10;
+    
+    const leaderboard = await Progress.getLeaderboard(
+        req.user.community ? req.user.community._id : null,
+        limit
     );
 
-    // Remove user from all contests
-    await Contest.updateMany(
-      { 'participants.user': req.user.id },
-      { $pull: { participants: { user: req.user.id } } }
+    res.status(200).json({
+        success: true,
+        data: { leaderboard }
+    });
+}));
+
+// @desc    Update extension installation status
+// @route   PUT /api/v1/users/extension/install
+// @access  Private (Personal users only)
+router.put('/extension/install', authorize('personal'), asyncHandler(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+            extensionInstalled: true,
+            lastExtensionSync: new Date()
+        },
+        { new: true }
     );
 
-    // Delete user's analytics
-    await Analytics.findOneAndDelete({ user: req.user.id });
-
-    // Delete user's submissions
-    await Submission.deleteMany({ user: req.user.id });
-
-    // Delete user account
-    await User.findByIdAndDelete(req.user.id);
-
-    res.json({
-      success: true,
-      message: 'Account deleted successfully'
+    res.status(200).json({
+        success: true,
+        message: 'Extension installation status updated',
+        data: {
+            extensionInstalled: user.extensionInstalled,
+            lastExtensionSync: user.lastExtensionSync
+        }
     });
-
-  } catch (error) {
-    console.error('Delete account error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while deleting account'
-    });
-  }
-});
+}));
 
 module.exports = router;

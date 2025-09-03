@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        .status-operational { color: #10b981; }
+        .status-degraded { color: #f59e0b; }
+        .status-outage { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+                        SkillPort
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="../index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Home</a>
+                    <a href="features.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
+                    <a href="pricing.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Pricing</a>
+                    <a href="pages/auth/login.html" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Login</a>
+                    <a href="auth/register.html" class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+                System
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Status</span>
+            </h1>
+            <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+                Real-time status of SkillPort services and infrastructure.
+            </p>
+        </div>
+
+        <!-- Overall Status -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">Overall System Status</h2>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-green-600 font-semibold">All Systems Operational</span>
+                </div>
+            </div>
+            <p class="text-slate-600">All SkillPort services are running normally. No issues reported.</p>
+        </div>
+
+        <!-- Service Status -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Service Status</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Web Application</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">API Services</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Database</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-slate-900">Code Execution Engine</span>
+                    </div>
+                    <span class="text-green-600 font-semibold">Operational</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uptime -->
+        <div class="hero-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Uptime</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.9%</div>
+                    <div class="text-slate-600">Last 30 Days</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.8%</div>
+                    <div class="text-slate-600">Last 90 Days</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">99.7%</div>
+                    <div class="text-slate-600">Last 12 Months</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident History -->
+        <div class="hero-card rounded-2xl p-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Recent Incidents</h2>
+            <div class="space-y-4">
+                <div class="border-l-4 border-green-500 pl-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-slate-900">No Recent Incidents</h3>
+                        <span class="text-sm text-slate-500">All systems operational</span>
+                    </div>
+                    <p class="text-slate-600">No incidents reported in the last 30 days.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">SkillPort</span>
+                    </div>
+                    <p class="text-slate-400">
+                        Empowering learners, building communities, tracking progress, achieving excellence!
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Platform</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="features.html" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="pricing.html" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="api.html" class="hover:text-white transition-colors">API</a></li>
+                        <li><a href="documentation.html" class="hover:text-white transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="help-center.html" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="community.html" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="status.html" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="gdpr.html" class="hover:text-white transition-colors">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+                <p>&copy; 2025 SkillPort. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

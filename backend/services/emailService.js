@@ -1,619 +1,408 @@
 const nodemailer = require('nodemailer');
-const path = require('path');
-const fs = require('fs').promises;
+const ErrorResponse = require('../utils/errorResponse');
 
 class EmailService {
-  constructor() {
-    this.transporter = null;
-    this.isProduction = process.env.NODE_ENV === 'production';
-    this.initializeTransporter();
-  }
+    constructor() {
+        this.transporter = null;
+        this.init();
+    }
 
-  async initializeTransporter() {
-    try {
-      if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
-        // Production email configuration (Gmail SMTP)
-        this.transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
-          },
-          secure: true,
-          port: 465
+    // Initialize email transporter
+    init() {
+        try {
+            this.transporter = nodemailer.createTransport({
+                host: process.env.EMAIL_HOST,
+                port: process.env.EMAIL_PORT,
+                secure: process.env.EMAIL_PORT == 465, // true for 465, false for other ports
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+            // Verify connection
+            this.transporter.verify((error, success) => {
+                if (error) {
+                    console.error('❌ Email service configuration error:', error);
+                } else {
+                    console.log('✅ Email service is ready');
+                }
+            });
+        } catch (error) {
+            console.error('❌ Failed to initialize email service:', error);
+        }
+    }
+
+    // Send email with template
+    async sendEmail(options) {
+        try {
+            // For development, log email instead of sending
+            if (process.env.NODE_ENV === 'development') {
+                console.log('📧 DEVELOPMENT EMAIL (not sent):', {
+                    to: options.email,
+                    subject: options.subject,
+                    html: options.html
+                });
+                return { messageId: 'dev-' + Date.now() };
+            }
+
+            const mailOptions = {
+                from: `SkillPort <${process.env.EMAIL_FROM}>`,
+                to: options.email,
+                subject: options.subject,
+                html: options.html,
+                text: options.text
+            };
+
+            const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email sent:', info.messageId);
+            return info;
+        } catch (error) {
+            console.error('❌ Email sending failed:', error);
+            // Don't throw error in development
+            if (process.env.NODE_ENV === 'development') {
+                console.log('📧 Email failed but continuing in development mode');
+                return { messageId: 'dev-error-' + Date.now() };
+            }
+            throw new ErrorResponse('Email could not be sent', 500);
+        }
+    }
+
+    // Send OTP verification email
+    async sendOTPEmail(email, otp, firstName) {
+        const subject = 'SkillPort - Verify Your Email';
+        const html = this.getOTPTemplate(otp, firstName);
+        
+        return this.sendEmail({
+            email,
+            subject,
+            html
         });
-        console.log('✅ Email Service: Gmail SMTP initialized successfully');
-      } else {
-        // Fallback to Ethereal if no Gmail credentials
-        const testAccount = await nodemailer.createTestAccount();
-        this.transporter = nodemailer.createTransport({
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false,
-          auth: {
-            user: testAccount.user,
-            pass: testAccount.pass
-          }
+    }
+
+    // Send welcome email
+    async sendWelcomeEmail(email, firstName, role, loginUrl) {
+        const subject = 'Welcome to SkillPort!';
+        const html = this.getWelcomeTemplate(firstName, role, loginUrl);
+        
+        return this.sendEmail({
+            email,
+            subject,
+            html
         });
-        console.log('✅ Email Service: Ethereal test account initialized (no Gmail credentials)');
-      }
-    } catch (error) {
-      console.error('❌ Email service initialization error:', error);
-      throw error;
     }
-  }
 
-  /**
-   * Send OTP email
-   * @param {string} email - Recipient email
-   * @param {string} otp - OTP code
-   * @param {string} type - Type of OTP (verification, reset)
-   * @returns {Object} - Result object
-   */
-  async sendOTP(email, otp, type = 'verification') {
-    try {
-      const subject = type === 'verification'
-        ? 'Email Verification - SkillPort'
-        : 'Password Reset - SkillPort';
-
-      const htmlContent = await this.generateOTPEmail(otp, type);
-
-      const result = await this.transporter.sendMail({
-        from: `"SkillPort" <${process.env.EMAIL_USER || 'noreply@skillport.com'}>`,
-        to: email,
-        subject: subject,
-        html: htmlContent
-      });
-
-      if (this.isProduction) {
-        console.log(`✅ OTP email sent successfully to ${email}`);
-        return {
-          success: true,
-          message: 'OTP email sent successfully',
-          messageId: result.messageId
-        };
-      } else {
-        // Development mode - show preview URL
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        console.log('📧 Email sent (development):', previewUrl);
-        return {
-          success: true,
-          message: 'OTP email sent successfully (development mode)',
-          messageId: result.messageId,
-          previewUrl: previewUrl
-        };
-      }
-    } catch (error) {
-      console.error('❌ Send OTP email error:', error);
-      throw new Error('Failed to send OTP email');
+    // Send password reset email
+    async sendPasswordResetEmail(email, resetUrl, firstName) {
+        const subject = 'SkillPort - Reset Your Password';
+        const html = this.getPasswordResetTemplate(resetUrl, firstName);
+        
+        return this.sendEmail({
+            email,
+            subject,
+            html
+        });
     }
-  }
 
-  /**
-   * Send password reset email
-   * @param {string} email - Recipient email
-   * @param {string} resetToken - Password reset token
-   * @param {string} username - Username
-   * @returns {Object} - Result object
-   */
-  async sendPasswordReset(email, resetToken, username) {
-    try {
-      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5001'}/reset-password?token=${resetToken}`;
-      const htmlContent = await this.generatePasswordResetEmail(username, resetUrl);
-
-      const result = await this.transporter.sendMail({
-        from: `"SkillPort" <${process.env.EMAIL_USER || 'noreply@skillport.com'}>`,
-        to: email,
-        subject: 'Password Reset Request - SkillPort',
-        html: htmlContent
-      });
-
-      if (this.isProduction) {
-        console.log(`✅ Password reset email sent successfully to ${email}`);
-        return {
-          success: true,
-          message: 'Password reset email sent successfully',
-          messageId: result.messageId
-        };
-      } else {
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        console.log('📧 Password reset email sent (development):', previewUrl);
-        return {
-          success: true,
-          message: 'Password reset email sent successfully (development mode)',
-          messageId: result.messageId,
-          previewUrl: previewUrl
-        };
-      }
-    } catch (error) {
-      console.error('❌ Send password reset email error:', error);
-      throw new Error('Failed to send password reset email');
+    // Send mentor invitation email
+    async sendMentorInvitationEmail(email, tempPassword, communityName, loginUrl, firstName) {
+        const subject = `You're invited to mentor at ${communityName}!`;
+        const html = this.getMentorInvitationTemplate(firstName, communityName, email, tempPassword, loginUrl);
+        
+        return this.sendEmail({
+            email,
+            subject,
+            html
+        });
     }
-  }
 
-  /**
-   * Send welcome email
-   * @param {string} email - Recipient email
-   * @param {string} username - Username
-   * @param {string} firstName - First name
-   * @returns {Object} - Result object
-   */
-  async sendWelcomeEmail(email, username, firstName) {
-    try {
-      const htmlContent = await this.generateWelcomeEmail(username, firstName);
-
-      const result = await this.transporter.sendMail({
-        from: `"SkillPort" <${process.env.EMAIL_USER || 'noreply@skillport.com'}>`,
-        to: email,
-        subject: 'Welcome to SkillPort! 🎉',
-        html: htmlContent
-      });
-
-      if (this.isProduction) {
-        console.log(`✅ Welcome email sent successfully to ${email}`);
-        return {
-          success: true,
-          message: 'Welcome email sent successfully',
-          messageId: result.messageId
-        };
-      } else {
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        console.log('📧 Welcome email sent (development):', previewUrl);
-        return {
-          success: true,
-          message: 'Welcome email sent successfully (development mode)',
-          messageId: result.messageId,
-          previewUrl: previewUrl
-        };
-      }
-    } catch (error) {
-      console.error('❌ Send welcome email error:', error);
-      throw new Error('Failed to send welcome email');
+    // Send student enrollment notification
+    async sendStudentEnrollmentEmail(email, communityName, batchName, loginUrl, firstName) {
+        const subject = `Welcome to ${communityName}!`;
+        const html = this.getStudentEnrollmentTemplate(firstName, communityName, batchName, loginUrl);
+        
+        return this.sendEmail({
+            email,
+            subject,
+            html
+        });
     }
-  }
 
-  /**
-   * Send contest invitation email
-   * @param {string} email - Recipient email
-   * @param {string} username - Username
-   * @param {string} contestName - Contest name
-   * @param {string} inviterName - Inviter name
-   * @param {string} contestUrl - Contest URL
-   * @returns {Object} - Result object
-   */
-  async sendContestInvitation(email, username, contestName, inviterName, contestUrl) {
-    try {
-      const htmlContent = await this.generateContestInvitationEmail(username, contestName, inviterName, contestUrl);
-
-      const result = await this.transporter.sendMail({
-        from: `"SkillPort" <${process.env.EMAIL_USER || 'noreply@skillport.com'}>`,
-        to: email,
-        subject: `You're invited to join "${contestName}" contest!`,
-        html: htmlContent
-      });
-
-      if (this.isProduction) {
-        console.log(`✅ Contest invitation email sent successfully to ${email}`);
-        return {
-          success: true,
-          message: 'Contest invitation email sent successfully',
-          messageId: result.messageId
-        };
-      } else {
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        console.log('📧 Contest invitation email sent (development):', previewUrl);
-        return {
-          success: true,
-          message: 'Contest invitation email sent successfully (development mode)',
-          messageId: result.messageId,
-          previewUrl: previewUrl
-        };
-      }
-    } catch (error) {
-      console.error('❌ Send contest invitation email error:', error);
-      throw new Error('Failed to send contest invitation email');
-    }
-  }
-
-  /**
-   * Send community invitation email
-   * @param {string} email - Recipient email
-   * @param {string} username - Username
-   * @param {string} communityName - Community name
-   * @param {string} inviterName - Inviter name
-   * @param {string} communityUrl - Community URL
-   * @returns {Object} - Result object
-   */
-  async sendCommunityInvitation(email, username, communityName, inviterName, communityUrl) {
-    try {
-      const htmlContent = await this.generateCommunityInvitationEmail(username, communityName, inviterName, communityUrl);
-
-      const result = await this.transporter.sendMail({
-        from: `"SkillPort" <${process.env.EMAIL_USER || 'noreply@skillport.com'}>`,
-        to: email,
-        subject: `Join "${communityName}" community on SkillPort!`,
-        html: htmlContent
-      });
-
-      if (this.isProduction) {
-        console.log(`✅ Community invitation email sent successfully to ${email}`);
-        return {
-          success: true,
-          message: 'Community invitation email sent successfully',
-          messageId: result.messageId
-        };
-      } else {
-        const previewUrl = nodemailer.getTestMessageUrl(result);
-        console.log('📧 Community invitation email sent (development):', previewUrl);
-        return {
-          success: true,
-          message: 'Community invitation email sent successfully (development mode)',
-          messageId: result.messageId,
-          previewUrl: previewUrl
-        };
-      }
-    } catch (error) {
-      console.error('❌ Send community invitation email error:', error);
-      throw new Error('Failed to send community invitation email');
-    }
-  }
-
-  /**
-   * Generate OTP email HTML content
-   * @param {string} otp - OTP code
-   * @param {string} type - Type of OTP
-   * @returns {string} - HTML content
-   */
-  async generateOTPEmail(otp, type) {
-    const title = type === 'verification'
-      ? 'Verify Your Email Address'
-      : 'Reset Your Password';
-    
-    const message = type === 'verification'
-      ? 'Please use the following OTP to verify your email address:'
-      : 'Please use the following OTP to reset your password:';
-    
-    const buttonText = type === 'verification' ? 'Verify Email' : 'Reset Password';
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title} - SkillPort</title>
-        <style>
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
-          .otp-box { background: white; border: 2px dashed #3b82f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-          .otp-code { font-size: 32px; font-weight: bold; color: #3b82f6; letter-spacing: 5px; }
-          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 14px; }
-          .warning { background: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎯 SkillPort</h1>
-            <h2>${title}</h2>
-          </div>
-          <div class="content">
-            <p>Hello!</p>
-            <p>${message}</p>
-            
-            <div class="otp-box">
-              <div class="otp-code">${otp}</div>
-              <p><strong>This OTP is valid for 10 minutes</strong></p>
+    // OTP Email Template
+    getOTPTemplate(otp, firstName) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Verify Your Email - SkillPort</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">SkillPort</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Build Your Skills, Build Your Future</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hi ${firstName}!</h2>
+                    
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+                        Thank you for joining SkillPort! To complete your registration, please verify your email address using the code below:
+                    </p>
+                    
+                    <!-- OTP Box -->
+                    <div style="background-color: #f9fafb; border: 2px dashed #d1d5db; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0;">
+                        <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Verification Code</p>
+                        <div style="font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 8px; margin: 0;">${otp}</div>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                        This code will expire in 10 minutes. If you didn't request this verification, please ignore this email.
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
             </div>
-            
-            <div class="warning">
-              <p><strong>⚠️ Security Notice:</strong></p>
-              <p>• Never share this OTP with anyone</p>
-              <p>• SkillPort staff will never ask for your OTP</p>
-              <p>• If you didn't request this, please ignore this email</p>
-            </div>
-            
-            <p>Best regards,<br>The SkillPort Team</p>
-          </div>
-          <div class="footer">
-            <p>This is an automated message. Please do not reply to this email.</p>
-            <p>© 2024 SkillPort. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  /**
-   * Generate password reset email HTML content
-   * @param {string} username - Username
-   * @param {string} resetUrl - Password reset URL
-   * @returns {string} - HTML content
-   */
-  async generatePasswordResetEmail(username, resetUrl) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Password Reset - SkillPort</title>
-        <style>
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; transition: background-color 0.2s; }
-          .button:hover { background: #2563eb; }
-          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 14px; }
-          .warning { background: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🔐 SkillPort</h1>
-            <h2>Password Reset Request</h2>
-          </div>
-          <div class="content">
-            <p>Hello ${username}!</p>
-            <p>We received a request to reset your password for your SkillPort account.</p>
-            
-            <p style="text-align: center;">
-              <a href="${resetUrl}" class="button">Reset My Password</a>
-            </p>
-            
-            <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #667eea;">${resetUrl}</p>
-            
-            <div class="warning">
-              <p><strong>⚠️ Security Notice:</strong></p>
-              <p>• This link is valid for 1 hour only</p>
-              <p>• If you didn't request this, please ignore this email</p>
-              <p>• Your password will remain unchanged until you click the link above</p>
-            </div>
-            
-            <p>Best regards,<br>The SkillPort Team</p>
-          </div>
-          <div class="footer">
-            <p>This is an automated message. Please do not reply to this email.</p>
-            <p>© 2024 SkillPort. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  /**
-   * Generate welcome email HTML content
-   * @param {string} username - Username
-   * @param {string} firstName - First name
-   * @returns {string} - HTML content
-   */
-  async generateWelcomeEmail(username, firstName) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to SkillPort! 🎉</title>
-        <style>
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
-          .feature { background: white; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 4px solid #3b82f6; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 14px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎯 SkillPort</h1>
-            <h2>Welcome aboard, ${firstName}! 🚀</h2>
-          </div>
-          <div class="content">
-            <p>Hi ${firstName}!</p>
-            <p>Welcome to SkillPort - your ultimate platform for coding excellence and community learning!</p>
-            
-            <div class="feature">
-              <h3>🚀 What you can do now:</h3>
-              <ul>
-                <li>Join coding communities and contests</li>
-                <li>Track your progress across platforms</li>
-                <li>Connect with mentors and peers</li>
-                <li>Build your coding portfolio</li>
-                <li>Participate in skill assessments</li>
-              </ul>
-            </div>
-            
-            <div class="feature">
-              <h3>💡 Getting Started:</h3>
-              <ol>
-                <li>Complete your profile</li>
-                <li>Join communities that interest you</li>
-                <li>Install our browser extension for automatic progress tracking</li>
-                <li>Start participating in contests</li>
-              </ol>
-            </div>
-            
-            <p>Ready to begin your coding journey? Let's make it amazing! 🎉</p>
-            
-            <p>Best regards,<br>The SkillPort Team</p>
-          </div>
-          <div class="footer">
-            <p>© 2024 SkillPort. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  /**
-   * Generate contest invitation email HTML content
-   * @param {string} username - Username
-   * @param {string} contestName - Contest name
-   * @param {string} inviterName - Inviter name
-   * @param {string} contestUrl - Contest URL
-   * @returns {string} - HTML content
-   */
-  async generateContestInvitationEmail(username, contestName, inviterName, contestUrl) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Contest Invitation - SkillPort</title>
-        <style>
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; transition: background-color 0.2s; }
-          .button:hover { background: #2563eb; }
-          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 14px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🏆 SkillPort</h1>
-            <h2>Contest Invitation</h2>
-          </div>
-          <div class="content">
-            <p>Hello ${username}!</p>
-            <p><strong>${inviterName}</strong> has invited you to join the <strong>"${contestName}"</strong> contest on SkillPort!</p>
-            
-            <p>This is your chance to showcase your skills and compete with other talented coders!</p>
-            
-            <p style="text-align: center;">
-              <a href="${contestUrl}" class="button">Join Contest Now</a>
-            </p>
-            
-            <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #667eea;">${contestUrl}</p>
-            
-            <p>Good luck! 🚀</p>
-            
-            <p>Best regards,<br>The SkillPort Team</p>
-          </div>
-          <div class="footer">
-            <p>© 2024 SkillPort. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  /**
-   * Generate community invitation email HTML content
-   * @param {string} username - Username
-   * @param {string} communityName - Community name
-   * @param {string} inviterName - Inviter name
-   * @param {string} communityUrl - Community URL
-   * @returns {string} - HTML content
-   */
-  async generateCommunityInvitationEmail(username, communityName, inviterName, communityUrl) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Community Invitation - SkillPort</title>
-        <style>
-          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; transition: background-color 0.2s; }
-          .button:hover { background: #2563eb; }
-          .footer { text-align: center; margin-top: 20px; color: #64748b; font-size: 14px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>👥 SkillPort</h1>
-            <h2>Community Invitation</h2>
-          </div>
-          <div class="content">
-            <p>Hello ${username}!</p>
-            <p><strong>${inviterName}</strong> has invited you to join the <strong>"${communityName}"</strong> community on SkillPort!</p>
-            
-            <p>Communities are where you can:</p>
-            <ul>
-              <li>Connect with like-minded coders</li>
-              <li>Share knowledge and experiences</li>
-              <li>Participate in group activities</li>
-              <li>Get mentorship and guidance</li>
-            </ul>
-            
-            <p style="text-align: center;">
-              <a href="${communityUrl}" class="button">Join Community</a>
-            </p>
-            
-            <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #3b82f6;">${communityUrl}</p>
-            
-            <p>Welcome to the community! 🎉</p>
-            
-            <p>Best regards,<br>The SkillPort Team</p>
-          </div>
-          <div class="footer">
-            <p>© 2024 SkillPort. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  /**
-   * Test email service functionality
-   * @returns {Object} - Test result
-   */
-  async testEmailService() {
-    try {
-      console.log('🧪 Testing Email Service...');
-      
-      const testResult = await this.sendOTP('test@example.com', '123456', 'verification');
-      console.log('✅ Email service test successful:', testResult);
-      
-      return {
-        success: true,
-        message: 'Email service test successful',
-        result: testResult
-      };
-    } catch (error) {
-      console.error('❌ Email service test failed:', error);
-      return {
-        success: false,
-        message: 'Email service test failed',
-        error: error.message
-      };
+        </body>
+        </html>
+        `;
     }
-  }
 
-  /**
-   * Get service status
-   * @returns {Object} - Service status
-   */
-  getStatus() {
-    return {
-      isProduction: this.isProduction,
-      hasCredentials: !!(process.env.EMAIL_USER && process.env.EMAIL_PASSWORD),
-      transporter: this.transporter ? 'initialized' : 'not initialized'
-    };
-  }
+    // Welcome Email Template
+    getWelcomeTemplate(firstName, role, loginUrl) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to SkillPort!</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">Welcome to SkillPort!</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Your learning journey starts now</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hi ${firstName}!</h2>
+                    
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                        Congratulations! Your SkillPort account has been successfully created. You're now part of a community dedicated to building skills and achieving greatness.
+                    </p>
+                    
+                    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #92400e; margin: 0; font-weight: 600;">Account Type: ${role.charAt(0).toUpperCase() + role.slice(1)}</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="${loginUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                            Start Your Journey
+                        </a>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                        If you have any questions, feel free to reach out to our support team. We're here to help you succeed!
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+    }
+
+    // Password Reset Template
+    getPasswordResetTemplate(resetUrl, firstName) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Reset Your Password - SkillPort</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">Reset Password</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">SkillPort Account Security</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hi ${firstName}!</h2>
+                    
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                        We received a request to reset your password. Click the button below to create a new password:
+                    </p>
+                    
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="${resetUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                            Reset Password
+                        </a>
+                    </div>
+                    
+                    <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #991b1b; margin: 0; font-size: 14px;">
+                            <strong>Security Notice:</strong> This link will expire in 10 minutes. If you didn't request this reset, please ignore this email.
+                        </p>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                        If the button doesn't work, copy and paste this link into your browser:<br>
+                        <span style="word-break: break-all; color: #dc2626;">${resetUrl}</span>
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+    }
+
+    // Mentor Invitation Template
+    getMentorInvitationTemplate(firstName, communityName, email, tempPassword, loginUrl) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Mentor Invitation - ${communityName}</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">Mentor Invitation</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">${communityName}</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hi ${firstName}!</h2>
+                    
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                        You've been invited to join <strong>${communityName}</strong> as a mentor on SkillPort! Your expertise and guidance will help shape the next generation of skilled professionals.
+                    </p>
+                    
+                    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #92400e; margin: 0 0 10px 0; font-weight: 600;">Your Login Credentials:</p>
+                        <p style="color: #92400e; margin: 0; font-family: monospace;">
+                            <strong>Email:</strong> ${email}<br>
+                            <strong>Temporary Password:</strong> ${tempPassword}
+                        </p>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="${loginUrl}" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                            Start Mentoring
+                        </a>
+                    </div>
+                    
+                    <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #047857; margin: 0; font-size: 14px;">
+                            <strong>Security:</strong> Please change your password after your first login for security purposes.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+    }
+
+    // Student Enrollment Template
+    getStudentEnrollmentTemplate(firstName, communityName, batchName, loginUrl) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to ${communityName}!</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">Welcome to ${communityName}!</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Your learning journey begins</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hi ${firstName}!</h2>
+                    
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                        Congratulations! You've been successfully enrolled in <strong>${communityName}</strong>. You're now part of an amazing learning community.
+                    </p>
+                    
+                    <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #1e40af; margin: 0; font-weight: 600;">Batch: ${batchName}</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="${loginUrl}" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                            Access Your Dashboard
+                        </a>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                        Get ready to learn, grow, and achieve your goals with the support of mentors and fellow students!
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+    }
 }
 
-module.exports = new EmailService();
+// Create singleton instance
+const emailService = new EmailService();
+
+module.exports = emailService;

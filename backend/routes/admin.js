@@ -1,14 +1,14 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const { auth, admin } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
 // All routes require authentication and admin role
-router.use(auth);
-router.use(admin);
+router.use(protect);
+router.use(authorize('community-admin'));
 
 // @route   GET /api/admin/users
 // @desc    Get all users with pagination and filtering
@@ -35,7 +35,6 @@ router.get('/users', async (req, res) => {
     // Get users with pagination
     const users = await User.find(filter)
       .select('-password -passwordResetToken -passwordResetExpires -emailVerificationToken -emailVerificationExpires')
-      .populate('assignedContest', 'name description')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -461,7 +460,7 @@ router.get('/dashboard', async (req, res) => {
 // @route   POST /api/admin/reset-user-password
 // @desc    Reset password for a specific user (Admin only)
 // @access  Private (Admin)
-router.post('/reset-user-password', auth, async (req, res) => {
+router.post('/reset-user-password', async (req, res) => {
   try {
     // Check if user is admin
     const adminUser = await User.findById(req.user.id);
@@ -520,7 +519,7 @@ router.post('/reset-user-password', auth, async (req, res) => {
 // @route   POST /api/admin/fix-old-users
 // @desc    Fix all old users with double-hashed passwords
 // @access  Private (Admin)
-router.post('/fix-old-users', auth, async (req, res) => {
+router.post('/fix-old-users', async (req, res) => {
   try {
     // Check if user is admin
     const adminUser = await User.findById(req.user.id);

@@ -1,214 +1,329 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, 'First name is required'],
-    trim: true,
-    maxlength: [50, 'First name cannot exceed 50 characters']
-  },
-  lastName: {
-    type: String,
-    required: [true, 'Last name is required'],
-    trim: true,
-    maxlength: [50, 'Last name cannot exceed 50 characters']
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  phoneNumber: {
-    type: String,
-    trim: true,
-    match: [/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number']
-  },
-  additionalEmails: [{
+const UserSchema = new mongoose.Schema({
+    // Basic Information
+    firstName: {
+        type: String,
+        required: [true, 'First name is required'],
+        trim: true,
+        maxlength: [50, 'First name cannot exceed 50 characters']
+    },
+    lastName: {
+        type: String,
+        required: [true, 'Last name is required'],
+        trim: true,
+        maxlength: [50, 'Last name cannot exceed 50 characters']
+    },
     email: {
-      type: String,
-      lowercase: true,
-      trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        lowercase: true,
+        match: [
+            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+            'Please enter a valid email'
+        ]
     },
-    label: {
-      type: String,
-      enum: ['college', 'university', 'company', 'other'],
-      default: 'other'
+    password: {
+        type: String,
+        required: function() {
+            return !this.isTemporaryPassword;
+        },
+        minlength: [6, 'Password must be at least 6 characters'],
+        select: false
     },
-    isVerified: {
-      type: Boolean,
-      default: false
+    
+    // User Role and Status
+    role: {
+        type: String,
+        enum: ['personal', 'community-admin', 'mentor', 'student'],
+        required: [true, 'User role is required']
     },
-    addedAt: {
-      type: Date,
-      default: Date.now
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended', 'pending'],
+        default: 'pending'
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    isTemporaryPassword: {
+        type: Boolean,
+        default: false
+    },
+    
+    // Profile Information
+    avatar: {
+        type: String,
+        default: null
+    },
+    bio: {
+        type: String,
+        maxlength: [500, 'Bio cannot exceed 500 characters']
+    },
+    dateOfBirth: {
+        type: Date
+    },
+    phoneNumber: {
+        type: String,
+        match: [/^\+?[\d\s-()]+$/, 'Please enter a valid phone number']
+    },
+    
+    // Community Association (for community-admin, mentor, student)
+    community: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Community',
+        required: function() {
+            return ['community-admin', 'mentor', 'student'].includes(this.role);
+        }
+    },
+    
+    // Student-specific fields
+    batch: {
+        type: String,
+        required: function() {
+            return this.role === 'student';
+        }
+    },
+    studentId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    
+    // Mentor-specific fields
+    expertise: [{
+        type: String
+    }],
+    yearsOfExperience: {
+        type: Number,
+        min: 0
+    },
+    
+    // Personal user specific fields
+    extensionInstalled: {
+        type: Boolean,
+        default: false
+    },
+    lastExtensionSync: {
+        type: Date
+    },
+    
+    // Coding platform usernames
+    platforms: {
+        leetcode: {
+            type: String,
+            trim: true
+        },
+        geeksforgeeks: {
+            type: String,
+            trim: true
+        },
+        hackerrank: {
+            type: String,
+            trim: true
+        },
+        interviewbit: {
+            type: String,
+            trim: true
+        },
+        github: {
+            type: String,
+            trim: true
+        }
+    },
+    
+    // Progress and Statistics
+    totalPoints: {
+        type: Number,
+        default: 0
+    },
+    level: {
+        type: Number,
+        default: 1
+    },
+    streak: {
+        type: Number,
+        default: 0
+    },
+    lastActivity: {
+        type: Date,
+        default: Date.now
+    },
+    
+    // Security fields
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    otpCode: String,
+    otpExpire: Date,
+    loginAttempts: {
+        type: Number,
+        default: 0
+    },
+    lockUntil: Date,
+    
+    // Preferences
+    preferences: {
+        notifications: {
+            email: { type: Boolean, default: true },
+            push: { type: Boolean, default: true },
+            contests: { type: Boolean, default: true },
+            achievements: { type: Boolean, default: true }
+        },
+        privacy: {
+            profileVisible: { type: Boolean, default: true },
+            progressVisible: { type: Boolean, default: true },
+            leaderboardVisible: { type: Boolean, default: true }
+        }
     }
-  }],
-  username: {
-    type: String,
-    required: [true, 'Username is required'],
-    unique: true,
-    trim: true,
-    minlength: [3, 'Username must be at least 3 characters'],
-    maxlength: [30, 'Username cannot exceed 30 characters'],
-    match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [8, 'Password must be at least 8 characters'],
-    select: false
-  },
-  role: {
-    type: String,
-    required: [true, 'Role is required'],
-    enum: ['personal', 'community', 'admin'],
-    default: 'personal'
-  },
-  
-  // Personal User fields
-  skillLevel: {
-    type: String,
-    enum: ['beginner', 'intermediate', 'advanced'],
-    required: function() { return this.role === 'personal'; }
-  },
-  primaryInterest: {
-    type: String,
-    enum: ['algorithms', 'web-development', 'mobile-development', 'data-science', 'system-design', 'cybersecurity', 'game-development', 'other'],
-    required: function() { return this.role === 'personal'; }
-  },
-  educationLevel: {
-    type: String,
-    enum: ['high-school', 'bachelor', 'master', 'phd', 'self-taught', 'other'],
-    required: function() { return this.role === 'personal'; }
-  },
-  bio: {
-    type: String,
-    maxlength: [500, 'Bio cannot exceed 500 characters']
-  },
-  
-  // Community User fields
-  organizationName: {
-    type: String,
-    maxlength: [200, 'Organization name cannot exceed 200 characters'],
-    required: function() { return this.role === 'community'; }
-  },
-  organizationType: {
-    type: String,
-    enum: ['university', 'bootcamp', 'company', 'school', 'nonprofit', 'other'],
-    required: function() { return this.role === 'community'; }
-  },
-  organizationSize: {
-    type: String,
-    enum: ['small', 'medium', 'large'],
-    required: function() { return this.role === 'community'; }
-  },
-  position: {
-    type: String,
-    maxlength: [100, 'Position cannot exceed 100 characters'],
-    required: function() { return this.role === 'community'; }
-  },
-  organizationWebsite: {
-    type: String,
-    match: [/^https?:\/\/.+/, 'Please enter a valid website URL']
-  },
-  // Common fields
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false
-  },
-  lastLogin: {
-    type: Date
-  },
-  lastLoginDate: {
-    type: Date
-  },
-  lastActive: {
-    type: Date
-  },
-  ipAddress: {
-    type: String
-  },
-  passwordResetToken: {
-    type: String
-  },
-  passwordResetExpires: {
-    type: Date
-  },
-  // Email verification fields
-  emailVerificationToken: {
-    type: String
-  },
-  emailVerificationExpires: {
-    type: Date
-  },
-  profilePicture: {
-    type: String,
-    default: ''
-  }
 }, {
-  timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  // Only hash password if it's actually modified (not just other fields)
-  if (!this.isModified('password')) {
-    console.log('🔐 Password not modified, skipping hash');
-    return next();
-  }
-  
-  try {
-    console.log('🔐 Hashing password for user:', this.email);
-    console.log('🔐 Original password length:', this.password.length);
-    
-    // Check if password is already hashed (bcrypt hashes are always 60 chars)
-    if (this.password.length === 60 && this.password.startsWith('$2a$')) {
-      console.log('🔐 Password already hashed, skipping');
-      return next();
+// Indexes
+UserSchema.index({ email: 1 });
+UserSchema.index({ community: 1, role: 1 });
+UserSchema.index({ role: 1, status: 1 });
+UserSchema.index({ studentId: 1 }, { sparse: true });
+
+// Virtual for full name
+UserSchema.virtual('fullName').get(function() {
+    return `${this.firstName} ${this.lastName}`;
+});
+
+// Virtual for account lock status
+UserSchema.virtual('isLocked').get(function() {
+    return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Pre-save middleware to hash password
+UserSchema.pre('save', async function(next) {
+    if (!this.isModified('password') || !this.password) {
+        return next();
     }
     
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
-    
-    console.log('🔐 Password hashed successfully');
-    console.log('🔐 Hashed password length:', this.password.length);
-    
     next();
-  } catch (error) {
-    console.error('❌ Password hashing error:', error);
-    next(error);
-  }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+// Pre-save middleware to generate student ID
+UserSchema.pre('save', async function(next) {
+    if (this.role === 'student' && !this.studentId) {
+        const community = await mongoose.model('Community').findById(this.community);
+        if (community) {
+            const studentCount = await this.constructor.countDocuments({
+                community: this.community,
+                role: 'student'
+            });
+            this.studentId = `${community.code}-${String(studentCount + 1).padStart(4, '0')}`;
+        }
+    }
+    next();
+});
+
+// Method to compare password
+UserSchema.methods.matchPassword = async function(enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Find user by any email (primary or additional)
-userSchema.statics.findByAnyEmail = function(email) {
-  return this.findOne({
-    $or: [
-      { email: email.toLowerCase() },
-      { 'additionalEmails.email': email.toLowerCase() }
-    ]
-  });
+// Method to generate JWT token
+UserSchema.methods.getSignedJwtToken = function() {
+    return jwt.sign(
+        { 
+            id: this._id,
+            role: this.role,
+            community: this.community ? this.community._id || this.community : null
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
 };
 
-// Remove password from JSON output
-userSchema.methods.toJSON = function() {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+// Method to generate email verification token
+UserSchema.methods.getEmailVerificationToken = function() {
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+    
+    this.emailVerificationToken = crypto
+        .createHash('sha256')
+        .update(verificationToken)
+        .digest('hex');
+    
+    this.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    
+    return verificationToken;
 };
 
-module.exports = mongoose.model('User', userSchema);
+// Method to generate reset password token
+UserSchema.methods.getResetPasswordToken = function() {
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+    
+    return resetToken;
+};
+
+// Method to generate OTP
+UserSchema.methods.generateOTP = function() {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    this.otpCode = crypto
+        .createHash('sha256')
+        .update(otp)
+        .digest('hex');
+    
+    this.otpExpire = Date.now() + parseInt(process.env.OTP_EXPIRE_MINUTES) * 60 * 1000;
+    
+    return otp;
+};
+
+// Method to verify OTP
+UserSchema.methods.verifyOTP = function(otp) {
+    const hashedOTP = crypto
+        .createHash('sha256')
+        .update(otp)
+        .digest('hex');
+    
+    return hashedOTP === this.otpCode && this.otpExpire > Date.now();
+};
+
+// Method to handle login attempts
+UserSchema.methods.incLoginAttempts = function() {
+    if (this.lockUntil && this.lockUntil < Date.now()) {
+        return this.updateOne({
+            $unset: { loginAttempts: 1, lockUntil: 1 }
+        });
+    }
+    
+    const updates = { $inc: { loginAttempts: 1 } };
+    
+    if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
+        updates.$set = {
+            lockUntil: Date.now() + 2 * 60 * 60 * 1000 // 2 hours
+        };
+    }
+    
+    return this.updateOne(updates);
+};
+
+// Method to reset login attempts
+UserSchema.methods.resetLoginAttempts = function() {
+    return this.updateOne({
+        $unset: { loginAttempts: 1, lockUntil: 1 }
+    });
+};
+
+module.exports = mongoose.model('User', UserSchema);

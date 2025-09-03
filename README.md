@@ -1,344 +1,360 @@
-# 🎯 SkillPort Community Platform
+# SkillPort Community Platform
 
-**A comprehensive skill tracking and community management platform for educational institutions and individual learners.**
+A comprehensive platform for building programming communities with features for students, mentors, and administrators. Includes personal skill tracking, community management, contests, projects, and browser extension integration.
 
-## 🌟 Project Overview
+## 🌟 Features
 
-SkillPort Community is a dual-mode platform that serves both individual learners and educational institutions. It provides skill tracking, community management, contest platforms, and comprehensive analytics to help users grow their technical skills and institutions manage their learning communities.
+### For Personal Users
+- **Browser Extension Integration** - Auto-track progress from LeetCode, HackerRank, CodeChef, Codeforces
+- **Skill Progress Tracking** - Monitor your coding journey with detailed analytics
+- **Goal Setting & Streaks** - Set daily/weekly goals and maintain learning streaks
+- **Achievement System** - Earn badges and points for milestones
 
-## ✨ Key Features
+### For Communities
+- **Multi-Role Management** - Admins, Mentors, and Students with role-based permissions
+- **Batch Management** - Organize students into cohorts with dedicated mentors
+- **Contest System** - Create and manage programming contests with real-time leaderboards
+- **Project Showcase** - Students can showcase their projects with collaboration features
+- **Progress Analytics** - Detailed insights into student performance and engagement
 
-### 👤 Personal User Mode
-- **Skill Tracking**: Monitor progress across multiple coding platforms (LeetCode, GitHub, GFG, Codeforces)
-- **Progress Analytics**: Visual progress tracking with detailed statistics
-- **Portfolio Building**: Create professional profiles and showcase projects
-- **Community Participation**: Join communities and participate in contests
-- **Learning Tracker**: Kanban-style task management for learning goals
+### For Administrators
+- **Community Dashboard** - Complete overview of community health and metrics
+- **User Management** - Add mentors, bulk import students, manage permissions
+- **Custom Branding** - Customize community appearance with logos and color schemes
+- **Analytics & Reports** - Track engagement, progress, and performance metrics
 
-### 🏢 Community User Mode (Institution Management)
-- **Community Creation**: Build and manage educational communities
-- **Member Management**: Add, remove, and promote community members
-- **Contest Platform**: Create and manage coding competitions
-- **Analytics Dashboard**: Comprehensive insights into community performance
-- **User Management**: Admin tools for managing learners and mentors
+### For Mentors
+- **Student Monitoring** - Track individual and group progress
+- **Contest Creation** - Design programming challenges and assessments
+- **Feedback System** - Provide guidance and feedback to students
+- **Performance Insights** - Identify struggling students and top performers
 
-### 🎓 Advanced Features
-- **Certificate Generation**: Professional certificates for achievements
-- **Credibility Scoring**: Algorithm-based skill assessment
-- **Multi-Platform Integration**: Real-time data from coding platforms
-- **Achievement System**: Badges and rewards for milestones
-- **Social Features**: Posts, comments, and community engagement
-
-## 🚀 Technology Stack
-
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - Database with Mongoose ODM
-- **JWT** - Authentication and authorization
-- **Nodemailer** - Email services (Gmail SMTP)
-- **bcryptjs** - Password hashing
-- **CORS** - Cross-origin resource sharing
+## 🏗️ Architecture
 
 ### Frontend
-- **HTML5** - Semantic markup
-- **CSS3** - Custom styling with Josefin Sans font
-- **JavaScript (ES6+)** - Modern JavaScript features
-- **Responsive Design** - Mobile-first approach
-- **Progressive Web App** - Offline capabilities
+- **Static HTML/CSS/JavaScript** - No framework dependencies, pure web technologies
+- **Tailwind CSS** - Utility-first CSS framework for consistent styling
+- **Lucide Icons** - Beautiful, customizable SVG icons
+- **Responsive Design** - Mobile-first approach with modern UI/UX
 
-### Security Features
-- **Rate Limiting** - API protection
-- **XSS Protection** - Cross-site scripting prevention
-- **Input Sanitization** - Data validation
-- **CORS Policy** - Secure cross-origin requests
-- **JWT Tokens** - Secure authentication
+### Backend
+- **Node.js + Express** - RESTful API with comprehensive endpoints
+- **MongoDB + Mongoose** - Document database with structured schemas
+- **JWT Authentication** - Secure token-based authentication
+- **File Upload System** - Handle avatars, project files, certificates
+- **Email Service** - OTP verification and notifications via Nodemailer
+- **Rate Limiting** - Security and performance optimization
+
+### Security
+- **Input Validation** - Express-validator for all API inputs
+- **Password Hashing** - bcryptjs with salt rounds
+- **CORS Protection** - Configurable cross-origin resource sharing
+- **Helmet.js** - Security headers and protection
+- **Rate Limiting** - Prevent abuse and ensure fair usage
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 16+ 
+- MongoDB 4.4+
+- Git
+
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd skillport-community
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp backend/config/config.env.example backend/config/config.env
+   # Edit config.env with your settings
+   ```
+
+3. **Start development environment**
+   ```bash
+   ./start-project.sh --seed
+   ```
+
+   This will:
+   - Install backend dependencies
+   - Seed database with sample data
+   - Start backend server (http://localhost:5001)
+   - Start frontend server (http://localhost:5000)
+
+4. **Access the application**
+   - Main site: http://localhost:5000/community-ui/index.html
+   - Personal dashboard: http://localhost:5000/skillport-personal/student-dashboard.html
+   - API health: http://localhost:5001/health
+
+### Sample Login Credentials
+```
+Admin (PW IOI):     admin@pwioi.com / Admin123!
+Admin (CodeCraft):  admin@codecraft.dev / Admin123!
+Mentor:             arjun.mentor@pwioi.com / Mentor123!
+Student:            aarav.student@pwioi.com / Student123!
+Personal User:      alex@example.com / Personal123!
+```
 
 ## 📁 Project Structure
 
 ```
 skillport-community/
-├── backend/                          # Backend server
-│   ├── models/                      # Database models
-│   ├── routes/                      # API endpoints
-│   ├── middleware/                  # Custom middleware
-│   ├── services/                    # Business logic
-│   └── server.js                    # Main server file
-├── community-ui/                     # Community management UI
-│   ├── css/                         # Custom CSS files
-│   ├── js/                          # JavaScript modules
-│   └── pages/                       # HTML pages
-│       ├── admin/                   # Admin dashboard pages
-│       └── auth/                    # Authentication pages
-├── skillport-personal/              # Personal user interface
-│   ├── student-dashboard.html       # Personal dashboard
-│   ├── profile.html                 # User profile
-│   ├── tracker.html                 # Progress tracker
-│   ├── stats.html                   # Analytics
-│   ├── communities.html             # Community participation
-│   ├── projects.html                # Project showcase
-│   └── posts.html                   # Social posts
-└── README.md                        # Project documentation
+├── backend/                 # Node.js backend
+│   ├── config/             # Database and environment config
+│   ├── controllers/        # Request handlers (future expansion)
+│   ├── middleware/         # Auth, validation, file upload
+│   ├── models/            # MongoDB schemas
+│   ├── routes/            # API endpoints
+│   ├── services/          # Email and external services
+│   ├── uploads/           # File storage
+│   ├── utils/             # Helper functions and API service
+│   └── server.js          # Main server file
+├── community-ui/           # Community platform frontend
+│   ├── pages/             # All HTML pages
+│   │   ├── admin/         # Administrator pages
+│   │   ├── auth/          # Authentication pages
+│   │   ├── mentor/        # Mentor pages
+│   │   └── user/          # Student pages
+│   ├── css/               # Stylesheets
+│   ├── js/                # JavaScript files
+│   └── index.html         # Landing page
+├── skillport-personal/     # Personal user frontend
+│   ├── *.html             # Personal dashboard pages
+│   ├── css/               # Personal-specific styles
+│   └── js/                # Personal-specific scripts
+├── start-project.sh        # Development startup script
+├── deploy.sh              # Production deployment script
+└── README.md              # This file
 ```
 
-## 🛠️ Installation & Setup
+## 🔧 Configuration
 
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (v5 or higher)
-- Git
-
-### Backend Setup
-```bash
-# Clone the repository
-git clone <repository-url>
-cd skillport-community/backend
-
-# Install dependencies
-npm install
-
-# Create environment file
-cp config.env .env
-
-# Configure environment variables
-# Edit .env file with your settings
-
-# Start the server
-npm start
-```
-
-### Frontend Setup
-```bash
-# Navigate to frontend directory
-cd community-ui
-
-# Open with Live Server or any HTTP server
-# The application will work with any static file server
-```
-
-### Environment Variables
-Create a `.env` file in the backend directory:
+### Environment Variables (`backend/config/config.env`)
 
 ```env
 # Server Configuration
+NODE_ENV=development
 PORT=5001
-NODE_ENV=production
+API_VERSION=v1
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/skillport
+MONGODB_URI=mongodb://localhost:27017/skillport_community
 
-# JWT
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRES_IN=7d
+# JWT Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_EXPIRE=7d
 
-# Email Service (Gmail)
-GMAIL_USER=your_email@gmail.com
-GMAIL_PASS=your_app_password
+# Email Service
+EMAIL_SERVICE=gmail
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=noreply@skillport.com
 
-# Security
-RATE_LIMIT_WINDOW=15m
-RATE_LIMIT_MAX=100
+# File Uploads
+MAX_FILE_SIZE=5242880
+FILE_UPLOAD_PATH=./uploads
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# CORS
+CORS_ORIGIN=http://localhost:3000,http://localhost:5000,http://127.0.0.1:5500
+
+# Extension
+EXTENSION_SECRET=your-extension-secret-key
 ```
 
-## 🔐 User Roles & Access
-
-### Personal User
-- **Registration**: Individual learners can register with personal information
-- **Access**: Personal dashboard, skill tracking, community participation
-- **Features**: Progress analytics, portfolio building, learning tracker
-
-### Community User (Institution)
-- **Registration**: Educational institutions with organization details
-- **Access**: Admin dashboard, community management, contest creation
-- **Features**: Member management, analytics, institutional oversight
-
-### Admin
-- **Access**: Full system access and user management
-- **Features**: System-wide analytics, user oversight, platform management
-
-## 📊 API Endpoints
+## 📡 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/send-otp` - Send verification OTP
-- `POST /api/auth/verify-otp` - Verify email OTP
-- `POST /api/auth/forgot-password` - Password reset request
-- `POST /api/auth/reset-password` - Reset password
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/verify-otp` - Email verification
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/forgot-password` - Password reset request
+- `POST /api/v1/auth/reset-password/:token` - Password reset
+- `GET /api/v1/auth/me` - Get current user
 
-### User Management
-- `GET /api/users/profile` - Get user profile
-- `PUT /api/users/profile` - Update user profile
-- `POST /api/users/avatar` - Upload profile picture
-- `GET /api/users/stats` - Get user statistics
-- `GET /api/users/tracker` - Get progress tracker data
+### Users
+- `GET /api/v1/users/profile` - Get user profile
+- `PUT /api/v1/users/profile` - Update profile
+- `GET /api/v1/users/dashboard` - Dashboard data
+- `POST /api/v1/users/mentors` - Create mentor (admin)
+- `POST /api/v1/users/students/batch` - Add students to batch
 
-### Community Management
-- `GET /api/communities` - List communities
-- `POST /api/communities` - Create community
-- `PUT /api/communities/:id` - Update community
-- `DELETE /api/communities/:id` - Delete community
-- `POST /api/communities/:id/members` - Add member
-- `DELETE /api/communities/:id/members/:userId` - Remove member
+### Communities
+- `GET /api/v1/communities` - List communities
+- `GET /api/v1/communities/:id` - Get community details
+- `GET /api/v1/communities/:id/dashboard` - Community dashboard
+- `POST /api/v1/communities/:id/batches` - Create batch
 
-### Contest Management
-- `GET /api/contests` - List contests
-- `POST /api/contests` - Create contest
-- `PUT /api/contests/:id` - Update contest
-- `DELETE /api/contests/:id` - Delete contest
-- `POST /api/contests/:id/participate` - Join contest
+### Contests
+- `GET /api/v1/contests` - List contests
+- `POST /api/v1/contests` - Create contest
+- `POST /api/v1/contests/:id/register` - Register for contest
+- `POST /api/v1/contests/:id/submit` - Submit solution
 
-## 🎨 UI Components
+### Projects
+- `GET /api/v1/projects` - List projects
+- `POST /api/v1/projects` - Create project
+- `PUT /api/v1/projects/:id` - Update project
+- `POST /api/v1/projects/:id/collaborators` - Add collaborator
 
-### Design System
-- **Font**: Josefin Sans (Google Fonts)
-- **Color Scheme**: Modern gradient design with glassmorphism effects
-- **Components**: Custom CSS components for consistent design
-- **Responsive**: Mobile-first responsive design
+### Progress
+- `GET /api/v1/progress` - Get user progress
+- `POST /api/v1/progress` - Create/update progress
+- `GET /api/v1/progress/leaderboard` - Get leaderboard
+- `GET /api/v1/progress/analytics` - Progress analytics
 
-### Key Components
-- **Navigation**: Consistent navigation across all pages
-- **Cards**: Information display with hover effects
-- **Forms**: User-friendly input forms with validation
-- **Tables**: Data display with sorting and filtering
-- **Modals**: Interactive dialogs for actions
-- **Charts**: Progress visualization and analytics
+### Extension (Personal Users)
+- `POST /api/v1/extension/token` - Generate extension token
+- `POST /api/v1/extension/sync` - Sync progress data
+- `GET /api/v1/extension/progress` - Get extension progress
 
-## 🔒 Security Features
+### File Upload
+- `POST /api/v1/upload/avatar` - Upload avatar
+- `POST /api/v1/upload/project/:id/files` - Upload project files
+- `POST /api/v1/upload/certificate` - Upload certificate
 
-### Authentication & Authorization
-- JWT-based authentication
-- Role-based access control
-- Secure password hashing with bcrypt
-- Email verification system
+## 🚢 Deployment
 
-### API Security
-- Rate limiting to prevent abuse
-- CORS policy configuration
-- Input validation and sanitization
-- XSS protection headers
+### Development
+```bash
+./start-project.sh --seed
+```
 
-### Data Protection
-- Secure password storage
-- Encrypted communication
-- Session management
-- Audit logging
+### Production
+```bash
+./deploy.sh
+```
 
-## 📱 User Experience
+The deployment script creates:
+- Production build with optimized assets
+- Docker configuration
+- Nginx reverse proxy config
+- Systemd service files
+- SSL-ready setup
 
-### Personal Dashboard
-- **Overview**: Quick stats and recent activity
-- **Progress Tracking**: Visual progress bars and charts
-- **Quick Actions**: Easy access to common features
-- **Recent Activity**: Timeline of user actions
+### Docker Deployment
+```bash
+docker-compose up -d
+```
 
-### Community Management
-- **Member Overview**: Community statistics and member list
-- **Contest Management**: Create and manage competitions
-- **Analytics**: Performance insights and reports
-- **User Management**: Add, edit, and remove members
+## 🧪 Database Schema
 
-### Responsive Design
-- **Mobile First**: Optimized for mobile devices
-- **Tablet Support**: Responsive layouts for tablets
-- **Desktop Experience**: Full-featured desktop interface
-- **Cross-Browser**: Compatible with modern browsers
+### User Model
+- Personal information and authentication
+- Role-based permissions (personal, community-admin, mentor, student)
+- Community associations and batch assignments
+- Progress tracking and achievement system
 
-## 🚀 Deployment
+### Community Model
+- Community branding and configuration
+- Batch management with mentor assignments
+- Feature toggles and limits
+- Statistics and analytics
 
-### Production Environment
-- **Server**: Node.js production server
-- **Database**: MongoDB Atlas or self-hosted
-- **Email**: Gmail SMTP or professional email service
-- **SSL**: HTTPS with valid SSL certificate
+### Progress Model
+- Skill-based progress tracking
+- Platform-specific data (LeetCode, HackerRank, etc.)
+- Weekly progress and streak tracking
+- Achievement and goal management
 
-### Environment Setup
-- Set `NODE_ENV=production`
-- Configure production database
-- Set up email service
-- Configure CORS for production domain
-- Set up monitoring and logging
+### Contest Model
+- Contest configuration and rules
+- Problem sets with test cases
+- Participant management and submissions
+- Real-time leaderboard and rankings
 
-### Performance Optimization
-- Database indexing
-- API response caching
-- Static file compression
-- CDN for static assets
+### Project Model
+- Project information and collaboration
+- File and image management
+- Review and rating system
+- Milestone and feature tracking
 
-## 🧪 Testing
+## 🔌 Browser Extension Integration
 
-### Backend Testing
-- API endpoint testing
-- Database operations
-- Authentication flows
-- Error handling
+The platform includes comprehensive browser extension support for personal users:
 
-### Frontend Testing
-- User interface testing
-- Responsive design testing
-- Cross-browser compatibility
-- User experience validation
+### Features
+- Auto-detect problem solving on major platforms
+- Sync progress in real-time
+- Track streaks and achievements
+- Platform-specific statistics
 
-## 📈 Future Enhancements
+### Supported Platforms
+- LeetCode
+- HackerRank  
+- CodeChef
+- Codeforces
 
-### Planned Features
-- **Mobile App**: Native mobile applications
-- **Advanced Analytics**: Machine learning insights
-- **Integration APIs**: Third-party platform connections
-- **Real-time Chat**: Community communication
-- **Video Conferencing**: Virtual learning sessions
+### Integration Flow
+1. Personal user registers and logs in
+2. Extension installation prompt appears
+3. Extension generates secure token
+4. Progress syncs automatically
+5. Dashboard shows real-time updates
 
-### Technical Improvements
-- **Microservices**: Service-oriented architecture
-- **Real-time Updates**: WebSocket implementation
-- **Advanced Caching**: Redis integration
-- **Load Balancing**: Horizontal scaling
+## 🛡️ Security Features
+
+- **JWT Authentication** with secure token management
+- **Password Hashing** using bcryptjs with salt
+- **Input Validation** on all API endpoints
+- **Rate Limiting** to prevent abuse
+- **CORS Protection** with configurable origins
+- **File Upload Security** with type and size validation
+- **SQL Injection Prevention** through Mongoose ODM
+- **XSS Protection** via Helmet.js security headers
+
+## 🎯 User Flows
+
+### Personal User Journey
+1. Register → Email verification → Extension setup
+2. Solve problems on coding platforms
+3. View progress in dashboard
+4. Set goals and track achievements
+5. Analyze performance over time
+
+### Community Student Journey
+1. Admin adds email to batch
+2. Student receives invitation
+3. Complete registration process
+4. Access community dashboard
+5. Participate in contests and projects
+6. Get mentorship and feedback
+
+### Community Admin Journey
+1. Register community
+2. Set up branding and configuration
+3. Create batches and add mentors
+4. Import student emails
+5. Monitor community health
+6. Analyze performance metrics
 
 ## 🤝 Contributing
 
-### Development Guidelines
-- Follow coding standards
-- Write comprehensive tests
-- Document new features
-- Use conventional commits
-
-### Code Review Process
-- Submit pull requests
-- Code review by maintainers
-- Automated testing
-- Documentation updates
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Team
+## 🆘 Support
 
-- **Project Lead**: SkillPort Development Team
-- **Backend Development**: Node.js & MongoDB experts
-- **Frontend Development**: HTML/CSS/JavaScript specialists
-- **UI/UX Design**: User experience designers
-
-## 📞 Support
-
-### Documentation
-- API documentation available at `/api/docs`
-- User guides in the `/docs` directory
-- Video tutorials for key features
-
-### Contact
-- **Email**: support@skillport.com
-- **Issues**: GitHub issue tracker
-- **Discussions**: GitHub discussions
-
-## 🎉 Acknowledgments
-
-- **Open Source Community**: For amazing tools and libraries
-- **Educational Institutions**: For feedback and testing
-- **Beta Users**: For valuable insights and suggestions
-- **Development Team**: For dedication and hard work
+For support and questions:
+- Check the deployment summary for troubleshooting
+- Review API documentation in the code
+- Check server logs for debugging information
 
 ---
 
-**SkillPort Community** - Empowering learners, building communities, tracking progress, achieving excellence! 🚀
-
+**Built with ❤️ for the programming community**

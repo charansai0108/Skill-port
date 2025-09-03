@@ -1,417 +1,234 @@
 const jwt = require('jsonwebtoken');
+const asyncHandler = require('./async');
+const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 
-// Authentication middleware
-const auth = async (req, res, next) => {
-  try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+// Protect routes - authenticate user
+exports.protect = asyncHandler(async (req, res, next) => {
+    let token;
+
+    // Check for token in headers
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+    // Check for token in cookies (if using cookie authentication)
+    else if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
+    }
+
+    // Make sure token exists
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. No token provided.'
-      });
+        return next(new ErrorResponse('Not authorized to access this route', 401));
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Check if user still exists
-    const user = await User.findById(decoded.userId).select('-password');
-    
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. User not found.'
-      });
-    }
-
-    // Check if user is active
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Account is deactivated.'
-      });
-    }
-
-    // Check if token is expired
-    if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Token has expired.'
-      });
-    }
-
-    // Add user to request object
-    req.user = user;
-    req.token = token;
-    
-    next();
-  } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Invalid token.'
-      });
-    }
-    
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Token has expired.'
-      });
-    }
-
-    console.error('Auth middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authentication.'
-    });
-  }
-};
-
-// Optional authentication middleware (doesn't fail if no token)
-const optionalAuth = async (req, res, next) => {
-  try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (token) {
-      try {
+    try {
+        // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.userId).select('-password');
+
+        // Get user from database
+        const user = await User.findById(decoded.id).populate('community');
+
+        if (!user) {
+            return next(new ErrorResponse('No user found with this token', 401));
+        }
+
+        // Check if user is active
+        if (user.status !== 'active') {
+            return next(new ErrorResponse('Account is not active', 401));
+        }
+
+        // Check if user is locked
+        if (user.isLocked) {
+            return next(new ErrorResponse('Account is temporarily locked', 401));
+        }
+
+        // Update last activity
+        user.lastActivity = Date.now();
+        await user.save({ validateBeforeSave: false });
+
+        // Add user to request object
+        req.user = user;
+        next();
+    } catch (err) {
+        return next(new ErrorResponse('Not authorized to access this route', 401));
+    }
+});
+
+// Grant access to specific roles
+exports.authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new ErrorResponse(`User role '${req.user.role}' is not authorized to access this route`, 403));
+        }
+        next();
+    };
+};
+
+// Check if user belongs to the same community (for community-scoped resources)
+exports.checkCommunityAccess = asyncHandler(async (req, res, next) => {
+    const { communityId } = req.params;
+
+    // Super admin can access any community
+    if (req.user.role === 'super-admin') {
+        return next();
+    }
+
+    // Community admin can only access their own community
+    if (req.user.role === 'community-admin') {
+        if (req.user.community._id.toString() !== communityId) {
+            return next(new ErrorResponse('Not authorized to access this community', 403));
+        }
+    }
+
+    // Mentors and students can only access their own community
+    if (['mentor', 'student'].includes(req.user.role)) {
+        if (req.user.community._id.toString() !== communityId) {
+            return next(new ErrorResponse('Not authorized to access this community', 403));
+        }
+    }
+
+    next();
+});
+
+// Check if user can access specific user data
+exports.checkUserAccess = asyncHandler(async (req, res, next) => {
+    const { userId } = req.params;
+
+    // Users can always access their own data
+    if (req.user._id.toString() === userId) {
+        return next();
+    }
+
+    // Community admin can access users in their community
+    if (req.user.role === 'community-admin') {
+        const targetUser = await User.findById(userId);
+        if (!targetUser) {
+            return next(new ErrorResponse('User not found', 404));
+        }
         
-        if (user && user.isActive) {
-          req.user = user;
-          req.token = token;
+        if (targetUser.community && targetUser.community.toString() !== req.user.community._id.toString()) {
+            return next(new ErrorResponse('Not authorized to access this user', 403));
         }
-      } catch (error) {
-        // Token is invalid, but we don't fail the request
-        console.log('Optional auth failed:', error.message);
-      }
-    }
-    
-    next();
-  } catch (error) {
-    console.error('Optional auth middleware error:', error);
-    next();
-  }
-};
-
-// Role-based access control middleware
-const requireRole = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Insufficient permissions.'
-      });
-    }
-
-    next();
-  };
-};
-
-// Admin access middleware
-const admin = requireRole('admin');
-
-// Community access middleware
-const community = requireRole('admin', 'community');
-
-// Personal access middleware
-const personal = requireRole('admin', 'personal');
-
-// User access middleware (any authenticated user)
-const user = requireRole('admin', 'personal', 'community');
-
-// Community admin middleware
-const communityAdmin = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
-    }
-
-    const communityId = req.params.id || req.params.communityId;
-    
-    if (!communityId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Community ID is required.'
-      });
-    }
-
-    // Import Community model here to avoid circular dependency
-    const Community = require('../models/Community');
-    
-    const community = await Community.findById(communityId);
-    
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found.'
-      });
-    }
-
-    // Check if user is admin of the community
-    const membership = community.members.find(member => 
-      member.user.toString() === req.user.id && 
-      member.isActive && 
-      member.role === 'admin'
-    );
-
-    if (!membership) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Community admin privileges required.'
-      });
-    }
-
-    req.community = community;
-    next();
-  } catch (error) {
-    console.error('Community admin middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authorization check.'
-    });
-  }
-};
-
-// Community moderator middleware
-const communityModerator = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
-    }
-
-    const communityId = req.params.id || req.params.communityId;
-    
-    if (!communityId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Community ID is required.'
-      });
-    }
-
-    const Community = require('../models/Community');
-    
-    const community = await Community.findById(communityId);
-    
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found.'
-      });
-    }
-
-    // Check if user is moderator or admin of the community
-    const membership = community.members.find(member => 
-      member.user.toString() === req.user.id && 
-      member.isActive && 
-      ['admin', 'moderator'].includes(member.role)
-    );
-
-    if (!membership) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Community moderator privileges required.'
-      });
-    }
-
-    req.community = community;
-    next();
-  } catch (error) {
-    console.error('Community moderator middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authorization check.'
-    });
-  }
-};
-
-// Contest creator middleware
-const contestCreator = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
-    }
-
-    const contestId = req.params.id || req.params.contestId;
-    
-    if (!contestId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Contest ID is required.'
-      });
-    }
-
-    const Contest = require('../models/Contest');
-    
-    const contest = await Contest.findById(contestId);
-    
-    if (!contest) {
-      return res.status(404).json({
-        success: false,
-        message: 'Contest not found.'
-      });
-    }
-
-    // Check if user is creator of the contest or admin
-    if (contest.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Contest creator privileges required.'
-      });
-    }
-
-    req.contest = contest;
-    next();
-  } catch (error) {
-    console.error('Contest creator middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authorization check.'
-    });
-  }
-};
-
-// Post author middleware
-const postAuthor = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
-    }
-
-    const postId = req.params.id || req.params.postId;
-    
-    if (!postId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Post ID is required.'
-      });
-    }
-
-    const Post = require('../models/Post');
-    
-    const post = await Post.findById(postId);
-    
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found.'
-      });
-    }
-
-    // Check if user is author of the post, community moderator, or admin
-    if (post.author.toString() !== req.user.id) {
-      // Check if user is community moderator
-      const Community = require('../models/Community');
-      const community = await Community.findById(post.community);
-      
-      if (community) {
-        const membership = community.members.find(member => 
-          member.user.toString() === req.user.id && 
-          member.isActive && 
-          ['admin', 'moderator'].includes(member.role)
-        );
-
-        if (!membership && req.user.role !== 'admin') {
-          return res.status(403).json({
-            success: false,
-            message: 'Access denied. Post author or moderator privileges required.'
-          });
+    // Mentors can access students in their community and batches
+    if (req.user.role === 'mentor') {
+        const targetUser = await User.findById(userId);
+        if (!targetUser) {
+            return next(new ErrorResponse('User not found', 404));
         }
-      } else if (req.user.role !== 'admin') {
-        return res.status(403).json({
-          success: false,
-          message: 'Access denied. Post author privileges required.'
-        });
-      }
+        
+        if (targetUser.role !== 'student' || 
+            !targetUser.community || 
+            targetUser.community.toString() !== req.user.community._id.toString()) {
+            return next(new ErrorResponse('Not authorized to access this user', 403));
+        }
     }
 
-    req.post = post;
-    next();
-  } catch (error) {
-    console.error('Post author middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authorization check.'
-    });
-  }
-};
-
-// Profile owner middleware
-const profileOwner = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Authentication required.'
-      });
-    }
-
-    const userId = req.params.id || req.params.userId;
-    
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'User ID is required.'
-      });
-    }
-
-    // Check if user is accessing their own profile or is admin
-    if (userId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Profile owner privileges required.'
-      });
+    // Students can only access their own data (already handled above)
+    if (req.user.role === 'student') {
+        return next(new ErrorResponse('Not authorized to access other user data', 403));
     }
 
     next();
-  } catch (error) {
-    console.error('Profile owner middleware error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authorization check.'
-    });
-  }
+});
+
+// Extension authentication middleware
+exports.authenticateExtension = asyncHandler(async (req, res, next) => {
+    let token;
+
+    // Check for extension token in headers
+    if (req.headers['x-extension-token']) {
+        token = req.headers['x-extension-token'];
+    }
+
+    if (!token) {
+        return next(new ErrorResponse('Extension token required', 401));
+    }
+
+    try {
+        // Verify extension token
+        const decoded = jwt.verify(token, process.env.EXTENSION_SECRET);
+
+        // Get user from database
+        const user = await User.findById(decoded.userId);
+
+        if (!user) {
+            return next(new ErrorResponse('Invalid extension token', 401));
+        }
+
+        // Check if user is personal user (extension only for personal users)
+        if (user.role !== 'personal') {
+            return next(new ErrorResponse('Extension access only for personal users', 403));
+        }
+
+        // Check if extension is installed
+        if (!user.extensionInstalled) {
+            return next(new ErrorResponse('Extension not properly installed', 403));
+        }
+
+        req.user = user;
+        next();
+    } catch (err) {
+        return next(new ErrorResponse('Invalid extension token', 401));
+    }
+});
+
+// Optional authentication - doesn't fail if no token
+exports.optionalAuth = asyncHandler(async (req, res, next) => {
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const user = await User.findById(decoded.id).populate('community');
+            
+            if (user && user.status === 'active') {
+                req.user = user;
+            }
+        } catch (err) {
+            // Continue without authentication
+        }
+    }
+
+    next();
+});
+
+// Rate limiting by user
+exports.userRateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
+    const userRequests = new Map();
+
+    return (req, res, next) => {
+        if (!req.user) {
+            return next();
+        }
+
+        const userId = req.user._id.toString();
+        const now = Date.now();
+        
+        if (!userRequests.has(userId)) {
+            userRequests.set(userId, { count: 1, resetTime: now + windowMs });
+            return next();
+        }
+
+        const userLimit = userRequests.get(userId);
+        
+        if (now > userLimit.resetTime) {
+            userRequests.set(userId, { count: 1, resetTime: now + windowMs });
+            return next();
+        }
+
+        if (userLimit.count >= maxRequests) {
+            return next(new ErrorResponse('User rate limit exceeded', 429));
+        }
+
+        userLimit.count++;
+        next();
+    };
 };
 
-// Rate limiting for authentication endpoints
-const authRateLimit = require('./security').authRateLimit;
-
-// Export all middleware
-module.exports = {
-  auth,
-  optionalAuth,
-  requireRole,
-  admin,
-  community,
-  personal,
-  user,
-  communityAdmin,
-  communityModerator,
-  contestCreator,
-  postAuthor,
-  profileOwner,
-  authRateLimit
-};
+module.exports = exports;

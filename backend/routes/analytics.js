@@ -6,14 +6,14 @@ const Community = require('../models/Community');
 const Contest = require('../models/Contest');
 const Submission = require('../models/Submission');
 const Post = require('../models/Post');
-const { auth, admin } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/analytics/dashboard
 // @desc    Get user dashboard analytics
 // @access  Private
-router.get('/dashboard', auth, async (req, res) => {
+router.get('/dashboard', protect, async (req, res) => {
   try {
     let analytics = await Analytics.findOne({ user: req.user.id });
     
@@ -111,7 +111,7 @@ router.get('/dashboard', auth, async (req, res) => {
 // @route   GET /api/analytics/admin
 // @desc    Get admin dashboard analytics
 // @access  Private (Admin only)
-router.get('/admin', [auth, admin], async (req, res) => {
+router.get('/admin', [protect, authorize('community-admin')], async (req, res) => {
   try {
     // Get system-wide statistics
     const totalUsers = await User.countDocuments();
@@ -302,7 +302,7 @@ router.get('/admin', [auth, admin], async (req, res) => {
 // @route   GET /api/analytics/community/:id
 // @desc    Get community analytics
 // @access  Private (Community members)
-router.get('/community/:id', auth, async (req, res) => {
+router.get('/community/:id', protect, async (req, res) => {
   try {
     const community = await Community.findById(req.params.id);
     if (!community) {
@@ -676,7 +676,7 @@ router.get('/contest/:id', async (req, res) => {
 // @route   POST /api/analytics/update
 // @desc    Update user analytics (called after actions)
 // @access  Private
-router.post('/update', auth, async (req, res) => {
+router.post('/update', protect, async (req, res) => {
   try {
     const { action, data } = req.body;
 

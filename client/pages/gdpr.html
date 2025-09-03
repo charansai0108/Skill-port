@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDPR Compliance - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+                        SkillPort
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="../index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Home</a>
+                    <a href="features.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
+                    <a href="pricing.html" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Pricing</a>
+                    <a href="pages/auth/login.html" class="btn-primary px-4 py-2 rounded-lg text-white">Login</a>
+                    <a href="auth/register.html" class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+                GDPR
+                <span class="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">Compliance</span>
+            </h1>
+            <p class="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+                Your data protection rights under the General Data Protection Regulation (GDPR).
+            </p>
+            <div class="text-sm text-slate-500">
+                Last updated: January 15, 2025
+            </div>
+        </div>
+
+        <!-- GDPR Overview -->
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">What is GDPR?</h2>
+            <p class="text-slate-700 mb-4">
+                The General Data Protection Regulation (GDPR) is a comprehensive data protection law that gives you control over your personal data and how it's used. It applies to all EU citizens and residents, regardless of where the data is processed.
+            </p>
+        </div>
+
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Your Rights Under GDPR</h2>
+            <div class="space-y-6">
+                <div class="border-l-4 border-red-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Access</h3>
+                    <p class="text-slate-700">You have the right to request a copy of all personal data we hold about you.</p>
+                </div>
+                
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Rectification</h3>
+                    <p class="text-slate-700">You can request that we correct any inaccurate or incomplete personal data.</p>
+                </div>
+                
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Erasure</h3>
+                    <p class="text-slate-700">You can request that we delete your personal data in certain circumstances.</p>
+                </div>
+                
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Portability</h3>
+                    <p class="text-slate-700">You can request a copy of your data in a machine-readable format.</p>
+                </div>
+                
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Object</h3>
+                    <p class="text-slate-700">You can object to the processing of your personal data in certain situations.</p>
+                </div>
+                
+                <div class="border-l-4 border-indigo-500 pl-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Right to Restrict Processing</h3>
+                    <p class="text-slate-700">You can request that we limit how we use your personal data.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">How to Exercise Your Rights</h2>
+            <p class="text-slate-700 mb-4">
+                To exercise any of your GDPR rights, you can:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Contact Us Directly</h3>
+                    <p class="text-slate-600">Send an email to privacy@skillport.com with your request.</p>
+                </div>
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Use Account Settings</h3>
+                    <p class="text-slate-600">Access and update your data through your account dashboard.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Data Processing Information</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Legal Basis for Processing</h3>
+                    <p class="text-slate-700 mb-3">We process your personal data based on the following legal grounds:</p>
+                    <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
+                        <li>Consent: When you explicitly agree to data processing</li>
+                        <li>Contract: To provide our services to you</li>
+                        <li>Legitimate Interest: To improve our services and security</li>
+                        <li>Legal Obligation: To comply with applicable laws</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-3">Data Retention</h3>
+                    <p class="text-slate-700">We retain your personal data only for as long as necessary to provide our services and comply with legal obligations. You can request deletion of your account at any time.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">International Data Transfers</h2>
+            <p class="text-slate-700 mb-4">
+                Your data may be transferred to and processed in countries outside the European Economic Area (EEA). We ensure appropriate safeguards are in place to protect your data in accordance with GDPR requirements.
+            </p>
+        </div>
+
+        <div class="content-card rounded-2xl p-8 mb-12">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Data Protection Officer</h2>
+            <p class="text-slate-700 mb-4">
+                We have appointed a Data Protection Officer (DPO) to oversee our data protection practices and ensure GDPR compliance.
+            </p>
+            <div class="bg-slate-50 rounded-lg p-4">
+                <p class="text-slate-700"><strong>Contact our DPO:</strong><br>
+                Email: dpo@skillport.com<br>
+                Address: 123 Tech Street, San Francisco, CA 94105</p>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="hero-card rounded-2xl p-8 text-center">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Questions About GDPR?</h2>
+            <p class="text-slate-600 mb-6">If you have any questions about your data protection rights, please contact us.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="contact.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
+                    Contact Us
+                </a>
+                <a href="privacy.html" class="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-slate-200 transition-colors">
+                    Privacy Policy
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">SkillPort</span>
+                    </div>
+                    <p class="text-slate-400">
+                        Empowering learners, building communities, tracking progress, achieving excellence!
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Platform</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="features.html" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="pricing.html" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="api.html" class="hover:text-white transition-colors">API</a></li>
+                        <li><a href="documentation.html" class="hover:text-white transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="help-center.html" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="contact.html" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="community.html" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="status.html" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="gdpr.html" class="hover:text-white transition-colors">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+                <p>&copy; 2025 SkillPort. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

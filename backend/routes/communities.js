@@ -1,899 +1,665 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, query } = require('express-validator');
+const asyncHandler = require('../middleware/async');
+const { authorize, checkCommunityAccess } = require('../middleware/auth');
+const ErrorResponse = require('../utils/errorResponse');
 const Community = require('../models/Community');
 const User = require('../models/User');
-const Post = require('../models/Post');
-const { auth, admin } = require('../middleware/auth');
+const Contest = require('../models/Contest');
+const Project = require('../models/Project');
 
 const router = express.Router();
 
-// @route   GET /api/communities
-// @desc    Get all communities with pagination and filters
+// @desc    Get all communities (public)
+// @route   GET /api/v1/communities
 // @access  Public
-router.get('/', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    // Build filter object
-    const filter = { status: 'active' };
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.privacy) filter.privacy = req.query.privacy;
-    if (req.query.search) {
-      filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { tags: { $in: [new RegExp(req.query.search, 'i')] } }
-      ];
-    }
-
-    // Build sort object
-    let sort = {};
-    switch (req.query.sortBy) {
-      case 'members':
-        sort = { memberCount: -1 };
-        break;
-      case 'activity':
-        sort = { postCount: -1 };
-        break;
-      case 'recent':
-        sort = { createdAt: -1 };
-        break;
-      case 'name':
-        sort = { name: 1 };
-        break;
-      default:
-        sort = { memberCount: -1 };
-    }
-
-    // Get communities with pagination
-    const communities = await Community.find(filter)
-      .populate('createdBy', 'firstName lastName username profilePicture')
-      .populate('members.user', 'firstName lastName username profilePicture')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit);
-
-    // Get total count for pagination
-    const total = await Community.countDocuments(filter);
-
-    // Add user membership status if authenticated
-    let communitiesWithMembership = communities;
-    if (req.headers.authorization) {
-      try {
-        const token = req.headers.authorization.replace('Bearer ', '');
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
-
-        communitiesWithMembership = communities.map(community => {
-          const communityObj = community.toObject();
-          const membership = community.members.find(member => 
-            member.user._id.toString() === userId && member.isActive
-          );
-          communityObj.isMember = !!membership;
-          communityObj.userRole = membership ? membership.role : null;
-          return communityObj;
-        });
-      } catch (error) {
-        // Token invalid, continue without membership info
-        communitiesWithMembership = communities.map(community => {
-          const communityObj = community.toObject();
-          communityObj.isMember = false;
-          communityObj.userRole = null;
-          return communityObj;
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      data: {
-        communities: communitiesWithMembership,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalCommunities: total,
-          communitiesPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get communities error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching communities'
-    });
-  }
-});
-
-// @route   GET /api/communities/:id
-// @desc    Get community by ID with detailed information
-// @access  Public
-router.get('/:id', async (req, res) => {
-  try {
-    const community = await Community.findById(req.params.id)
-      .populate('createdBy', 'firstName lastName username profilePicture bio')
-      .populate('members.user', 'firstName lastName username profilePicture')
-      .populate('members.user', 'firstName lastName username profilePicture');
-
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    if (community.status !== 'active') {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Get recent posts
-    const recentPosts = await Post.find({ 
-      community: req.params.id, 
-      status: 'active' 
-    })
-    .populate('author', 'firstName lastName username profilePicture')
-    .sort({ createdAt: -1 })
-    .limit(5);
-
-    // Add user membership status if authenticated
-    let communityWithMembership = community.toObject();
-    communityWithMembership.recentPosts = recentPosts;
-    communityWithMembership.isMember = false;
-    communityWithMembership.userRole = null;
-
-    if (req.headers.authorization) {
-      try {
-        const token = req.headers.authorization.replace('Bearer ', '');
-        const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
-
-        const membership = community.members.find(member => 
-          member.user._id.toString() === userId && member.isActive
-        );
-        communityWithMembership.isMember = !!membership;
-        communityWithMembership.userRole = membership ? membership.role : null;
-      } catch (error) {
-        // Token invalid, continue without membership info
-      }
-    }
-
-    res.json({
-      success: true,
-      data: communityWithMembership
-    });
-
-  } catch (error) {
-    console.error('Get community error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching community'
-    });
-  }
-});
-
-// @route   POST /api/communities
-// @desc    Create a new community
-// @access  Private
-router.post('/', [
-  auth,
-  body('name').trim().isLength({ min: 3, max: 100 }).withMessage('Community name must be between 3 and 100 characters'),
-  body('description').trim().isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
-  body('category').isIn(['algorithms', 'data-structures', 'web-development', 'mobile-development', 'ai-ml', 'system-design', 'other']).withMessage('Invalid category'),
-  body('privacy').isIn(['public', 'private', 'invite-only']).withMessage('Invalid privacy setting'),
-  body('maxMembers').optional().isInt({ min: 10, max: 10000 }).withMessage('Max members must be between 10 and 10000'),
-  body('rules').optional().isArray().withMessage('Rules must be an array'),
-  body('tags').optional().isArray().withMessage('Tags must be an array')
-], async (req, res) => {
-  try {
-    // Check for validation errors
+router.get('/', [
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+    query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
+    query('search').optional().isString().withMessage('Search must be a string')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { 
-      name, 
-      description, 
-      shortDescription,
-      category, 
-      privacy, 
-      maxMembers, 
-      rules, 
-      tags,
-      image,
-      banner
-    } = req.body;
-
-    // Check if community name already exists
-    const existingCommunity = await Community.findOne({ 
-      name: { $regex: new RegExp(`^${name}$`, 'i') } 
-    });
-    if (existingCommunity) {
-      return res.status(400).json({
-        success: false,
-        message: 'Community name already exists'
-      });
-    }
-
-    // Create community
-    const community = new Community({
-      name,
-      description,
-      shortDescription,
-      category,
-      privacy,
-      maxMembers: maxMembers || 1000,
-      rules: rules || [],
-      tags: tags || [],
-      image,
-      banner,
-      createdBy: req.user.id,
-      members: [{
-        user: req.user.id,
-        role: 'admin',
-        joinedAt: new Date(),
-        lastActivity: new Date()
-      }]
-    });
-
-    await community.save();
-
-    // Update user's communities
-    await User.findByIdAndUpdate(req.user.id, {
-      $push: {
-        communities: {
-          community: community._id,
-          role: 'admin',
-          joinedAt: new Date()
-        }
-      }
-    });
-
-    // Populate createdBy and members for response
-    await community.populate('createdBy', 'firstName lastName username profilePicture');
-    await community.populate('members.user', 'firstName lastName username profilePicture');
-
-    res.status(201).json({
-      success: true,
-      message: 'Community created successfully',
-      data: community
-    });
-
-  } catch (error) {
-    console.error('Create community error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while creating community'
-    });
-  }
-});
-
-// @route   PUT /api/communities/:id
-// @desc    Update community
-// @access  Private (Admin/Moderator)
-router.put('/:id', [
-  auth,
-  body('name').optional().trim().isLength({ min: 3, max: 100 }).withMessage('Community name must be between 3 and 100 characters'),
-  body('description').optional().trim().isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
-  body('category').optional().isIn(['algorithms', 'data-structures', 'web-development', 'mobile-development', 'ai-ml', 'system-design', 'other']).withMessage('Invalid category'),
-  body('privacy').optional().isIn(['public', 'private', 'invite-only']).withMessage('Invalid privacy setting'),
-  body('maxMembers').optional().isInt({ min: 10, max: 10000 }).withMessage('Max members must be between 10 and 10000'),
-  body('rules').optional().isArray().withMessage('Rules must be an array'),
-  body('tags').optional().isArray().withMessage('Tags must be an array')
-], async (req, res) => {
-  try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    const community = await Community.findById(req.params.id);
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Check if user has permission to update
-    const membership = community.members.find(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-    
-    if (!membership || !['admin', 'moderator'].includes(membership.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'You do not have permission to update this community'
-      });
-    }
-
-    // Check if name is being changed and if it conflicts
-    if (req.body.name && req.body.name !== community.name) {
-      const existingCommunity = await Community.findOne({ 
-        name: { $regex: new RegExp(`^${req.body.name}$`, 'i') },
-        _id: { $ne: req.params.id }
-      });
-      if (existingCommunity) {
-        return res.status(400).json({
-          success: false,
-          message: 'Community name already exists'
-        });
-      }
-    }
-
-    // Update community
-    const updatedCommunity = await Community.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    )
-    .populate('createdBy', 'firstName lastName username profilePicture')
-    .populate('members.user', 'firstName lastName username profilePicture');
-
-    res.json({
-      success: true,
-      message: 'Community updated successfully',
-      data: updatedCommunity
-    });
-
-  } catch (error) {
-    console.error('Update community error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating community'
-    });
-  }
-});
-
-// @route   POST /api/communities/:id/join
-// @desc    Join a community
-// @access  Private
-router.post('/:id/join', auth, async (req, res) => {
-  try {
-    const community = await Community.findById(req.params.id);
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    if (community.status !== 'active') {
-      return res.status(400).json({
-        success: false,
-        message: 'Community is not active'
-      });
-    }
-
-    // Check if user is already a member
-    const isMember = community.members.some(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-
-    if (isMember) {
-      return res.status(400).json({
-        success: false,
-        message: 'You are already a member of this community'
-      });
-    }
-
-    // Check if community is full
-    if (community.members.filter(m => m.isActive).length >= community.maxMembers) {
-      return res.status(400).json({
-        success: false,
-        message: 'Community is full'
-      });
-    }
-
-    // Add user to community
-    community.members.push({
-      user: req.user.id,
-      role: 'member',
-      joinedAt: new Date(),
-      lastActivity: new Date()
-    });
-
-    await community.save();
-
-    // Update user's communities
-    await User.findByIdAndUpdate(req.user.id, {
-      $push: {
-        communities: {
-          community: community._id,
-          role: 'member',
-          joinedAt: new Date()
-        }
-      }
-    });
-
-    res.json({
-      success: true,
-      message: 'Successfully joined the community'
-    });
-
-  } catch (error) {
-    console.error('Join community error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while joining community'
-    });
-  }
-});
-
-// @route   POST /api/communities/:id/leave
-// @desc    Leave a community
-// @access  Private
-router.post('/:id/leave', auth, async (req, res) => {
-  try {
-    const community = await Community.findById(req.params.id);
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Find user's membership
-    const memberIndex = community.members.findIndex(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-
-    if (memberIndex === -1) {
-      return res.status(400).json({
-        success: false,
-        message: 'You are not a member of this community'
-      });
-    }
-
-    // Check if user is the only admin
-    if (community.members[memberIndex].role === 'admin') {
-      const adminCount = community.members.filter(m => m.role === 'admin' && m.isActive).length;
-      if (adminCount === 1) {
-        return res.status(400).json({
-          success: false,
-          message: 'Cannot leave community as you are the only admin'
-        });
-      }
-    }
-
-    // Mark member as inactive
-    community.members[memberIndex].isActive = false;
-    await community.save();
-
-    // Remove from user's communities
-    await User.findByIdAndUpdate(req.user.id, {
-      $pull: {
-        communities: { community: community._id }
-      }
-    });
-
-    res.json({
-      success: true,
-      message: 'Successfully left the community'
-    });
-
-  } catch (error) {
-    console.error('Leave community error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while leaving community'
-    });
-  }
-});
-
-// @route   POST /api/communities/:id/members/:userId/role
-// @desc    Update member role (Admin only)
-// @access  Private (Admin)
-router.post('/:id/members/:userId/role', [
-  auth,
-  body('role').isIn(['member', 'moderator', 'admin']).withMessage('Invalid role')
-], async (req, res) => {
-  try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    const { role } = req.body;
-    const community = await Community.findById(req.params.id);
-    
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Check if user is admin
-    const userMembership = community.members.find(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-    
-    if (!userMembership || userMembership.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Only admins can change member roles'
-      });
-    }
-
-    // Find target member
-    const targetMemberIndex = community.members.findIndex(member => 
-      member.user.toString() === req.params.userId && member.isActive
-    );
-
-    if (targetMemberIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-
-    // Check if trying to change own role
-    if (req.params.userId === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot change your own role'
-      });
-    }
-
-    // Update role
-    community.members[targetMemberIndex].role = role;
-    await community.save();
-
-    // Update user's community role
-    await User.updateOne(
-      { 
-        _id: req.params.userId,
-        'communities.community': community._id
-      },
-      {
-        $set: {
-          'communities.$.role': role
-        }
-      }
-    );
-
-    res.json({
-      success: true,
-      message: 'Member role updated successfully'
-    });
-
-  } catch (error) {
-    console.error('Update member role error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating member role'
-    });
-  }
-});
-
-// @route   POST /api/communities/:id/add-member
-// @desc    Add a member to a community by email
-// @access  Private (Community Admin/Moderator)
-router.post('/:id/add-member', [
-  auth,
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('role').isIn(['member', 'moderator']).withMessage('Invalid role')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    const { email, role } = req.body;
-    const communityId = req.params.id;
-
-    // Find community
-    const community = await Community.findById(communityId);
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Check if user is admin of this community
-    const userMembership = community.members.find(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-    
-    if (!userMembership || userMembership.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Only community admins can add members'
-      });
-    }
-
-    // Find user by ANY email (primary or additional)
-    const user = await User.findByAnyEmail(email);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found with this email address. User must add this email to their personal profile first.'
-      });
-    }
-
-    // Check if user is already a member
-    const existingMember = community.members.find(member => 
-      member.user.toString() === user._id.toString()
-    );
-
-    if (existingMember) {
-      if (existingMember.isActive) {
-        return res.status(400).json({
-          success: false,
-          message: 'User is already an active member of this community'
-        });
-      } else {
-        // Reactivate existing member
-        existingMember.isActive = true;
-        existingMember.role = role;
-        existingMember.joinedAt = new Date();
-        await community.save();
-        
-        return res.json({
-          success: true,
-          message: 'Member reactivated successfully',
-          data: {
-            member: {
-              user: user._id,
-              role: role,
-              joinedAt: existingMember.joinedAt,
-              isActive: true
-            }
-          }
-        });
-      }
-    }
-
-    // Add new member
-    community.members.push({
-      user: user._id,
-      role: role,
-      joinedAt: new Date(),
-      isActive: true
-    });
-
-    // Update member count
-    community.memberCount = community.members.filter(member => member.isActive).length;
-
-    await community.save();
-
-    res.json({
-      success: true,
-      message: 'Member added successfully',
-      data: {
-        member: {
-          user: user._id,
-          role: role,
-          joinedAt: new Date(),
-          isActive: true
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Add member error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while adding member'
-    });
-  }
-});
-
-// @route   DELETE /api/communities/:id/members/:userId
-// @desc    Remove member from community (Admin only)
-// @access  Private (Admin)
-router.delete('/:id/members/:userId', auth, async (req, res) => {
-  try {
-    const community = await Community.findById(req.params.id);
-    
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Check if user is admin
-    const userMembership = community.members.find(member => 
-      member.user.toString() === req.user.id && member.isActive
-    );
-    
-    if (!userMembership || userMembership.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Only admins can remove members'
-      });
-    }
-
-    // Check if trying to remove self
-    if (req.params.userId === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot remove yourself from the community'
-      });
-    }
-
-    // Find target member
-    const targetMemberIndex = community.members.findIndex(member => 
-      member.user.toString() === req.params.userId && member.isActive
-    );
-
-    if (targetMemberIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Member not found'
-      });
-    }
-
-    // Mark member as inactive
-    community.members[targetMemberIndex].isActive = false;
-    await community.save();
-
-    // Remove from user's communities
-    await User.findByIdAndUpdate(req.params.userId, {
-      $pull: {
-        communities: { community: community._id }
-      }
-    });
-
-    res.json({
-      success: true,
-      message: 'Member removed successfully'
-    });
-
-  } catch (error) {
-    console.error('Remove member error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while removing member'
-    });
-  }
-});
-
-// @route   GET /api/communities/:id/members
-// @desc    Get community members with pagination
-// @access  Public
-router.get('/:id/members', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
-
-    const community = await Community.findById(req.params.id)
-      .populate({
-        path: 'members.user',
-        select: 'firstName lastName username profilePicture bio',
-        options: {
-          skip: skip,
-          limit: limit,
-          sort: { 'members.joinedAt': 1 }
-        }
-      });
-
-    if (!community) {
-      return res.status(404).json({
-        success: false,
-        message: 'Community not found'
-      });
-    }
-
-    // Filter active members
-    const activeMembers = community.members.filter(member => member.isActive);
-    const totalMembers = activeMembers.length;
-
-    res.json({
-      success: true,
-      data: {
-        members: activeMembers,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(totalMembers / limit),
-          totalMembers: totalMembers,
-          membersPerPage: limit
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Get community members error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching community members'
-    });
-  }
-});
-
-// @route   GET /api/communities/:id/posts
-// @desc    Get community posts with pagination
-// @access  Public
-router.get('/:id/posts', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    // Build filter
-    const filter = { 
-      community: req.params.id, 
-      status: 'active' 
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const startIndex = (page - 1) * limit;
+
+    // Build query for public communities
+    const query = { 
+        status: 'active',
+        isPublic: true 
     };
 
-    if (req.query.type) filter.type = req.query.type;
-    if (req.query.category) filter.category = req.query.category;
-
-    // Build sort
-    let sort = {};
-    switch (req.query.sortBy) {
-      case 'recent':
-        sort = { createdAt: -1 };
-        break;
-      case 'popular':
-        sort = { 'likes.length': -1, createdAt: -1 };
-        break;
-      case 'comments':
-        sort = { 'comments.length': -1, createdAt: -1 };
-        break;
-      default:
-        sort = { createdAt: -1 };
+    if (req.query.search) {
+        query.$or = [
+            { name: { $regex: req.query.search, $options: 'i' } },
+            { description: { $regex: req.query.search, $options: 'i' } },
+            { code: { $regex: req.query.search, $options: 'i' } }
+        ];
     }
 
-    const posts = await Post.find(filter)
-      .populate('author', 'firstName lastName username profilePicture')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit);
+    const communities = await Community.find(query)
+        .populate('admin', 'firstName lastName')
+        .select('-batches -contactInfo -socialLinks') // Hide private info
+        .sort({ 'stats.totalStudents': -1 })
+        .limit(limit)
+        .skip(startIndex);
 
-    const total = await Post.countDocuments(filter);
+    const total = await Community.countDocuments(query);
 
-    res.json({
-      success: true,
-      data: {
-        posts,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalPosts: total,
-          postsPerPage: limit
+    // Pagination result
+    const pagination = {};
+
+    if (startIndex + limit < total) {
+        pagination.next = {
+            page: page + 1,
+            limit
+        };
+    }
+
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page - 1,
+            limit
+        };
+    }
+
+    res.status(200).json({
+        success: true,
+        count: communities.length,
+        total,
+        pagination,
+        data: { communities }
+    });
+}));
+
+// @desc    Get specific community details
+// @route   GET /api/v1/communities/:id
+// @access  Public
+router.get('/:id', asyncHandler(async (req, res, next) => {
+    const community = await Community.findById(req.params.id)
+        .populate('admin', 'firstName lastName avatar')
+        .populate('activeStudentsCount')
+        .populate('activeMentorsCount');
+
+    if (!community) {
+        return next(new ErrorResponse('Community not found', 404));
+    }
+
+    // Only show public communities or if user has access
+    if (!community.isPublic && (!req.user || req.user.community._id.toString() !== community._id.toString())) {
+        return next(new ErrorResponse('Community not found', 404));
+    }
+
+    // Hide sensitive information for non-members
+    const isMember = req.user && req.user.community && req.user.community._id.toString() === community._id.toString();
+    
+    const responseData = {
+        id: community._id,
+        name: community.name,
+        code: community.code,
+        description: community.description,
+        logo: community.logo,
+        banner: community.banner,
+        primaryColor: community.primaryColor,
+        secondaryColor: community.secondaryColor,
+        admin: community.admin,
+        status: community.status,
+        isPublic: community.isPublic,
+        features: community.features,
+        stats: community.stats,
+        createdAt: community.createdAt
+    };
+
+    if (isMember) {
+        responseData.batches = community.batches;
+        responseData.contactInfo = community.contactInfo;
+        responseData.socialLinks = community.socialLinks;
+        responseData.maxStudents = community.maxStudents;
+        responseData.maxMentors = community.maxMentors;
+    }
+
+    res.status(200).json({
+        success: true,
+        data: { community: responseData }
+    });
+}));
+
+// @desc    Update community details (Admin only)
+// @route   PUT /api/v1/communities/:id
+// @access  Private (Community Admin)
+router.put('/:id', authorize('community-admin'), checkCommunityAccess, [
+    body('name').optional().trim().isLength({ min: 2, max: 100 }).withMessage('Name must be 2-100 characters'),
+    body('description').optional().isLength({ max: 1000 }).withMessage('Description cannot exceed 1000 characters'),
+    body('primaryColor').optional().matches(/^#[0-9A-F]{6}$/i).withMessage('Primary color must be a valid hex color'),
+    body('secondaryColor').optional().matches(/^#[0-9A-F]{6}$/i).withMessage('Secondary color must be a valid hex color'),
+    body('isPublic').optional().isBoolean().withMessage('isPublic must be a boolean'),
+    body('allowSelfRegistration').optional().isBoolean().withMessage('allowSelfRegistration must be a boolean')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const allowedFields = [
+        'name', 'description', 'primaryColor', 'secondaryColor', 
+        'isPublic', 'allowSelfRegistration', 'contactInfo', 'socialLinks'
+    ];
+
+    const updateData = {};
+    allowedFields.forEach(field => {
+        if (req.body[field] !== undefined) {
+            updateData[field] = req.body[field];
         }
-      }
     });
 
-  } catch (error) {
-    console.error('Get community posts error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching community posts'
+    const community = await Community.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+    ).populate('admin', 'firstName lastName');
+
+    res.status(200).json({
+        success: true,
+        message: 'Community updated successfully',
+        data: { community }
     });
-  }
-});
+}));
+
+// @desc    Get community dashboard data (Admin only)
+// @route   GET /api/v1/communities/:id/dashboard
+// @access  Private (Community Admin)
+router.get('/:id/dashboard', authorize('community-admin'), checkCommunityAccess, asyncHandler(async (req, res, next) => {
+    const communityId = req.params.id;
+
+    // Get community with populated data
+    const community = await Community.findById(communityId)
+        .populate('admin', 'firstName lastName avatar');
+
+    // Get recent users (last 30 days)
+    const recentUsers = await User.find({
+        community: communityId,
+        createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+    }).select('firstName lastName role batch createdAt').sort({ createdAt: -1 }).limit(10);
+
+    // Get contest statistics
+    const contestStats = await Contest.getContestStats(communityId);
+
+    // Get project statistics
+    const projectStats = await Project.aggregate([
+        { $match: { community: mongoose.Types.ObjectId(communityId) } },
+        {
+            $group: {
+                _id: null,
+                totalProjects: { $sum: 1 },
+                completedProjects: {
+                    $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                },
+                inProgressProjects: {
+                    $sum: { $cond: [{ $eq: ['$status', 'in-progress'] }, 1, 0] }
+                }
+            }
+        }
+    ]);
+
+    // Get batch statistics
+    const batchStats = community.batches.map(batch => ({
+        name: batch.name,
+        code: batch.code,
+        status: batch.status,
+        studentCount: 0, // Will be populated by a separate query
+        mentorCount: batch.mentors.length
+    }));
+
+    // Get student counts per batch
+    const studentCounts = await User.aggregate([
+        { $match: { community: mongoose.Types.ObjectId(communityId), role: 'student' } },
+        { $group: { _id: '$batch', count: { $sum: 1 } } }
+    ]);
+
+    // Update batch stats with student counts
+    batchStats.forEach(batch => {
+        const studentData = studentCounts.find(sc => sc._id === batch.code);
+        batch.studentCount = studentData ? studentData.count : 0;
+    });
+
+    // Get top performers (last 30 days)
+    const topPerformers = await User.find({
+        community: communityId,
+        role: 'student',
+        lastActivity: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+    }).select('firstName lastName totalPoints streak avatar')
+      .sort({ totalPoints: -1 })
+      .limit(5);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            community,
+            stats: {
+                users: {
+                    total: community.stats.totalStudents + community.stats.totalMentors,
+                    students: community.stats.totalStudents,
+                    mentors: community.stats.totalMentors,
+                    recent: recentUsers
+                },
+                contests: contestStats[0] || { totalContests: 0, activeContests: 0, totalParticipants: 0, totalSubmissions: 0 },
+                projects: projectStats[0] || { totalProjects: 0, completedProjects: 0, inProgressProjects: 0 },
+                batches: batchStats,
+                topPerformers
+            }
+        }
+    });
+}));
+
+// @desc    Add new batch (Admin only)
+// @route   POST /api/v1/communities/:id/batches
+// @access  Private (Community Admin)
+router.post('/:id/batches', authorize('community-admin'), checkCommunityAccess, [
+    body('name').trim().notEmpty().withMessage('Batch name is required'),
+    body('description').optional().isString().withMessage('Description must be a string'),
+    body('startDate').optional().isISO8601().withMessage('Invalid start date format'),
+    body('endDate').optional().isISO8601().withMessage('Invalid end date format'),
+    body('maxStudents').optional().isInt({ min: 1, max: 100 }).withMessage('Max students must be between 1 and 100')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const community = await Community.findById(req.params.id);
+    
+    const batchData = {
+        name: req.body.name,
+        description: req.body.description || '',
+        startDate: req.body.startDate ? new Date(req.body.startDate) : undefined,
+        endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
+        maxStudents: req.body.maxStudents || 50
+    };
+
+    try {
+        await community.addBatch(batchData);
+        
+        res.status(201).json({
+            success: true,
+            message: 'Batch created successfully',
+            data: {
+                batch: community.batches[community.batches.length - 1]
+            }
+        });
+    } catch (error) {
+        return next(new ErrorResponse(error.message, 400));
+    }
+}));
+
+// @desc    Update batch (Admin only)
+// @route   PUT /api/v1/communities/:id/batches/:batchId
+// @access  Private (Community Admin)
+router.put('/:id/batches/:batchId', authorize('community-admin'), checkCommunityAccess, [
+    body('name').optional().trim().notEmpty().withMessage('Batch name cannot be empty'),
+    body('description').optional().isString().withMessage('Description must be a string'),
+    body('status').optional().isIn(['active', 'inactive', 'completed']).withMessage('Invalid batch status'),
+    body('maxStudents').optional().isInt({ min: 1, max: 100 }).withMessage('Max students must be between 1 and 100')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const community = await Community.findById(req.params.id);
+    const batch = community.batches.id(req.params.batchId);
+
+    if (!batch) {
+        return next(new ErrorResponse('Batch not found', 404));
+    }
+
+    // Update batch fields
+    const allowedFields = ['name', 'description', 'status', 'maxStudents', 'startDate', 'endDate'];
+    allowedFields.forEach(field => {
+        if (req.body[field] !== undefined) {
+            batch[field] = req.body[field];
+        }
+    });
+
+    await community.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Batch updated successfully',
+        data: { batch }
+    });
+}));
+
+// @desc    Delete batch (Admin only)
+// @route   DELETE /api/v1/communities/:id/batches/:batchId
+// @access  Private (Community Admin)
+router.delete('/:id/batches/:batchId', authorize('community-admin'), checkCommunityAccess, asyncHandler(async (req, res, next) => {
+    const community = await Community.findById(req.params.id);
+    const batch = community.batches.id(req.params.batchId);
+
+    if (!batch) {
+        return next(new ErrorResponse('Batch not found', 404));
+    }
+
+    // Check if batch has students
+    const studentCount = await User.countDocuments({
+        community: community._id,
+        batch: batch.code,
+        role: 'student'
+    });
+
+    if (studentCount > 0) {
+        return next(new ErrorResponse('Cannot delete batch with existing students', 400));
+    }
+
+    batch.deleteOne();
+    await community.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Batch deleted successfully',
+        data: {}
+    });
+}));
+
+// @desc    Assign mentor to batch (Admin only)
+// @route   POST /api/v1/communities/:id/batches/:batchId/mentors
+// @access  Private (Community Admin)
+router.post('/:id/batches/:batchId/mentors', authorize('community-admin'), checkCommunityAccess, [
+    body('mentorId').isMongoId().withMessage('Valid mentor ID is required')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { mentorId } = req.body;
+    
+    // Verify mentor exists and belongs to this community
+    const mentor = await User.findOne({
+        _id: mentorId,
+        role: 'mentor',
+        community: req.params.id
+    });
+
+    if (!mentor) {
+        return next(new ErrorResponse('Mentor not found in this community', 404));
+    }
+
+    const community = await Community.findById(req.params.id);
+    const batch = community.batches.id(req.params.batchId);
+
+    if (!batch) {
+        return next(new ErrorResponse('Batch not found', 404));
+    }
+
+    // Check if mentor is already assigned
+    if (batch.mentors.includes(mentorId)) {
+        return next(new ErrorResponse('Mentor is already assigned to this batch', 400));
+    }
+
+    batch.mentors.push(mentorId);
+    await community.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Mentor assigned to batch successfully',
+        data: {
+            batch,
+            mentor: {
+                id: mentor._id,
+                firstName: mentor.firstName,
+                lastName: mentor.lastName,
+                email: mentor.email
+            }
+        }
+    });
+}));
+
+// @desc    Remove mentor from batch (Admin only)
+// @route   DELETE /api/v1/communities/:id/batches/:batchId/mentors/:mentorId
+// @access  Private (Community Admin)
+router.delete('/:id/batches/:batchId/mentors/:mentorId', authorize('community-admin'), checkCommunityAccess, asyncHandler(async (req, res, next) => {
+    const community = await Community.findById(req.params.id);
+    const batch = community.batches.id(req.params.batchId);
+
+    if (!batch) {
+        return next(new ErrorResponse('Batch not found', 404));
+    }
+
+    const mentorIndex = batch.mentors.indexOf(req.params.mentorId);
+    if (mentorIndex === -1) {
+        return next(new ErrorResponse('Mentor not assigned to this batch', 404));
+    }
+
+    batch.mentors.splice(mentorIndex, 1);
+    await community.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Mentor removed from batch successfully',
+        data: {}
+    });
+}));
+
+// @desc    Get community analytics (Admin only)
+// @route   GET /api/v1/communities/:id/analytics
+// @access  Private (Community Admin)
+router.get('/:id/analytics', authorize('community-admin'), checkCommunityAccess, asyncHandler(async (req, res, next) => {
+    const communityId = req.params.id;
+    const { period = '30d' } = req.query;
+
+    // Calculate date range
+    let startDate;
+    switch (period) {
+        case '7d':
+            startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            break;
+        case '30d':
+            startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            break;
+        case '90d':
+            startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+            break;
+        default:
+            startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    }
+
+    // User growth analytics
+    const userGrowth = await User.aggregate([
+        {
+            $match: {
+                community: mongoose.Types.ObjectId(communityId),
+                createdAt: { $gte: startDate }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                    role: '$role'
+                },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { '_id.date': 1 } }
+    ]);
+
+    // Activity analytics
+    const activityData = await User.aggregate([
+        {
+            $match: {
+                community: mongoose.Types.ObjectId(communityId),
+                lastActivity: { $gte: startDate }
+            }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$lastActivity' } },
+                activeUsers: { $sum: 1 },
+                totalPoints: { $sum: '$totalPoints' }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    // Contest participation
+    const contestParticipation = await Contest.aggregate([
+        {
+            $match: {
+                community: mongoose.Types.ObjectId(communityId),
+                createdAt: { $gte: startDate }
+            }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                contestsCreated: { $sum: 1 },
+                totalParticipants: { $sum: '$stats.totalParticipants' }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    // Project creation
+    const projectCreation = await Project.aggregate([
+        {
+            $match: {
+                community: mongoose.Types.ObjectId(communityId),
+                createdAt: { $gte: startDate }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                    status: '$status'
+                },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { '_id.date': 1 } }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            period,
+            analytics: {
+                userGrowth,
+                activity: activityData,
+                contests: contestParticipation,
+                projects: projectCreation
+            }
+        }
+    });
+}));
+
+// @desc    Join a community (Student joining flow)
+// @route   POST /api/v1/communities/:id/join
+// @access  Private
+router.post('/:id/join', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('otp').optional().isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { email, password, otp } = req.body;
+    const community = await Community.findById(req.params.id).populate('batches');
+    
+    if (!community) {
+        return next(new ErrorResponse('Community not found', 404));
+    }
+    
+    if (community.status !== 'active') {
+        return next(new ErrorResponse('Community is not active', 400));
+    }
+
+    // Check if student email exists in any batch
+    let existingStudent = null;
+    let targetBatch = null;
+    
+    for (const batch of community.batches) {
+        const studentInBatch = await User.findOne({
+            email: email,
+            batch: batch.name,
+            community: community._id
+        });
+        
+        if (studentInBatch) {
+            existingStudent = studentInBatch;
+            targetBatch = batch;
+            break;
+        }
+    }
+
+    if (existingStudent) {
+        return res.status(200).json({
+            success: true,
+            message: 'Student already exists in the community',
+            data: {
+                communityId: community._id,
+                communityName: community.name,
+                batchName: targetBatch.name,
+                studentId: existingStudent._id
+            }
+        });
+    } else {
+        // Create new student account if password provided
+        if (!password) {
+            return next(new ErrorResponse('Password is required for new students', 400));
+        }
+
+        // Find default batch or create one
+        let defaultBatch = community.batches.find(b => b.name === 'Default Batch');
+        if (!defaultBatch) {
+            defaultBatch = {
+                name: 'Default Batch',
+                code: 'DEFAULT',
+                description: 'Default batch for new students',
+                status: 'active',
+                maxStudents: 50
+            };
+            community.batches.push(defaultBatch);
+            await community.save();
+        }
+
+        // Create new student account
+        const newStudent = await User.create({
+            firstName: 'New',
+            lastName: 'Student',
+            email: email,
+            password: password,
+            role: 'student',
+            community: community._id,
+            batch: defaultBatch.name,
+            status: 'active',
+            isEmailVerified: true
+        });
+
+        // Update community member count
+        await Community.findByIdAndUpdate(community._id, {
+            $inc: { 'stats.totalStudents': 1 }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Successfully joined the community as new student',
+            data: {
+                communityId: community._id,
+                communityName: community.name,
+                batchName: defaultBatch.name,
+                studentId: newStudent._id
+            }
+        });
+    }
+}));
 
 module.exports = router;

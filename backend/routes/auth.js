@@ -1,479 +1,417 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const asyncHandler = require('../middleware/async');
+const { protect } = require('../middleware/auth');
+const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
+const Community = require('../models/Community');
 const emailService = require('../services/emailService');
-// const { extractIP } = require('../middleware/security');
+const crypto = require('crypto');
 
 const router = express.Router();
 
-// @route   GET /api/auth/status
-// @desc    Check auth service status
-// @access  Public
-router.get('/status', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Auth service is running',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Helper function to generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign(
-    { userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-  );
-};
-
-// Helper function to send response
-const sendResponse = (res, success, message, data = null, statusCode = 200) => {
-  const response = { success, message };
-  if (data) response.data = data;
-  res.status(statusCode).json(response);
-};
-
-// @route   POST /api/auth/register
-// @desc    Register a new user
+// @desc    Register user (Personal or Community Admin)
+// @route   POST /api/v1/auth/register
 // @access  Public
 router.post('/register', [
-  body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be between 2 and 50 characters'),
-  body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be between 2 and 50 characters'),
-  body('username').trim().isLength({ min: 3, max: 30 }).matches(/^[a-zA-Z0-9_]+$/).withMessage('Username must be between 3 and 30 characters and contain only letters, numbers, and underscores'),
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-  body('role').isIn(['personal', 'community']).withMessage('Invalid role')
-], async (req, res) => {
-  try {
-    // Check for validation errors
+    body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
+    body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('role').isIn(['personal', 'community']).withMessage('Role must be personal or community'),
+    // Community-specific validations
+    body('communityName').if(body('role').equals('community')).notEmpty().withMessage('Community name is required'),
+    body('communityCode').if(body('role').equals('community')).matches(/^[A-Z0-9]{2,10}$/).withMessage('Community code must be 2-10 uppercase letters/numbers')
+], asyncHandler(async (req, res, next) => {
+    // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('❌ Validation errors:', errors.array());
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-
-
-    const {
-      firstName,
-      lastName,
-      username,
-      email,
-      password,
-      role,
-      educationLevel,
-      fieldOfStudy,
-      experienceYears,
-      specialization,
-      bio,
-      primaryInterest,
-      skillLevel
-    } = req.body;
+    const { firstName, lastName, email, role, communityName, communityCode, communityDescription } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
-    });
-
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      if (existingUser.email === email) {
-        return sendResponse(res, false, 'Email already registered', null, 400);
-      }
-      if (existingUser.username === username) {
-        return sendResponse(res, false, 'Username already taken', null, 400);
-      }
+        return next(new ErrorResponse('Email is already registered', 400));
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    let user;
+    let community;
 
-    // Generate email verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    const emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Create user with role-specific fields
-    const userData = {
-      firstName,
-      lastName,
-      username,
-      email,
-      password: hashedPassword,
-      role,
-      emailVerificationToken,
-      emailVerificationExpires,
-      isEmailVerified: false,
-      isActive: true,
-      lastActive: new Date(),
-      lastLoginDate: new Date(),
-      ipAddress: req.ip
-    };
-
-    // Add role-specific fields
-    if (role === 'personal') {
-      userData.skillLevel = skillLevel;
-      userData.primaryInterest = primaryInterest;
-      userData.educationLevel = educationLevel;
-      userData.fieldOfStudy = req.body.fieldOfStudy;
-      userData.bio = bio;
-    } else if (role === 'community') {
-      userData.organizationName = req.body.organizationName;
-      userData.organizationType = req.body.organizationType;
-      userData.organizationSize = req.body.organizationSize;
-      userData.position = req.body.position;
-      userData.organizationWebsite = req.body.organizationWebsite;
-    }
-
-    const user = new User(userData);
-
-    await user.save();
-
-    // Generate OTP for email verification
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Store OTP in user document (temporary)
-    user.emailVerificationToken = otp;
-    user.emailVerificationExpires = emailVerificationExpires;
-    await user.save();
-
-    // Send verification email
     try {
-      await emailService.sendOTP(email, otp, 'verification');
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Continue with registration even if email fails
+        if (role === 'community') {
+            // Check if community code is already taken
+            const existingCommunity = await Community.findOne({ code: communityCode.toUpperCase() });
+            if (existingCommunity) {
+                return next(new ErrorResponse('Community code is already taken', 400));
+            }
+
+            // Create community first
+            community = await Community.create({
+                name: communityName,
+                code: communityCode.toUpperCase(),
+                description: communityDescription || '',
+                admin: null // Will be set after user creation
+            });
+
+            // Create community admin user
+            user = await User.create({
+                firstName,
+                lastName,
+                email,
+                role: 'community-admin',
+                community: community._id,
+                status: 'pending',
+                isTemporaryPassword: true
+            });
+
+            // Update community admin reference
+            community.admin = user._id;
+            await community.save();
+        } else {
+            // Create personal user
+            user = await User.create({
+                firstName,
+                lastName,
+                email,
+                role: 'personal',
+                status: 'pending',
+                isTemporaryPassword: true
+            });
+        }
+
+        // Generate OTP
+        const otp = user.generateOTP();
+        await user.save({ validateBeforeSave: false });
+
+        // Send OTP email
+        try {
+            await emailService.sendOTPEmail(user.email, otp, user.firstName);
+        } catch (emailError) {
+            console.error('Email sending failed:', emailError);
+            // Don't fail registration if email fails
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Registration initiated. Please check your email for OTP verification.',
+            data: {
+                userId: user._id,
+                email: user.email,
+                role: user.role,
+                otpSent: true,
+                ...(community && { communityId: community._id, communityCode: community.code })
+            }
+        });
+
+    } catch (error) {
+        // Cleanup on error
+        if (community) {
+            await Community.findByIdAndDelete(community._id);
+        }
+        if (user) {
+            await User.findByIdAndDelete(user._id);
+        }
+        throw error;
     }
+}));
 
-    // Generate JWT token
-    const token = generateToken(user._id);
-
-    // Remove sensitive data from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    delete userResponse.emailVerificationToken;
-    delete userResponse.emailVerificationExpires;
-
-    sendResponse(res, true, 'Registration successful. Please verify your email.', {
-      user: userResponse,
-      token,
-      requiresEmailVerification: true
-    }, 201);
-
-  } catch (error) {
-    console.error('Registration error:', error);
-    sendResponse(res, false, 'Server error during registration', null, 500);
-  }
-});
-
-// @route   POST /api/auth/send-otp
-// @desc    Send OTP for email verification or password reset
-// @access  Public
-router.post('/send-otp', [
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('type').isIn(['verification', 'password_reset']).withMessage('Invalid OTP type')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
-    }
-
-    const { email, type } = req.body;
-
-    // Find user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return sendResponse(res, false, 'User not found with this email address', null, 404);
-    }
-
-    if (type === 'verification' && user.isEmailVerified) {
-      return sendResponse(res, false, 'Email is already verified', null, 400);
-    }
-
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Store OTP
-    if (type === 'verification') {
-      user.emailVerificationToken = otp;
-      user.emailVerificationExpires = expiresAt;
-    } else {
-      user.passwordResetToken = otp;
-      user.passwordResetExpires = expiresAt;
-    }
-
-    await user.save();
-
-    // Send OTP email
-    try {
-      await emailService.sendOTP(email, otp, type);
-      sendResponse(res, true, `OTP sent to ${email}`, { expiresAt });
-    } catch (emailError) {
-      console.error('Failed to send OTP email:', emailError);
-      sendResponse(res, false, 'Failed to send OTP. Please try again.', null, 500);
-    }
-
-  } catch (error) {
-    console.error('Send OTP error:', error);
-    sendResponse(res, false, 'Server error while sending OTP', null, 500);
-  }
-});
-
-// @route   POST /api/auth/verify-otp
-// @desc    Verify OTP for email verification or password reset
+// @desc    Verify OTP and complete registration
+// @route   POST /api/v1/auth/verify-otp
 // @access  Public
 router.post('/verify-otp', [
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('otp').isLength({ min: 6, max: 6 }).isNumeric().withMessage('OTP must be 6 digits'),
-  body('type').isIn(['verification', 'password_reset']).withMessage('Invalid OTP type')
-], async (req, res) => {
-  try {
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { email, otp, type } = req.body;
+    const { email, otp, password } = req.body;
 
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('community');
     if (!user) {
-      return sendResponse(res, false, 'User not found with this email address', null, 404);
+        return next(new ErrorResponse('User not found', 404));
     }
 
-    // Check OTP and expiration
-    let isValid = false;
-    let tokenField = '';
-    let expiresField = '';
-
-    if (type === 'verification') {
-      tokenField = 'emailVerificationToken';
-      expiresField = 'emailVerificationExpires';
-    } else {
-      tokenField = 'passwordResetToken';
-      expiresField = 'passwordResetExpires';
+    // Verify OTP
+    if (!user.verifyOTP(otp)) {
+        return next(new ErrorResponse('Invalid or expired OTP', 400));
     }
 
-    if (user[tokenField] === otp && user[expiresField] > new Date()) {
-      isValid = true;
-    }
-
-    if (!isValid) {
-      return sendResponse(res, false, 'Invalid or expired OTP', null, 400);
-    }
-
-    // Process verification
-    if (type === 'verification') {
-      user.isEmailVerified = true;
-      user.emailVerificationToken = undefined;
-      user.emailVerificationExpires = undefined;
-      
-      // Send welcome email
-      try {
-        await emailService.sendWelcomeEmail(email, user.username, user.firstName);
-      } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError);
-      }
-    } else {
-      // Password reset - clear tokens
-      user.passwordResetToken = undefined;
-      user.passwordResetExpires = undefined;
-    }
-
-    await user.save();
-
-    // Generate JWT token for verified users
-    let token = null;
-    if (type === 'verification') {
-      token = generateToken(user._id);
-    }
-
-    sendResponse(res, true, `${type === 'verification' ? 'Email verified' : 'OTP verified'} successfully`, {
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        isEmailVerified: user.isEmailVerified
-      }
-    });
-
-  } catch (error) {
-    console.error('Verify OTP error:', error);
-    sendResponse(res, false, 'Server error while verifying OTP', null, 500);
-  }
-});
-
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
-router.post('/login', [
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('password').notEmpty().withMessage('Password is required')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
-    }
-
-    const { email, password } = req.body;
-
-    // Find user by email
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      console.log('❌ User not found for email:', email);
-      return sendResponse(res, false, 'Invalid credentials', null, 401);
-    }
-
-    console.log('✅ User found:', user.email);
-    console.log('✅ Password field exists:', !!user.password);
-    console.log('✅ Password length:', user.password ? user.password.length : 'undefined');
-
-    // Check if user is active
-    if (!user.isActive) {
-      return sendResponse(res, false, 'Account is deactivated. Please contact support.', null, 401);
-    }
-
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return sendResponse(res, false, 'Invalid credentials', null, 401);
-    }
-
-    // Email verification is disabled for now - users can login immediately after registration
-
-    // Update last login
-    user.lastLoginDate = new Date();
-    user.lastActive = new Date();
-    user.ipAddress = req.ip;
+    // Set password and activate account
+    user.password = password;
+    user.isEmailVerified = true;
+    user.status = 'active';
+    user.otpCode = undefined;
+    user.otpExpire = undefined;
+    
     await user.save();
 
     // Generate JWT token
-    const token = generateToken(user._id);
+    const token = user.getSignedJwtToken();
 
-    // Remove sensitive data from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
+    // Send welcome email
+    try {
+        const loginUrl = user.role === 'personal' 
+            ? `${process.env.FRONTEND_URL}/skillport-personal/student-dashboard.html`
+            : `${process.env.FRONTEND_URL}/community-ui/pages/admin/admin-dashboard.html`;
+        
+        await emailService.sendWelcomeEmail(user.email, user.firstName, user.role, loginUrl);
+    } catch (emailError) {
+        console.error('Welcome email failed:', emailError);
+    }
 
-    sendResponse(res, true, 'Login successful', {
-      user: userResponse,
-      token
+    res.status(200).json({
+        success: true,
+        message: 'Email verified successfully. Registration completed.',
+        data: {
+            token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                community: user.community,
+                isEmailVerified: user.isEmailVerified,
+                status: user.status
+            }
+        }
     });
+}));
 
-  } catch (error) {
-    console.error('Login error:', error);
-    sendResponse(res, false, 'Server error during login', null, 500);
-  }
-});
-
-// @route   POST /api/auth/forgot-password
-// @desc    Send password reset email
+// @desc    Resend OTP
+// @route   POST /api/v1/auth/resend-otp
 // @access  Public
-router.post('/forgot-password', [
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address')
-], async (req, res) => {
-  try {
+router.post('/resend-otp', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
     const { email } = req.body;
 
-    // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      // Don't reveal if user exists or not
-      return sendResponse(res, true, 'If an account with that email exists, a password reset link has been sent.');
+        return next(new ErrorResponse('User not found', 404));
+    }
+
+    if (user.isEmailVerified) {
+        return next(new ErrorResponse('Email is already verified', 400));
+    }
+
+    // Generate new OTP
+    const otp = user.generateOTP();
+    await user.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await emailService.sendOTPEmail(user.email, otp, user.firstName);
+    } catch (emailError) {
+        console.error('OTP email failed:', emailError);
+        return next(new ErrorResponse('Failed to send OTP email', 500));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'OTP sent successfully',
+        data: {
+            email: user.email,
+            otpSent: true
+        }
+    });
+}));
+
+// @desc    Login user
+// @route   POST /api/v1/auth/login
+// @access  Public
+router.post('/login', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('password').notEmpty().withMessage('Password is required')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { email, password } = req.body;
+
+    // Find user with password field
+    const user = await User.findOne({ email }).select('+password').populate('community');
+    
+    if (!user) {
+        return next(new ErrorResponse('Invalid credentials', 401));
+    }
+
+    // Check if account is locked
+    if (user.isLocked) {
+        return next(new ErrorResponse('Account is temporarily locked due to too many failed login attempts', 423));
+    }
+
+    // Check if email is verified
+    if (!user.isEmailVerified) {
+        return next(new ErrorResponse('Please verify your email before logging in', 401));
+    }
+
+    // Check password
+    const isMatch = await user.matchPassword(password);
+    
+    if (!isMatch) {
+        await user.incLoginAttempts();
+        return next(new ErrorResponse('Invalid credentials', 401));
+    }
+
+    // Reset login attempts on successful login
+    if (user.loginAttempts > 0) {
+        await user.resetLoginAttempts();
+    }
+
+    // Check if it's a temporary password (for mentors)
+    const requirePasswordChange = user.isTemporaryPassword;
+
+    // Generate JWT token
+    const token = user.getSignedJwtToken();
+
+    // Update last activity
+    user.lastActivity = Date.now();
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: {
+            token,
+            requirePasswordChange,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                community: user.community,
+                status: user.status,
+                avatar: user.avatar,
+                extensionInstalled: user.extensionInstalled
+            }
+        }
+    });
+}));
+
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgot-password
+// @access  Public
+router.post('/forgot-password', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
     }
 
     // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const resetToken = user.getResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
 
-    // Store reset token
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = resetExpires;
-    await user.save();
+    // Create reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/community-ui/pages/auth/reset-password.html?token=${resetToken}`;
 
-    // Send password reset email
     try {
-      await emailService.sendPasswordReset(email, resetToken, user.username);
-      sendResponse(res, true, 'Password reset email sent successfully');
-    } catch (emailError) {
-      console.error('Failed to send password reset email:', emailError);
-      sendResponse(res, false, 'Failed to send password reset email. Please try again.', null, 500);
+        await emailService.sendPasswordResetEmail(user.email, resetUrl, user.firstName);
+
+        res.status(200).json({
+            success: true,
+            message: 'Password reset email sent',
+            data: {
+                email: user.email,
+                resetEmailSent: true
+            }
+        });
+    } catch (error) {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return next(new ErrorResponse('Email could not be sent', 500));
     }
+}));
 
-  } catch (error) {
-    console.error('Forgot password error:', error);
-    sendResponse(res, false, 'Server error while processing request', null, 500);
-  }
-});
-
-// @route   POST /api/auth/reset-password
-// @desc    Reset password using token
+// @desc    Reset password
+// @route   POST /api/v1/auth/reset-password/:resettoken
 // @access  Public
-router.post('/reset-password', [
-  body('token').notEmpty().withMessage('Reset token is required'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
-], async (req, res) => {
-  try {
+router.post('/reset-password/:resettoken', [
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { token, password } = req.body;
+    // Get hashed token
+    const resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(req.params.resettoken)
+        .digest('hex');
 
-    // Find user with valid reset token
     const user = await User.findOne({
-      passwordResetToken: token,
-      passwordResetExpires: { $gt: new Date() }
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() }
     });
 
     if (!user) {
-      return sendResponse(res, false, 'Invalid or expired reset token', null, 400);
+        return next(new ErrorResponse('Invalid or expired reset token', 400));
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Update password and clear reset token
-    user.password = hashedPassword;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    // Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    user.isTemporaryPassword = false;
+    
     await user.save();
 
-    sendResponse(res, true, 'Password reset successfully');
+    // Generate JWT token
+    const token = user.getSignedJwtToken();
 
-  } catch (error) {
-    console.error('Reset password error:', error);
-    sendResponse(res, false, 'Server error while resetting password', null, 500);
-  }
-});
+    res.status(200).json({
+        success: true,
+        message: 'Password reset successful',
+        data: {
+            token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role
+            }
+        }
+    });
+}));
 
-// @route   POST /api/auth/change-password
-// @desc    Change password (authenticated user)
+// @desc    Change password (for logged in users)
+// @route   PUT /api/v1/auth/change-password
 // @access  Private
-router.post('/change-password', [
-  require('../middleware/auth').auth,
-  body('currentPassword').notEmpty().withMessage('Current password is required'),
-  body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters long')
-], async (req, res) => {
-  try {
+router.put('/change-password', protect, [
+    body('currentPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
     const { currentPassword, newPassword } = req.body;
@@ -481,205 +419,111 @@ router.post('/change-password', [
     // Get user with password
     const user = await User.findById(req.user.id).select('+password');
 
-    // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isCurrentPasswordValid) {
-      return sendResponse(res, false, 'Current password is incorrect', null, 400);
+    // Check current password (skip for temporary passwords)
+    if (!user.isTemporaryPassword) {
+        const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
+            return next(new ErrorResponse('Current password is incorrect', 400));
+        }
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update password
-    user.password = hashedPassword;
+    // Set new password
+    user.password = newPassword;
+    user.isTemporaryPassword = false;
     await user.save();
 
-    sendResponse(res, true, 'Password changed successfully');
-
-  } catch (error) {
-    console.error('Change password error:', error);
-    sendResponse(res, false, 'Server error while changing password', null, 500);
-  }
-});
-
-// @route   GET /api/auth/me
-// @desc    Get current user profile
-// @access  Private
-router.get('/me', require('../middleware/auth').auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id)
-      .populate('communities.community', 'name description category')
-      .select('-password -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires');
-
-    if (!user) {
-      return sendResponse(res, false, 'User not found', null, 404);
-    }
-
-    sendResponse(res, true, 'Profile retrieved successfully', { user });
-
-  } catch (error) {
-    console.error('Get profile error:', error);
-    sendResponse(res, false, 'Server error while retrieving profile', null, 500);
-  }
-});
-
-// @route   POST /api/auth/logout
-// @desc    Logout user (client-side token removal)
-// @access  Private
-router.post('/logout', require('../middleware/auth').auth, async (req, res) => {
-  try {
-    // Update last active time
-    await User.findByIdAndUpdate(req.user.id, {
-      lastActive: new Date()
+    res.status(200).json({
+        success: true,
+        message: 'Password changed successfully'
     });
+}));
 
-    sendResponse(res, true, 'Logged out successfully');
-
-  } catch (error) {
-    console.error('Logout error:', error);
-    sendResponse(res, false, 'Server error during logout', null, 500);
-  }
-});
-
-// @route   POST /api/auth/refresh-token
-// @desc    Refresh JWT token
+// @desc    Get current logged in user
+// @route   GET /api/v1/auth/me
 // @access  Private
-router.post('/refresh-token', require('../middleware/auth').auth, async (req, res) => {
-  try {
-    // Generate new token
-    const newToken = generateToken(req.user.id);
+router.get('/me', protect, asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).populate('community');
 
-    sendResponse(res, true, 'Token refreshed successfully', {
-      token: newToken,
-      user: {
-        id: req.user.id,
-        username: req.user.username,
-        email: req.user.email,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        role: req.user.role
-      }
+    res.status(200).json({
+        success: true,
+        data: {
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                fullName: user.fullName,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                avatar: user.avatar,
+                bio: user.bio,
+                community: user.community,
+                batch: user.batch,
+                studentId: user.studentId,
+                totalPoints: user.totalPoints,
+                level: user.level,
+                streak: user.streak,
+                extensionInstalled: user.extensionInstalled,
+                lastExtensionSync: user.lastExtensionSync,
+                preferences: user.preferences,
+                createdAt: user.createdAt,
+                lastActivity: user.lastActivity
+            }
+        }
     });
+}));
 
-  } catch (error) {
-    console.error('Refresh token error:', error);
-    sendResponse(res, false, 'Server error while refreshing token', null, 500);
-  }
-});
-
-// @route   POST /api/auth/verify-email
-// @desc    Verify email address
+// @desc    Logout user
+// @route   POST /api/v1/auth/logout
 // @access  Private
-router.post('/verify-email', [
-  require('../middleware/auth').auth,
-  body('otp').isLength({ min: 6, max: 6 }).isNumeric().withMessage('OTP must be 6 digits')
-], async (req, res) => {
-  try {
+router.post('/logout', protect, asyncHandler(async (req, res, next) => {
+    // Update user's last activity
+    await User.findByIdAndUpdate(req.user.id, { lastActivity: Date.now() });
+
+    res.status(200).json({
+        success: true,
+        message: 'Logged out successfully',
+        data: {}
+    });
+}));
+
+// @desc    Check if email exists (for student joining flow)
+// @route   POST /api/v1/auth/check-email
+// @access  Public
+router.post('/check-email', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return sendResponse(res, false, 'Validation failed', { errors: errors.array() }, 400);
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { otp } = req.body;
+    const { email } = req.body;
 
-    // Check if user is already verified
-    if (req.user.isEmailVerified) {
-      return sendResponse(res, false, 'Email is already verified', null, 400);
+    // Check if user already exists
+    const existingUser = await User.findOne({ email }).populate('community');
+    if (existingUser) {
+        return res.status(200).json({
+            success: true,
+            data: {
+                exists: true,
+                userType: existingUser.role,
+                community: existingUser.community,
+                canLogin: existingUser.isEmailVerified && existingUser.status === 'active'
+            }
+        });
     }
 
-    // Verify OTP
-    if (req.user.emailVerificationToken !== otp || req.user.emailVerificationExpires < new Date()) {
-      return sendResponse(res, false, 'Invalid or expired OTP', null, 400);
-    }
-
-    // Mark email as verified
-    req.user.isEmailVerified = true;
-    req.user.emailVerificationToken = undefined;
-    req.user.emailVerificationExpires = undefined;
-    await req.user.save();
-
-    // Send welcome email
-    try {
-      await emailService.sendWelcomeEmail(req.user.email, req.user.username, req.user.firstName);
-    } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
-    }
-
-    sendResponse(res, true, 'Email verified successfully');
-
-  } catch (error) {
-    console.error('Verify email error:', error);
-    sendResponse(res, false, 'Server error while verifying email', null, 500);
-  }
-});
-
-// @route   POST /api/auth/fix-old-passwords
-// @desc    Fix old users with double-hashed passwords (temporary route)
-// @access  Public (temporary for development)
-router.post('/fix-old-passwords', async (req, res) => {
-  try {
-    const { email, newPassword = 'Test123!' } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email is required'
-      });
-    }
-
-    // Find user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    console.log(`🔧 Fixing password for user: ${email}`);
-    console.log(`🔧 Old password length: ${user.password.length}`);
-
-    // Hash new password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update password
-    user.password = hashedPassword;
-    await user.save();
-
-    console.log(`✅ Password fixed for user: ${email}`);
-    console.log(`✅ New password length: ${user.password.length}`);
-
-    res.json({
-      success: true,
-      message: `Password fixed successfully for ${email}`,
-      user: {
-        email: user.email,
-        username: user.username,
-        role: user.role
-      },
-      note: `You can now login with password: ${newPassword}`
+    // Check if email is pre-registered by any community admin
+    // This would be implemented when we add the student pre-registration feature
+    // For now, return that email doesn't exist
+    res.status(200).json({
+        success: true,
+        data: {
+            exists: false,
+            canRegister: true
+        }
     });
-
-  } catch (error) {
-    console.error('Fix password error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during password fix'
-    });
-  }
-});
-
-// @route   GET /api/auth/status
-// @desc    Check auth service status
-// @access  Public
-router.get('/status', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Auth service is running',
-    timestamp: new Date().toISOString()
-  });
-});
+}));
 
 module.exports = router;

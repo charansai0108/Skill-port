@@ -1,191 +1,278 @@
 const mongoose = require('mongoose');
 
-const communitySchema = new mongoose.Schema({
-  // Basic Information
-  name: {
-    type: String,
-    required: [true, 'Community name is required'],
-    trim: true,
-    maxlength: [100, 'Community name cannot exceed 100 characters'],
-    unique: true
-  },
-  description: {
-    type: String,
-    required: [true, 'Description is required'],
-    maxlength: [1000, 'Description cannot exceed 1000 characters']
-  },
-  shortDescription: {
-    type: String,
-    maxlength: [200, 'Short description cannot exceed 200 characters']
-  },
-  
-  // Category and Type
-  category: {
-    type: String,
-    enum: ['algorithms', 'data-structures', 'web-development', 'mobile-development', 'ai-ml', 'system-design', 'other'],
-    required: true
-  },
-  privacy: {
-    type: String,
-    enum: ['public', 'private', 'invite-only'],
-    default: 'public'
-  },
-  
-  // Members Management
-  members: [{
-    user: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'User', 
-      required: true 
+const CommunitySchema = new mongoose.Schema({
+    // Basic Information
+    name: {
+        type: String,
+        required: [true, 'Community name is required'],
+        trim: true,
+        maxlength: [100, 'Community name cannot exceed 100 characters']
     },
-    role: { 
-      type: String, 
-      enum: ['member', 'moderator', 'admin'], 
-      default: 'member' 
+    code: {
+        type: String,
+        required: [true, 'Community code is required'],
+        unique: true,
+        uppercase: true,
+        match: [/^[A-Z0-9]{2,10}$/, 'Community code must be 2-10 uppercase letters/numbers']
     },
-    joinedAt: { 
-      type: Date, 
-      default: Date.now 
+    description: {
+        type: String,
+        maxlength: [1000, 'Description cannot exceed 1000 characters']
     },
-    isActive: { 
-      type: Boolean, 
-      default: true 
+    
+    // Visual Branding
+    logo: {
+        type: String,
+        default: null
     },
-    lastActivity: {
-      type: Date,
-      default: Date.now
+    banner: {
+        type: String,
+        default: null
+    },
+    primaryColor: {
+        type: String,
+        default: '#3B82F6',
+        match: [/^#[0-9A-F]{6}$/i, 'Primary color must be a valid hex color']
+    },
+    secondaryColor: {
+        type: String,
+        default: '#1E40AF',
+        match: [/^#[0-9A-F]{6}$/i, 'Secondary color must be a valid hex color']
+    },
+    
+    // Community Admin
+    admin: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: [false, 'Community admin is required']
+    },
+    
+    // Status and Settings
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended'],
+        default: 'active'
+    },
+    isPublic: {
+        type: Boolean,
+        default: false
+    },
+    allowSelfRegistration: {
+        type: Boolean,
+        default: false
+    },
+    
+    // Limits and Quotas
+    maxStudents: {
+        type: Number,
+        default: 100,
+        min: [1, 'Max students must be at least 1'],
+        max: [1000, 'Max students cannot exceed 1000']
+    },
+    maxMentors: {
+        type: Number,
+        default: 10,
+        min: [1, 'Max mentors must be at least 1'],
+        max: [50, 'Max mentors cannot exceed 50']
+    },
+    maxBatches: {
+        type: Number,
+        default: 10,
+        min: [1, 'Max batches must be at least 1'],
+        max: [50, 'Max batches cannot exceed 50']
+    },
+    
+    // Batches Configuration
+    batches: [{
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        code: {
+            type: String,
+            required: true,
+            uppercase: true
+        },
+        description: String,
+        startDate: Date,
+        endDate: Date,
+        maxStudents: {
+            type: Number,
+            default: 50
+        },
+        status: {
+            type: String,
+            enum: ['active', 'inactive', 'completed'],
+            default: 'active'
+        },
+        mentors: [{
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        }]
+    }],
+    
+    // Features and Modules
+    features: {
+        contests: { type: Boolean, default: true },
+        leaderboard: { type: Boolean, default: true },
+        certificates: { type: Boolean, default: true },
+        mentorship: { type: Boolean, default: true },
+        projects: { type: Boolean, default: true },
+        discussions: { type: Boolean, default: true },
+        analytics: { type: Boolean, default: true }
+    },
+    
+    // Statistics
+    stats: {
+        totalStudents: { type: Number, default: 0 },
+        totalMentors: { type: Number, default: 0 },
+        totalContests: { type: Number, default: 0 },
+        totalProjects: { type: Number, default: 0 },
+        averageProgress: { type: Number, default: 0 }
+    },
+    
+    // Contact Information
+    contactInfo: {
+        email: {
+            type: String,
+            match: [
+                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                'Please enter a valid email'
+            ]
+        },
+        phone: String,
+        website: String,
+        address: {
+            street: String,
+            city: String,
+            state: String,
+            country: String,
+            zipCode: String
+        }
+    },
+    
+    // Social Links
+    socialLinks: {
+        website: String,
+        linkedin: String,
+        twitter: String,
+        github: String,
+        discord: String
+    },
+    
+    // Subscription and Billing (for future use)
+    subscription: {
+        plan: {
+            type: String,
+            enum: ['free', 'basic', 'premium', 'enterprise'],
+            default: 'free'
+        },
+        expiresAt: Date,
+        isActive: { type: Boolean, default: true }
     }
-  }],
-  
-  // Limits and Settings
-  maxMembers: {
-    type: Number,
-    default: 1000,
-    min: [10, 'Community must have at least 10 members']
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  
-  // Content and Rules
-  rules: [String],
-  tags: [String],
-  image: String,
-  banner: String,
-  
-  // Statistics
-  memberCount: {
-    type: Number,
-    default: 0
-  },
-  postCount: {
-    type: Number,
-    default: 0
-  },
-  contestCount: {
-    type: Number,
-    default: 0
-  },
-  
-  // Metadata
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['active', 'inactive', 'suspended', 'pending'],
-    default: 'active'
-  },
-  
-  // Settings
-  allowMemberInvites: {
-    type: Boolean,
-    default: true
-  },
-  requireApproval: {
-    type: Boolean,
-    default: false
-  },
-  autoApprove: {
-    type: Boolean,
-    default: true
-  }
 }, {
-  timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-// Indexes for performance
-communitySchema.index({ name: 'text', description: 'text', tags: 'text' });
-communitySchema.index({ category: 1, privacy: 1, status: 1 });
-communitySchema.index({ 'members.user': 1 });
-communitySchema.index({ createdAt: -1 });
+// Indexes
+CommunitySchema.index({ code: 1 });
+CommunitySchema.index({ admin: 1 });
+CommunitySchema.index({ status: 1 });
+CommunitySchema.index({ 'batches.code': 1 });
 
-// Pre-save middleware to update member count
-communitySchema.pre('save', function(next) {
-  if (this.isModified('members')) {
-    this.memberCount = this.members.filter(member => member.isActive).length;
-  }
-  next();
+// Virtual for active students count
+CommunitySchema.virtual('activeStudentsCount', {
+    ref: 'User',
+    localField: '_id',
+    foreignField: 'community',
+    count: true,
+    match: { role: 'student', status: 'active' }
 });
 
-// Methods
-communitySchema.methods.addMember = function(userId, role = 'member') {
-  const existingMember = this.members.find(member => 
-    member.user.toString() === userId.toString()
-  );
-  
-  if (existingMember) {
-    existingMember.isActive = true;
-    existingMember.role = role;
-    existingMember.lastActivity = new Date();
-  } else {
-    this.members.push({
-      user: userId,
-      role: role,
-      joinedAt: new Date(),
-      lastActivity: new Date()
+// Virtual for active mentors count
+CommunitySchema.virtual('activeMentorsCount', {
+    ref: 'User',
+    localField: '_id',
+    foreignField: 'community',
+    count: true,
+    match: { role: 'mentor', status: 'active' }
+});
+
+// Pre-save middleware to update stats
+CommunitySchema.pre('save', async function(next) {
+    if (this.isModified('batches')) {
+        // Update batch codes if not set
+        this.batches.forEach((batch, index) => {
+            if (!batch.code) {
+                batch.code = `${this.code}-B${String(index + 1).padStart(2, '0')}`;
+            }
+        });
+    }
+    next();
+});
+
+// Method to add a batch
+CommunitySchema.methods.addBatch = function(batchData) {
+    if (this.batches.length >= this.maxBatches) {
+        throw new Error('Maximum number of batches reached');
+    }
+    
+    const batchCode = batchData.code || `${this.code}-B${String(this.batches.length + 1).padStart(2, '0')}`;
+    
+    this.batches.push({
+        ...batchData,
+        code: batchCode
     });
-  }
-  
-  return this.save();
-};
-
-communitySchema.methods.removeMember = function(userId) {
-  const memberIndex = this.members.findIndex(member => 
-    member.user.toString() === userId.toString()
-  );
-  
-  if (memberIndex !== -1) {
-    this.members[memberIndex].isActive = false;
+    
     return this.save();
-  }
-  
-  return Promise.resolve(this);
 };
 
-communitySchema.methods.isMember = function(userId) {
-  return this.members.some(member => 
-    member.user.toString() === userId.toString() && member.isActive
-  );
+// Method to get batch by code
+CommunitySchema.methods.getBatchByCode = function(batchCode) {
+    return this.batches.find(batch => batch.code === batchCode);
 };
 
-communitySchema.methods.isAdmin = function(userId) {
-  return this.members.some(member => 
-    member.user.toString() === userId.toString() && 
-    member.role === 'admin' && 
-    member.isActive
-  );
+// Method to check if user can join
+CommunitySchema.methods.canAddStudent = function() {
+    return this.stats.totalStudents < this.maxStudents;
 };
 
-communitySchema.methods.isModerator = function(userId) {
-  return this.members.some(member => 
-    member.user.toString() === userId.toString() && 
-    (member.role === 'moderator' || member.role === 'admin') && 
-    member.isActive
-  );
+// Method to check if mentor can be added
+CommunitySchema.methods.canAddMentor = function() {
+    return this.stats.totalMentors < this.maxMentors;
 };
 
-module.exports = mongoose.model('Community', communitySchema);
+// Method to update statistics
+CommunitySchema.methods.updateStats = async function() {
+    const User = mongoose.model('User');
+    const Contest = mongoose.model('Contest');
+    const Project = mongoose.model('Project');
+    
+    const [studentCount, mentorCount, contestCount, projectCount] = await Promise.all([
+        User.countDocuments({ community: this._id, role: 'student', status: 'active' }),
+        User.countDocuments({ community: this._id, role: 'mentor', status: 'active' }),
+        Contest.countDocuments({ community: this._id }),
+        Project.countDocuments({ community: this._id })
+    ]);
+    
+    // Calculate average progress (placeholder - implement based on your progress model)
+    const students = await User.find({ community: this._id, role: 'student', status: 'active' });
+    const averageProgress = students.length > 0 
+        ? students.reduce((sum, student) => sum + (student.totalPoints || 0), 0) / students.length 
+        : 0;
+    
+    this.stats = {
+        totalStudents: studentCount,
+        totalMentors: mentorCount,
+        totalContests: contestCount,
+        totalProjects: projectCount,
+        averageProgress: Math.round(averageProgress)
+    };
+    
+    return this.save();
+};
+
+module.exports = mongoose.model('Community', CommunitySchema);
