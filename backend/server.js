@@ -17,7 +17,11 @@ connectDB();
 // Route files
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const mentorRoutes = require('./routes/mentor');
+const userSpecificRoutes = require('./routes/user');
+const personalRoutes = require('./routes/personal');
 const communityRoutes = require('./routes/communities');
+const communityDashboardRoutes = require('./routes/community');
 const contestRoutes = require('./routes/contests');
 const projectRoutes = require('./routes/projects');
 const progressRoutes = require('./routes/progress');
@@ -25,6 +29,7 @@ const extensionRoutes = require('./routes/extension');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin');
 const analyticsRoutes = require('./routes/analytics');
+const contactRoutes = require('./routes/contact');
 
 // Middleware files
 const errorHandler = require('./middleware/error');
@@ -40,7 +45,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000', 'http://localhost:8000', 'http://localhost:8080'],
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000', 'http://localhost:8000', 'http://localhost:8080', 'http://localhost:8002'],
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -71,12 +76,12 @@ const limiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false
 });
-app.use('/api/', limiter);
+app.use('/api/', limiter); // Rate limiting enabled
 
 // Strict rate limiting for auth endpoints
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 10 auth requests per windowMs
+    max: 1000, // limit each IP to 1000 auth requests per windowMs (increased for testing)
     message: {
         error: 'Too many authentication attempts, please try again later.',
         retryAfter: 900
@@ -84,10 +89,13 @@ const authLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false
 });
-app.use('/api/v1/auth', authLimiter);
+app.use('/api/v1/auth', authLimiter); // Auth rate limiting enabled
 
 // Static file serving for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Static file serving for frontend
+app.use(express.static(path.join(__dirname, '../client')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -100,11 +108,26 @@ app.get('/health', (req, res) => {
     });
 });
 
+// API health check endpoint
+app.get(`/api/${process.env.API_VERSION || 'v1'}/health`, (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'API is running',
+        timestamp: new Date().toISOString(),
+        version: process.env.API_VERSION || 'v1',
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
 // API Routes
 const apiVersion = process.env.API_VERSION || 'v1';
 app.use(`/api/${apiVersion}/auth`, authRoutes);
 app.use(`/api/${apiVersion}/users`, protect, userRoutes);
+app.use(`/api/${apiVersion}/mentor`, protect, mentorRoutes);
+app.use(`/api/${apiVersion}/user`, protect, userSpecificRoutes);
+app.use(`/api/${apiVersion}/personal`, protect, personalRoutes);
 app.use(`/api/${apiVersion}/communities`, protect, communityRoutes);
+app.use(`/api/${apiVersion}/community`, protect, communityDashboardRoutes);
 app.use(`/api/${apiVersion}/contests`, protect, contestRoutes);
 app.use(`/api/${apiVersion}/projects`, protect, projectRoutes);
 app.use(`/api/${apiVersion}/progress`, protect, progressRoutes);
@@ -112,6 +135,7 @@ app.use(`/api/${apiVersion}/extension`, extensionRoutes);
 app.use(`/api/${apiVersion}/upload`, protect, uploadRoutes);
 app.use(`/api/${apiVersion}/admin`, protect, adminRoutes);
 app.use(`/api/${apiVersion}/analytics`, protect, analyticsRoutes);
+app.use(`/api/${apiVersion}/contact`, contactRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res) => {
@@ -123,6 +147,10 @@ app.all('*', (req, res) => {
             `POST /api/${apiVersion}/auth/register`,
             `POST /api/${apiVersion}/auth/login`,
             `GET /api/${apiVersion}/users/profile`,
+            `GET /api/${apiVersion}/mentor/students`,
+            `GET /api/${apiVersion}/mentor/contests`,
+            `GET /api/${apiVersion}/user/contests`,
+            `GET /api/${apiVersion}/user/profile`,
             `GET /api/${apiVersion}/communities`,
             `GET /api/${apiVersion}/contests`,
             `GET /api/${apiVersion}/projects`,

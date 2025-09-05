@@ -6,10 +6,12 @@
     <title>Login - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../js/suppress-warnings.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="../../js/apiService.js"></script>
     <script src="../../js/notifications.js"></script>
     <script src="../../js/authManager.js"></script>
+    <script src="../../js/login.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -155,6 +157,7 @@
 
                 <button 
                     type="submit" 
+                    id="loginButton"
                     class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
                 >
                     <i data-lucide="log-in" class="w-5 h-5"></i>
@@ -257,106 +260,6 @@
             }
             lucide.createIcons();
         }
-
-        // Form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                console.log('🔐 Attempting login for:', email);
-                
-                const response = await window.APIService.login(email, password);
-                
-                if (response.success) {
-                    showAlert('🎉 Login successful! Redirecting...', 'success');
-                    
-                    setTimeout(() => {
-                        // Redirect based on user role
-                        if (response.data.user && response.data.user.role === 'personal') {
-                            const personalUrl = '/skillport-personal/student-dashboard';
-                            console.log('🔄 Redirecting to personal dashboard:', personalUrl);
-                            window.location.href = personalUrl;
-                        } else if (response.data.user && response.data.user.role === 'community-admin') {
-                            const adminUrl = '/pages/admin/admin-dashboard.html';
-                            console.log('🔄 Redirecting to admin dashboard:', adminUrl);
-                            window.location.href = adminUrl;
-                        } else if (response.data.user && response.data.user.role === 'mentor') {
-                            const mentorUrl = '/pages/mentor/mentor-dashboard.html';
-                            console.log('🔄 Redirecting to mentor dashboard:', mentorUrl);
-                            window.location.href = mentorUrl;
-                        } else if (response.data.user && response.data.user.role === 'student') {
-                            const studentUrl = '/pages/user/user-dashboard.html';
-                            console.log('🔄 Redirecting to student dashboard:', studentUrl);
-                            window.location.href = studentUrl;
-                        } else {
-                            const defaultUrl = '/skillport-personal/student-dashboard.html';
-                            console.log('🔄 Redirecting to default dashboard:', defaultUrl);
-                            window.location.href = defaultUrl;
-                        }
-                    }, 1500);
-                } else {
-                    showAlert(response.error || response.message || 'Login failed', 'error');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                if (error.message && error.message.includes('Failed to fetch')) {
-                    showAlert('❌ Backend server not running. Please start the backend server first.', 'error');
-                } else {
-                    showAlert('Login failed: ' + (error.message || 'Unknown error'), 'error');
-                }
-            }
-        });
-
-        // Alert system
-        function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            
-            const bgColor = type === 'success' ? 'bg-green-500' : 
-                           type === 'error' ? 'bg-red-500' : 
-                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
-            
-            alert.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-4 max-w-sm`;
-            alert.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span>${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            `;
-            
-            alertContainer.appendChild(alert);
-            lucide.createIcons();
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (alert.parentElement) {
-                    alert.remove();
-                }
-            }, 5000);
-        }
-
-        // Check authentication status on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
-            if (window.authManager && window.authManager.isAuthenticated) {
-                // Redirect to appropriate dashboard
-                const userRole = window.authManager.getUserRole();
-                if (userRole === 'personal') {
-                    window.location.href = '/skillport-personal/student-dashboard.html';
-                } else if (userRole === 'community-admin') {
-                    window.location.href = '/pages/admin/admin-dashboard';
-                } else if (userRole === 'mentor') {
-                    window.location.href = '/pages/mentor/mentor-dashboard';
-                } else if (userRole === 'student') {
-                    window.location.href = '/pages/user/user-dashboard';
-                }
-            }
-        });
     </script>
 </body>
 </html>

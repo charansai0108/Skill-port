@@ -7,12 +7,19 @@ class AuthManager {
     constructor() {
         this.currentUser = null;
         this.isAuthenticated = false;
+        this.isInitialized = false;
         this.init();
     }
 
     init() {
+        if (this.isInitialized) {
+            console.log('🔐 AuthManager: Already initialized, skipping...');
+            return;
+        }
+        
         this.checkAuthStatus();
         this.setupEventListeners();
+        this.isInitialized = true;
     }
 
     setupEventListeners() {
@@ -29,36 +36,46 @@ class AuthManager {
     }
 
     async checkAuthStatus() {
+        console.log('🔐 AuthManager: Starting authentication check...');
         const token = localStorage.getItem('jwt_token');
         
         if (!token) {
+            console.log('🔐 AuthManager: No token found, handling unauthenticated');
             this.handleUnauthenticated();
             return;
         }
 
+        console.log('🔐 AuthManager: Token found, verifying with backend...');
         try {
             // Verify token with backend
             const response = await window.APIService.getUserProfile();
+            console.log('🔐 AuthManager: Backend response:', response);
             
             if (response.success) {
-                this.currentUser = response.data;
+                // Handle different response formats from different endpoints
+                this.currentUser = response.data.user || response.data;
                 this.isAuthenticated = true;
+                console.log('🔐 AuthManager: Authentication successful, user:', this.currentUser);
                 this.handleAuthenticated();
             } else {
+                console.log('🔐 AuthManager: Backend returned error, handling invalid token');
                 this.handleInvalidToken();
             }
         } catch (error) {
-            console.error('Auth check failed:', error);
+            console.error('🔐 AuthManager: Auth check failed:', error);
+            console.error('🔐 AuthManager: Error stack:', error.stack);
             this.handleInvalidToken();
         }
     }
 
     handleAuthenticated() {
+        console.log('🔐 AuthManager: handleAuthenticated called');
         // Update UI to show authenticated state
         this.updateAuthUI();
         
         // Redirect based on role if on login/register page
         if (this.shouldRedirect()) {
+            console.log('🔐 AuthManager: Should redirect, calling redirectByRole');
             this.redirectByRole();
         }
 
@@ -69,6 +86,7 @@ class AuthManager {
     }
 
     handleUnauthenticated() {
+        console.log('🔐 AuthManager: handleUnauthenticated called');
         this.currentUser = null;
         this.isAuthenticated = false;
         
@@ -77,6 +95,7 @@ class AuthManager {
         
         // Redirect to login if on protected page
         if (this.isProtectedPage()) {
+            console.log('🔐 AuthManager: On protected page, redirecting to login');
             this.redirectToLogin();
         }
 
@@ -86,14 +105,78 @@ class AuthManager {
 
     handleInvalidToken() {
         localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_data');
         this.handleUnauthenticated();
         
         // Show notification
         if (window.notifications) {
-            window.notifications.error(
-                'Session Expired',
-                'Your session has expired. Please log in again.'
-            );
+            window.notifications.error({
+                title: 'Session Expired',
+                message: 'Your session has expired. Please log in again.'
+            });
+        }
+    }
+
+    // Enhanced logout functionality
+    logout() {
+        console.log('🔐 AuthManager: Logging out user...');
+        
+        // Clear all stored data
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_data');
+        sessionStorage.clear();
+        
+        // Reset state
+        this.isAuthenticated = false;
+        this.currentUser = null;
+        this.userRole = null;
+        this.communityId = null;
+        
+        // Redirect to login
+        this.redirectToLogin();
+        
+        // Show logout notification
+        if (window.notifications) {
+            window.notifications.success({
+                title: 'Logged Out',
+                message: 'You have been successfully logged out'
+            });
+        }
+    }
+
+    // Check if token is expired
+    isTokenExpired() {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) return true;
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Date.now() / 1000;
+            return payload.exp < currentTime;
+        } catch (error) {
+            console.error('🔐 AuthManager: Error checking token expiration:', error);
+            return true;
+        }
+    }
+
+    // Get stored user data
+    getStoredUserData() {
+        try {
+            const userData = localStorage.getItem('user_data');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('🔐 AuthManager: Error parsing stored user data:', error);
+            return null;
+        }
+    }
+
+    // Store user data
+    storeUserData(userData) {
+        try {
+            localStorage.setItem('user_data', JSON.stringify(userData));
+            console.log('🔐 AuthManager: User data stored successfully');
+        } catch (error) {
+            console.error('🔐 AuthManager: Error storing user data:', error);
         }
     }
 
@@ -114,10 +197,10 @@ class AuthManager {
                 
                 window.notifications?.success(
                     'Welcome back!',
-                    `Successfully logged in as ${response.data.user.firstName}`
+                    `Successfully logged in as ${response.data.firstName}`
                 );
 
-                return { success: true, user: response.data.user };
+                return { success: true, user: response.data };
             } else {
                 window.notifications?.error(
                     'Login Failed',
@@ -317,9 +400,9 @@ class AuthManager {
 
         const role = this.currentUser.role;
         const redirects = {
-            'community-admin': '/pages/admin/admin-dashboard.html',
-            'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/user/user-dashboard.html',
+            'community-admin': '/pages/admin/admin-dashboard',
+            'mentor': '/pages/mentor/mentor-dashboard',
+            'student': '/pages/user/user-dashboard',
             'personal': '/skillport-personal/student-dashboard'
         };
 
@@ -332,19 +415,25 @@ class AuthManager {
     isProtectedPage() {
         const currentPath = window.location.pathname;
         const protectedPaths = [
-            '/admin/',
-            '/mentor/',
-            '/user/',
+            '/pages/admin/',
+            '/pages/mentor/',
+            '/pages/user/',
             '/skillport-personal/'
         ];
         
-        return protectedPaths.some(path => currentPath.includes(path));
+        const isProtected = protectedPaths.some(path => currentPath.includes(path));
+        console.log('🔐 AuthManager: isProtectedPage check - currentPath:', currentPath, 'isProtected:', isProtected);
+        return isProtected;
     }
 
     redirectToLogin() {
         const currentPath = window.location.pathname;
-        if (!currentPath.includes('login.html')) {
-            window.location.href = '/pages/auth/login.html';
+        console.log('🔐 AuthManager: redirectToLogin called, currentPath:', currentPath);
+        if (!currentPath.includes('login')) {
+            console.log('🔐 AuthManager: Redirecting to login page');
+            window.location.href = '/pages/auth/login';
+        } else {
+            console.log('🔐 AuthManager: Already on login page, not redirecting');
         }
     }
 
@@ -433,8 +522,26 @@ class AuthManager {
     }
 }
 
-// Create global instance
-window.authManager = new AuthManager();
+// Initialize AuthManager when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔐 Initializing AuthManager...');
+    
+    // Prevent multiple instances
+    if (window.authManager) {
+        console.log('🔐 AuthManager already initialized, skipping...');
+        return;
+    }
+    
+    // Wait for APIService to be ready
+    setTimeout(() => {
+        try {
+            window.authManager = new AuthManager();
+            window.AuthManager = window.authManager; // Also expose as uppercase for compatibility
+        } catch (error) {
+            console.error('🔐 Failed to initialize AuthManager:', error);
+        }
+    }, 100);
+});
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

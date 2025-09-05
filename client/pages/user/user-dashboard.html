@@ -3,546 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Dashboard - PW IOI Community</title>
+  <title>User Dashboard - SkillPort Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../../js/suppress-warnings.js"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../js/apiService.js"></script>
+  <script src="../../js/notifications.js"></script>
+  <script src="../../js/authManager.js"></script>
+  <script src="../../js/contextManager.js"></script>
+  <script src="../../js/dataLoader.js"></script>
+  <script src="../../js/uiHelpers.js"></script>
+  <script src="../../js/pageController.js"></script>
+  <script src="../../js/userDashboard.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    
-    /* Enhanced transitions and animations */
-    .nav-link {
-      transition: all 0.3s ease-in-out;
+    body { 
+      font-family: 'Inter', sans-serif; 
     }
-    
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: rgba(59, 130, 246, 0.3);
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-      transform: translateY(-2px);
-    }
-    
-    /* Enhanced glassy stat cards */
-    .stat-card {
-      transition: all 0.3s ease-in-out;
-      animation: fadeInUp 0.3s ease-out;
-      backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.65);
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(59, 130, 246, 0.05);
-    }
-    
-    .stat-card:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: rgba(59, 130, 246, 0.6);
-      border-width: 3px;
-      box-shadow: 
-        0 8px 25px rgba(59, 130, 246, 0.2),
-        0 0 0 2px rgba(59, 130, 246, 0.2);
-      transform: translateY(-3px) scale(1.02);
-    }
-    
-    /* Enhanced glassy effects for all cards */
-    .dashboard-card {
-      transition: all 0.3s ease-in-out;
-      backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.7);
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(59, 130, 246, 0.05);
-    }
-    
-    .dashboard-card:hover {
-      background: rgba(255, 255, 255, 0.95);
-      border-color: rgba(59, 130, 246, 0.6);
-      border-width: 3px;
-      box-shadow: 
-        0 8px 25px rgba(59, 130, 246, 0.2),
-        0 0 0 2px rgba(59, 130, 246, 0.2);
-      transform: translateY(-3px) scale(1.02);
-    }
-    
-    /* Enhanced glassy action cards - ONLY for Quick Actions */
-    .action-card {
-      transition: all 0.3s ease-in-out;
-      animation: fadeInUp 0.3s ease-out;
-      backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.65);
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(59, 130, 246, 0.05);
-    }
-    
-    .action-card:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: rgba(59, 130, 246, 0.6);
-      border-width: 3px;
-      box-shadow: 
-        0 8px 25px rgba(59, 130, 246, 0.2),
-        0 0 0 2px rgba(59, 130, 246, 0.2);
-      transform: translateY(-3px) scale(1.02);
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    /* Staggered animation delays */
-    .stat-card:nth-child(1) { animation-delay: 0.05s; }
-    .stat-card:nth-child(2) { animation-delay: 0.1s; }
-    .stat-card:nth-child(3) { animation-delay: 0.15s; }
-    .stat-card:nth-child(4) { animation-delay: 0.2s; }
-    
-    .page-content {
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
-  <!-- Navbar -->
-  <nav class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <div class="flex items-center gap-2 group">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="user" class="w-5 h-5 text-white"></i>
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <h1 class="text-xl font-bold text-gray-900">SkillPort Community</h1>
           </div>
-          <span class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            <span id="navbar-student-name">Student</span>
-          </span>
         </div>
-        <div class="hidden md:flex items-center gap-1">
-          <a href="user-dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
-            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-          </a>
-          <a href="user-contests.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
-            <i data-lucide="trophy" class="w-4 h-4"></i> Contests
-          </a>
-          <a href="user-leaderboard.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
-            <i data-lucide="award" class="w-4 h-4"></i> Leaderboard
-          </a>
-          <a href="user-mentor-feedback.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
-            <i data-lucide="message-square" class="w-4 h-4"></i> Mentor Feedback
-          </a>
-          <a href="user-profile.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
-          </a>
+        <div class="flex items-center space-x-4">
+          <button id="refresh-dashboard" class="text-gray-500 hover:text-gray-700">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+          </button>
+          <button id="logout-button" class="text-gray-500 hover:text-gray-700">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
+  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- User Profile Section -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">Welcome back, <span id="user-name">-</span>!</h1>
-      <p class="text-lg text-slate-600">Track your progress and participate in community contests.</p>
-    </div>
-
-    <!-- User Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
-        <i data-lucide="target" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-blue-600" id="total-score">-</div>
-        <div class="text-sm text-slate-600">Total Score</div>
-      </div>
-      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
-        <i data-lucide="check-circle" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-green-600" id="problems-solved">-</div>
-        <div class="text-sm text-slate-600">Problems Solved</div>
-      </div>
-      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
-        <i data-lucide="trophy" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-amber-600" id="contests-won">-</div>
-        <div class="text-sm text-slate-600">Contests Won</div>
-      </div>
-      <div class="stat-card bg-white rounded-lg shadow-lg p-6 text-center">
-        <i data-lucide="trending-up" class="w-8 h-8 text-purple-600 mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-purple-600" id="accuracy">-</div>
-        <div class="text-sm text-slate-600">Accuracy</div>
+      <div id="user-profile" data-loading>
+        <!-- User profile will be loaded here -->
       </div>
     </div>
 
-    <!-- Dashboard Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-      <!-- Profile Section -->
-      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-bold text-slate-900 mb-4">Profile</h2>
-        <div class="flex items-center gap-4 mb-4">
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" alt="Profile" class="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-blue-200">
-          <div>
-            <h3 class="font-semibold text-slate-900">Alex Johnson</h3>
-            <p class="text-slate-600 text-sm">Computer Science Student</p>
-            <p class="text-blue-600 text-sm font-medium">3rd Year</p>
-          </div>
-        </div>
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-2">
-            <i data-lucide="mail" class="w-4 h-4 text-slate-500"></i>
-            <span class="text-slate-600">alex.johnson@email.com</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <i data-lucide="map-pin" class="w-4 h-4 text-slate-500"></i>
-            <span class="text-slate-600">New York, NY</span>
-          </div>
-        </div>
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div id="student-stats" data-loading>
+        <!-- Student stats will be loaded here -->
       </div>
-
-      <!-- Top Performance -->
-      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Top Performance</h2>
-          <a href="user-leaderboard.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
-        </div>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-bold">1</span>
-              </div>
-              <span class="font-medium text-slate-900">Algorithm Contest</span>
-            </div>
-            <span class="text-sm font-bold text-green-600">95%</span>
-          </div>
-          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-bold">2</span>
-              </div>
-              <span class="font-medium text-slate-900">Java Challenge</span>
-            </div>
-            <span class="text-sm font-bold text-blue-600">92%</span>
-          </div>
-          <div class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-100">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-bold">3</span>
-              </div>
-              <span class="font-medium text-slate-900">Python Contest</span>
-            </div>
-            <span class="text-sm font-bold text-purple-600">89%</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Contests -->
-      <div class="dashboard-card bg-white rounded-lg shadow-lg p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Active Contests</h2>
-          <a href="user-contests.html" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
-        </div>
-        <div class="space-y-3">
-          <div class="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-            <h4 class="font-medium text-slate-900">Weekly Algorithm Challenge</h4>
-            <p class="text-sm text-slate-600 mb-2">156 participants</p>
-            <div class="flex items-center gap-2 text-xs text-blue-600">
-              <i data-lucide="clock" class="w-3 h-3"></i>
-              <span>Ends in 2 days</span>
-            </div>
-          </div>
-          <div class="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
-            <h4 class="font-medium text-slate-900">Data Structures Master</h4>
-            <p class="text-sm text-slate-600 mb-2">89 participants</p>
-            <div class="flex items-center gap-2 text-xs text-green-600">
-              <i data-lucide="clock" class="w-3 h-3"></i>
-              <span>Ends in 5 days</span>
-            </div>
-          </div>
-        </div>
+      <div id="mentor-stats" data-loading>
+        <!-- Mentor stats will be loaded here -->
       </div>
     </div>
 
-    <!-- Recent Activity Feed -->
-    <div class="dashboard-card bg-white rounded-lg shadow-lg p-6 mb-8">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
-      <div class="space-y-4">
-        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
-          <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-            <i data-lucide="check-circle" class="w-5 h-5 text-white"></i>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Left Column -->
+      <div class="space-y-8">
+        <!-- Recent Contests -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Recent Contests</h2>
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-slate-900">Solved "Binary Search" problem</p>
-            <p class="text-xs text-slate-600">Algorithm contest submission</p>
+          <div class="p-6">
+            <div id="recent-contests" data-loading>
+              <!-- Recent contests will be loaded here -->
+            </div>
           </div>
-          <span class="text-xs text-slate-500">2 hours ago</span>
         </div>
-        
-        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-            <i data-lucide="trophy" class="w-5 h-5 text-white"></i>
+
+        <!-- Progress Tracking -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Progress Tracking</h2>
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-slate-900">Won Java Contest</p>
-            <p class="text-xs text-slate-600">"Core Java Programming"</p>
+          <div class="p-6">
+            <div id="progress-tracking" data-loading>
+              <!-- Progress tracking will be loaded here -->
+            </div>
           </div>
-          <span class="text-xs text-slate-500">1 day ago</span>
-        </div>
-        
-        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-100">
-          <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center">
-            <i data-lucide="users" class="w-5 h-5 text-white"></i>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-slate-900">Joined new contest</p>
-            <p class="text-xs text-slate-600">"Dynamic Programming Masterclass"</p>
-          </div>
-          <span class="text-xs text-slate-500">3 days ago</span>
-        </div>
-        
-        <div class="flex items-center gap-4 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-100">
-          <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
-            <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-slate-900">Improved ranking</p>
-            <p class="text-xs text-slate-600">Moved to #3 in overall leaderboard</p>
-          </div>
-          <span class="text-xs text-slate-500">1 week ago</span>
         </div>
       </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div>
-      <h2 class="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <a href="user-contests.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="trophy" class="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">Join Contest</h3>
-          <p class="text-sm text-slate-600">Participate in active contests</p>
-        </a>
-        <a href="user-leaderboard.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="bar-chart-3" class="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
-          <p class="text-sm text-slate-600">Check your rankings</p>
-        </a>
-        <a href="user-mentor-feedback.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="message-square" class="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">Get Feedback</h3>
-          <p class="text-sm text-slate-600">Request mentor feedback</p>
-        </a>
-        <a href="user-profile.html" class="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-          <i data-lucide="user" class="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform"></i>
-          <h3 class="font-semibold text-slate-900 mb-2">My Profile</h3>
-          <p class="text-sm text-slate-600">Manage your profile</p>
-        </a>
+      <!-- Right Column -->
+      <div class="space-y-8">
+        <!-- Mentor Recommendations -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Mentor Recommendations</h2>
+          </div>
+          <div class="p-6">
+            <div id="mentor-recommendations" data-loading>
+              <!-- Mentor recommendations will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Students (for mentors) -->
+        <div class="bg-white rounded-lg shadow" id="assigned-students-section" style="display: none;">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Assigned Students</h2>
+          </div>
+          <div class="p-6">
+            <div id="assigned-students" data-loading>
+              <!-- Assigned students will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentor Contests (for mentors) -->
+        <div class="bg-white rounded-lg shadow" id="mentor-contests-section" style="display: none;">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">My Contests</h2>
+          </div>
+          <div class="p-6">
+            <div id="mentor-contests" data-loading>
+              <!-- Mentor contests will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentor Performance (for mentors) -->
+        <div class="bg-white rounded-lg shadow" id="mentor-performance-section" style="display: none;">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Performance</h2>
+          </div>
+          <div class="p-6">
+            <div id="mentor-performance" data-loading>
+              <!-- Mentor performance will be loaded here -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- Load API and App scripts -->
-  <script src="../js/apiService.js"></script>
-  <script src="../js/notifications.js"></script>
-  <script src="../js/authManager.js"></script>
-  <script src="../js/dataManager.js"></script>
-
   <script>
     lucide.createIcons();
-    
-    // User Dashboard Controller
-    class UserDashboard {
-      constructor() {
-        this.api = window.APIService;
-        this.userData = null;
-        this.stats = null;
-        this.init();
-      }
-
-      async init() {
-        try {
-          // Load dashboard data
-          await this.loadUserData();
-          await this.loadDashboardStats();
-          
-        } catch (error) {
-          console.error('Dashboard initialization failed:', error);
-          this.showError('Failed to initialize dashboard');
-        }
-      }
-
-      async loadUserData() {
-        try {
-          const response = await this.api.getCurrentUser();
-          if (response.success) {
-            this.userData = response.data.user;
-            this.updateUserInfo();
-          }
-        } catch (error) {
-          console.error('Failed to load user data:', error);
-        }
-      }
-
-      async loadDashboardStats() {
-        try {
-          const response = await this.api.getUserStats();
-          if (response.success) {
-            this.stats = response.data.stats;
-            this.updateStats();
-          }
-        } catch (error) {
-          console.error('Failed to load user stats:', error);
-        }
-      }
-
-      updateUserInfo() {
-        if (!this.userData) return;
-        
-        const nameElement = document.getElementById('user-name');
-        if (nameElement) {
-          nameElement.textContent = this.userData.firstName || this.userData.name || 'User';
-        }
-      }
-
-      updateStats() {
-        if (!this.stats) return;
-
-        if (this.stats.totalScore !== undefined) {
-          document.getElementById('total-score').textContent = this.stats.totalScore.toLocaleString();
-        }
-        if (this.stats.problemsSolved !== undefined) {
-          document.getElementById('problems-solved').textContent = this.stats.problemsSolved.toLocaleString();
-        }
-        if (this.stats.contestsWon !== undefined) {
-          document.getElementById('contests-won').textContent = this.stats.contestsWon.toLocaleString();
-        }
-        if (this.stats.accuracy !== undefined) {
-          document.getElementById('accuracy').textContent = `${this.stats.accuracy}%`;
-        }
-      }
-
-      showError(message) {
-        console.error(message);
-        // TODO: Implement proper error display
-      }
-    }
-
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      // Check authentication first
-      if (window.authManager && !window.authManager.isAuthenticated) {
-        window.location.href = '/pages/auth/login.html';
-        return;
-      }
-
-      // Check if user is student
-      if (window.authManager && !window.authManager.isStudent()) {
-        window.location.href = '/pages/auth/login.html';
-        return;
-      }
-
-      new UserDashboard();
-      
-      // Initialize DataManager for dynamic data
-      if (window.DataManager) {
-        window.DataManager.updateUserContestData();
-      }
-      
-      // Add page transition effects
-      document.body.classList.add('page-loaded');
-      
-      // Add smooth navigation transitions
-      document.querySelectorAll('a[href^="user-"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-          // Add page exit animation
-          document.body.classList.add('page-exiting');
-          
-          // Small delay for animation
-          setTimeout(() => {
-            window.location.href = link.href;
-          }, 150);
-        });
-      });
-    });
-
-    // Add page transition CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      .page-loaded {
-        animation: pageEnter 0.3s ease-out;
-      }
-      
-      .page-exiting {
-        animation: pageExit 0.1s ease-in;
-      }
-      
-      @keyframes pageEnter {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
-      @keyframes pageExit {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-20px); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Enhanced page transitions
-    document.addEventListener('DOMContentLoaded', () => {
-      // Add page transition effects
-      const pageContent = document.querySelector('.page-content');
-      if (pageContent) {
-        pageContent.style.opacity = '0';
-        pageContent.style.transform = 'translateX(-20px)';
-        
-        setTimeout(() => {
-          pageContent.style.transition = 'all 0.5s ease-out';
-          pageContent.style.opacity = '1';
-          pageContent.style.transform = 'translateX(0)';
-        }, 100);
-      }
-      
-      // Add staggered animation to stat cards
-      const statCards = document.querySelectorAll('.stat-card');
-      statCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-          card.style.transition = 'all 0.6s ease-out';
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, 200 + (index * 100));
-      });
-      
-      // Add staggered animation to action cards
-      const actionCards = document.querySelectorAll('.action-card');
-      actionCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.9)';
-        
-        setTimeout(() => {
-          card.style.transition = 'all 0.5s ease-out';
-          card.style.opacity = '1';
-          card.style.transform = 'scale(1)';
-        }, 600 + (index * 100));
-      });
-    });
   </script>
 </body>
 </html>

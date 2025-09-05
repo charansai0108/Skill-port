@@ -6,11 +6,16 @@
   <title>Admin Dashboard - SkillPort Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../../js/suppress-warnings.js"></script>
       <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="../../js/apiService.js"></script>
     <script src="../../js/notifications.js"></script>
     <script src="../../js/authManager.js"></script>
-    <script src="../../js/dataManager.js"></script>
+    <script src="../../js/contextManager.js"></script>
+    <script src="../../js/dataLoader.js"></script>
+    <script src="../../js/uiHelpers.js"></script>
+    <script src="../../js/pageController.js"></script>
+    <script src="../../js/dashboard.js"></script>
   <style>
     body { 
       font-family: 'Inter', sans-serif; 
@@ -545,7 +550,70 @@
 
       async loadDashboardData() {
         try {
-          // Initialize empty dashboard data
+          // Load real analytics data from backend
+          const response = await window.APIService.getAdminAnalytics();
+          
+          if (response.success) {
+            const data = response.data;
+            
+            // Update statistics with real data
+            const stats = {
+              userStats: { 
+                total: data.overview?.totalUsers || 0, 
+                growth: 0 
+              },
+              roleStats: { 
+                mentors: data.overview?.totalMentors || 0, 
+                mentorGrowth: 0 
+              },
+              contestStats: { 
+                active: data.overview?.totalContests || 0, 
+                growth: 0 
+              },
+              submissionStats: { 
+                totalSolved: data.overview?.totalSubmissions || 0, 
+                growth: 0 
+              }
+            };
+            
+            this.updateStats(stats);
+
+            // Update recent users and mentors with real data
+            this.updateRecentUsers(data.recent?.users || []);
+            this.updateRecentMentors(data.recent?.mentors || []);
+            this.updateRecentActivity(data.recent?.activities || []);
+            
+            // Load other sections
+            this.loadCommunityInsights();
+            this.loadAlertsAndNotifications();
+            this.loadContestManagement();
+            this.loadPerformanceMetrics();
+            this.loadCommunityHealth();
+          } else {
+            // Fallback to empty data if API fails
+            const emptyStats = {
+              userStats: { total: 0, growth: 0 },
+              roleStats: { mentors: 0, mentorGrowth: 0 },
+              contestStats: { active: 0, growth: 0 },
+              submissionStats: { totalSolved: 0, growth: 0 }
+            };
+            
+            this.updateStats(emptyStats);
+            this.updateRecentUsers([]);
+            this.updateRecentMentors([]);
+            this.updateRecentActivity([]);
+            this.loadCommunityInsights();
+            this.loadAlertsAndNotifications();
+            this.loadContestManagement();
+            this.loadPerformanceMetrics();
+            this.loadCommunityHealth();
+          }
+
+        } catch (error) {
+          console.error('Failed to load dashboard data:', error);
+          this.showError('Failed to load dashboard data');
+          
+          // Fallback to empty data
           const emptyStats = {
             userStats: { total: 0, growth: 0 },
             roleStats: { mentors: 0, mentorGrowth: 0 },
@@ -554,8 +622,6 @@
           };
           
           this.updateStats(emptyStats);
-
-          // Initialize empty user lists
           this.updateRecentUsers([]);
           this.updateRecentMentors([]);
           this.updateRecentActivity([]);
@@ -564,10 +630,6 @@
           this.loadContestManagement();
           this.loadPerformanceMetrics();
           this.loadCommunityHealth();
-
-        } catch (error) {
-          console.error('Failed to load dashboard data:', error);
-          this.showError('Failed to load dashboard data');
         }
       }
 
@@ -755,9 +817,148 @@
         return icons[type] || 'activity';
       }
 
+      loadAlertsAndNotifications() {
+        // Initialize alerts with sample data
+        const alerts = [
+          {
+            type: 'flagged',
+            title: 'Flagged Submission',
+            description: 'Contest: "Array Problems" - User: john_doe',
+            action: 'Review'
+          },
+          {
+            type: 'pending',
+            title: 'Pending Mentor',
+            description: 'Sarah Wilson - Algorithms Expert',
+            action: 'Approve'
+          },
+          {
+            type: 'system',
+            title: 'System Alert',
+            description: 'High contest participation detected',
+            action: 'View'
+          }
+        ];
+        
+        this.updateAlerts(alerts);
+      }
+
+      updateAlerts(alerts) {
+        const container = document.querySelector('#alerts-container');
+        if (!container) return;
+
+        if (!alerts.length) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">No alerts</p>';
+          return;
+        }
+
+        container.innerHTML = alerts.map(alert => `
+          <div class="flex items-center gap-3 p-3 bg-${this.getAlertColor(alert.type)}-50 rounded-lg border-l-4 border-${this.getAlertColor(alert.type)}-400">
+            <i data-lucide="${this.getAlertIcon(alert.type)}" class="w-5 h-5 text-${this.getAlertColor(alert.type)}-600"></i>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-${this.getAlertColor(alert.type)}-900">${alert.title}</p>
+              <p class="text-xs text-${this.getAlertColor(alert.type)}-600">${alert.description}</p>
+            </div>
+            <button class="text-${this.getAlertColor(alert.type)}-600 hover:text-${this.getAlertColor(alert.type)}-800 text-xs">${alert.action}</button>
+          </div>
+        `).join('');
+
+        // Recreate icons
+        lucide.createIcons();
+      }
+
+      loadContestManagement() {
+        // Initialize contest management with sample data
+        const contestData = {
+          activeContests: 5,
+          pendingContests: 2,
+          contestsNeedingMentors: 1,
+          totalParticipants: 127,
+          pendingSubmissions: 23
+        };
+        
+        this.updateContestManagement(contestData);
+      }
+
+      updateContestManagement(data) {
+        const elements = {
+          activeContestsCount: document.querySelector('#active-contests-count'),
+          pendingContestsCount: document.querySelector('#pending-contests-count'),
+          contestsNeedingMentors: document.querySelector('#contests-needing-mentors'),
+          totalParticipants: document.querySelector('#total-participants'),
+          pendingSubmissions: document.querySelector('#pending-submissions')
+        };
+
+        if (elements.activeContestsCount) elements.activeContestsCount.textContent = data.activeContests || 0;
+        if (elements.pendingContestsCount) elements.pendingContestsCount.textContent = data.pendingContests || 0;
+        if (elements.contestsNeedingMentors) elements.contestsNeedingMentors.textContent = data.contestsNeedingMentors || 0;
+        if (elements.totalParticipants) elements.totalParticipants.textContent = data.totalParticipants || 0;
+        if (elements.pendingSubmissions) elements.pendingSubmissions.textContent = data.pendingSubmissions || 0;
+      }
+
+      loadPerformanceMetrics() {
+        // Initialize performance metrics with sample data
+        const metrics = {
+          contestSuccessRate: '85%',
+          avgMentorResponse: '2.3 hrs',
+          userEngagement: '73%'
+        };
+        
+        this.updatePerformanceMetrics(metrics);
+      }
+
+      updatePerformanceMetrics(metrics) {
+        // Update performance metrics display
+        const elements = document.querySelectorAll('.bg-slate-50 .text-sm.font-semibold');
+        if (elements.length >= 3) {
+          elements[0].textContent = metrics.contestSuccessRate || '85%';
+          elements[1].textContent = metrics.avgMentorResponse || '2.3 hrs';
+          elements[2].textContent = metrics.userEngagement || '73%';
+        }
+      }
+
+      loadCommunityHealth() {
+        // Initialize community health with sample data
+        const health = {
+          weeklyGrowth: '+12%',
+          activeDiscussions: 18,
+          topContributors: 24
+        };
+        
+        this.updateCommunityHealth(health);
+      }
+
+      updateCommunityHealth(health) {
+        // Update community health display
+        const elements = document.querySelectorAll('.bg-slate-50 .text-sm.font-semibold');
+        if (elements.length >= 6) {
+          elements[3].textContent = health.weeklyGrowth || '+12%';
+          elements[4].textContent = health.activeDiscussions || 18;
+          elements[5].textContent = health.topContributors || 24;
+        }
+      }
+
+      getAlertColor(type) {
+        const colors = {
+          'flagged': 'red',
+          'pending': 'yellow',
+          'system': 'blue'
+        };
+        return colors[type] || 'blue';
+      }
+
+      getAlertIcon(type) {
+        const icons = {
+          'flagged': 'flag',
+          'pending': 'user-check',
+          'system': 'alert-circle'
+        };
+        return icons[type] || 'alert-circle';
+      }
+
       showError(message) {
-        if (this.api.showNotification) {
-          this.api.showNotification(message, 'error');
+        if (window.uiHelpers && window.uiHelpers.showError) {
+          window.uiHelpers.showError('Error', message);
         } else {
           alert(message);
         }
@@ -765,16 +966,79 @@
     }
 
     // Initialize dashboard when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      // Check authentication first
-      if (window.authManager && !window.authManager.isAuthenticated) {
-        window.location.href = '/pages/auth/login.html';
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🔐 Admin Dashboard: DOM loaded, starting authentication check...');
+      
+      // Check if we have a token first
+      const token = localStorage.getItem('jwt_token');
+      if (!token) {
+        console.log('🔐 Admin Dashboard: No token found, redirecting to login');
+        window.location.href = '/pages/auth/login';
         return;
       }
+      
+      console.log('🔐 Admin Dashboard: Token found, checking authentication...');
+      
+      // Wait for AuthManager to be ready and check authentication
+      let authManager = window.authManager || window.AuthManager;
+      
+      if (authManager) {
+        console.log('🔐 Admin Dashboard: AuthManager found, waiting for auth check...');
+        
+        try {
+          // Wait for authentication check to complete
+          await authManager.checkAuthStatus();
+          
+          console.log('🔐 Admin Dashboard: Auth check completed, isAuthenticated:', authManager.isAuthenticated);
+          console.log('🔐 Admin Dashboard: Current user:', authManager.currentUser);
+          
+          // Check authentication after async check
+          if (!authManager.isAuthenticated) {
+            console.log('🔐 Admin Dashboard: Not authenticated, redirecting to login');
+            window.location.href = '/pages/auth/login';
+            return;
+          }
 
-      // Check if user is admin
-      if (window.authManager && !window.authManager.isAdmin()) {
-        window.location.href = '/pages/auth/login.html';
+          // Check if user is admin
+          if (!authManager.isAdmin()) {
+            console.log('🔐 Admin Dashboard: Not admin, redirecting to login');
+            window.location.href = '/pages/auth/login';
+            return;
+          }
+          
+          console.log('🔐 Admin Dashboard: Authentication successful, user is admin, initializing dashboard...');
+        } catch (error) {
+          console.error('🔐 Admin Dashboard: Auth check failed:', error);
+          window.location.href = '/pages/auth/login';
+          return;
+        }
+      } else {
+        console.log('🔐 Admin Dashboard: AuthManager not available, waiting for initialization...');
+        
+        // Wait for AuthManager to be initialized
+        let attempts = 0;
+        const maxAttempts = 10;
+        const checkAuthManager = () => {
+          attempts++;
+          authManager = window.authManager || window.AuthManager;
+          
+          if (authManager) {
+            console.log('🔐 Admin Dashboard: AuthManager found after waiting, proceeding...');
+            // Recursively call the authentication check
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+            return;
+          }
+          
+          if (attempts < maxAttempts) {
+            console.log(`🔐 Admin Dashboard: AuthManager still not available, attempt ${attempts}/${maxAttempts}, waiting...`);
+            setTimeout(checkAuthManager, 200);
+          } else {
+            console.log('🔐 Admin Dashboard: AuthManager not available after waiting, redirecting to login');
+            window.location.href = '/pages/auth/login';
+          }
+        };
+        
+        checkAuthManager();
         return;
       }
 

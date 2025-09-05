@@ -1,498 +1,517 @@
 /**
- * SkillPort API Service
- * Connects frontend to backend APIs
+ * Enhanced API Service
+ * Comprehensive API communication layer with error handling, authentication, and role management
  */
 
 class APIService {
     constructor() {
         this.baseURL = 'http://localhost:5001/api/v1';
-        this.token = localStorage.getItem('jwt_token');
-        this.setupInterceptors();
+        this.timeout = 10000; // 10 seconds
+        this.retryAttempts = 3;
+        this.retryDelay = 1000; // 1 second
     }
 
-    // Setup request/response interceptors
-    setupInterceptors() {
-        // Add token to requests if available
-        this.addAuthHeader = (config) => {
-            if (this.token) {
-                config.headers = config.headers || {};
-                config.headers.Authorization = `Bearer ${this.token}`;
-            }
-            return config;
+    // Get authentication headers
+    getAuthHeaders() {
+        const token = localStorage.getItem('jwt_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         };
-
-        // Handle token expiration
-        this.handleTokenExpiration = (response) => {
-            if (response.status === 401) {
-                this.logout();
-                window.location.href = '/pages/auth/login.html';
-            }
-            return response;
-        };
-    }
-
-    // Update token
-    setToken(token) {
-        this.token = token;
-        localStorage.setItem('jwt_token', token);
-    }
-
-    // Clear token
-    clearToken() {
-        this.token = null;
-        localStorage.removeItem('jwt_token');
-    }
-
-    // Logout (removed duplicate - see line 139 for main logout method)
-
-    // Generic request method
-    async request(endpoint, options = {}) {
-        try {
-            const config = this.addAuthHeader({
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
-                ...options
-            });
-
-            const response = await fetch(`${this.baseURL}${endpoint}`, config);
-            this.handleTokenExpiration(response);
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('API Request Error:', error);
-            throw error;
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
+        
+        return headers;
     }
 
-    // ===== AUTHENTICATION ENDPOINTS =====
+    // Make HTTP request with retry logic
+    async makeRequest(url, options = {}) {
+        const config = {
+            method: 'GET',
+            headers: this.getAuthHeaders(),
+            timeout: this.timeout,
+            ...options
+        };
 
-    async login(email, password) {
-        const response = await this.request('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password })
+        // Add body for POST/PUT requests
+        if (config.body && typeof config.body === 'object') {
+            config.body = JSON.stringify(config.body);
+        }
+
+        let lastError;
+        
+        for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+            try {
+                console.log(`🌐 API Request (attempt ${attempt}): ${config.method} ${url}`);
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+                
+                const response = await fetch(url, {
+                    ...config,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`🌐 API Response: ${response.status} ${response.statusText}`);
+                
+                // Handle different response types
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+                
+                // Handle HTTP errors
+                if (!response.ok) {
+                    throw new APIError(
+                        data.error || `HTTP ${response.status}: ${response.statusText}`,
+                        response.status,
+                        data
+                    );
+                }
+                
+                return data;
+                
+            } catch (error) {
+                lastError = error;
+                console.error(`🌐 API Request failed (attempt ${attempt}):`, error);
+                
+                // Don't retry on authentication errors or client errors
+                if (error instanceof APIError && (error.status === 401 || error.status === 403 || error.status < 500)) {
+                    throw error;
+                }
+                
+                // Wait before retry (except on last attempt)
+                if (attempt < this.retryAttempts) {
+                    await this.delay(this.retryDelay * attempt);
+                }
+            }
+        }
+        
+        throw lastError;
+    }
+
+    // Utility method for delays
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // GET request
+    async get(endpoint, params = {}) {
+        const url = new URL(`${this.baseURL}${endpoint}`);
+        Object.keys(params).forEach(key => {
+            if (params[key] !== undefined && params[key] !== null) {
+                url.searchParams.append(key, params[key]);
+            }
         });
         
-        if (response.success) {
-            this.setToken(response.data.token);
-        }
-        
-        return response;
+        return this.makeRequest(url.toString());
+    }
+
+    // POST request
+    async post(endpoint, data = {}) {
+        return this.makeRequest(`${this.baseURL}${endpoint}`, {
+            method: 'POST',
+            body: data
+        });
+    }
+
+    // PUT request
+    async put(endpoint, data = {}) {
+        return this.makeRequest(`${this.baseURL}${endpoint}`, {
+            method: 'PUT',
+            body: data
+        });
+    }
+
+    // DELETE request
+    async delete(endpoint) {
+        return this.makeRequest(`${this.baseURL}${endpoint}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Authentication endpoints
+    async login(email, password) {
+        return this.post('/auth/login', { email, password });
     }
 
     async register(userData) {
-        return await this.request('/auth/register', {
-            method: 'POST',
-            body: JSON.stringify(userData)
-        });
+        return this.post('/auth/register', userData);
     }
-
-    async verifyOTP(email, otp, password) {
-        return await this.request('/auth/verify-otp', {
-            method: 'POST',
-            body: JSON.stringify({ email, otp, password })
-        });
-    }
-
-    async resendOTP(email) {
-        return await this.request('/auth/resend-otp', {
-            method: 'POST',
-            body: JSON.stringify({ email })
-        });
-    }
-
-    async forgotPassword(email) {
-        return await this.request('/auth/forgot-password', {
-            method: 'POST',
-            body: JSON.stringify({ email })
-        });
-    }
-
-    async resetPassword(resetToken, newPassword) {
-        return await this.request(`/auth/reset-password/${resetToken}`, {
-            method: 'POST',
-            body: JSON.stringify({ password: newPassword })
-        });
-    }
-
-    async changePassword(currentPassword, newPassword) {
-        return await this.request('/auth/change-password', {
-            method: 'PUT',
-            body: JSON.stringify({ 
-                currentPassword, 
-                newPassword 
-            })
-        });
-    }
-
-    async logout() {
-        try {
-            await this.request('/auth/logout', { method: 'POST' });
-        } finally {
-            this.clearToken();
-            window.location.href = '/pages/auth/login.html';
-        }
-    }
-
-    // ===== USER MANAGEMENT ENDPOINTS =====
 
     async getUserProfile() {
-        return await this.request('/users/profile');
+        return this.get('/users/profile');
     }
 
-    async updateProfile(profileData) {
-        return await this.request('/users/profile', {
-            method: 'PUT',
-            body: JSON.stringify(profileData)
-        });
+    // Community endpoints
+    async getCommunitySummary(communityId) {
+        return this.get(`/community/${communityId}/summary`);
     }
 
-    async getUserDashboard() {
-        return await this.request('/users/dashboard');
+    async getCommunityInsights(communityId) {
+        return this.get(`/community/${communityId}/insights`);
+    }
+
+    async getRecentActivity(communityId) {
+        return this.get(`/community/${communityId}/recent-activity`);
+    }
+
+    async getRecentUsers(communityId, limit = 10) {
+        return this.get(`/community/${communityId}/users`, { limit, sort: '-createdAt' });
+    }
+
+    async getRecentMentors(communityId, limit = 10) {
+        return this.get(`/community/${communityId}/mentors`, { limit, sort: '-createdAt' });
+    }
+
+    // User management endpoints
+    async getUsers(params = {}) {
+        return this.get('/users', params);
     }
 
     async getUserById(userId) {
-        return await this.request(`/users/${userId}`);
+        return this.get(`/users/${userId}`);
     }
 
-    async updatePreferences(preferences) {
-        return await this.request('/users/preferences', {
-            method: 'PUT',
-            body: JSON.stringify(preferences)
-        });
+    async updateUser(userId, userData) {
+        return this.put(`/users/${userId}`, userData);
     }
 
-    async getUserProgress(userId) {
-        return await this.request(`/users/${userId}/progress`);
+    async deleteUser(userId) {
+        return this.delete(`/users/${userId}`);
     }
 
-    async getLeaderboard() {
-        return await this.request('/users/leaderboard/community');
-    }
-
-    // ===== COMMUNITY MANAGEMENT ENDPOINTS =====
-
-    async getCommunities(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
-        const endpoint = queryString ? `/communities?${queryString}` : '/communities';
-        return await this.request(endpoint);
-    }
-
-    async getCommunityById(communityId) {
-        return await this.request(`/communities/${communityId}`);
-    }
-
-    async getCommunityDashboard(communityId) {
-        return await this.request(`/communities/${communityId}/dashboard`);
-    }
-
-    async getCommunityAnalytics(communityId) {
-        return await this.request(`/communities/${communityId}/analytics`);
-    }
-
-    async joinCommunity(communityId, joinData) {
-        return await this.request(`/communities/${communityId}/join`, {
-            method: 'POST',
-            body: JSON.stringify(joinData)
-        });
-    }
-
-    async createCommunity(communityData) {
-        return await this.request('/communities', {
-            method: 'POST',
-            body: JSON.stringify(communityData)
-        });
-    }
-
-    async updateCommunity(communityId, updateData) {
-        return await this.request(`/communities/${communityId}`, {
-            method: 'PUT',
-            body: JSON.stringify(updateData)
-        });
-    }
-
-    async deleteCommunity(communityId) {
-        return await this.request(`/communities/${communityId}`, {
-            method: 'DELETE'
-        });
-    }
-
-    // ===== CONTEST MANAGEMENT ENDPOINTS =====
-
+    // Contest endpoints
     async getContests(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
-        const endpoint = queryString ? `/contests?${queryString}` : '/contests';
-        return await this.request(endpoint);
+        return this.get('/contests', params);
     }
 
     async getContestById(contestId) {
-        return await this.request(`/contests/${contestId}`);
+        return this.get(`/contests/${contestId}`);
     }
 
     async createContest(contestData) {
-        return await this.request('/contests', {
-            method: 'POST',
-            body: JSON.stringify(contestData)
-        });
+        return this.post('/contests', contestData);
     }
 
-    async updateContest(contestId, updateData) {
-        return await this.request(`/contests/${contestId}`, {
-            method: 'PUT',
-            body: JSON.stringify(updateData)
-        });
+    async updateContest(contestId, contestData) {
+        return this.put(`/contests/${contestId}`, contestData);
     }
 
     async deleteContest(contestId) {
-        return await this.request(`/contests/${contestId}`, {
-            method: 'DELETE'
-        });
+        return this.delete(`/contests/${contestId}`);
     }
 
-    async registerForContest(contestId) {
-        return await this.request(`/contests/${contestId}/register`, {
-            method: 'POST'
-        });
-    }
-
-    async getContestLeaderboard(contestId) {
-        return await this.request(`/contests/${contestId}/leaderboard`);
-    }
-
-    async getContestSubmissions(contestId) {
-        return await this.request(`/contests/${contestId}/submissions`);
-    }
-
-    async getUpcomingContests() {
-        return await this.request('/contests/upcoming');
-    }
-
-    // ===== PROJECT MANAGEMENT ENDPOINTS =====
-
-    async getProjects(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
-        const endpoint = queryString ? `/projects?${queryString}` : '/projects';
-        return await this.request(endpoint);
-    }
-
-    async getProjectById(projectId) {
-        return await this.request(`/projects/${projectId}`);
-    }
-
-    async createProject(projectData) {
-        return await this.request('/projects', {
-            method: 'POST',
-            body: JSON.stringify(projectData)
-        });
-    }
-
-    async updateProject(projectId, updateData) {
-        return await this.request(`/projects/${projectId}`, {
-            method: 'PUT',
-            body: JSON.stringify(updateData)
-        });
-    }
-
-    async deleteProject(projectId) {
-        return await this.request(`/projects/${projectId}`, {
-            method: 'DELETE'
-        });
-    }
-
-    async getTrendingProjects() {
-        return await this.request('/projects/trending');
-    }
-
-    async getProjectStats(projectId) {
-        return await this.request(`/projects/stats/${projectId}`);
-    }
-
-    // ===== PROGRESS & ANALYTICS ENDPOINTS =====
-
-    async getUserProgress(userId) {
-        return await this.request(`/progress/user/${userId}`);
-    }
-
-    async updateProgress(progressData) {
-        return await this.request('/progress', {
-            method: 'POST',
-            body: JSON.stringify(progressData)
-        });
+    // Analytics endpoints
+    async getAnalytics(params = {}) {
+        return this.get('/analytics/dashboard', params);
     }
 
     async getCommunityAnalytics(communityId) {
-        return await this.request(`/analytics/community/${communityId}`);
+        return this.get(`/analytics/community/${communityId}`);
     }
 
-    async getUserAnalytics(userId) {
-        return await this.request(`/analytics/user/${userId}`);
+    // Admin endpoints
+    async getAdminUsers(params = {}) {
+        return this.get('/admin/users', params);
     }
 
-    // ===== EXTENSION INTEGRATION ENDPOINTS =====
-
-    async syncExtensionData(extensionData) {
-        return await this.request('/extension/sync', {
-            method: 'POST',
-            headers: {
-                'X-Extension-Token': localStorage.getItem('extension_token') || 'default_token'
-            },
-            body: JSON.stringify(extensionData)
-        });
+    async getAdminAnalytics() {
+        return this.get('/admin/analytics');
     }
 
-    async getExtensionProgress() {
-        return await this.request('/extension/progress');
+    // Token management
+    setToken(token) {
+        if (token) {
+            localStorage.setItem('jwt_token', token);
+            console.log('🔐 API Service: Token stored successfully');
+        } else {
+            localStorage.removeItem('jwt_token');
+            console.log('🔐 API Service: Token removed');
+        }
     }
 
-    async getExtensionSettings() {
-        return await this.request('/extension/settings');
+    getToken() {
+        return localStorage.getItem('jwt_token');
     }
 
-    async updateExtensionSettings(settings) {
-        return await this.request('/extension/settings', {
-            method: 'PUT',
-            body: JSON.stringify(settings)
-        });
+    clearToken() {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_data');
+        console.log('🔐 API Service: All tokens cleared');
     }
-
-    // ===== FILE UPLOAD ENDPOINTS =====
-
-    async uploadAvatar(file) {
-        const formData = new FormData();
-        formData.append('avatar', file);
-
-        return await this.request('/upload/avatar', {
-            method: 'POST',
-            headers: {}, // Let browser set content-type for FormData
-            body: formData
-        });
-    }
-
-    async uploadProjectFiles(projectId, files) {
-        const formData = new FormData();
-        files.forEach(file => {
-            formData.append('files', file);
-        });
-
-        return await this.request(`/upload/project/${projectId}/files`, {
-            method: 'POST',
-            headers: {}, // Let browser set content-type for FormData
-            body: formData
-        });
-    }
-
-    // ===== UTILITY METHODS =====
 
     // Check if user is authenticated
     isAuthenticated() {
-        return !!this.token;
+        const token = this.getToken();
+        if (!token) return false;
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Date.now() / 1000;
+            return payload.exp > currentTime;
+        } catch (error) {
+            console.error('🔐 API Service: Error checking token:', error);
+            return false;
+        }
     }
 
     // Get user role from token
     getUserRole() {
-        if (!this.token) return null;
+        const token = this.getToken();
+        if (!token) return null;
         
         try {
-            const payload = JSON.parse(atob(this.token.split('.')[1]));
+            const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.role;
         } catch (error) {
-            return null;
-        }
-    }
-
-    // Check if user has specific role
-    hasRole(role) {
-        const userRole = this.getUserRole();
-        return userRole === role;
-    }
-
-    // Check if user is admin
-    isAdmin() {
-        return this.hasRole('community-admin');
-    }
-
-    // Check if user is mentor
-    isMentor() {
-        return this.hasRole('mentor');
-    }
-
-    // Check if user is student
-    isStudent() {
-        return this.hasRole('student');
-    }
-
-    // Check if user is personal user
-    isPersonalUser() {
-        return this.hasRole('personal');
-    }
-
-    // Get user ID from token
-    getUserId() {
-        if (!this.token) return null;
-        
-        try {
-            const payload = JSON.parse(atob(this.token.split('.')[1]));
-            return payload.id;
-        } catch (error) {
+            console.error('🔐 API Service: Error getting user role:', error);
             return null;
         }
     }
 
     // Get community ID from token
     getCommunityId() {
-        if (!this.token) return null;
+        const token = this.getToken();
+        if (!token) return null;
         
         try {
-            const payload = JSON.parse(atob(this.token.split('.')[1]));
+            const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.community;
         } catch (error) {
+            console.error('🔐 API Service: Error getting community ID:', error);
             return null;
         }
     }
 
-    // Format API error messages
-    formatError(error) {
-        if (error.message) {
-            return error.message;
-        }
-        if (typeof error === 'string') {
-            return error;
-        }
-        return 'An unexpected error occurred';
+    // Admin API methods
+    async getAllUsers(options = {}) {
+        const queryParams = new URLSearchParams(options).toString();
+        return this.get(`/users?${queryParams}`);
     }
 
-    // Handle API errors gracefully
-    handleError(error, fallbackMessage = 'Something went wrong') {
-        console.error('API Error:', error);
-        
-        const errorMessage = this.formatError(error);
-        
-        // Show user-friendly error message
-        if (window.showNotification) {
-            window.showNotification(errorMessage, 'error');
-        } else {
-            alert(errorMessage);
-        }
-        
-        return {
-            success: false,
-            error: errorMessage,
-            fallback: fallbackMessage
-        };
+    async getUserById(userId) {
+        return this.get(`/users/${userId}`);
+    }
+
+    async updateUser(userId, userData) {
+        return this.put(`/users/${userId}`, userData);
+    }
+
+    async deleteUser(userId) {
+        return this.delete(`/users/${userId}`);
+    }
+
+    async getAllContests(options = {}) {
+        const queryParams = new URLSearchParams(options).toString();
+        return this.get(`/contests?${queryParams}`);
+    }
+
+    async getContestById(contestId) {
+        return this.get(`/contests/${contestId}`);
+    }
+
+    async createContest(contestData) {
+        return this.post('/contests', contestData);
+    }
+
+    async updateContest(contestId, contestData) {
+        return this.put(`/contests/${contestId}`, contestData);
+    }
+
+    async deleteContest(contestId) {
+        return this.delete(`/contests/${contestId}`);
+    }
+
+    // Mentor API methods
+    async getMentorStudents() {
+        return this.get('/mentor/students');
+    }
+
+    async getMentorContests() {
+        return this.get('/mentor/contests');
+    }
+
+    async getMentorAnalytics() {
+        return this.get('/mentor/analytics');
+    }
+
+    async getMentorActivity() {
+        return this.get('/mentor/activity');
+    }
+
+    // User API methods
+    async getUserContests(options = {}) {
+        const queryParams = new URLSearchParams(options).toString();
+        return this.get(`/user/contests?${queryParams}`);
+    }
+
+    async registerForContest(contestId) {
+        return this.post(`/contests/${contestId}/register`);
+    }
+
+    async getContestResults(contestId) {
+        return this.get(`/contests/${contestId}/results`);
+    }
+
+    // Analytics endpoints
+    async getAnalytics(params = {}) {
+        return this.get('/admin/analytics', params);
+    }
+
+    async exportAnalytics(params = {}) {
+        return this.get('/admin/analytics/export', params);
+    }
+
+    // Leaderboard endpoints
+    async getLeaderboard(params = {}) {
+        return this.get('/leaderboard', params);
+    }
+
+    async exportLeaderboard(params = {}) {
+        return this.get('/leaderboard/export', params);
+    }
+
+    // Mentor-specific endpoints
+    async getMentorContests(params = {}) {
+        return this.get('/mentor/contests', params);
+    }
+
+    async getMentorProfile() {
+        return this.get('/mentor/profile');
+    }
+
+    async updateMentorProfile(data) {
+        return this.put('/mentor/profile', data);
+    }
+
+    async duplicateContest(contestId) {
+        return this.post(`/contests/${contestId}/duplicate`);
+    }
+
+    // Personal user endpoints
+    async getUserProfilePersonal() {
+        return this.get('/personal/profile');
+    }
+
+    async updateUserProfilePersonal(data) {
+        return this.put('/personal/profile', data);
+    }
+
+    async getUserProgress() {
+        return this.get('/personal/progress');
+    }
+
+    async getUserProjects() {
+        return this.get('/personal/projects');
+    }
+
+    async createUserProject(data) {
+        return this.post('/personal/projects', data);
+    }
+
+    async updateUserProject(projectId, data) {
+        return this.put(`/personal/projects/${projectId}`, data);
+    }
+
+    async deleteUserProject(projectId) {
+        return this.delete(`/personal/projects/${projectId}`);
+    }
+
+    async getUserStats() {
+        return this.get('/personal/stats');
+    }
+
+    async getUserCommunities() {
+        return this.get('/personal/communities');
+    }
+
+    async getUserLeaderboard(params = {}) {
+        return this.get('/user/leaderboard', params);
+    }
+
+    async exportUserData() {
+        return this.get('/user/export');
+    }
+
+    async deleteAccount(data) {
+        return this.delete('/user/account', data);
+    }
+
+    // Community endpoints
+    async getCommunityData(params = {}) {
+        return this.get('/community/data', params);
+    }
+
+    async joinCommunity() {
+        return this.post('/community/join');
+    }
+
+    async leaveCommunity() {
+        return this.delete('/community/leave');
+    }
+
+    async joinEvent(eventId) {
+        return this.post(`/events/${eventId}/join`);
+    }
+
+    // Common endpoints
+    async changePassword(data) {
+        return this.put('/auth/change-password', data);
+    }
+
+    async uploadAvatar(formData) {
+        return this.post('/upload/avatar', formData, true);
+    }
+
+    // Personal Dashboard API Methods
+    async getUserProjects() {
+        return this.get('/users/projects');
+    }
+
+    async createProject(projectData) {
+        return this.post('/users/projects', projectData);
+    }
+
+    async deleteProject(projectId) {
+        return this.delete(`/users/projects/${projectId}`);
+    }
+
+    async getUserSubmissions() {
+        return this.get('/users/submissions');
+    }
+
+    async getUserCommunities() {
+        return this.get('/users/communities');
+    }
+
+    async updateUserPreferences(preferences) {
+        return this.put('/users/preferences', preferences);
     }
 }
 
-// Create global instance
+// Custom API Error class
+class APIError extends Error {
+    constructor(message, status, data = null) {
+        super(message);
+        this.name = 'APIError';
+        this.status = status;
+        this.data = data;
+    }
+}
+
+// Initialize API Service
 window.APIService = new APIService();
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = APIService;
+    module.exports = { APIService, APIError };
 }

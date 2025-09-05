@@ -457,6 +457,67 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
+// @route   GET /api/admin/analytics
+// @desc    Get detailed admin analytics
+// @access  Private/Admin
+router.get('/analytics', async (req, res) => {
+  try {
+    // Get comprehensive user statistics
+    const totalUsers = await User.countDocuments();
+    const activeUsers = await User.countDocuments({ status: 'active' });
+    const pendingUsers = await User.countDocuments({ status: 'pending' });
+    const suspendedUsers = await User.countDocuments({ status: 'suspended' });
+
+    // Get role-based statistics
+    const personalUsers = await User.countDocuments({ role: 'personal' });
+    const communityUsers = await User.countDocuments({ role: 'community' });
+    const communityAdmins = await User.countDocuments({ role: 'community-admin' });
+
+    // Get user growth over time (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const newUsersThisMonth = await User.countDocuments({
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+
+    // Get user activity statistics
+    const usersWithActivity = await User.countDocuments({
+      lastActivity: { $gte: thirtyDaysAgo }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        userAnalytics: {
+          total: totalUsers,
+          active: activeUsers,
+          pending: pendingUsers,
+          suspended: suspendedUsers,
+          newThisMonth: newUsersThisMonth,
+          activeThisMonth: usersWithActivity
+        },
+        roleAnalytics: {
+          personal: personalUsers,
+          community: communityUsers,
+          communityAdmin: communityAdmins
+        },
+        growthMetrics: {
+          monthlyGrowth: newUsersThisMonth,
+          activeUserRate: totalUsers > 0 ? Math.round((usersWithActivity / totalUsers) * 100) : 0
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching analytics'
+    });
+  }
+});
+
 // @route   POST /api/admin/reset-user-password
 // @desc    Reset password for a specific user (Admin only)
 // @access  Private (Admin)

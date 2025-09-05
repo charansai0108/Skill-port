@@ -1,7 +1,7 @@
 const admin = (req, res, next) => {
   try {
     // Check if user exists and has admin role
-    if (!req.user || req.user.role !== 'admin') {
+    if (!req.user || req.user.role !== 'community-admin') {
       return res.status(403).json({
         success: false,
         message: 'Access denied. Admin privileges required.'

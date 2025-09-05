@@ -10,7 +10,11 @@
     <script src="../js/apiService.js"></script>
     <script src="../js/notifications.js"></script>
     <script src="../js/authManager.js"></script>
-    <script src="../js/dataManager.js"></script>
+    <script src="../js/contextManager.js"></script>
+    <script src="../js/dataLoader.js"></script>
+    <script src="../js/uiHelpers.js"></script>
+    <script src="../js/pageController.js"></script>
+    <script src="../js/personalProjectsController.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -626,7 +630,6 @@
             // Implementation for filtering projects
         }
     </script>
-    <script src="../js/dataManager.js"></script>
 
         function showProjectDetails(projectId) {
             const project = projects[projectId];
@@ -989,7 +992,5 @@
             loadProjects();
         });
     </script>
-    <!-- Load API Service -->
-    <script src="../js/apiService.js"></script>
 </body>
 </html>

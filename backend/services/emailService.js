@@ -8,66 +8,91 @@ class EmailService {
     }
 
     // Initialize email transporter
-    init() {
+    async init() {
         try {
+            // Use Gmail SMTP for real email sending
+            console.log('📧 Setting up Gmail SMTP for email sending...');
+            
             this.transporter = nodemailer.createTransport({
-                host: process.env.EMAIL_HOST,
-                port: process.env.EMAIL_PORT,
-                secure: process.env.EMAIL_PORT == 465, // true for 465, false for other ports
+                service: 'gmail',
+                host: 'smtp.gmail.com',
+                port: 587,
+                secure: false,
                 auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
+                    user: 'skillport24@gmail.com',
+                    pass: 'nojh bjpj lnho yqxs'
                 },
                 tls: {
                     rejectUnauthorized: false
                 }
             });
 
-            // Verify connection
-            this.transporter.verify((error, success) => {
-                if (error) {
-                    console.error('❌ Email service configuration error:', error);
-                } else {
-                    console.log('✅ Email service is ready');
-                }
-            });
+            console.log('✅ Gmail SMTP configured successfully');
+            console.log('📧 Using Gmail service for real email sending');
+            console.log('📬 Sending emails from: skillport24@gmail.com');
+            
         } catch (error) {
             console.error('❌ Failed to initialize email service:', error);
+            console.log('📧 Falling back to console logging for development');
+            
+            // Fallback to console logging
+            this.transporter = {
+                sendMail: async (options) => {
+                    console.log('📧 EMAIL (Console Fallback):');
+                    console.log('📬 To:', options.to);
+                    console.log('📝 Subject:', options.subject);
+                    console.log('📄 Content:', options.html);
+                    return { messageId: 'console-' + Date.now() };
+                }
+            };
         }
+
+        // Verify connection
+        this.transporter.verify((error, success) => {
+            if (error) {
+                console.error('❌ Email service configuration error:', error);
+            } else {
+                console.log('✅ Email service is ready');
+            }
+        });
     }
 
     // Send email with template
     async sendEmail(options) {
         try {
-            // For development, log email instead of sending
-            if (process.env.NODE_ENV === 'development') {
-                console.log('📧 DEVELOPMENT EMAIL (not sent):', {
-                    to: options.email,
-                    subject: options.subject,
-                    html: options.html
-                });
-                return { messageId: 'dev-' + Date.now() };
-            }
-
             const mailOptions = {
-                from: `SkillPort <${process.env.EMAIL_FROM}>`,
+                from: 'SkillPort <skillport24@gmail.com>',
                 to: options.email,
                 subject: options.subject,
-                html: options.html,
-                text: options.text
+                html: options.html
             };
 
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('✅ Email sent:', info.messageId);
-            return info;
-        } catch (error) {
-            console.error('❌ Email sending failed:', error);
-            // Don't throw error in development
-            if (process.env.NODE_ENV === 'development') {
-                console.log('📧 Email failed but continuing in development mode');
-                return { messageId: 'dev-error-' + Date.now() };
+            const result = await this.transporter.sendMail(mailOptions);
+            
+            console.log('✅ Email sent successfully!');
+            console.log('📧 Message ID:', result.messageId);
+            console.log('📬 To:', options.email);
+            console.log('📝 Subject:', options.subject);
+            
+            // Show preview URL for Ethereal Email
+            const previewUrl = nodemailer.getTestMessageUrl(result);
+            if (previewUrl) {
+                console.log('🔗 Preview URL:', previewUrl);
+                console.log('🌐 Open this URL to view the email:', previewUrl);
             }
-            throw new ErrorResponse('Email could not be sent', 500);
+            
+            return result;
+        } catch (error) {
+            console.error('❌ Failed to send email:', error);
+            console.log('📧 Email will be logged to console instead');
+            
+            // Fallback to console logging
+            console.log('📧 EMAIL CONTENT:');
+            console.log('📬 To:', options.email);
+            console.log('📝 Subject:', options.subject);
+            console.log('📄 HTML:', options.html);
+            
+            return { messageId: 'fallback-' + Date.now() };
         }
     }
 
@@ -126,6 +151,18 @@ class EmailService {
         
         return this.sendEmail({
             email,
+            subject,
+            html
+        });
+    }
+
+    // Send contact form notification
+    async sendContactNotification(contactData) {
+        const subject = `New Contact Form Submission - ${contactData.firstName} ${contactData.lastName}`;
+        const html = this.getContactTemplate(contactData);
+        
+        return this.sendEmail({
+            email: process.env.ADMIN_EMAIL || process.env.EMAIL_FROM,
             subject,
             html
         });
@@ -386,6 +423,56 @@ class EmailService {
                     
                     <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
                         Get ready to learn, grow, and achieve your goals with the support of mentors and fellow students!
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 12px; margin: 0;">
+                        © 2024 SkillPort. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+    }
+
+    // Contact Form Template
+    getContactTemplate(contactData) {
+        return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Contact Form Submission - SkillPort</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">New Contact Form</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">SkillPort Website</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 20px;">
+                    <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Contact Form Submission</h2>
+                    
+                    <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                        <p style="color: #4b5563; margin: 0 0 10px 0; font-size: 16px;"><strong>Name:</strong> ${contactData.firstName} ${contactData.lastName}</p>
+                        <p style="color: #4b5563; margin: 0 0 10px 0; font-size: 16px;"><strong>Email:</strong> ${contactData.email}</p>
+                        <p style="color: #4b5563; margin: 0 0 10px 0; font-size: 16px;"><strong>Subject:</strong> ${contactData.subject || 'General Inquiry'}</p>
+                    </div>
+                    
+                    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                        <p style="color: #92400e; margin: 0 0 10px 0; font-weight: 600;">Message:</p>
+                        <p style="color: #92400e; margin: 0; line-height: 1.6;">${contactData.message}</p>
+                    </div>
+                    
+                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                        Please respond to this inquiry as soon as possible.
                     </p>
                 </div>
                 

@@ -7,6 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../js/apiService.js"></script>
+  <script src="../../js/notifications.js"></script>
+  <script src="../../js/authManager.js"></script>
+  <script src="../../js/contextManager.js"></script>
+  <script src="../../js/dataLoader.js"></script>
+  <script src="../../js/uiHelpers.js"></script>
+  <script src="../../js/pageController.js"></script>
+  <script src="../../js/mentorContestsController.js"></script>
   <style>
     body { 
       font-family: 'Inter', sans-serif; 
@@ -327,7 +335,6 @@
   <script src="../../js/apiService.js"></script>
   <script src="../../js/notifications.js"></script>
   <script src="../../js/authManager.js"></script>
-  <script src="../../js/dataManager.js"></script>
 
      <script>
      lucide.createIcons();
@@ -512,9 +519,9 @@
           navbarMentorName.textContent = 'Dr. Sarah Chen';
         }
         
-        // Initialize DataManager for dynamic data
-        if (window.DataManager) {
-          window.DataManager.updateMentorContestData();
+        // Initialize Mentor Contests Controller for dynamic data
+        if (window.mentorContestsController) {
+          window.mentorContestsController.loadMentorContests();
         }
         
         // Load contests dynamically

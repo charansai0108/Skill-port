@@ -6,6 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Community = require('../models/Community');
 const Progress = require('../models/Progress');
+const Submission = require('../models/Submission');
 const emailService = require('../services/emailService');
 
 const router = express.Router();
@@ -568,6 +569,55 @@ router.put('/extension/install', authorize('personal'), asyncHandler(async (req,
             extensionInstalled: user.extensionInstalled,
             lastExtensionSync: user.lastExtensionSync
         }
+    });
+}));
+
+// @desc    Get user submissions
+// @route   GET /api/v1/users/submissions
+// @access  Private (User)
+router.get('/submissions', asyncHandler(async (req, res, next) => {
+    const { page = 1, limit = 10, status, platform } = req.query;
+    
+    let query = { user: req.user.id };
+    
+    if (status) {
+        query.status = status;
+    }
+    
+    if (platform) {
+        query.platform = platform;
+    }
+
+    const submissions = await Submission.find(query)
+        .populate('contest', 'name')
+        .populate('problem', 'title difficulty')
+        .sort({ submittedAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+
+    const total = await Submission.countDocuments(query);
+
+    res.status(200).json({
+        success: true,
+        count: submissions.length,
+        total,
+        data: submissions
+    });
+}));
+
+// @desc    Get user communities
+// @route   GET /api/v1/users/communities
+// @access  Private (User)
+router.get('/communities', asyncHandler(async (req, res, next) => {
+    const communities = await Community.find({
+        'members.user': req.user.id,
+        'members.isActive': true
+    }).select('name description memberCount postCount');
+
+    res.status(200).json({
+        success: true,
+        count: communities.length,
+        data: communities
     });
 }));
 

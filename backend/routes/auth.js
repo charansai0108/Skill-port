@@ -17,10 +17,13 @@ router.post('/register', [
     body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
     body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
-    body('role').isIn(['personal', 'community']).withMessage('Role must be personal or community'),
+    body('role').isIn(['personal', 'community', 'student']).withMessage('Role must be personal, community, or student'),
     // Community-specific validations
     body('communityName').if(body('role').equals('community')).notEmpty().withMessage('Community name is required'),
-    body('communityCode').if(body('role').equals('community')).matches(/^[A-Z0-9]{2,10}$/).withMessage('Community code must be 2-10 uppercase letters/numbers')
+    body('communityCode').if(body('role').equals('community')).matches(/^[A-Z0-9]{2,10}$/).withMessage('Community code must be 2-10 uppercase letters/numbers'),
+    // Student-specific validations
+    body('communityId').if(body('role').equals('student')).notEmpty().withMessage('Community ID is required for student registration'),
+    body('batch').if(body('role').equals('student')).notEmpty().withMessage('Batch is required for student registration')
 ], asyncHandler(async (req, res, next) => {
     // Check validation errors
     const errors = validationResult(req);
@@ -28,7 +31,7 @@ router.post('/register', [
         return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { firstName, lastName, email, role, communityName, communityCode, communityDescription } = req.body;
+    const { firstName, lastName, email, role, communityName, communityCode, communityDescription, communityId, batch } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -69,6 +72,24 @@ router.post('/register', [
             // Update community admin reference
             community.admin = user._id;
             await community.save();
+        } else if (role === 'student') {
+            // Verify community exists
+            community = await Community.findById(communityId);
+            if (!community) {
+                return next(new ErrorResponse('Community not found', 404));
+            }
+
+            // Create student user
+            user = await User.create({
+                firstName,
+                lastName,
+                email,
+                role: 'student',
+                community: community._id,
+                batch: batch,
+                status: 'pending',
+                isTemporaryPassword: true
+            });
         } else {
             // Create personal user
             user = await User.create({
@@ -83,6 +104,7 @@ router.post('/register', [
 
         // Generate OTP
         const otp = user.generateOTP();
+        console.log(`🔐 OTP for ${user.email}: ${otp}`); // Log OTP for testing
         await user.save({ validateBeforeSave: false });
 
         // Send OTP email
@@ -249,6 +271,7 @@ router.post('/login', [
     if (!user) {
         return next(new ErrorResponse('Invalid credentials', 401));
     }
+
 
     // Check if account is locked
     if (user.isLocked) {
@@ -522,6 +545,32 @@ router.post('/check-email', [
         data: {
             exists: false,
             canRegister: true
+        }
+    });
+}));
+
+// @desc    Get OTP for testing (development only)
+// @route   GET /api/v1/auth/test-otp/:email
+// @access  Public
+router.get('/test-otp/:email', asyncHandler(async (req, res, next) => {
+    if (process.env.NODE_ENV !== 'development') {
+        return next(new ErrorResponse('Not available in production', 404));
+    }
+    
+    const { email } = req.params;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+    
+    res.status(200).json({
+        success: true,
+        data: {
+            email: user.email,
+            otp: user.otpCode ? 'Check console for OTP' : 'No OTP found',
+            otpExpire: user.otpExpire,
+            isExpired: user.otpExpire < Date.now()
         }
     });
 }));

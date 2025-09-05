@@ -16,6 +16,14 @@ class NotificationSystem {
     }
 
     createContainer() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.createContainer();
+            });
+            return;
+        }
+        
         this.container = document.createElement('div');
         this.container.id = 'notification-container';
         this.container.className = 'notification-container';
@@ -155,7 +163,7 @@ class NotificationSystem {
         document.head.appendChild(styleSheet);
     }
 
-    show(options) {
+    show(options = {}) {
         const {
             title = 'Notification',
             message = '',
@@ -170,7 +178,8 @@ class NotificationSystem {
             message,
             type,
             closable,
-            action
+            action,
+            duration
         });
 
         this.container.appendChild(notification);
@@ -182,7 +191,7 @@ class NotificationSystem {
         }, 100);
 
         // Auto-remove after duration
-        if (duration > 0) {
+        if (duration && duration > 0) {
             setTimeout(() => {
                 this.remove(notification);
             }, duration);
@@ -191,7 +200,7 @@ class NotificationSystem {
         return notification;
     }
 
-    createNotification({ title, message, type, closable, action }) {
+    createNotification({ title, message, type, closable, action, duration = 5000 }) {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
 
