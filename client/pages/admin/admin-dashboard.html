@@ -1001,7 +1001,31 @@
 
           // Check if user is admin
           if (!authManager.isAdmin()) {
-            console.log('🔐 Admin Dashboard: Not admin, redirecting to login');
+            console.log('🔐 Admin Dashboard: Not admin, checking user role...');
+            
+            // If user is personal, redirect to personal dashboard
+            if (authManager.isPersonalUser()) {
+              console.log('🔐 Admin Dashboard: Personal user detected, redirecting to personal dashboard');
+              window.location.href = '/skillport-personal/student-dashboard';
+              return;
+            }
+            
+            // If user is mentor, redirect to mentor dashboard
+            if (authManager.isMentor()) {
+              console.log('🔐 Admin Dashboard: Mentor user detected, redirecting to mentor dashboard');
+              window.location.href = '/pages/mentor/mentor-dashboard';
+              return;
+            }
+            
+            // If user is student, redirect to student dashboard
+            if (authManager.isStudent()) {
+              console.log('🔐 Admin Dashboard: Student user detected, redirecting to student dashboard');
+              window.location.href = '/pages/user/user-dashboard';
+              return;
+            }
+            
+            // If no recognized role, redirect to login
+            console.log('🔐 Admin Dashboard: Unknown role, redirecting to login');
             window.location.href = '/pages/auth/login';
             return;
           }
