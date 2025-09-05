@@ -48,9 +48,8 @@ class LoginHandler {
 
     checkExistingAuth() {
         console.log('🔐 LoginHandler: Checking existing authentication...');
-        const token = localStorage.getItem('jwt_token');
-        if (token && window.authManager) {
-            console.log('🔐 LoginHandler: Existing token found, checking authentication...');
+        if (window.authManager) {
+            console.log('🔐 LoginHandler: Checking authentication with backend...');
             window.authManager.checkAuthStatus().then(() => {
                 if (window.authManager.isAuthenticated) {
                     console.log('🔐 LoginHandler: User already authenticated, redirecting...');
@@ -58,11 +57,9 @@ class LoginHandler {
                 }
             }).catch(error => {
                 console.error('🔐 LoginHandler: Auth check failed:', error);
-                // Clear invalid token
-                localStorage.removeItem('jwt_token');
             });
         } else {
-            console.log('🔐 LoginHandler: No existing token found');
+            console.log('🔐 LoginHandler: AuthManager not available');
         }
     }
 
@@ -151,25 +148,8 @@ class LoginHandler {
         console.log('🔐 LoginHandler: Response data:', response.data);
         
         try {
-            // CRITICAL: Store token securely in localStorage
-            if (response.data && response.data.token) {
-                localStorage.setItem('jwt_token', response.data.token);
-                console.log('🔐 LoginHandler: Token stored successfully:', response.data.token.substring(0, 20) + '...');
-                
-                // Verify token was stored
-                const storedToken = localStorage.getItem('jwt_token');
-                if (storedToken === response.data.token) {
-                    console.log('🔐 LoginHandler: Token storage verified');
-                } else {
-                    console.error('🔐 LoginHandler: Token storage verification failed!');
-                    this.showError('Failed to store authentication token');
-                    return;
-                }
-            } else {
-                console.error('🔐 LoginHandler: No token in response!');
-                this.showError('No authentication token received');
-                return;
-            }
+            // Token is now handled by httpOnly cookies
+            console.log('🔐 LoginHandler: Authentication successful, token handled by httpOnly cookies');
 
             // Update AuthManager
             if (window.authManager) {
@@ -252,28 +232,81 @@ class LoginHandler {
             console.log('🔐 LoginHandler: Redirecting to:', redirectUrl);
             console.log('🔐 LoginHandler: Current location:', window.location.href);
             
-            // CRITICAL: Multiple redirect methods to ensure it works
+            // CRITICAL: Use a more reliable redirect method
             try {
-                // Method 1: Direct assignment
+                // Ensure we have a full URL
+                const fullRedirectUrl = redirectUrl.startsWith('http') ? redirectUrl : `${window.location.origin}${redirectUrl}`;
+                console.log('🔐 LoginHandler: Full redirect URL:', fullRedirectUrl);
+                
+                // Method 1: Direct assignment with full URL
                 console.log('🔐 LoginHandler: Setting window.location.href...');
-                window.location.href = redirectUrl;
+                window.location.href = fullRedirectUrl;
                 console.log('🔐 LoginHandler: Redirect command executed');
                 
-                // Method 2: Backup with assign (in case href fails)
+                // Method 2: Immediate backup with assign
                 setTimeout(() => {
-                    if (window.location.pathname.includes('login')) {
-                        console.log('🔐 LoginHandler: Redirect failed, trying window.location.assign...');
-                        window.location.assign(redirectUrl);
-                    }
-                }, 2000);
+                    console.log('🔐 LoginHandler: Trying window.location.assign...');
+                    window.location.assign(fullRedirectUrl);
+                }, 50);
                 
-                // Method 3: Backup with replace (in case assign fails)
+                // Method 3: Backup with replace
                 setTimeout(() => {
-                    if (window.location.pathname.includes('login')) {
-                        console.log('🔐 LoginHandler: Redirect failed, trying window.location.replace...');
-                        window.location.replace(redirectUrl);
+                    console.log('🔐 LoginHandler: Trying window.location.replace...');
+                    window.location.replace(fullRedirectUrl);
+                }, 100);
+                
+                // Method 4: Force redirect with top.location (for iframes)
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying top.location...');
+                    if (window.top) {
+                        window.top.location.href = fullRedirectUrl;
                     }
-                }, 4000);
+                }, 150);
+                
+                // Method 5: Create a link and click it (most reliable)
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying link click method...');
+                    const link = document.createElement('a');
+                    link.href = fullRedirectUrl;
+                    link.target = '_self';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 200);
+                
+                // Method 6: Force reload with new URL
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying force reload...');
+                    window.location = fullRedirectUrl;
+                }, 250);
+                
+                // Method 7: Use history.pushState and then reload
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying history.pushState...');
+                    history.pushState(null, '', fullRedirectUrl);
+                    window.location.reload();
+                }, 300);
+                
+                // Method 8: Use document.location
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying document.location...');
+                    document.location = fullRedirectUrl;
+                }, 350);
+                
+                // Method 9: Use window.open and close current window
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying window.open method...');
+                    window.open(fullRedirectUrl, '_self');
+                }, 400);
+                
+                // Method 10: Force redirect with meta refresh
+                setTimeout(() => {
+                    console.log('🔐 LoginHandler: Trying meta refresh...');
+                    const meta = document.createElement('meta');
+                    meta.httpEquiv = 'refresh';
+                    meta.content = '0; url=' + fullRedirectUrl;
+                    document.head.appendChild(meta);
+                }, 450);
                 
             } catch (error) {
                 console.error('🔐 LoginHandler: Redirect error:', error);
@@ -356,7 +389,8 @@ class LoginHandler {
     // Utility method to clear authentication
     static clearAuth() {
         console.log('🔐 LoginHandler: Clearing authentication...');
-        localStorage.removeItem('jwt_token');
+        // Clear local data (cookies are handled by backend)
+        localStorage.removeItem('user_data');
         if (window.authManager) {
             window.authManager.currentUser = null;
             window.authManager.isAuthenticated = false;
@@ -367,7 +401,7 @@ class LoginHandler {
     // Utility method to test redirect
     static testRedirect() {
         console.log('🔐 LoginHandler: Testing redirect...');
-        window.location.href = '/pages/admin/admin-dashboard';
+        window.location.href = 'pages/admin/admin-dashboard.html';
     }
 }
 

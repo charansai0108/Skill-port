@@ -13,9 +13,27 @@ class PersonalDashboardController extends PageController {
 
     async init() {
         console.log('🎯 PersonalDashboardController: Initializing...');
+        
+        // Wait for AuthManager to be available
+        let retries = 0;
+        while (!window.authManager && retries < 10) {
+            console.log('🎯 PersonalDashboardController: Waiting for AuthManager...', retries);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+        }
+        
+        if (!window.authManager) {
+            console.error('🎯 PersonalDashboardController: AuthManager not available after 10 retries');
+            window.location.href = '/pages/auth/login.html';
+            return;
+        }
+        
         await super.init();
         
-        if (!this.isAuthenticated) {
+        // Give AuthManager a moment to complete authentication
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        if (!window.authManager.isAuthenticated) {
             console.log('🎯 PersonalDashboardController: User not authenticated, redirecting to login');
             window.location.href = '/pages/auth/login.html';
             return;

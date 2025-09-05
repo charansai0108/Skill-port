@@ -9,18 +9,52 @@ class APIService {
         this.timeout = 10000; // 10 seconds
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 1 second
+        this.csrfToken = null;
+        this.init();
+    }
+
+    async init() {
+        // Get CSRF token on initialization
+        try {
+            const response = await fetch('http://localhost:5001/api/csrf-token', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.csrfToken = data.data.csrfToken;
+            }
+        } catch (error) {
+            console.warn('Failed to get CSRF token:', error);
+        }
+    }
+
+    // Refresh CSRF token
+    async refreshCSRFToken() {
+        try {
+            const response = await fetch('http://localhost:5001/api/csrf-token', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.csrfToken = data.data.csrfToken;
+                return true;
+            }
+        } catch (error) {
+            console.warn('Failed to refresh CSRF token:', error);
+        }
+        return false;
     }
 
     // Get authentication headers
     getAuthHeaders() {
-        const token = localStorage.getItem('jwt_token');
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         };
         
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        // Add CSRF token for non-GET requests
+        if (this.csrfToken) {
+            headers['X-CSRF-Token'] = this.csrfToken;
         }
         
         return headers;
@@ -31,6 +65,7 @@ class APIService {
         const config = {
             method: 'GET',
             headers: this.getAuthHeaders(),
+            credentials: 'include', // Include cookies in requests
             timeout: this.timeout,
             ...options
         };
@@ -51,7 +86,8 @@ class APIService {
                 
                 const response = await fetch(url, {
                     ...config,
-                    signal: controller.signal
+                    signal: controller.signal,
+                    credentials: 'include' // Include cookies in requests
                 });
                 
                 clearTimeout(timeoutId);
@@ -70,6 +106,15 @@ class APIService {
                 
                 // Handle HTTP errors
                 if (!response.ok) {
+                    // Handle CSRF token errors
+                    if (response.status === 403 && data.type === 'CSRFError') {
+                        // Try to refresh CSRF token and retry once
+                        if (attempt === 1) {
+                            await this.refreshCSRFToken();
+                            continue;
+                        }
+                    }
+                    
                     throw new APIError(
                         data.error || `HTTP ${response.status}: ${response.statusText}`,
                         response.status,
@@ -228,25 +273,20 @@ class APIService {
         return this.get('/admin/analytics');
     }
 
-    // Token management
+    // Token management (now handled by httpOnly cookies)
     setToken(token) {
-        if (token) {
-            localStorage.setItem('jwt_token', token);
-            console.log('🔐 API Service: Token stored successfully');
-        } else {
-            localStorage.removeItem('jwt_token');
-            console.log('🔐 API Service: Token removed');
-        }
+        // Tokens are now handled by httpOnly cookies
+        console.log('🔐 API Service: Token management handled by httpOnly cookies');
     }
 
     getToken() {
-        return localStorage.getItem('jwt_token');
+        // Tokens are now handled by httpOnly cookies
+        return null;
     }
 
     clearToken() {
-        localStorage.removeItem('jwt_token');
-        localStorage.removeItem('user_data');
-        console.log('🔐 API Service: All tokens cleared');
+        // Tokens are now handled by httpOnly cookies
+        console.log('🔐 API Service: Token management handled by httpOnly cookies');
     }
 
     // Logout user (deactivate database session)
@@ -471,6 +511,68 @@ class APIService {
         return this.delete('/community/leave');
     }
 
+    // New Community endpoints
+    async getAllCommunities() {
+        return this.get('/communities');
+    }
+
+    async getCommunityByCode(code) {
+        return this.get(`/community/${code}`);
+    }
+
+    async getCommunityDetails(communityId) {
+        return this.get(`/community/${communityId}/details`);
+    }
+
+    async addMentor(communityId, mentorData) {
+        return this.post(`/community/${communityId}/mentors`, mentorData);
+    }
+
+    async addStudent(communityId, studentData) {
+        return this.post(`/community/${communityId}/students`, studentData);
+    }
+
+    async createBatch(communityId, batchData) {
+        return this.post(`/community/${communityId}/batches`, batchData);
+    }
+
+    async getCommunityStats(communityId) {
+        return this.get(`/community/${communityId}/stats`);
+    }
+
+    // New Contest endpoints
+    async getContests() {
+        return this.get('/contests');
+    }
+
+    async getContestById(contestId) {
+        return this.get(`/contests/${contestId}`);
+    }
+
+    async createContest(contestData) {
+        return this.post('/contests', contestData);
+    }
+
+    async updateContest(contestId, contestData) {
+        return this.put(`/contests/${contestId}`, contestData);
+    }
+
+    async startContest(contestId) {
+        return this.post(`/contests/${contestId}/start`);
+    }
+
+    async joinContest(contestId) {
+        return this.post(`/contests/${contestId}/join`);
+    }
+
+    async submitSolution(contestId, solutionData) {
+        return this.post(`/contests/${contestId}/submit`, solutionData);
+    }
+
+    async getContestLeaderboard(contestId) {
+        return this.get(`/contests/${contestId}/leaderboard`);
+    }
+
     async joinEvent(eventId) {
         return this.post(`/events/${eventId}/join`);
     }
@@ -507,6 +609,41 @@ class APIService {
 
     async updateUserPreferences(preferences) {
         return this.put('/users/preferences', preferences);
+    }
+
+    // Utility methods
+    formatError(error) {
+        if (error instanceof APIError) {
+            return error.message;
+        }
+        
+        if (error.message) {
+            return error.message;
+        }
+        
+        return 'An unexpected error occurred';
+    }
+
+    // Health check
+    async healthCheck() {
+        try {
+            const response = await fetch('http://localhost:5001/health');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            throw new APIError('Health check failed', 0, error);
+        }
+    }
+
+    // Get server status
+    async getServerStatus() {
+        try {
+            const response = await fetch('http://localhost:5001/api/v1/health');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            throw new APIError('Server status check failed', 0, error);
+        }
     }
 }
 

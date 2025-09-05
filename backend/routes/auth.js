@@ -7,6 +7,7 @@ const User = require('../models/User');
 const Community = require('../models/Community');
 const emailService = require('../services/emailService');
 const SessionService = require('../services/sessionService');
+const logger = require('../config/logger');
 const crypto = require('crypto');
 
 const router = express.Router();
@@ -18,13 +19,15 @@ router.post('/register', [
     body('firstName').trim().isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
     body('lastName').trim().isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
-    body('role').isIn(['personal', 'community', 'student']).withMessage('Role must be personal, community, or student'),
-    // Community-specific validations
-    body('communityName').if(body('role').equals('community')).notEmpty().withMessage('Community name is required'),
-    body('communityCode').if(body('role').equals('community')).matches(/^[A-Z0-9]{2,10}$/).withMessage('Community code must be 2-10 uppercase letters/numbers'),
-    // Student-specific validations
-    body('communityId').if(body('role').equals('student')).notEmpty().withMessage('Community ID is required for student registration'),
-    body('batch').if(body('role').equals('student')).notEmpty().withMessage('Batch is required for student registration')
+    body('role').isIn(['personal', 'community-admin']).withMessage('Role must be personal or community-admin'),
+    // Community admin specific validations
+    body('communityName').if(body('role').equals('community-admin')).notEmpty().withMessage('Community name is required'),
+    body('communityCode').if(body('role').equals('community-admin')).matches(/^[A-Z0-9]{2,10}$/).withMessage('Community code must be 2-10 uppercase letters/numbers'),
+    body('communityDescription').if(body('role').equals('community-admin')).optional().isLength({ max: 500 }).withMessage('Description cannot exceed 500 characters'),
+    // Personal user specific validations
+    body('experience').if(body('role').equals('personal')).isIn(['beginner', 'intermediate', 'advanced', 'expert']).withMessage('Experience must be beginner, intermediate, advanced, or expert'),
+    body('skills').if(body('role').equals('personal')).optional().isArray().withMessage('Skills must be an array'),
+    body('bio').if(body('role').equals('personal')).optional().isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters')
 ], asyncHandler(async (req, res, next) => {
     // Check validation errors
     const errors = validationResult(req);
@@ -32,7 +35,7 @@ router.post('/register', [
         return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const { firstName, lastName, email, role, communityName, communityCode, communityDescription, communityId, batch } = req.body;
+    const { firstName, lastName, email, role, communityName, communityCode, communityDescription, experience, skills, bio } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -44,7 +47,7 @@ router.post('/register', [
     let community;
 
     try {
-        if (role === 'community') {
+        if (role === 'community-admin') {
             // Check if community code is already taken
             const existingCommunity = await Community.findOne({ code: communityCode.toUpperCase() });
             if (existingCommunity) {
@@ -73,24 +76,6 @@ router.post('/register', [
             // Update community admin reference
             community.admin = user._id;
             await community.save();
-        } else if (role === 'student') {
-            // Verify community exists
-            community = await Community.findById(communityId);
-            if (!community) {
-                return next(new ErrorResponse('Community not found', 404));
-            }
-
-            // Create student user
-            user = await User.create({
-                firstName,
-                lastName,
-                email,
-                role: 'student',
-                community: community._id,
-                batch: batch,
-                status: 'pending',
-                isTemporaryPassword: true
-            });
         } else {
             // Create personal user
             user = await User.create({
@@ -98,6 +83,9 @@ router.post('/register', [
                 lastName,
                 email,
                 role: 'personal',
+                experience: experience,
+                skills: skills || [],
+                bio: bio || '',
                 status: 'pending',
                 isTemporaryPassword: true
             });
@@ -105,14 +93,14 @@ router.post('/register', [
 
         // Generate OTP
         const otp = user.generateOTP();
-        console.log(`🔐 OTP for ${user.email}: ${otp}`); // Log OTP for testing
+        logger.info(`🔐 OTP for ${user.email}: ${otp}`); // Log OTP for testing
         await user.save({ validateBeforeSave: false });
 
         // Send OTP email
         try {
             await emailService.sendOTPEmail(user.email, otp, user.firstName);
         } catch (emailError) {
-            console.error('Email sending failed:', emailError);
+            logger.error('Email sending failed:', emailError);
             // Don't fail registration if email fails
         }
 
@@ -146,7 +134,12 @@ router.post('/register', [
 router.post('/verify-otp', [
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/[0-9]/).withMessage('Password must contain at least one number')
+        .matches(/[@$!%*?&]/).withMessage('Password must contain at least one special character (@$!%*?&)')
 ], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -161,9 +154,20 @@ router.post('/verify-otp', [
         return next(new ErrorResponse('User not found', 404));
     }
 
+    // Check if OTP is locked
+    if (user.isOTPLocked) {
+        return next(new ErrorResponse('Too many OTP attempts. Please try again later.', 429));
+    }
+
     // Verify OTP
     if (!user.verifyOTP(otp)) {
+        await user.incOTPAttempts();
         return next(new ErrorResponse('Invalid or expired OTP', 400));
+    }
+
+    // Reset OTP attempts on successful verification
+    if (user.otpAttempts > 0) {
+        await user.resetOTPAttempts();
     }
 
     // Set password and activate account
@@ -186,14 +190,21 @@ router.post('/verify-otp', [
         
         await emailService.sendWelcomeEmail(user.email, user.firstName, user.role, loginUrl);
     } catch (emailError) {
-        console.error('Welcome email failed:', emailError);
+        logger.error('Welcome email failed:', emailError);
     }
+
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.status(200).json({
         success: true,
         message: 'Email verified successfully. Registration completed.',
         data: {
-            token,
             user: {
                 id: user._id,
                 firstName: user.firstName,
@@ -230,6 +241,11 @@ router.post('/resend-otp', [
         return next(new ErrorResponse('Email is already verified', 400));
     }
 
+    // Check if OTP is locked
+    if (user.isOTPLocked) {
+        return next(new ErrorResponse('Too many OTP attempts. Please try again later.', 429));
+    }
+
     // Generate new OTP
     const otp = user.generateOTP();
     await user.save({ validateBeforeSave: false });
@@ -238,7 +254,7 @@ router.post('/resend-otp', [
     try {
         await emailService.sendOTPEmail(user.email, otp, user.firstName);
     } catch (emailError) {
-        console.error('OTP email failed:', emailError);
+        logger.error('OTP email failed:', emailError);
         return next(new ErrorResponse('Failed to send OTP email', 500));
     }
 
@@ -314,9 +330,9 @@ router.post('/login', [
                 requirePasswordChange: requirePasswordChange
             }
         });
-        console.log('🔐 Auth: Database session created for user:', user._id);
+        logger.info('🔐 Auth: Database session created for user:', user._id);
     } catch (sessionError) {
-        console.error('🔐 Auth: Error creating session:', sessionError);
+        logger.error('🔐 Auth: Error creating session:', sessionError);
         // Continue with login even if session creation fails
     }
 
@@ -324,11 +340,18 @@ router.post('/login', [
     user.lastActivity = Date.now();
     await user.save({ validateBeforeSave: false });
 
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     res.status(200).json({
         success: true,
         message: 'Login successful',
         data: {
-            token,
             requirePasswordChange,
             user: {
                 id: user._id,
@@ -394,7 +417,12 @@ router.post('/forgot-password', [
 // @route   POST /api/v1/auth/reset-password/:resettoken
 // @access  Public
 router.post('/reset-password/:resettoken', [
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/[0-9]/).withMessage('Password must contain at least one number')
+        .matches(/[@$!%*?&]/).withMessage('Password must contain at least one special character (@$!%*?&)')
 ], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -427,11 +455,18 @@ router.post('/reset-password/:resettoken', [
     // Generate JWT token
     const token = user.getSignedJwtToken();
 
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     res.status(200).json({
         success: true,
         message: 'Password reset successful',
         data: {
-            token,
             user: {
                 id: user._id,
                 firstName: user.firstName,
@@ -448,7 +483,12 @@ router.post('/reset-password/:resettoken', [
 // @access  Private
 router.put('/change-password', protect, [
     body('currentPassword').notEmpty().withMessage('Current password is required'),
-    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
+    body('newPassword')
+        .isLength({ min: 8 }).withMessage('New password must be at least 8 characters')
+        .matches(/[A-Z]/).withMessage('New password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('New password must contain at least one lowercase letter')
+        .matches(/[0-9]/).withMessage('New password must contain at least one number')
+        .matches(/[@$!%*?&]/).withMessage('New password must contain at least one special character (@$!%*?&)')
 ], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -468,9 +508,18 @@ router.put('/change-password', protect, [
         }
     }
 
+    // Check if password was recently used
+    if (user.isPasswordRecentlyUsed(newPassword)) {
+        return next(new ErrorResponse('Password was recently used. Please choose a different password.', 400));
+    }
+
     // Set new password
     user.password = newPassword;
     user.isTemporaryPassword = false;
+    
+    // Add to password history
+    user.addPasswordToHistory(newPassword);
+    
     await user.save();
 
     res.status(200).json({
@@ -518,25 +567,115 @@ router.get('/me', protect, asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/auth/logout
 // @access  Private
 router.post('/logout', protect, asyncHandler(async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
     
     // Deactivate session in database
     if (token) {
         try {
             await SessionService.deactivateSession(token);
-            console.log('🔐 Auth: Session deactivated for user:', req.user.id);
+            logger.info('🔐 Auth: Session deactivated for user:', req.user.id);
         } catch (sessionError) {
-            console.error('🔐 Auth: Error deactivating session:', sessionError);
+            logger.error('🔐 Auth: Error deactivating session:', sessionError);
         }
     }
 
     // Update user's last activity
     await User.findByIdAndUpdate(req.user.id, { lastActivity: Date.now() });
 
+    // Clear httpOnly cookie
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+    });
+
     res.status(200).json({
         success: true,
         message: 'Logged out successfully',
         data: {}
+    });
+}));
+
+// @desc    Join community (for personal users)
+// @route   POST /api/v1/auth/join-community
+// @access  Public
+router.post('/join-community', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('communityCode').notEmpty().withMessage('Community code is required'),
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/[0-9]/).withMessage('Password must contain at least one number')
+        .matches(/[@$!%*?&]/).withMessage('Password must contain at least one special character (@$!%*?&)'),
+    body('confirmPassword').custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error('Password confirmation does not match password');
+        }
+        return true;
+    })
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const { email, communityCode, password } = req.body;
+
+    // Find community by code
+    const community = await Community.findOne({ code: communityCode.toUpperCase() });
+    if (!community) {
+        return next(new ErrorResponse('Community not found', 404));
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return next(new ErrorResponse('Email is already registered', 400));
+    }
+
+    // Create student user
+    const user = await User.create({
+        firstName: req.body.firstName || 'Student',
+        lastName: req.body.lastName || 'User',
+        email,
+        password,
+        role: 'student',
+        community: community._id,
+        batch: req.body.batch || 'Default',
+        status: 'pending',
+        isTemporaryPassword: false
+    });
+
+    // Add student to community
+    await community.addStudent(user._id);
+
+    // Generate OTP for verification
+    const otp = user.generateOTP();
+    await user.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await emailService.sendOTPEmail(user.email, otp, user.firstName);
+    } catch (emailError) {
+        logger.error('OTP email failed:', emailError);
+        return next(new ErrorResponse('Failed to send OTP email', 500));
+    }
+
+    res.status(201).json({
+        success: true,
+        message: 'Community joining initiated. Please check your email for OTP verification.',
+        data: {
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                community: user.community,
+                batch: user.batch
+            }
+        }
     });
 }));
 

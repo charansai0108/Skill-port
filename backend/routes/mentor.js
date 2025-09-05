@@ -4,156 +4,225 @@ const asyncHandler = require('../middleware/async');
 const { protect, authorize } = require('../middleware/auth');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
-const Contest = require('../models/Contest');
-const Progress = require('../models/Progress');
 const Community = require('../models/Community');
+const Contest = require('../models/Contest');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
-// @desc    Get mentor's students
-// @route   GET /api/v1/mentor/students
-// @access  Private (Mentor)
-router.get('/students', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
-    const students = await User.find({ 
-        role: 'student',
-        community: req.user.community 
-    }).select('-password').sort({ createdAt: -1 });
-
-    res.status(200).json({
-        success: true,
-        count: students.length,
-        data: students
-    });
-}));
-
-// @desc    Get mentor's contests
+// @desc    Get assigned contests
 // @route   GET /api/v1/mentor/contests
-// @access  Private (Mentor)
+// @access  Private (Mentor only)
 router.get('/contests', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
     const contests = await Contest.find({ 
-        createdBy: req.user.id 
-    }).sort({ createdAt: -1 });
-
-    res.status(200).json({
-        success: true,
-        count: contests.length,
-        data: contests
-    });
-}));
-
-// @desc    Get mentor analytics
-// @route   GET /api/v1/mentor/analytics
-// @access  Private (Mentor)
-router.get('/analytics', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
-    const totalStudents = await User.countDocuments({ 
-        role: 'student',
-        community: req.user.community 
-    });
-    
-    const totalContests = await Contest.countDocuments({ 
-        createdBy: req.user.id 
-    });
-    
-    const activeContests = await Contest.countDocuments({ 
-        createdBy: req.user.id,
-        status: 'active'
-    });
+        mentor: req.user._id,
+        community: req.user.community._id
+    }).populate('participants.user', 'firstName lastName email');
 
     res.status(200).json({
         success: true,
         data: {
-            totalStudents,
-            totalContests,
-            activeContests
+            contests
         }
     });
 }));
 
-// @desc    Get mentor activity
-// @route   GET /api/v1/mentor/activity
-// @access  Private (Mentor)
-router.get('/activity', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
-    const recentContests = await Contest.find({ 
-        createdBy: req.user.id 
-    }).sort({ createdAt: -1 }).limit(5);
-
-    res.status(200).json({
-        success: true,
-        data: recentContests
-    });
-}));
-
-// @desc    Get mentor profile
-// @route   GET /api/v1/mentor/profile
-// @access  Private (Mentor)
-router.get('/profile', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
-    const mentor = await User.findById(req.user.id).select('-password');
+// @desc    Get students in assigned batches
+// @route   GET /api/v1/mentor/students
+// @access  Private (Mentor only)
+router.get('/students', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
+    const community = await Community.findById(req.user.community._id);
     
-    if (!mentor) {
-        return next(new ErrorResponse('Mentor not found', 404));
-    }
+    // Get batches assigned to this mentor
+    const mentorBatches = community.batches.filter(batch => 
+        batch.mentor && batch.mentor.toString() === req.user._id.toString()
+    );
+
+    // Get students from assigned batches
+    const students = await User.find({
+        community: req.user.community._id,
+        role: 'student',
+        batch: { $in: mentorBatches.map(batch => batch.name) }
+    }).select('-password -otpCode -otpExpire');
 
     res.status(200).json({
         success: true,
-        data: mentor
+        data: {
+            students,
+            assignedBatches: mentorBatches
+        }
     });
 }));
 
-// @desc    Update mentor profile
-// @route   PUT /api/v1/mentor/profile
-// @access  Private (Mentor)
-router.put('/profile', protect, authorize('mentor'), [
-    body('firstName').optional().trim().isLength({ min: 2, max: 50 }),
-    body('lastName').optional().trim().isLength({ min: 2, max: 50 }),
-    body('bio').optional().trim().isLength({ max: 500 }),
-    body('expertise').optional().isArray()
+// @desc    Update contest
+// @route   PUT /api/v1/mentor/contests/:contestId
+// @access  Private (Mentor only)
+router.put('/contests/:contestId', protect, authorize('mentor'), [
+    body('title').optional().trim().isLength({ min: 5, max: 200 }).withMessage('Title must be 5-200 characters'),
+    body('description').optional().trim().isLength({ min: 10, max: 1000 }).withMessage('Description must be 10-1000 characters'),
+    body('startDate').optional().isISO8601().withMessage('Start date must be a valid date'),
+    body('endDate').optional().isISO8601().withMessage('End date must be a valid date'),
+    body('duration').optional().isInt({ min: 1 }).withMessage('Duration must be a positive number'),
+    body('status').optional().isIn(['draft', 'published', 'active', 'completed', 'cancelled']).withMessage('Invalid status')
 ], asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return next(new ErrorResponse('Validation failed', 400));
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const mentor = await User.findByIdAndUpdate(
-        req.user.id,
-        req.body,
-        { new: true, runValidators: true }
-    ).select('-password');
-
-    res.status(200).json({
-        success: true,
-        data: mentor
+    const contest = await Contest.findOne({
+        _id: req.params.contestId,
+        mentor: req.user._id,
+        community: req.user.community._id
     });
-}));
 
-// @desc    Duplicate contest
-// @route   POST /api/v1/mentor/contests/:contestId/duplicate
-// @access  Private (Mentor)
-router.post('/contests/:contestId/duplicate', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
-    const originalContest = await Contest.findById(req.params.contestId);
-    
-    if (!originalContest) {
+    if (!contest) {
         return next(new ErrorResponse('Contest not found', 404));
     }
 
-    if (originalContest.createdBy.toString() !== req.user.id) {
-        return next(new ErrorResponse('Not authorized to duplicate this contest', 403));
+    // Update contest fields
+    const updateFields = ['title', 'description', 'startDate', 'endDate', 'duration', 'status', 'rules', 'prizes'];
+    updateFields.forEach(field => {
+        if (req.body[field] !== undefined) {
+            if (field === 'startDate' || field === 'endDate') {
+                contest[field] = new Date(req.body[field]);
+            } else {
+                contest[field] = req.body[field];
+            }
+        }
+    });
+
+    await contest.save();
+
+    logger.info(`Contest updated by mentor ${req.user.email}: ${contest.title}`);
+
+    res.status(200).json({
+        success: true,
+        message: 'Contest updated successfully',
+        data: {
+            contest
+        }
+    });
+}));
+
+// @desc    Add participant to contest
+// @route   POST /api/v1/mentor/contests/:contestId/participants
+// @access  Private (Mentor only)
+router.post('/contests/:contestId/participants', protect, authorize('mentor'), [
+    body('userId').notEmpty().withMessage('User ID is required')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
     }
 
-    const duplicatedContest = new Contest({
-        ...originalContest.toObject(),
-        _id: undefined,
-        title: `${originalContest.title} (Copy)`,
-        status: 'draft',
-        createdAt: new Date(),
-        updatedAt: new Date()
+    const contest = await Contest.findOne({
+        _id: req.params.contestId,
+        mentor: req.user._id,
+        community: req.user.community._id
     });
 
-    await duplicatedContest.save();
+    if (!contest) {
+        return next(new ErrorResponse('Contest not found', 404));
+    }
 
-    res.status(201).json({
-        success: true,
-        data: duplicatedContest
+    const { userId } = req.body;
+
+    // Verify user is a student in the community
+    const student = await User.findOne({
+        _id: userId,
+        community: req.user.community._id,
+        role: 'student'
     });
+
+    if (!student) {
+        return next(new ErrorResponse('Student not found in this community', 404));
+    }
+
+    try {
+        await contest.addParticipant(userId);
+        
+        logger.info(`Student ${student.email} added to contest ${contest.title} by mentor ${req.user.email}`);
+
+        res.status(200).json({
+            success: true,
+            message: 'Participant added successfully',
+            data: {
+                participant: {
+                    id: student._id,
+                    firstName: student.firstName,
+                    lastName: student.lastName,
+                    email: student.email,
+                    batch: student.batch
+                }
+            }
+        });
+    } catch (error) {
+        return next(new ErrorResponse(error.message, 400));
+    }
+}));
+
+// @desc    Remove participant from contest
+// @route   DELETE /api/v1/mentor/contests/:contestId/participants/:userId
+// @access  Private (Mentor only)
+router.delete('/contests/:contestId/participants/:userId', protect, authorize('mentor'), asyncHandler(async (req, res, next) => {
+    const contest = await Contest.findOne({
+        _id: req.params.contestId,
+        mentor: req.user._id,
+        community: req.user.community._id
+    });
+
+    if (!contest) {
+        return next(new ErrorResponse('Contest not found', 404));
+    }
+
+    try {
+        await contest.removeParticipant(req.params.userId);
+        
+        logger.info(`Student ${req.params.userId} removed from contest ${contest.title} by mentor ${req.user.email}`);
+
+        res.status(200).json({
+            success: true,
+            message: 'Participant removed successfully'
+        });
+    } catch (error) {
+        return next(new ErrorResponse(error.message, 400));
+    }
+}));
+
+// @desc    Update participant status
+// @route   PUT /api/v1/mentor/contests/:contestId/participants/:userId/status
+// @access  Private (Mentor only)
+router.put('/contests/:contestId/participants/:userId/status', protect, authorize('mentor'), [
+    body('status').isIn(['active', 'completed', 'dropped']).withMessage('Invalid status')
+], asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    const contest = await Contest.findOne({
+        _id: req.params.contestId,
+        mentor: req.user._id,
+        community: req.user.community._id
+    });
+
+    if (!contest) {
+        return next(new ErrorResponse('Contest not found', 404));
+    }
+
+    try {
+        await contest.updateParticipantStatus(req.params.userId, req.body.status);
+        
+        logger.info(`Student ${req.params.userId} status updated to ${req.body.status} in contest ${contest.title} by mentor ${req.user.email}`);
+
+        res.status(200).json({
+            success: true,
+            message: 'Participant status updated successfully'
+        });
+    } catch (error) {
+        return next(new ErrorResponse(error.message, 400));
+    }
 }));
 
 module.exports = router;

@@ -37,34 +37,40 @@ class AuthManager {
 
     async checkAuthStatus() {
         console.log('🔐 AuthManager: Starting authentication check...');
-        const token = localStorage.getItem('jwt_token');
         
-        if (!token) {
-            console.log('🔐 AuthManager: No token found, handling unauthenticated');
-            this.handleUnauthenticated();
-            return;
-        }
-
-        console.log('🔐 AuthManager: Token found, verifying with database session...');
         try {
-            // Verify token with backend (now uses database session verification)
+            // Wait for APIService to be available
+            let retries = 0;
+            while (!window.APIService && retries < 10) {
+                console.log('🔐 AuthManager: Waiting for APIService...', retries);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (!window.APIService) {
+                console.error('🔐 AuthManager: APIService not available after 10 retries');
+                this.handleUnauthenticated();
+                return;
+            }
+            
+            // Verify authentication with backend (uses httpOnly cookies)
             const response = await window.APIService.getUserProfile();
-            console.log('🔐 AuthManager: Database session response:', response);
+            console.log('🔐 AuthManager: Authentication response:', response);
             
             if (response.success) {
                 // Handle different response formats from different endpoints
                 this.currentUser = response.data.user || response.data;
                 this.isAuthenticated = true;
-                console.log('🔐 AuthManager: Database session verified, user:', this.currentUser);
+                console.log('🔐 AuthManager: Authentication verified, user:', this.currentUser);
                 this.handleAuthenticated();
             } else {
-                console.log('🔐 AuthManager: Database session invalid, handling invalid token');
-                this.handleInvalidToken();
+                console.log('🔐 AuthManager: Authentication invalid, handling unauthenticated');
+                this.handleUnauthenticated();
             }
         } catch (error) {
             console.error('🔐 AuthManager: Auth check failed:', error);
             console.error('🔐 AuthManager: Error stack:', error.stack);
-            this.handleInvalidToken();
+            this.handleUnauthenticated();
         }
     }
 
@@ -104,7 +110,7 @@ class AuthManager {
     }
 
     handleInvalidToken() {
-        localStorage.removeItem('jwt_token');
+        // Clear any local data
         localStorage.removeItem('user_data');
         this.handleUnauthenticated();
         
@@ -121,8 +127,7 @@ class AuthManager {
     logout() {
         console.log('🔐 AuthManager: Logging out user...');
         
-        // Clear all stored data
-        localStorage.removeItem('jwt_token');
+        // Clear local data (cookies are handled by backend)
         localStorage.removeItem('user_data');
         sessionStorage.clear();
         
@@ -144,19 +149,10 @@ class AuthManager {
         }
     }
 
-    // Check if token is expired
+    // Check if token is expired (now handled by httpOnly cookies)
     isTokenExpired() {
-        const token = localStorage.getItem('jwt_token');
-        if (!token) return true;
-        
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Date.now() / 1000;
-            return payload.exp < currentTime;
-        } catch (error) {
-            console.error('🔐 AuthManager: Error checking token expiration:', error);
-            return true;
-        }
+        // Token expiration is now handled by httpOnly cookies
+        return false;
     }
 
     // Get stored user data
@@ -400,10 +396,10 @@ class AuthManager {
 
         const role = this.currentUser.role;
         const redirects = {
-            'community-admin': '/pages/admin/admin-dashboard',
-            'mentor': '/pages/mentor/mentor-dashboard',
-            'student': '/pages/user/user-dashboard',
-            'personal': '/skillport-personal/student-dashboard'
+            'community-admin': '/pages/admin/admin-dashboard.html',
+            'mentor': '/pages/mentor/mentor-dashboard.html',
+            'student': '/pages/user/user-dashboard.html',
+            'personal': '/skillport-personal/student-dashboard.html'
         };
 
         const redirectUrl = redirects[role];
@@ -415,10 +411,10 @@ class AuthManager {
     isProtectedPage() {
         const currentPath = window.location.pathname;
         const protectedPaths = [
-            '/pages/admin/',
-            '/pages/mentor/',
-            '/pages/user/',
-            '/skillport-personal/'
+            'pages/admin/',
+            'pages/mentor/',
+            'pages/user/',
+            'skillport-personal/'
         ];
         
         const isProtected = protectedPaths.some(path => currentPath.includes(path));
@@ -431,7 +427,7 @@ class AuthManager {
         console.log('🔐 AuthManager: redirectToLogin called, currentPath:', currentPath);
         if (!currentPath.includes('login')) {
             console.log('🔐 AuthManager: Redirecting to login page');
-            window.location.href = '/pages/auth/login';
+            window.location.href = '/pages/auth/login.html';
         } else {
             console.log('🔐 AuthManager: Already on login page, not redirecting');
         }

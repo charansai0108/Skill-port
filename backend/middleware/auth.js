@@ -8,13 +8,13 @@ const SessionService = require('../services/sessionService');
 exports.protect = asyncHandler(async (req, res, next) => {
     let token;
 
-    // Check for token in headers
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
-    }
-    // Check for token in cookies (if using cookie authentication)
-    else if (req.cookies && req.cookies.token) {
+    // Check for token in cookies first (primary method)
+    if (req.cookies && req.cookies.token) {
         token = req.cookies.token;
+    }
+    // Check for token in headers (fallback for API calls)
+    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
     }
 
     // Make sure token exists
@@ -70,14 +70,14 @@ exports.checkCommunityAccess = asyncHandler(async (req, res, next) => {
 
     // Community admin can only access their own community
     if (req.user.role === 'community-admin') {
-        if (req.user.community._id.toString() !== communityId) {
+        if (!req.user.community || String(req.user.community._id) !== String(communityId)) {
             return next(new ErrorResponse('Not authorized to access this community', 403));
         }
     }
 
     // Mentors and students can only access their own community
     if (['mentor', 'student'].includes(req.user.role)) {
-        if (req.user.community._id.toString() !== communityId) {
+        if (!req.user.community || String(req.user.community._id) !== String(communityId)) {
             return next(new ErrorResponse('Not authorized to access this community', 403));
         }
     }
@@ -101,7 +101,7 @@ exports.checkUserAccess = asyncHandler(async (req, res, next) => {
             return next(new ErrorResponse('User not found', 404));
         }
         
-        if (targetUser.community && targetUser.community.toString() !== req.user.community._id.toString()) {
+        if (targetUser.community && String(targetUser.community) !== String(req.user.community._id)) {
             return next(new ErrorResponse('Not authorized to access this user', 403));
         }
     }
@@ -115,7 +115,7 @@ exports.checkUserAccess = asyncHandler(async (req, res, next) => {
         
         if (targetUser.role !== 'student' || 
             !targetUser.community || 
-            targetUser.community.toString() !== req.user.community._id.toString()) {
+            String(targetUser.community) !== String(req.user.community._id)) {
             return next(new ErrorResponse('Not authorized to access this user', 403));
         }
     }

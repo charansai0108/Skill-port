@@ -58,9 +58,23 @@ class PageController {
 
     // Check authentication
     async checkAuthentication() {
+        // Wait for AuthManager to be available
+        let retries = 0;
+        while (!window.authManager && retries < 10) {
+            console.log(`🎮 ${this.constructor.name}: Waiting for AuthManager...`, retries);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+        }
+        
+        if (!window.authManager) {
+            console.error(`🎮 ${this.constructor.name}: AuthManager not available after 10 retries`);
+            window.location.href = '/pages/auth/login.html';
+            return;
+        }
+        
         if (!window.authManager.isAuthenticated) {
             console.log(`🎮 ${this.constructor.name}: User not authenticated, redirecting to login`);
-            window.location.href = '/pages/auth/login';
+            window.location.href = '/pages/auth/login.html';
             return;
         }
 

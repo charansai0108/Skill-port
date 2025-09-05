@@ -392,6 +392,17 @@
                         <input type="text" id="otpInput" maxlength="6" placeholder="000000" required class="form-input w-full px-4 py-3 text-center text-xl font-bold rounded-xl">
                     </div>
                     
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-slate-700">Set Password *</label>
+                        <div class="relative">
+                            <input type="password" id="otpPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl" placeholder="Enter your password">
+                            <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('otpPassword')">
+                                <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500">Password must contain: 8+ chars, uppercase, lowercase, number, special character</p>
+                    </div>
+                    
                     <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
                         <i data-lucide="check" class="w-5 h-5"></i>
                         Verify Email
@@ -463,7 +474,7 @@
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
-                skillLevel: formData.get('skillLevel'),
+                experience: formData.get('skillLevel'),
                 educationLevel: formData.get('educationLevel'),
                 fieldOfStudy: formData.get('fieldOfStudy'),
                 bio: formData.get('bio'),
@@ -472,7 +483,7 @@
             
             // Debug: Log all form data
             console.log('🔍 Form data being sent:', userData);
-            console.log('🔍 skillLevel:', userData.skillLevel);
+            console.log('🔍 experience:', userData.experience);
             console.log('🔍 educationLevel:', userData.educationLevel);
             console.log('🔍 selectedRole:', selectedRole);
             
@@ -495,7 +506,9 @@
                     showOTPForm(userData.email);
                 } else {
                     console.log('❌ Registration failed:', result);
-                    alert('Registration failed: ' + result.message);
+                    alert('Registration failed: ' + result.error);
+                    // Don't show OTP form if registration failed
+                    return;
                 }
             } catch (error) {
                 console.error('❌ Registration error:', error);
@@ -512,7 +525,7 @@
             
             const formData = new FormData(e.target);
             const userData = {
-                role: 'community',
+                role: 'community-admin',
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
@@ -545,7 +558,9 @@
                     showOTPForm(userData.email);
                 } else {
                     console.log('❌ Community registration failed:', result);
-                    alert('Registration failed: ' + result.message);
+                    alert('Registration failed: ' + result.error);
+                    // Don't show OTP form if registration failed
+                    return;
                 }
             } catch (error) {
                 console.error('❌ Community registration error:', error);
@@ -594,9 +609,7 @@
                     body: JSON.stringify({
                         email: currentEmail,
                         otp: otp,
-                        password: selectedRole === 'personal' ? 
-                            document.getElementById('personalPassword').value : 
-                            document.getElementById('communityPassword').value
+                        password: document.getElementById('otpPassword').value
                     })
                 });
                 
@@ -670,8 +683,22 @@
         // Password toggle functionality
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
+            if (!input) {
+                console.error('Input element not found:', inputId);
+                return;
+            }
+            
             const toggleBtn = input.parentNode.querySelector('.password-toggle');
+            if (!toggleBtn) {
+                console.error('Toggle button not found for input:', inputId);
+                return;
+            }
+            
             const eyeIcon = toggleBtn.querySelector('i');
+            if (!eyeIcon) {
+                console.error('Eye icon not found for input:', inputId);
+                return;
+            }
 
             if (input.type === 'password') {
                 input.type = 'text';

@@ -32,7 +32,14 @@ const UserSchema = new mongoose.Schema({
         required: function() {
             return !this.isTemporaryPassword;
         },
-        minlength: [6, 'Password must be at least 6 characters'],
+        minlength: [8, 'Password must be at least 8 characters'],
+        validate: {
+            validator: function(password) {
+                if (!password) return true; // Allow empty for temporary passwords
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(password);
+            },
+            message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+        },
         select: false
     },
     
@@ -41,6 +48,43 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['personal', 'community-admin', 'mentor', 'student'],
         required: [true, 'User role is required']
+    },
+    
+    // Community association (for community users)
+    community: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Community',
+        required: function() {
+            return ['community-admin', 'mentor', 'student'].includes(this.role);
+        }
+    },
+    
+    // Batch association (for students)
+    batch: {
+        type: String,
+        required: function() {
+            return this.role === 'student';
+        }
+    },
+    
+    // Experience level (for personal users)
+    experience: {
+        type: String,
+        enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+        required: function() {
+            return this.role === 'personal';
+        }
+    },
+    
+    // Skills (for personal users)
+    skills: [{
+        type: String
+    }],
+    
+    // Bio (for personal users)
+    bio: {
+        type: String,
+        maxlength: [500, 'Bio cannot exceed 500 characters']
     },
     status: {
         type: String,
@@ -113,6 +157,27 @@ const UserSchema = new mongoose.Schema({
         type: Date
     },
     
+    // Additional security fields
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false
+    },
+    twoFactorSecret: {
+        type: String,
+        select: false
+    },
+    lastPasswordChange: {
+        type: Date,
+        default: Date.now
+    },
+    passwordHistory: [{
+        password: String,
+        changedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    
     // Coding platform usernames
     platforms: {
         leetcode: {
@@ -162,6 +227,11 @@ const UserSchema = new mongoose.Schema({
     resetPasswordExpire: Date,
     otpCode: String,
     otpExpire: Date,
+    otpAttempts: {
+        type: Number,
+        default: 0
+    },
+    otpLockUntil: Date,
     loginAttempts: {
         type: Number,
         default: 0
@@ -202,6 +272,11 @@ UserSchema.virtual('fullName').get(function() {
 // Virtual for account lock status
 UserSchema.virtual('isLocked').get(function() {
     return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Virtual for OTP lock status
+UserSchema.virtual('isOTPLocked').get(function() {
+    return !!(this.otpLockUntil && this.otpLockUntil > Date.now());
 });
 
 // Pre-save middleware to hash password
@@ -324,6 +399,84 @@ UserSchema.methods.resetLoginAttempts = function() {
     return this.updateOne({
         $unset: { loginAttempts: 1, lockUntil: 1 }
     });
+};
+
+// Method to handle OTP attempts
+UserSchema.methods.incOTPAttempts = function() {
+    if (this.otpLockUntil && this.otpLockUntil < Date.now()) {
+        return this.updateOne({
+            $unset: { otpAttempts: 1, otpLockUntil: 1 }
+        });
+    }
+    
+    const updates = { $inc: { otpAttempts: 1 } };
+    
+    if (this.otpAttempts + 1 >= 5 && !this.isOTPLocked) {
+        updates.$set = {
+            otpLockUntil: Date.now() + 15 * 60 * 1000 // 15 minutes
+        };
+    }
+    
+    return this.updateOne(updates);
+};
+
+// Method to reset OTP attempts
+UserSchema.methods.resetOTPAttempts = function() {
+    return this.updateOne({
+        $unset: { otpAttempts: 1, otpLockUntil: 1 }
+    });
+};
+
+// Method to check if password was used recently
+UserSchema.methods.isPasswordRecentlyUsed = function(password) {
+    if (!this.passwordHistory || this.passwordHistory.length === 0) {
+        return false;
+    }
+    
+    // Check last 5 passwords
+    const recentPasswords = this.passwordHistory.slice(-5);
+    return recentPasswords.some(entry => bcrypt.compareSync(password, entry.password));
+};
+
+// Method to add password to history
+UserSchema.methods.addPasswordToHistory = function(password) {
+    if (!this.passwordHistory) {
+        this.passwordHistory = [];
+    }
+    
+    // Keep only last 10 passwords
+    if (this.passwordHistory.length >= 10) {
+        this.passwordHistory = this.passwordHistory.slice(-9);
+    }
+    
+    this.passwordHistory.push({
+        password: password,
+        changedAt: new Date()
+    });
+    
+    this.lastPasswordChange = new Date();
+};
+
+// Method to check if account needs password change
+UserSchema.methods.needsPasswordChange = function() {
+    if (!this.lastPasswordChange) return false;
+    
+    const daysSinceChange = (Date.now() - this.lastPasswordChange.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceChange > 90; // 90 days
+};
+
+// Method to get user statistics
+UserSchema.methods.getUserStats = function() {
+    return {
+        totalPoints: this.totalPoints || 0,
+        level: this.level || 1,
+        streak: this.streak || 0,
+        lastActivity: this.lastActivity,
+        accountAge: Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+        isActive: this.status === 'active',
+        isEmailVerified: this.isEmailVerified,
+        needsPasswordChange: this.needsPasswordChange()
+    };
 };
 
 module.exports = mongoose.model('User', UserSchema);

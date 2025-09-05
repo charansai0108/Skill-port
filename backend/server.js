@@ -5,7 +5,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 const path = require('path');
+const logger = require('./config/logger');
+const { csrfMiddleware, generateCSRFToken, getCSRFToken } = require('./middleware/csrf');
 
 // Load environment variables
 dotenv.config({ path: './config.env' });
@@ -22,7 +25,10 @@ const userSpecificRoutes = require('./routes/user');
 const personalRoutes = require('./routes/personal');
 const communityRoutes = require('./routes/communities');
 const communityDashboardRoutes = require('./routes/community');
+const newCommunityRoutes = require('./routes/community');
+const studentRoutes = require('./routes/student');
 const contestRoutes = require('./routes/contests');
+const newContestRoutes = require('./routes/contest');
 const projectRoutes = require('./routes/projects');
 const progressRoutes = require('./routes/progress');
 const extensionRoutes = require('./routes/extension');
@@ -30,6 +36,7 @@ const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin');
 const analyticsRoutes = require('./routes/analytics');
 const contactRoutes = require('./routes/contact');
+const healthRoutes = require('./routes/health');
 
 // Middleware files
 const errorHandler = require('./middleware/error');
@@ -49,7 +56,7 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Extension-Token']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Extension-Token', 'X-CSRF-Token']
 };
 app.use(cors(corsOptions));
 
@@ -60,9 +67,17 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 
+// Cookie parsing middleware
+app.use(cookieParser());
+
+// CSRF protection middleware
+app.use(csrfMiddleware);
+
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
+} else {
+    app.use(morgan('combined', { stream: logger.stream }));
 }
 
 // Rate limiting
@@ -108,6 +123,9 @@ app.get('/health', (req, res) => {
     });
 });
 
+// CSRF token endpoint
+app.get('/api/csrf-token', getCSRFToken);
+
 // API health check endpoint
 app.get(`/api/${process.env.API_VERSION || 'v1'}/health`, (req, res) => {
     res.status(200).json({
@@ -124,11 +142,14 @@ const apiVersion = process.env.API_VERSION || 'v1';
 app.use(`/api/${apiVersion}/auth`, authRoutes);
 app.use(`/api/${apiVersion}/users`, protect, userRoutes);
 app.use(`/api/${apiVersion}/mentor`, protect, mentorRoutes);
+app.use(`/api/${apiVersion}/student`, protect, studentRoutes);
 app.use(`/api/${apiVersion}/user`, protect, userSpecificRoutes);
 app.use(`/api/${apiVersion}/personal`, protect, personalRoutes);
 app.use(`/api/${apiVersion}/communities`, protect, communityRoutes);
 app.use(`/api/${apiVersion}/community`, protect, communityDashboardRoutes);
+app.use(`/api/${apiVersion}/community`, newCommunityRoutes);
 app.use(`/api/${apiVersion}/contests`, protect, contestRoutes);
+app.use(`/api/${apiVersion}/contests`, newContestRoutes);
 app.use(`/api/${apiVersion}/projects`, protect, projectRoutes);
 app.use(`/api/${apiVersion}/progress`, protect, progressRoutes);
 app.use(`/api/${apiVersion}/extension`, extensionRoutes);
@@ -136,6 +157,7 @@ app.use(`/api/${apiVersion}/upload`, protect, uploadRoutes);
 app.use(`/api/${apiVersion}/admin`, protect, adminRoutes);
 app.use(`/api/${apiVersion}/analytics`, protect, analyticsRoutes);
 app.use(`/api/${apiVersion}/contact`, contactRoutes);
+app.use(`/api/${apiVersion}/health`, healthRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res) => {
@@ -201,10 +223,11 @@ process.on('SIGINT', () => {
 const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, () => {
-    console.log(`🚀 SkillPort API Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    console.log(`📍 Health check: http://localhost:${PORT}/health`);
-    console.log(`🔗 API Base URL: http://localhost:${PORT}/api/${apiVersion}`);
-    console.log(`📁 Static files: http://localhost:${PORT}/uploads`);
+    logger.info(`🚀 SkillPort API Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    logger.info(`📍 Health check: 
+        http://localhost:${PORT}/health`);
+    logger.info(`🔗 API Base URL: http://localhost:${PORT}/api/${apiVersion}`);
+    logger.info(`📁 Static files: http://localhost:${PORT}/uploads`);
 });
 
 module.exports = app;

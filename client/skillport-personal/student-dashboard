@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        // Redirect to the correct URL with .html extension
+        window.location.replace('/skillport-personal/student-dashboard.html');
+    </script>
+</head>
+<body>
+    <p>Redirecting to dashboard...</p>
+</body>
+</html>

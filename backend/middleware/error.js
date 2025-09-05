@@ -1,14 +1,29 @@
 const ErrorResponse = require('../utils/errorResponse');
+const logger = require('../config/logger');
 
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
 
     // Log error for debugging
-    console.error(`❌ Error: ${err.message}`.red);
+    logger.error(`❌ Error: ${err.message}`);
     if (process.env.NODE_ENV === 'development') {
-        console.error(err.stack);
+        logger.debug(err.stack);
     }
+
+    // Log error details for monitoring
+    logger.error(`🚨 Error Details:`, {
+        message: err.message,
+        name: err.name,
+        code: err.code,
+        statusCode: err.statusCode || 500,
+        user: req.user?.id || 'anonymous',
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        url: req.originalUrl,
+        method: req.method,
+        timestamp: new Date().toISOString()
+    });
 
     // Mongoose bad ObjectId
     if (err.name === 'CastError') {
@@ -83,6 +98,30 @@ const errorHandler = (err, req, res, next) => {
         error = new ErrorResponse(message, 500);
     }
 
+    // CORS errors
+    if (err.message && err.message.includes('CORS')) {
+        const message = 'Cross-origin request blocked';
+        error = new ErrorResponse(message, 403);
+    }
+
+    // Session errors
+    if (err.message && err.message.includes('session')) {
+        const message = 'Session error occurred';
+        error = new ErrorResponse(message, 401);
+    }
+
+    // OTP errors
+    if (err.message && err.message.includes('OTP')) {
+        const message = 'OTP verification failed';
+        error = new ErrorResponse(message, 400);
+    }
+
+    // Password validation errors
+    if (err.message && err.message.includes('password')) {
+        const message = 'Password validation failed';
+        error = new ErrorResponse(message, 400);
+    }
+
     // Default error response
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Server Error';
@@ -113,9 +152,9 @@ const errorHandler = (err, req, res, next) => {
         errorResponse.type = 'ServerError';
     }
 
-    // Log error details for monitoring
+    // Additional logging for server errors
     if (statusCode >= 500) {
-        console.error(`🚨 Server Error [${req.method} ${req.originalUrl}]:`, {
+        logger.error(`🚨 Critical Server Error [${req.method} ${req.originalUrl}]:`, {
             error: message,
             user: req.user?.id || 'anonymous',
             ip: req.ip,

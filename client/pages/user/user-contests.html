@@ -390,13 +390,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Check authentication first
       if (window.authManager && !window.authManager.isAuthenticated) {
-        window.location.href = '/pages/auth/login.html';
+        window.location.href = 'pages/auth/login.html';
         return;
       }
 
       // Check if user is student
       if (window.authManager && !window.authManager.isStudent()) {
-        window.location.href = '/pages/auth/login.html';
+        window.location.href = 'pages/auth/login.html';
         return;
       }
 

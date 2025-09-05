@@ -6,6 +6,7 @@
     <title>Register - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../js/suppress-warnings.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="../../js/apiService.js"></script>
     <script src="../../js/notifications.js"></script>
@@ -21,12 +22,6 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
             transition: all 0.3s ease;
-        }
-        
-        .auth-card:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(239, 68, 68, 0.4);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
         }
         
         .form-input {
@@ -48,22 +43,8 @@
         
         .btn-primary:hover {
             background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
         
         .role-card {
@@ -72,618 +53,249 @@
         }
         
         .role-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
         
-        .form-container { 
-            display: none; 
-        }
-        
-        .form-container.show { 
-            display: block !important; 
-            animation: slideInUp 0.3s ease-out;
-        }
-        
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .auth-container {
-            animation: fadeInUp 0.6s ease-out;
+        .role-card.selected {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen p-4">
-    <div class="auth-container max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="flex items-center justify-center gap-3 mb-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
+<body class="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl">
+        <div class="auth-card rounded-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                    <i data-lucide="user-plus" class="w-8 h-8 text-red-600"></i>
                 </div>
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-                    SkillPort
-                </h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Join SkillPort</h1>
+                <p class="text-gray-600">Choose your role to get started</p>
             </div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-4">Create Your Account</h2>
-            <p class="text-slate-600 text-lg">Join the SkillPort community and start your journey</p>
-        </div>
 
-        <!-- Role Selection -->
-        <div id="roleSelection" class="max-w-4xl mx-auto mb-12">
-            <h3 class="text-xl font-bold text-slate-800 text-center mb-8">Choose Your Role</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Personal User Card -->
-                <div class="role-card auth-card rounded-3xl p-8 cursor-pointer" onclick="showForm('personal')">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <i data-lucide="user" class="w-10 h-10 text-white"></i>
+            <!-- Role Selection -->
+            <div id="roleSelection" class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6 text-center">Select Your Role</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Personal User Card -->
+                    <div class="role-card p-6 border-2 border-gray-200 rounded-xl" data-role="personal">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+                                <i data-lucide="user" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Personal User</h3>
+                            <p class="text-gray-600 text-sm mb-4">Join as a student and participate in communities</p>
+                            <ul class="text-left text-sm text-gray-500 space-y-1">
+                                <li>• Browse and join communities</li>
+                                <li>• Participate in contests</li>
+                                <li>• Track your progress</li>
+                                <li>• Connect with mentors</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">Personal Learner</h3>
-                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">Track progress, join contests, build portfolio</p>
-                        <button class="btn-primary text-white px-8 py-4 rounded-xl font-bold text-lg">
-                            🚀 Start Learning Journey
-                        </button>
                     </div>
-                </div>
-                
-                <!-- Community User Card -->
-                <div class="role-card auth-card rounded-3xl p-8 cursor-pointer" onclick="showForm('community')">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <i data-lucide="users" class="w-10 h-10 text-white"></i>
+
+                    <!-- Community Admin Card -->
+                    <div class="role-card p-6 border-2 border-gray-200 rounded-xl" data-role="community-admin">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+                                <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Community Admin</h3>
+                            <p class="text-gray-600 text-sm mb-4">Create and manage your own community</p>
+                            <ul class="text-left text-sm text-gray-500 space-y-1">
+                                <li>• Create your community</li>
+                                <li>• Add mentors and students</li>
+                                <li>• Organize contests</li>
+                                <li>• Manage community settings</li>
+                            </ul>
                         </div>
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Community Builder</h3>
-                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">Manage teams, create learning communities</p>
-                        <button class="btn-primary text-white px-8 py-4 rounded-xl font-bold text-lg">
-                            🌟 Build Community
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Personal Registration Form -->
-        <div id="personalForm" class="form-container max-w-2xl mx-auto">
-            <div class="auth-card rounded-3xl p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Personal Learner Registration</h2>
-                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                
-                <form id="personalRegistrationForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">First Name *</label>
-                            <input type="text" name="firstName" required class="form-input w-full px-4 py-3 rounded-xl">
+            <!-- Registration Forms -->
+            <div id="registrationForms" class="hidden">
+                <!-- Personal User Form -->
+                <form id="personalForm" class="hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Personal User Registration</h2>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" name="firstName" class="form-input w-full px-4 py-3 rounded-lg" required>
                         </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Last Name *</label>
-                            <input type="text" name="lastName" required class="form-input w-full px-4 py-3 rounded-xl">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" name="lastName" class="form-input w-full px-4 py-3 rounded-lg" required>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Username *</label>
-                            <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Email *</label>
-                            <input type="email" name="email" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" name="email" class="form-input w-full px-4 py-3 rounded-lg" required>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Skill Level *</label>
-                        <select name="skillLevel" required class="form-input w-full px-4 py-3 rounded-xl">
-                            <option value="">Select skill level</option>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
+                        <select name="experience" class="form-input w-full px-4 py-3 rounded-lg" required>
+                            <option value="">Select your experience level</option>
                             <option value="beginner">Beginner</option>
                             <option value="intermediate">Intermediate</option>
                             <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
                         </select>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Education Level</label>
-                            <select name="educationLevel" class="form-input w-full px-4 py-3 rounded-xl">
-                                <option value="">Select education level</option>
-                                <option value="high-school">High School</option>
-                                <option value="bachelor">Bachelor's Degree</option>
-                                <option value="master">Master's Degree</option>
-                                <option value="phd">PhD</option>
-                                <option value="self-taught">Self Taught</option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Field of Study</label>
-                            <input type="text" name="fieldOfStudy" class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Computer Science">
-                        </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Skills (comma-separated)</label>
+                        <input type="text" name="skills" placeholder="JavaScript, Python, React..." class="form-input w-full px-4 py-3 rounded-lg">
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Bio</label>
-                        <textarea name="bio" rows="4" class="form-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about yourself..."></textarea>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bio (optional)</label>
+                        <textarea name="bio" rows="3" placeholder="Tell us about yourself..." class="form-input w-full px-4 py-3 rounded-lg"></textarea>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Password *</label>
-                            <div class="relative">
-                                <input type="password" name="password" id="personalPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('personalPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
+                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-lg text-white font-semibold">
+                        Register as Personal User
+                    </button>
+                </form>
+
+                <!-- Community Admin Form -->
+                <form id="adminForm" class="hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Community Admin Registration</h2>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" name="firstName" class="form-input w-full px-4 py-3 rounded-lg" required>
                         </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Confirm Password *</label>
-                            <div class="relative">
-                                <input type="password" name="confirmPassword" id="personalConfirmPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('personalConfirmPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" name="lastName" class="form-input w-full px-4 py-3 rounded-lg" required>
                         </div>
                     </div>
-                    
-                    <div class="flex items-start">
-                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500 mt-1">
-                        <label class="ml-3 text-sm text-slate-600">
-                            I agree to the <a href="../terms.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Terms of Service</a> and <a href="../privacy.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Privacy Policy</a>
-                        </label>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" name="email" class="form-input w-full px-4 py-3 rounded-lg" required>
                     </div>
-                    
-                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i>
-                        Create Personal Account
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Community Name</label>
+                        <input type="text" name="communityName" class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Community Code</label>
+                        <input type="text" name="communityCode" placeholder="e.g., TECH2024" class="form-input w-full px-4 py-3 rounded-lg" required>
+                        <p class="text-sm text-gray-500 mt-1">2-10 uppercase letters/numbers</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Community Description (optional)</label>
+                        <textarea name="communityDescription" rows="3" placeholder="Describe your community..." class="form-input w-full px-4 py-3 rounded-lg"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-lg text-white font-semibold">
+                        Create Community & Register
                     </button>
                 </form>
             </div>
-        </div>
 
-        <!-- Community Registration Form -->
-        <div id="communityForm" class="form-container max-w-2xl mx-auto">
-            <div class="auth-card rounded-3xl p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Community Builder Registration</h2>
-                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                
-                <form id="communityRegistrationForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">First Name *</label>
-                            <input type="text" name="firstName" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Last Name *</label>
-                            <input type="text" name="lastName" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Username *</label>
-                            <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Email *</label>
-                            <input type="email" name="email" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Community Name *</label>
-                            <input type="text" name="communityName" required class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Stanford CS Department">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Community Code *</label>
-                            <input type="text" name="communityCode" required class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., STANFORD" maxlength="10" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" title="2-10 uppercase letters/numbers only">
-                            <p class="text-xs text-slate-500 mt-1">2-10 uppercase letters/numbers only (auto-converted to uppercase)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Community Description</label>
-                        <textarea name="communityDescription" rows="3" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Brief description of your community (optional)"></textarea>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Organization Size</label>
-                            <select name="organizationSize" class="form-input w-full px-4 py-3 rounded-xl">
-                                <option value="">Select size</option>
-                                <option value="small">Small (1-50 people)</option>
-                                <option value="medium">Medium (51-200 people)</option>
-                                <option value="large">Large (200+ people)</option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Your Position</label>
-                            <input type="text" name="position" class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Professor, Manager">
-                        </div>
-                    </div>
-                    
-
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Organization Website</label>
-                        <input type="url" name="organizationWebsite" class="form-input w-full px-4 py-3 rounded-xl" placeholder="https://example.com">
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Password *</label>
-                            <div class="relative">
-                                <input type="password" name="password" id="communityPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('communityPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Confirm Password *</label>
-                            <div class="relative">
-                                <input type="password" name="confirmPassword" id="communityConfirmPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('communityConfirmPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500 mt-1">
-                        <label class="ml-3 text-sm text-slate-600">
-                            I agree to the <a href="../terms.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Terms of Service</a> and <a href="../privacy.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Privacy Policy</a>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                        Create Community Account
-                    </button>
-                </form>
+            <!-- Back Button -->
+            <div id="backButton" class="hidden text-center mt-6">
+                <button onclick="goBack()" class="text-gray-600 hover:text-gray-800 font-medium">
+                    ← Back to Role Selection
+                </button>
             </div>
-        </div>
 
-        <!-- OTP Form -->
-        <div id="otpForm" class="form-container max-w-md mx-auto">
-            <div class="auth-card rounded-3xl p-8 text-center">
-                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="mail" class="w-8 h-8 text-white"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800 mb-4">Email Verification</h2>
-                <p class="text-slate-600 mb-6">We've sent a 6-digit code to <span id="otpEmail" class="font-semibold"></span></p>
-                <p class="text-slate-500 text-sm mb-6">Check your email inbox and spam folder for the verification code.</p>
-                
-                <form id="otpVerificationForm" class="space-y-6">
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Enter OTP</label>
-                        <input type="text" id="otpInput" maxlength="6" placeholder="000000" required class="form-input w-full px-4 py-3 text-center text-xl font-bold rounded-xl">
-                    </div>
-                    
-                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                        Verify Email
-                    </button>
-                    
-                    <div class="flex items-center justify-center space-x-4">
-                        <button type="button" id="resendOTPBtn" class="text-red-600 hover:text-red-700 font-medium hover:underline">
-                            Resend OTP
-                        </button>
-                        <button type="button" onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-700 font-medium hover:underline">
-                            Back to Registration
-                        </button>
-                    </div>
-                </form>
+            <!-- Login Link -->
+            <div class="text-center mt-8">
+                <p class="text-gray-600">Already have an account? 
+                    <a href="login.html" class="text-red-600 hover:text-red-700 font-medium">Sign in</a>
+                </p>
             </div>
-        </div>
-
-        <!-- Back to Login -->
-        <div class="text-center mt-12">
-            <p class="text-slate-600">
-                Already have an account? 
-                <a href="login.html" class="text-red-600 hover:text-red-700 font-semibold hover:underline">Sign in here</a>
-            </p>
         </div>
     </div>
 
-    <!-- Simple JavaScript -->
     <script>
-        lucide.createIcons();
-        
-        // Simple form switching
-        function showForm(role) {
-            console.log('Showing form for:', role);
-            
-            // Hide role selection
-            document.getElementById('roleSelection').style.display = 'none';
-            
-            // Show appropriate form
-            if (role === 'personal') {
-                document.getElementById('personalForm').classList.add('show');
-            } else if (role === 'community') {
-                document.getElementById('communityForm').classList.add('show');
-            }
-        }
-        
-        function showRoleSelection() {
-            console.log('Going back to role selection');
-            
-            // Hide all forms
-            document.querySelectorAll('.form-container').forEach(form => {
-                form.classList.remove('show');
-            });
-            
-            // Show role selection
-            document.getElementById('roleSelection').style.display = 'block';
-        }
-        
-        // Form submission handlers
-        document.getElementById('personalRegistrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Personal form submitted');
-            
-            // Set the selected role for OTP redirect
-            selectedRole = 'personal';
-            
-            const formData = new FormData(e.target);
-            const userData = {
-                role: 'personal',
-                firstName: formData.get('firstName'),
-                lastName: formData.get('lastName'),
-                email: formData.get('email'),
-                password: formData.get('password'),
-                skillLevel: formData.get('skillLevel'),
-                educationLevel: formData.get('educationLevel'),
-                fieldOfStudy: formData.get('fieldOfStudy'),
-                bio: formData.get('bio'),
-                agreeTerms: formData.get('agreeTerms')
-            };
-            
-            // Debug: Log all form data
-            console.log('🔍 Form data being sent:', userData);
-            console.log('🔍 skillLevel:', userData.skillLevel);
-            console.log('🔍 educationLevel:', userData.educationLevel);
-            console.log('🔍 selectedRole:', selectedRole);
-            
-            // Password will be set after OTP verification
-            
-            try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(userData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('🎉 Registration successful! Please check your email for OTP verification.');
-                    // Show OTP form or redirect
-                    showOTPForm(userData.email);
-                } else {
-                    console.log('❌ Registration failed:', result);
-                    alert('Registration failed: ' + result.message);
-                }
-            } catch (error) {
-                console.error('❌ Registration error:', error);
-                alert('Registration failed: ' + error.message);
-            }
-        });
-        
-        document.getElementById('communityRegistrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Community form submitted');
-            
-            // Set the selected role for OTP redirect
-            selectedRole = 'community';
-            
-            const formData = new FormData(e.target);
-            const userData = {
-                role: 'community',
-                firstName: formData.get('firstName'),
-                lastName: formData.get('lastName'),
-                email: formData.get('email'),
-                password: formData.get('password'),
-                communityName: formData.get('communityName'),
-                communityCode: formData.get('communityCode'),
-                communityDescription: formData.get('communityDescription'),
-                organizationSize: formData.get('organizationSize'),
-                position: formData.get('position'),
-                organizationWebsite: formData.get('organizationWebsite'),
-                agreeTerms: formData.get('agreeTerms')
-            };
-            
-            // Debug: Log all form data
-            console.log('🔍 Community form data being sent:', userData);
-            console.log('🔍 selectedRole:', selectedRole);
-            
-            // Password will be set after OTP verification
-            
-            try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(userData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('🎉 Registration successful! Please check your email for OTP verification.');
-                    // Show OTP form or redirect
-                    showOTPForm(userData.email);
-                } else {
-                    console.log('❌ Community registration failed:', result);
-                    alert('Registration failed: ' + result.message);
-                }
-            } catch (error) {
-                console.error('❌ Community registration error:', error);
-                alert('Registration failed: ' + error.message);
-            }
-        });
-        
-        // Show OTP form
-        function showOTPForm(email) {
-            console.log('🎯 showOTPForm called with email:', email);
-            console.log('🎯 selectedRole:', selectedRole);
-            console.log('🎯 currentEmail:', currentEmail);
-            
-            currentEmail = email;
-            document.getElementById('otpEmail').textContent = email;
-            
-            // Hide all forms
-            document.querySelectorAll('.form-container').forEach(form => {
-                form.classList.remove('show');
-                console.log('🔒 Hiding form:', form.id);
-            });
-            
-            // Show OTP form
-            const otpForm = document.getElementById('otpForm');
-            console.log('🎯 OTP form element:', otpForm);
-            console.log('🎯 OTP form classes before:', otpForm.className);
-            
-            otpForm.classList.add('show');
-            console.log('🎯 OTP form classes after:', otpForm.className);
-            console.log('🎯 OTP form display style:', window.getComputedStyle(otpForm).display);
-        }
-        
-        // OTP verification handler
-        document.getElementById('otpVerificationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('OTP verification submitted');
-            
-            const otp = document.getElementById('otpInput').value;
-            
-            try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/verify-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: currentEmail,
-                        otp: otp,
-                        password: selectedRole === 'personal' ? 
-                            document.getElementById('personalPassword').value : 
-                            document.getElementById('communityPassword').value
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('🎉 Email verified successfully! Redirecting...');
-                    
-                    // Redirect to login page after successful registration
-                    setTimeout(() => {
-                        const loginUrl = 'login.html';
-                        console.log('🔄 Registration successful! Redirecting to login page:', loginUrl);
-                        window.location.href = loginUrl;
-                    }, 2000);
-                } else {
-                    alert('OTP verification failed: ' + result.message);
-                }
-            } catch (error) {
-                alert('OTP verification failed: ' + error.message);
-            }
-        });
-        
-        // Resend OTP handler
-        document.getElementById('resendOTPBtn').addEventListener('click', async function() {
-            try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/resend-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: currentEmail,
-                        type: 'verification'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('OTP resent successfully!');
-                } else {
-                    alert('Failed to resend OTP: ' + result.message);
-                }
-            } catch (error) {
-                alert('Failed to resend OTP: ' + error.message);
-            }
-        });
-        
-        // Track selected role
-        let selectedRole = '';
-        let currentEmail = '';
-        
-        // Update showForm to track role
-        function showForm(role) {
-            console.log('Showing form for:', role);
-            selectedRole = role;
-            
-            // Hide role selection
-            document.getElementById('roleSelection').style.display = 'none';
-            
-            // Show appropriate form
-            if (role === 'personal') {
-                document.getElementById('personalForm').classList.add('show');
-            } else if (role === 'community') {
-                document.getElementById('communityForm').classList.add('show');
-            }
-        }
-        
-        console.log('Registration page loaded successfully with full backend integration!');
-        
-        // Password toggle functionality
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const toggleBtn = input.parentNode.querySelector('.password-toggle');
-            const eyeIcon = toggleBtn.querySelector('i');
+        let selectedRole = null;
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                input.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
-            lucide.createIcons();
+        // Role selection
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedRole = card.dataset.role;
+                
+                // Show registration form
+                document.getElementById('roleSelection').classList.add('hidden');
+                document.getElementById('registrationForms').classList.remove('hidden');
+                document.getElementById('backButton').classList.remove('hidden');
+                
+                if (selectedRole === 'personal') {
+                    document.getElementById('personalForm').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminForm').classList.remove('hidden');
+                }
+            });
+        });
+
+        // Back button
+        function goBack() {
+            document.getElementById('roleSelection').classList.remove('hidden');
+            document.getElementById('registrationForms').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('personalForm').classList.add('hidden');
+            document.getElementById('adminForm').classList.add('hidden');
+            selectedRole = null;
         }
+
+        // Form submissions
+        document.getElementById('personalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleRegistration('personal');
+        });
+
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleRegistration('community-admin');
+        });
+
+        async function handleRegistration(role) {
+            const form = role === 'personal' ? document.getElementById('personalForm') : document.getElementById('adminForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Add role to data
+            data.role = role;
+
+            // Process skills for personal users
+            if (role === 'personal' && data.skills) {
+                data.skills = data.skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+            }
+
+            try {
+                const response = await window.APIService.post('/auth/register', data);
+                
+                if (response.success) {
+                    // Show success message
+                    if (window.notifications) {
+                        window.notifications.success({
+                            title: 'Registration Successful',
+                            message: 'Please check your email for OTP verification'
+                        });
+                    }
+                    
+                    // Redirect to OTP verification page
+                    setTimeout(() => {
+                        window.location.href = 'verify-otp.html?email=' + encodeURIComponent(data.email);
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (window.notifications) {
+                    window.notifications.error({
+                        title: 'Registration Failed',
+                        message: error.message || 'An error occurred during registration'
+                    });
+                }
+            }
+        }
+
+        // Initialize Lucide icons
+        lucide.createIcons();
     </script>
 </body>
 </html>

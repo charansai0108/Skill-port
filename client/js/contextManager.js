@@ -156,13 +156,13 @@ class ContextManager {
     // Get role-specific dashboard path
     getDashboardPath() {
         const rolePaths = {
-            'community-admin': '/pages/admin/admin-dashboard',
-            'mentor': '/pages/mentor/mentor-dashboard',
-            'student': '/pages/user/user-dashboard',
-            'personal': '/skillport-personal/student-dashboard'
+            'community-admin': '/pages/admin/admin-dashboard.html',
+            'mentor': '/pages/mentor/mentor-dashboard.html',
+            'student': '/pages/user/user-dashboard.html',
+            'personal': '/skillport-personal/student-dashboard.html'
         };
         
-        return rolePaths[this.userRole] || '/pages/auth/login';
+        return rolePaths[this.userRole] || '/pages/auth/login.html';
     }
 
     // Get role-specific page permissions
