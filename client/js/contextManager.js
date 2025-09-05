@@ -171,6 +171,7 @@ class ContextManager {
         const mentorPages = ['/pages/mentor/', '/pages/admin/'];
         const studentPages = ['/pages/user/', '/pages/mentor/'];
         const personalPages = ['/skillport-personal/', '/pages/personal/'];
+        const communityPages = ['/pages/community', '/pages/communities']; // Personal users can access community pages
         
         switch (this.userRole) {
             case 'community-admin':
@@ -180,7 +181,9 @@ class ContextManager {
             case 'student':
                 return studentPages.some(prefix => pagePath.startsWith(prefix));
             case 'personal':
-                return personalPages.some(prefix => pagePath.startsWith(prefix));
+                // Personal users can access their dashboard AND community pages
+                return personalPages.some(prefix => pagePath.startsWith(prefix)) || 
+                       communityPages.some(prefix => pagePath.startsWith(prefix));
             default:
                 return false;
         }
