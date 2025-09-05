@@ -249,6 +249,18 @@ class APIService {
         console.log('🔐 API Service: All tokens cleared');
     }
 
+    // Logout user (deactivate database session)
+    async logout() {
+        try {
+            const response = await this.makeRequest('POST', '/auth/logout');
+            console.log('🔐 API Service: Logout successful');
+            return response;
+        } catch (error) {
+            console.error('🔐 API Service: Logout failed:', error);
+            throw error;
+        }
+    }
+
     // Check if user is authenticated
     isAuthenticated() {
         const token = this.getToken();

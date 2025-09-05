@@ -2,8 +2,9 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
+const SessionService = require('../services/sessionService');
 
-// Protect routes - authenticate user
+// Protect routes - authenticate user using database sessions
 exports.protect = asyncHandler(async (req, res, next) => {
     let token;
 
@@ -22,14 +23,11 @@ exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Get user from database
-        const user = await User.findById(decoded.id).populate('community');
+        // Verify session in database
+        const user = await SessionService.verifySession(token);
 
         if (!user) {
-            return next(new ErrorResponse('No user found with this token', 401));
+            return next(new ErrorResponse('Invalid or expired session', 401));
         }
 
         // Check if user is active
@@ -42,14 +40,11 @@ exports.protect = asyncHandler(async (req, res, next) => {
             return next(new ErrorResponse('Account is temporarily locked', 401));
         }
 
-        // Update last activity
-        user.lastActivity = Date.now();
-        await user.save({ validateBeforeSave: false });
-
         // Add user to request object
         req.user = user;
         next();
     } catch (err) {
+        console.error('🔐 Auth Middleware: Session verification error:', err);
         return next(new ErrorResponse('Not authorized to access this route', 401));
     }
 });

@@ -45,20 +45,20 @@ class AuthManager {
             return;
         }
 
-        console.log('🔐 AuthManager: Token found, verifying with backend...');
+        console.log('🔐 AuthManager: Token found, verifying with database session...');
         try {
-            // Verify token with backend
+            // Verify token with backend (now uses database session verification)
             const response = await window.APIService.getUserProfile();
-            console.log('🔐 AuthManager: Backend response:', response);
+            console.log('🔐 AuthManager: Database session response:', response);
             
             if (response.success) {
                 // Handle different response formats from different endpoints
                 this.currentUser = response.data.user || response.data;
                 this.isAuthenticated = true;
-                console.log('🔐 AuthManager: Authentication successful, user:', this.currentUser);
+                console.log('🔐 AuthManager: Database session verified, user:', this.currentUser);
                 this.handleAuthenticated();
             } else {
-                console.log('🔐 AuthManager: Backend returned error, handling invalid token');
+                console.log('🔐 AuthManager: Database session invalid, handling invalid token');
                 this.handleInvalidToken();
             }
         } catch (error) {

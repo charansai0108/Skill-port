@@ -6,6 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Community = require('../models/Community');
 const emailService = require('../services/emailService');
+const SessionService = require('../services/sessionService');
 const crypto = require('crypto');
 
 const router = express.Router();
@@ -302,6 +303,23 @@ router.post('/login', [
     // Generate JWT token
     const token = user.getSignedJwtToken();
 
+    // Create database session
+    try {
+        await SessionService.createSession(user._id, token, {
+            type: 'web',
+            userAgent: req.get('User-Agent') || '',
+            ipAddress: req.ip || req.connection.remoteAddress || '',
+            data: {
+                loginTime: new Date(),
+                requirePasswordChange: requirePasswordChange
+            }
+        });
+        console.log('🔐 Auth: Database session created for user:', user._id);
+    } catch (sessionError) {
+        console.error('🔐 Auth: Error creating session:', sessionError);
+        // Continue with login even if session creation fails
+    }
+
     // Update last activity
     user.lastActivity = Date.now();
     await user.save({ validateBeforeSave: false });
@@ -500,6 +518,18 @@ router.get('/me', protect, asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/auth/logout
 // @access  Private
 router.post('/logout', protect, asyncHandler(async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    // Deactivate session in database
+    if (token) {
+        try {
+            await SessionService.deactivateSession(token);
+            console.log('🔐 Auth: Session deactivated for user:', req.user.id);
+        } catch (sessionError) {
+            console.error('🔐 Auth: Error deactivating session:', sessionError);
+        }
+    }
+
     // Update user's last activity
     await User.findByIdAndUpdate(req.user.id, { lastActivity: Date.now() });
 
