@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const asyncHandler = require('../middleware/async');
 const { protect } = require('../middleware/auth');
+const requireAuth = require('../middleware/authMiddleware');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Community = require('../models/Community');
@@ -9,8 +10,17 @@ const emailService = require('../services/emailService');
 const SessionService = require('../services/sessionService');
 const logger = require('../config/logger');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
+
+// Token helpers
+function createAccessToken(userId) {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '15m' });
+}
+function createRefreshToken(userId) {
+  return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+}
 
 // @desc    Register user (Personal or Community Admin)
 // @route   POST /api/v1/auth/register
@@ -316,54 +326,41 @@ router.post('/login', [
     // Check if it's a temporary password (for mentors)
     const requirePasswordChange = user.isTemporaryPassword;
 
-    // Generate JWT token
-    const token = user.getSignedJwtToken();
-
-    // Create database session
-    try {
-        await SessionService.createSession(user._id, token, {
-            type: 'web',
-            userAgent: req.get('User-Agent') || '',
-            ipAddress: req.ip || req.connection.remoteAddress || '',
-            data: {
-                loginTime: new Date(),
-                requirePasswordChange: requirePasswordChange
-            }
-        });
-        logger.info('🔐 Auth: Database session created for user:', user._id);
-    } catch (sessionError) {
-        logger.error('🔐 Auth: Error creating session:', sessionError);
-        // Continue with login even if session creation fails
-    }
+    // Generate JWT tokens
+    const accessToken = createAccessToken(user._id);
+    const refreshToken = createRefreshToken(user._id);
 
     // Update last activity
     user.lastActivity = Date.now();
     await user.save({ validateBeforeSave: false });
 
-    // Set httpOnly cookie
-    res.cookie('token', token, {
+    // Set httpOnly cookies
+    res.cookie('accessToken', accessToken, {
         httpOnly: true,
+        sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     res.status(200).json({
-        success: true,
+        ok: true,
         message: 'Login successful',
-        data: {
-            requirePasswordChange,
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-                community: user.community,
-                status: user.status,
-                avatar: user.avatar,
-                extensionInstalled: user.extensionInstalled
-            }
+        user: {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            role: user.role,
+            community: user.community,
+            status: user.status,
+            avatar: user.avatar,
+            extensionInstalled: user.extensionInstalled
         }
     });
 }));
@@ -743,5 +740,47 @@ router.get('/test-otp/:email', asyncHandler(async (req, res, next) => {
         }
     });
 }));
+
+/**
+ * GET /api/v1/auth/me
+ * Returns the currently authenticated user based on accessToken cookie
+ */
+router.get('/me', requireAuth, async (req, res) => {
+  return res.json({ ok: true, user: req.user });
+});
+
+/**
+ * POST /api/v1/auth/refresh
+ * Uses refreshToken cookie to issue a new accessToken cookie.
+ */
+router.post('/refresh', async (req, res) => {
+  try {
+    const token = req.cookies && req.cookies.refreshToken;
+    if (!token) return res.status(401).json({ ok: false, message: 'No refresh token' });
+
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    } catch (err) {
+      return res.status(401).json({ ok: false, message: 'Refresh token invalid or expired' });
+    }
+
+    const user = await User.findById(payload.id);
+    if (!user) return res.status(401).json({ ok: false, message: 'User not found' });
+
+    const newAccess = createAccessToken(user._id);
+    res.cookie('accessToken', newAccess, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('refresh error', err);
+    return res.status(500).json({ ok: false, message: 'Server error' });
+  }
+});
 
 module.exports = router;
