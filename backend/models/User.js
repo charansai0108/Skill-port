@@ -73,7 +73,7 @@ const UserSchema = new mongoose.Schema({
         match: [/^\+?[\d\s-()]+$/, 'Please enter a valid phone number']
     },
     
-    // Community Association (for all users except personal users who can optionally join)
+    // Community Association (for community-admin, mentor, student)
     community: {
         type: mongoose.Schema.ObjectId,
         ref: 'Community',
@@ -81,12 +81,6 @@ const UserSchema = new mongoose.Schema({
             return ['community-admin', 'mentor', 'student'].includes(this.role);
         }
     },
-    
-    // Personal users can join multiple communities (optional)
-    joinedCommunities: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'Community'
-    }],
     
     // Student-specific fields
     batch: {

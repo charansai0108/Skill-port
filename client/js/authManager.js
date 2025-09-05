@@ -470,16 +470,6 @@ class AuthManager {
         return this.currentUser?.role === 'personal';
     }
 
-    // Check if personal user has joined any communities
-    hasJoinedCommunities() {
-        return this.isPersonalUser() && this.currentUser?.joinedCommunities?.length > 0;
-    }
-
-    // Get joined communities for personal users
-    getJoinedCommunities() {
-        return this.isPersonalUser() ? this.currentUser?.joinedCommunities || [] : [];
-    }
-
     // Check if user can access specific community
     canAccessCommunity(communityId) {
         if (!this.isAuthenticated) return false;
@@ -487,9 +477,9 @@ class AuthManager {
         // Admins can access all communities
         if (this.isAdmin()) return true;
         
-        // Personal users can access communities they've joined
+        // Personal users cannot access communities (standalone users)
         if (this.isPersonalUser()) {
-            return this.currentUser.joinedCommunities?.includes(communityId) || false;
+            return false;
         }
         
         // Check if user belongs to the community (for mentor/student)
