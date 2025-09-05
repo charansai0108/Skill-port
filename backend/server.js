@@ -19,23 +19,8 @@ connectDB();
 
 // Route files
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const mentorRoutes = require('./routes/mentor');
-const userSpecificRoutes = require('./routes/user');
-const personalRoutes = require('./routes/personal');
 const communityRoutes = require('./routes/communities');
-const communityDashboardRoutes = require('./routes/community');
-const newCommunityRoutes = require('./routes/community');
-const studentRoutes = require('./routes/student');
 const contestRoutes = require('./routes/contests');
-const newContestRoutes = require('./routes/contest');
-const projectRoutes = require('./routes/projects');
-const progressRoutes = require('./routes/progress');
-const extensionRoutes = require('./routes/extension');
-const uploadRoutes = require('./routes/upload');
-const adminRoutes = require('./routes/admin');
-const analyticsRoutes = require('./routes/analytics');
-const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
 // Middleware files
@@ -140,23 +125,8 @@ app.get(`/api/${process.env.API_VERSION || 'v1'}/health`, (req, res) => {
 // API Routes
 const apiVersion = process.env.API_VERSION || 'v1';
 app.use(`/api/${apiVersion}/auth`, authRoutes);
-app.use(`/api/${apiVersion}/users`, protect, userRoutes);
-app.use(`/api/${apiVersion}/mentor`, protect, mentorRoutes);
-app.use(`/api/${apiVersion}/student`, protect, studentRoutes);
-app.use(`/api/${apiVersion}/user`, protect, userSpecificRoutes);
-app.use(`/api/${apiVersion}/personal`, protect, personalRoutes);
-app.use(`/api/${apiVersion}/communities`, protect, communityRoutes);
-app.use(`/api/${apiVersion}/community`, protect, communityDashboardRoutes);
-app.use(`/api/${apiVersion}/community`, newCommunityRoutes);
-app.use(`/api/${apiVersion}/contests`, protect, contestRoutes);
-app.use(`/api/${apiVersion}/contests`, newContestRoutes);
-app.use(`/api/${apiVersion}/projects`, protect, projectRoutes);
-app.use(`/api/${apiVersion}/progress`, protect, progressRoutes);
-app.use(`/api/${apiVersion}/extension`, extensionRoutes);
-app.use(`/api/${apiVersion}/upload`, protect, uploadRoutes);
-app.use(`/api/${apiVersion}/admin`, protect, adminRoutes);
-app.use(`/api/${apiVersion}/analytics`, protect, analyticsRoutes);
-app.use(`/api/${apiVersion}/contact`, contactRoutes);
+app.use(`/api/${apiVersion}/communities`, communityRoutes);
+app.use(`/api/${apiVersion}/contests`, contestRoutes);
 app.use(`/api/${apiVersion}/health`, healthRoutes);
 
 // Handle undefined routes
