@@ -917,6 +917,8 @@ class FirebaseService {
 
     // Utility Methods
     getErrorMessage(error) {
+        console.log('🔍 FirebaseService: Error details:', error);
+        
         const errorMessages = {
             'auth/email-already-in-use': 'This email is already registered',
             'auth/invalid-email': 'Please enter a valid email address',
@@ -931,7 +933,27 @@ class FirebaseService {
             'auth/requires-recent-login': 'Please log in again to perform this action'
         };
 
-        return errorMessages[error.code] || 'An unexpected error occurred';
+        // Check for error code
+        if (error.code) {
+            return errorMessages[error.code] || error.message || 'An unexpected error occurred';
+        }
+        
+        // Check for error message
+        if (error.message) {
+            // Check if it's a Firebase error message
+            if (error.message.includes('email-already-in-use')) {
+                return 'This email is already registered';
+            }
+            if (error.message.includes('invalid-email')) {
+                return 'Please enter a valid email address';
+            }
+            if (error.message.includes('weak-password')) {
+                return 'Password should be at least 6 characters';
+            }
+            return error.message;
+        }
+
+        return 'An unexpected error occurred';
     }
 
     // Getters
