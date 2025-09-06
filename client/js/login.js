@@ -1,8 +1,10 @@
 /**
- * SkillPort Login Handler - Complete Fix
- * Handles user authentication, token storage, and role-based redirects
- * Fixes all frontend issues that prevent successful login and redirect
+ * SkillPort Login Handler - Firebase Integration
+ * Handles user authentication using Firebase Authentication
+ * Provides secure authentication with automatic token management
  */
+
+import firebaseService from './firebaseService.js';
 
 class LoginHandler {
     constructor() {
@@ -47,19 +49,12 @@ class LoginHandler {
     }
 
     checkExistingAuth() {
-        console.log('🔐 LoginHandler: Checking existing authentication...');
-        if (window.authManager) {
-            console.log('🔐 LoginHandler: Checking authentication with backend...');
-            window.authManager.checkAuthStatus().then(() => {
-                if (window.authManager.isAuthenticated) {
-                    console.log('🔐 LoginHandler: User already authenticated, redirecting...');
-                    this.redirectByRole(window.authManager.currentUser);
-                }
-            }).catch(error => {
-                console.error('🔐 LoginHandler: Auth check failed:', error);
-            });
+        console.log('🔐 LoginHandler: Checking existing Firebase authentication...');
+        if (firebaseService.default.isUserAuthenticated()) {
+            console.log('🔐 LoginHandler: User already authenticated via Firebase, redirecting...');
+            this.redirectByRole(firebaseService.default.getCurrentUser());
         } else {
-            console.log('🔐 LoginHandler: AuthManager not available');
+            console.log('🔐 LoginHandler: User not authenticated');
         }
     }
 
@@ -105,20 +100,19 @@ class LoginHandler {
             // Show loading state
             this.setLoadingState(true);
             
-            console.log('🔐 LoginHandler: Attempting login for:', email);
-            console.log('🔐 LoginHandler: APIService available:', !!window.APIService);
+            console.log('🔐 LoginHandler: Attempting Firebase login for:', email);
             
-            // Make login API call
-            const response = await window.APIService.login(email, password);
+            // Make Firebase login call
+            const response = await firebaseService.default.login(email, password);
             
-            console.log('🔐 LoginHandler: Login response received:', response);
+            console.log('🔐 LoginHandler: Firebase login response received:', response);
             
             if (response && response.success) {
-                console.log('🔐 LoginHandler: Login successful, processing...');
+                console.log('🔐 LoginHandler: Firebase login successful, processing...');
                 await this.handleLoginSuccess(response);
             } else {
-                console.log('🔐 LoginHandler: Login failed:', response?.error || 'Unknown error');
-                this.handleLoginError(response?.error || 'Login failed');
+                console.log('🔐 LoginHandler: Firebase login failed:', response?.message || 'Unknown error');
+                this.handleLoginError(response?.message || 'Login failed');
             }
             
         } catch (error) {
@@ -144,44 +138,28 @@ class LoginHandler {
     }
 
     async handleLoginSuccess(response) {
-        console.log('🔐 LoginHandler: Processing successful login...');
+        console.log('🔐 LoginHandler: Processing successful Firebase login...');
         console.log('🔐 LoginHandler: Response data:', response.data);
         
         try {
-            // Token is now handled by httpOnly cookies
-            console.log('🔐 LoginHandler: Authentication successful, token handled by httpOnly cookies');
+            // Firebase handles authentication state automatically
+            console.log('🔐 LoginHandler: Firebase authentication successful');
 
-            // Update AuthManager
+            // Update AuthManager if available
             if (window.authManager) {
                 console.log('🔐 LoginHandler: Updating AuthManager...');
-                await window.authManager.checkAuthStatus();
-                console.log('🔐 LoginHandler: AuthManager updated, isAuthenticated:', window.authManager.isAuthenticated);
-                
-                if (!window.authManager.isAuthenticated) {
-                    console.error('🔐 LoginHandler: AuthManager not authenticated after token storage!');
-                    this.showError('Authentication verification failed');
-                    return;
-                }
-                
-                // Store user data
-                if (window.authManager.currentUser) {
-                    window.authManager.storeUserData(window.authManager.currentUser);
-                    console.log('🔐 LoginHandler: User data stored successfully');
-                }
-            } else {
-                console.error('🔐 LoginHandler: AuthManager not available!');
-                this.showError('Authentication system not available');
-                return;
+                // AuthManager will be updated automatically via Firebase auth state changes
+                console.log('🔐 LoginHandler: AuthManager will be updated via Firebase auth state changes');
             }
 
             // Show success message
             this.showSuccess('Login successful! Redirecting...');
 
-            // CRITICAL: Ensure redirect happens after token is processed
+            // Redirect after a short delay
             setTimeout(() => {
                 console.log('🔐 LoginHandler: About to redirect by role...');
                 this.redirectByRole(response.data);
-            }, 1000); // Increased delay to ensure everything is processed
+            }, 1000);
             
         } catch (error) {
             console.error('🔐 LoginHandler: Error in handleLoginSuccess:', error);
@@ -223,7 +201,7 @@ class LoginHandler {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
             'student': '/pages/student/user-dashboard.html',
-            'personal': '/pages/personal/student-dashboard.html'
+            'personal': '/pages/personal/index.html'
         };
 
         const redirectUrl = redirectUrls[user.role];

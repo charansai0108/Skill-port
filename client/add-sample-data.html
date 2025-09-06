@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Sample Data to Firebase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Add Sample Data to Firebase</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Sample Communities</h2>
+            <button onclick="addSampleCommunities()" 
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                Add Sample Communities
+            </button>
+            <div id="communitiesResult" class="mt-4"></div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Sample Contests</h2>
+            <button onclick="addSampleContests()" 
+                    class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                Add Sample Contests
+            </button>
+            <div id="contestsResult" class="mt-4"></div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Sample Projects</h2>
+            <button onclick="addSampleProjects()" 
+                    class="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700">
+                Add Sample Projects
+            </button>
+            <div id="projectsResult" class="mt-4"></div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">View Data</h2>
+            <button onclick="viewCommunities()" 
+                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 mr-2">
+                View Communities
+            </button>
+            <button onclick="viewContests()" 
+                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 mr-2">
+                View Contests
+            </button>
+            <button onclick="viewProjects()" 
+                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                View Projects
+            </button>
+            <div id="viewResult" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxcvIYVzwk8_0tX4fErmUxP0auFNyReFc",
+            authDomain: "skillport-a0c39.firebaseapp.com",
+            projectId: "skillport-a0c39",
+            storageBucket: "skillport-a0c39.firebasestorage.app",
+            messagingSenderId: "625176486393",
+            appId: "1:625176486393:web:9a832be086afbcaeb05d28"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.addSampleCommunities = async function() {
+            const resultDiv = document.getElementById('communitiesResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Adding sample communities...</p>';
+
+            const sampleCommunities = [
+                {
+                    name: "Web Development Hub",
+                    code: "WEBDEV2024",
+                    description: "A community for web developers to share knowledge, collaborate on projects, and learn together.",
+                    admin: {
+                        firstName: "John",
+                        lastName: "Smith",
+                        email: "john@example.com"
+                    },
+                    totalMembers: 150,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "Data Science Enthusiasts",
+                    code: "DATA2024",
+                    description: "Join us to explore the world of data science, machine learning, and AI.",
+                    admin: {
+                        firstName: "Sarah",
+                        lastName: "Johnson",
+                        email: "sarah@example.com"
+                    },
+                    totalMembers: 89,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "Mobile App Developers",
+                    code: "MOBILE2024",
+                    description: "Building amazing mobile applications for iOS and Android platforms.",
+                    admin: {
+                        firstName: "Mike",
+                        lastName: "Chen",
+                        email: "mike@example.com"
+                    },
+                    totalMembers: 67,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "Cybersecurity Warriors",
+                    code: "CYBER2024",
+                    description: "Protecting digital assets and learning about cybersecurity best practices.",
+                    admin: {
+                        firstName: "Alex",
+                        lastName: "Rodriguez",
+                        email: "alex@example.com"
+                    },
+                    totalMembers: 112,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                }
+            ];
+
+            try {
+                for (const community of sampleCommunities) {
+                    await addDoc(collection(db, 'communities'), community);
+                }
+                resultDiv.innerHTML = '<p class="text-green-600">✅ Sample communities added successfully!</p>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+
+        window.addSampleContests = async function() {
+            const resultDiv = document.getElementById('contestsResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Adding sample contests...</p>';
+
+            const sampleContests = [
+                {
+                    title: "React Challenge 2024",
+                    description: "Build a modern React application with the latest features and best practices.",
+                    startDate: new Date('2024-01-15'),
+                    endDate: new Date('2024-02-15'),
+                    rules: [
+                        "Use React 18+",
+                        "Implement TypeScript",
+                        "Follow clean code principles"
+                    ],
+                    prizes: [
+                        "1st Place: $1000",
+                        "2nd Place: $500",
+                        "3rd Place: $250"
+                    ],
+                    status: "active",
+                    participants: [],
+                    submissions: [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    title: "Python Data Analysis Contest",
+                    description: "Analyze the given dataset and provide meaningful insights using Python.",
+                    startDate: new Date('2024-01-20'),
+                    endDate: new Date('2024-02-20'),
+                    rules: [
+                        "Use Python 3.8+",
+                        "Include data visualization",
+                        "Document your approach"
+                    ],
+                    prizes: [
+                        "1st Place: $800",
+                        "2nd Place: $400",
+                        "3rd Place: $200"
+                    ],
+                    status: "active",
+                    participants: [],
+                    submissions: [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                }
+            ];
+
+            try {
+                for (const contest of sampleContests) {
+                    await addDoc(collection(db, 'contests'), contest);
+                }
+                resultDiv.innerHTML = '<p class="text-green-600">✅ Sample contests added successfully!</p>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+
+        window.viewCommunities = async function() {
+            const resultDiv = document.getElementById('viewResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Loading communities...</p>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'communities'));
+                const communities = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold mb-2">Communities (${communities.length}):</h3>
+                    <div class="space-y-2">
+                        ${communities.map(community => `
+                            <div class="p-3 bg-gray-50 rounded">
+                                <strong>${community.name}</strong> (${community.code})<br>
+                                <small>${community.description}</small><br>
+                                <small>Members: ${community.totalMembers}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+
+        window.addSampleProjects = async function() {
+            const resultDiv = document.getElementById('projectsResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Adding sample projects...</p>';
+
+            const sampleProjects = [
+                {
+                    name: "E-Commerce Website",
+                    description: "A full-stack e-commerce platform built with React and Node.js",
+                    type: "web",
+                    status: "In Progress",
+                    views: 45,
+                    updatedAt: new Date('2024-01-10'),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "Mobile Banking App",
+                    description: "Secure mobile banking application for iOS and Android",
+                    type: "mobile",
+                    status: "Completed",
+                    views: 128,
+                    updatedAt: new Date('2024-01-05'),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "AI Chatbot",
+                    description: "Intelligent customer service chatbot using machine learning",
+                    type: "ai",
+                    status: "On Hold",
+                    views: 67,
+                    updatedAt: new Date('2024-01-01'),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                },
+                {
+                    name: "Desktop Task Manager",
+                    description: "Cross-platform desktop application for task management",
+                    type: "desktop",
+                    status: "In Progress",
+                    views: 23,
+                    updatedAt: new Date('2024-01-15'),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                }
+            ];
+
+            try {
+                for (const project of sampleProjects) {
+                    await addDoc(collection(db, 'projects'), project);
+                }
+                resultDiv.innerHTML = '<p class="text-green-600">✅ Sample projects added successfully!</p>';
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+
+        window.viewContests = async function() {
+            const resultDiv = document.getElementById('viewResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Loading contests...</p>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'contests'));
+                const contests = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold mb-2">Contests (${contests.length}):</h3>
+                    <div class="space-y-2">
+                        ${contests.map(contest => `
+                            <div class="p-3 bg-gray-50 rounded">
+                                <strong>${contest.title}</strong><br>
+                                <small>${contest.description}</small><br>
+                                <small>Status: ${contest.status}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+
+        window.viewProjects = async function() {
+            const resultDiv = document.getElementById('viewResult');
+            resultDiv.innerHTML = '<p class="text-blue-600">Loading projects...</p>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'projects'));
+                const projects = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold mb-2">Projects (${projects.length}):</h3>
+                    <div class="space-y-2">
+                        ${projects.map(project => `
+                            <div class="p-3 bg-gray-50 rounded">
+                                <strong>${project.name}</strong><br>
+                                <small>${project.description}</small><br>
+                                <small>Type: ${project.type} | Status: ${project.status}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            }
+        };
+    </script>
+</body>
+</html>

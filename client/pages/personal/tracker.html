@@ -7,6 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="/js/firebaseService.js"></script>
+    <script type="module" src="/js/firebaseApiService.js"></script>
+    <script type="module" src="/js/authManager.js"></script>
+    <script type="module" src="/js/apiService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -601,6 +605,39 @@
             'Sunday': []
         };
 
+        // Load tasks from Firebase
+        async function loadTasksFromFirebase() {
+            try {
+                console.log('Loading tasks from Firebase...');
+                const response = await window.APIService.getTasks();
+                if (response.success) {
+                    // Group tasks by day
+                    dailyTasks = {
+                        'Monday': [],
+                        'Tuesday': [],
+                        'Wednesday': [],
+                        'Thursday': [],
+                        'Friday': [],
+                        'Saturday': [],
+                        'Sunday': []
+                    };
+                    
+                    response.data.forEach(task => {
+                        if (task.day && dailyTasks[task.day]) {
+                            dailyTasks[task.day].push(task);
+                        }
+                    });
+                    
+                    updateDailyTasksDisplay();
+                    updateWeeklyProgress();
+                } else {
+                    console.error('Failed to load tasks:', response.message);
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
         function showTaskInput(day) {
             currentDay = day;
             document.getElementById('modalDay').textContent = `Add Tasks for ${day}`;
@@ -614,7 +651,7 @@
             currentDay = '';
         }
 
-        function addTask() {
+        async function addTask() {
             const taskDescription = document.getElementById('taskInput').value.trim();
             const platform = document.getElementById('taskPlatform').value;
             const difficulty = document.getElementById('taskDifficulty').value;
@@ -629,15 +666,30 @@
                 platform: platform,
                 difficulty: difficulty,
                 completed: false,
+                day: currentDay,
                 id: Date.now()
             };
 
-            dailyTasks[currentDay].push(task);
-            updateDailyTasksDisplay();
-            closeTaskModal();
-            
-            // Update the day's progress
-            updateDayProgress(currentDay);
+            try {
+                // Save to Firebase
+                const response = await window.APIService.createTask(task);
+                if (response.success) {
+                    task.id = response.taskId; // Use Firebase ID
+                    dailyTasks[currentDay].push(task);
+                    updateDailyTasksDisplay();
+                    closeTaskModal();
+                    updateDayProgress(currentDay);
+                } else {
+                    alert('Failed to save task: ' + response.message);
+                }
+            } catch (error) {
+                console.error('Error saving task:', error);
+                // Fallback to local storage
+                dailyTasks[currentDay].push(task);
+                updateDailyTasksDisplay();
+                closeTaskModal();
+                updateDayProgress(currentDay);
+            }
         }
 
         function updateDailyTasksDisplay() {
@@ -726,8 +778,18 @@
             });
         }
 
+        function updateWeeklyProgress() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            days.forEach(day => {
+                updateDayProgress(day);
+            });
+        }
+
         // Initialize the display
         updateDailyTasksDisplay();
+        
+        // Load tasks from Firebase
+        loadTasksFromFirebase();
         
         // Initialize DataManager for dynamic data
         if (window.DataManager) {
@@ -735,14 +797,5 @@
         }
     </script>
     
-    <!-- Load required scripts -->
-    <script src="../js/apiService.js"></script>
-    <script src="../js/notifications.js"></script>
-    <script src="../js/authManager.js"></script>
-    <script src="../js/contextManager.js"></script>
-    <script src="../js/dataLoader.js"></script>
-    <script src="../js/uiHelpers.js"></script>
-    <script src="../js/pageController.js"></script>
-    <script src="../js/personalTrackerController.js"></script>
 </body>
 </html> 

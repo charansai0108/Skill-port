@@ -12,7 +12,9 @@
     <script src="../../js/routeGuard.js"></script>
     <script src="../../js/apiService.js"></script>
     <script src="../../js/notifications.js"></script>
-    <script src="../../js/auth.js"></script>
+    <script type="module" src="../../js/firebaseService.js"></script>
+    <script type="module" src="../../js/firebaseApiService.js"></script>
+    <script type="module" src="../../js/authManager.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -261,6 +263,56 @@
             }
             lucide.createIcons();
         }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Use Firebase service for login
+                const firebaseService = await import('../../js/firebaseService.js');
+                const response = await firebaseService.default.login(email, password);
+                
+                if (response.success) {
+                    // Show success message
+                    if (window.notifications) {
+                        window.notifications.success({
+                            title: 'Login Successful',
+                            message: 'Welcome back!'
+                        });
+                    }
+                    
+                    // Redirect based on role
+                    const user = response.user;
+                    let redirectUrl = '/pages/personal/index.html'; // Default
+                    
+                    if (user.role === 'community-admin') {
+                        redirectUrl = '/pages/admin/admin-dashboard.html';
+                    } else if (user.role === 'mentor') {
+                        redirectUrl = '/pages/mentor/mentor-dashboard.html';
+                    } else if (user.role === 'student') {
+                        redirectUrl = '/pages/student/user-dashboard.html';
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                if (window.notifications) {
+                    window.notifications.error({
+                        title: 'Login Failed',
+                        message: error.message || 'An error occurred during login'
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>

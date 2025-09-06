@@ -159,7 +159,7 @@ class ContextManager {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
             'student': '/pages/student/user-dashboard.html',
-            'personal': '/pages/personal/student-dashboard.html'
+            'personal': '/pages/personal/index.html'
         };
         
         return rolePaths[this.userRole] || '/pages/auth/login.html';

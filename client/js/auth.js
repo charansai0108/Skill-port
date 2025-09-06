@@ -17,7 +17,7 @@ async function handleLogin(evt) {
     if (data.user.role === 'community-admin') window.location.href = '/pages/admin/admin-dashboard.html';
     else if (data.user.role === 'mentor') window.location.href = '/pages/mentor/mentor-dashboard.html';
     else if (data.user.role === 'student') window.location.href = '/pages/student/user-dashboard.html';
-    else window.location.href = '/pages/personal/student-dashboard.html';
+    else window.location.href = '/pages/personal/index.html';
   } else {
     alert(data.message || 'Login failed');
   }

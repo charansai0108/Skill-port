@@ -10,6 +10,7 @@ dotenv.config({ path: './backend/config.env' });
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const firebaseAuthRoutes = require('./routes/firebaseAuth');
 
 // Import rate limiters
 const { generalLimiter, extensionLimiter, loginLimiter, otpLimiter } = require('./middleware/rateLimiter');
@@ -49,6 +50,7 @@ app.use('/api/', generalLimiter);
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/firebase-auth', firebaseAuthRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

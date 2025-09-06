@@ -18,6 +18,9 @@
   ],
   "author": "SkillPort Team",
   "license": "MIT",
+  "dependencies": {
+    "firebase": "^10.14.1"
+  },
   "devDependencies": {
     "cypress": "^13.0.0"
   },

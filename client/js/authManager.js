@@ -1,7 +1,10 @@
 /**
  * SkillPort Authentication Manager
  * Handles user authentication, session management, and role-based access
+ * Now uses Firebase Authentication for secure authentication
  */
+
+import firebaseService from './firebaseService.js';
 
 class AuthManager {
     constructor() {
@@ -17,72 +20,68 @@ class AuthManager {
             return;
         }
         
-        this.checkAuthStatus();
+        // Listen for Firebase auth state changes
+        firebaseService.onAuthStateChange((user, isAuthenticated) => {
+            this.handleAuthStateChange(isAuthenticated, user);
+        });
+        
         this.setupEventListeners();
         this.isInitialized = true;
+        console.log('🔐 AuthManager: Initialized with Firebase Authentication');
     }
 
     setupEventListeners() {
-        // Listen for storage changes (e.g., token updates from other tabs)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'jwt_token') {
-                this.checkAuthStatus();
-            }
-        });
-
         // Listen for custom auth events
-        window.addEventListener('auth:login', () => this.checkAuthStatus());
+        window.addEventListener('auth:login', () => this.handleLogin());
         window.addEventListener('auth:logout', () => this.handleLogout());
     }
 
-    async checkAuthStatus() {
-        console.log('🔐 AuthManager: Starting authentication check...');
+    handleAuthStateChange(isAuthenticated, user) {
+        console.log('🔐 AuthManager: Auth state changed:', isAuthenticated ? 'User logged in' : 'User logged out');
         
-        try {
-            // Wait for APIService to be available
-            let retries = 0;
-            while (!window.APIService && retries < 10) {
-                console.log('🔐 AuthManager: Waiting for APIService...', retries);
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
-            
-            if (!window.APIService) {
-                console.error('🔐 AuthManager: APIService not available after 10 retries');
-                this.handleUnauthenticated();
-                return;
-            }
-            
-            // Verify authentication with backend (uses httpOnly cookies)
-            const response = await window.APIService.get('/auth/me');
-            console.log('🔐 AuthManager: Authentication response:', response);
-            
-            // Standardized format: {success: true, data: {user: ...}}
-            if (response && response.success && response.data && response.data.user) {
-                this.currentUser = response.data.user;
-                this.isAuthenticated = true;
-                console.log('🔐 AuthManager: Authentication verified, user:', this.currentUser);
-                this.handleAuthenticated();
-            } else {
-                console.log('🔐 AuthManager: Authentication invalid, handling unauthenticated');
-                this.handleUnauthenticated();
-            }
-        } catch (error) {
-            console.error('🔐 AuthManager: Auth check failed:', error);
-            console.error('🔐 AuthManager: Error stack:', error.stack);
+        this.isAuthenticated = isAuthenticated;
+        this.currentUser = user;
+        
+        if (isAuthenticated) {
+            this.handleAuthenticated();
+        } else {
             this.handleUnauthenticated();
         }
     }
 
+    // This method is now handled by Firebase auth state changes
+    async checkAuthStatus() {
+        // Firebase handles authentication state automatically
+        // This method is kept for compatibility but is no longer needed
+        console.log('🔐 AuthManager: checkAuthStatus called - handled by Firebase auth state changes');
+        return this.isAuthenticated;
+    }
+
     handleAuthenticated() {
         console.log('🔐 AuthManager: handleAuthenticated called');
+        console.log('🔐 AuthManager: Current user in handleAuthenticated:', this.currentUser);
+        
         // Update UI to show authenticated state
         this.updateAuthUI();
         
-        // Redirect based on role if on login/register page
+        // Force redirect for community-admin users
+        if (this.currentUser && this.currentUser.role === 'community-admin') {
+            console.log('🔐 AuthManager: Community-admin detected, forcing redirect to admin dashboard');
+            const currentPath = window.location.pathname;
+            if (!currentPath.includes('admin-dashboard')) {
+                console.log('🔐 AuthManager: Redirecting community-admin to admin dashboard');
+                window.location.href = '/pages/admin/admin-dashboard.html';
+                return;
+            }
+        }
+        
+        // Always check for redirect, regardless of current page
+        console.log('🔐 AuthManager: Checking if should redirect...');
         if (this.shouldRedirect()) {
             console.log('🔐 AuthManager: Should redirect, calling redirectByRole');
             this.redirectByRole();
+        } else {
+            console.log('🔐 AuthManager: No redirect needed');
         }
 
         // Dispatch custom event
@@ -99,10 +98,18 @@ class AuthManager {
         // Update UI to show unauthenticated state
         this.updateAuthUI();
         
-        // Redirect to login if on protected page
-        if (this.isProtectedPage()) {
-            console.log('🔐 AuthManager: On protected page, redirecting to login');
+        // Redirect to login if on protected page OR if not on login/register pages
+        const currentPath = window.location.pathname;
+        const isAuthPage = currentPath.includes('login') || currentPath.includes('register') || currentPath.includes('forgot-password');
+        const isProtected = this.isProtectedPage();
+        
+        console.log('🔐 AuthManager: Redirect check - currentPath:', currentPath, 'isProtected:', isProtected, 'isAuthPage:', isAuthPage);
+        
+        if (isProtected || (!isAuthPage && currentPath !== '/')) {
+            console.log('🔐 AuthManager: Redirecting to login');
             this.redirectToLogin();
+        } else {
+            console.log('🔐 AuthManager: Not redirecting - staying on current page');
         }
 
         // Dispatch custom event
@@ -183,20 +190,17 @@ class AuthManager {
                 'Please wait while we authenticate your account.'
             );
 
-            const response = await window.APIService.login(email, password);
+            const response = await firebaseService.login(email, password);
             
             window.notifications?.hideLoading(loadingNotification);
 
-            if (response.success && response.data && response.data.user) {
-                // Token is automatically set by APIService
-                await this.checkAuthStatus();
-                
+            if (response.success && response.user) {
                 window.notifications?.success(
                     'Welcome back!',
-                    `Successfully logged in as ${response.data.user.firstName}`
+                    `Successfully logged in as ${response.user.firstName || response.user.displayName}`
                 );
 
-                return { success: true, user: response.data.user };
+                return { success: true, user: response.user };
             } else {
                 window.notifications?.error(
                     'Login Failed',
@@ -207,7 +211,7 @@ class AuthManager {
         } catch (error) {
             window.notifications?.hideLoading(loadingNotification);
             
-            const errorMessage = window.APIService?.formatError(error) || 'Login failed';
+            const errorMessage = error.message || 'Login failed';
             window.notifications?.error('Login Error', errorMessage);
             
             return { success: false, error: errorMessage };
@@ -221,7 +225,7 @@ class AuthManager {
                 'Please wait while we set up your account.'
             );
 
-            const response = await window.APIService.register(userData);
+            const response = await firebaseService.register(userData);
             
             window.notifications?.hideLoading(loadingNotification);
 
@@ -234,14 +238,14 @@ class AuthManager {
             } else {
                 window.notifications?.error(
                     'Registration Failed',
-                    response.error || 'Failed to create account'
+                    response.message || 'Failed to create account'
                 );
-                return { success: false, error: response.error };
+                return { success: false, error: response.message };
             }
         } catch (error) {
             window.notifications?.hideLoading(loadingNotification);
             
-            const errorMessage = window.APIService?.formatError(error) || 'Registration failed';
+            const errorMessage = error.message || 'Registration failed';
             window.notifications?.error('Registration Error', errorMessage);
             
             return { success: false, error: errorMessage };
@@ -255,24 +259,27 @@ class AuthManager {
                 'Please wait while we log you out.'
             );
 
-            await window.APIService.logout();
+            const response = await firebaseService.logout();
             
             window.notifications?.hideLoading(loadingNotification);
             
-            // Clear local state
-            this.currentUser = null;
-            this.isAuthenticated = false;
-            
-            // Show success message
-            window.notifications?.success(
-                'Logged Out',
-                'You have been successfully logged out.'
-            );
+            if (response.success) {
+                // Show success message
+                window.notifications?.success(
+                    'Logged Out',
+                    'You have been successfully logged out.'
+                );
 
-            // Redirect to login
-            setTimeout(() => {
-                window.location.href = '/pages/auth/login.html';
-            }, 1000);
+                // Redirect to login
+                setTimeout(() => {
+                    window.location.href = '/pages/auth/login.html';
+                }, 1000);
+            } else {
+                window.notifications?.error(
+                    'Logout Error',
+                    response.message || 'Failed to log out'
+                );
+            }
 
         } catch (error) {
             window.notifications?.hideLoading(loadingNotification);
@@ -386,15 +393,71 @@ class AuthManager {
 
     shouldRedirect() {
         const currentPath = window.location.pathname;
-        return currentPath.includes('login.html') || 
-               currentPath.includes('register.html') ||
-               currentPath.includes('forgot-password.html');
+        console.log('🔐 AuthManager: shouldRedirect check - currentPath:', currentPath);
+        console.log('🔐 AuthManager: shouldRedirect check - currentUser:', this.currentUser);
+        
+        // Always redirect from auth pages
+        if (currentPath.includes('login.html') || 
+            currentPath.includes('register.html') ||
+            currentPath.includes('forgot-password.html')) {
+            console.log('🔐 AuthManager: On auth page, should redirect');
+            return true;
+        }
+        
+        // Also redirect if user is on wrong dashboard for their role
+        if (this.currentUser && this.currentUser.role) {
+            const role = this.currentUser.role;
+            console.log('🔐 AuthManager: User role:', role);
+            
+            const validDashboardPaths = {
+                'community-admin': '/pages/admin/admin-dashboard.html',
+                'mentor': '/pages/mentor/mentor-dashboard.html',
+                'student': '/pages/student/user-dashboard.html',
+                'personal': '/pages/personal/student-dashboard.html'
+            };
+            
+            const correctDashboard = validDashboardPaths[role];
+            console.log('🔐 AuthManager: Correct dashboard for role', role, ':', correctDashboard);
+            
+            if (correctDashboard && !currentPath.includes(correctDashboard.replace('.html', ''))) {
+                console.log('🔐 AuthManager: User is on wrong dashboard, should redirect');
+                return true;
+            } else {
+                console.log('🔐 AuthManager: User is on correct dashboard, no redirect needed');
+            }
+        } else {
+            console.log('🔐 AuthManager: No current user or role, no redirect needed');
+        }
+        
+        return false;
     }
 
     redirectByRole() {
-        if (!this.currentUser) return;
+        if (!this.currentUser) {
+            console.log('🔐 AuthManager: No current user, skipping redirect');
+            return;
+        }
 
         const role = this.currentUser.role;
+        const currentPath = window.location.pathname;
+        
+        console.log('🔐 AuthManager: Current user:', this.currentUser);
+        console.log('🔐 AuthManager: User role:', role);
+        console.log('🔐 AuthManager: Current path:', currentPath);
+        
+        // Don't redirect if already on a valid dashboard page
+        const validDashboardPaths = [
+            '/pages/admin/admin-dashboard.html',
+            '/pages/mentor/mentor-dashboard.html', 
+            '/pages/student/user-dashboard.html',
+            '/pages/personal/student-dashboard.html'
+        ];
+        
+        if (validDashboardPaths.some(path => currentPath.includes(path.replace('.html', '')))) {
+            console.log('🔐 AuthManager: Already on valid dashboard, skipping redirect');
+            return;
+        }
+
         const redirects = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
@@ -403,8 +466,13 @@ class AuthManager {
         };
 
         const redirectUrl = redirects[role];
-        if (redirectUrl && window.location.pathname !== redirectUrl) {
+        console.log('🔐 AuthManager: Redirect URL for role', role, ':', redirectUrl);
+        
+        if (redirectUrl && currentPath !== redirectUrl) {
+            console.log('🔐 AuthManager: Redirecting to:', redirectUrl);
             window.location.href = redirectUrl;
+        } else {
+            console.log('🔐 AuthManager: No redirect needed or invalid role');
         }
     }
 
@@ -439,7 +507,7 @@ class AuthManager {
     }
 
     getUserId() {
-        return this.currentUser?._id;
+        return this.currentUser?.uid;
     }
 
     getUserRole() {
@@ -464,6 +532,11 @@ class AuthManager {
 
     isPersonalUser() {
         return this.currentUser?.role === 'personal';
+    }
+
+    // Get Firebase ID token for API calls
+    async getIdToken() {
+        return await firebaseService.getIdToken();
     }
 
     // Check if user can access specific community

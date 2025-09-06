@@ -7,14 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="../js/apiService.js"></script>
-    <script src="../js/notifications.js"></script>
-    <script src="../js/authManager.js"></script>
-    <script src="../js/contextManager.js"></script>
-    <script src="../js/dataLoader.js"></script>
-    <script src="../js/uiHelpers.js"></script>
-    <script src="../js/pageController.js"></script>
-    <script src="../js/personalStatsController.js"></script>
+    <script type="module" src="/js/apiService.js"></script>
+    <script type="module" src="/js/notifications.js"></script>
+    <script type="module" src="/js/authManager.js"></script>
+    <script type="module" src="/js/contextManager.js"></script>
+    <script type="module" src="/js/dataLoader.js"></script>
+    <script type="module" src="/js/uiHelpers.js"></script>
+    <script type="module" src="/js/pageController.js"></script>
+    <script type="module" src="/js/personalStatsController.js"></script>
+    <script type="module" src="/js/firebaseService.js"></script>
+    <script type="module" src="/js/firebaseApiService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -457,49 +459,112 @@
 
         async function loadStatsData() {
             try {
-                // Load sample stats data for development
-                const sampleData = {
-                    problemsSolved: 247,
-                    skillRating: 1850,
-                    dayStreak: 23,
-                    achievements: 8,
-                    weeklyProgress: {
-                        monday: 5,
-                        tuesday: 4,
-                        wednesday: 3,
-                        thursday: 5,
-                        friday: 2
-                    },
-                    topSkills: [
-                        { name: 'Algorithms', percentage: 95 },
-                        { name: 'Web Development', percentage: 88 },
-                        { name: 'Database', percentage: 82 },
-                        { name: 'Mobile Development', percentage: 75 }
-                    ]
-                };
-                
-                updateStatsDisplay(sampleData);
+                console.log('Loading stats data from Firebase...');
+                const response = await window.APIService.getUserStats();
+                if (response.success) {
+                    updateStatsDisplay(response.data);
+                } else {
+                    console.error('Failed to load stats:', response.message);
+                    // Fallback to sample data
+                    const sampleData = {
+                        problemsSolved: 0,
+                        skillRating: 1000,
+                        dayStreak: 0,
+                        achievements: 0,
+                        totalProjects: 0,
+                        totalContests: 0,
+                        joinedCommunities: 0,
+                        weeklyProgress: {
+                            monday: 0, tuesday: 0, wednesday: 0, thursday: 0, friday: 0
+                        },
+                        topSkills: [
+                            { name: 'JavaScript', percentage: 0 },
+                            { name: 'Python', percentage: 0 },
+                            { name: 'React', percentage: 0 },
+                            { name: 'Node.js', percentage: 0 }
+                        ]
+                    };
+                    updateStatsDisplay(sampleData);
+                }
             } catch (error) {
                 console.error('Failed to load stats data:', error);
             }
         }
 
         function updateStatsDisplay(statsData) {
+            console.log('Updating stats display with data:', statsData);
+            
             // Update main stats
-            if (statsData.problemsSolved) {
-                // Update problems solved count
+            const problemsSolvedEl = document.querySelector('[data-stat="problems-solved"]');
+            if (problemsSolvedEl) {
+                problemsSolvedEl.textContent = statsData.problemsSolved || 0;
             }
             
-            if (statsData.skillRating) {
-                // Update skill rating
+            const skillRatingEl = document.querySelector('[data-stat="skill-rating"]');
+            if (skillRatingEl) {
+                skillRatingEl.textContent = statsData.skillRating || 1000;
             }
             
-            if (statsData.dayStreak) {
-                // Update day streak
+            const dayStreakEl = document.querySelector('[data-stat="day-streak"]');
+            if (dayStreakEl) {
+                dayStreakEl.textContent = statsData.dayStreak || 0;
             }
             
-            if (statsData.achievements) {
-                // Update achievements count
+            const achievementsEl = document.querySelector('[data-stat="achievements"]');
+            if (achievementsEl) {
+                achievementsEl.textContent = statsData.achievements || 0;
+            }
+            
+            // Update additional stats if available
+            if (statsData.totalProjects) {
+                const projectsEl = document.querySelector('[data-stat="total-projects"]');
+                if (projectsEl) projectsEl.textContent = statsData.totalProjects;
+            }
+            
+            if (statsData.totalContests) {
+                const contestsEl = document.querySelector('[data-stat="total-contests"]');
+                if (contestsEl) contestsEl.textContent = statsData.totalContests;
+            }
+            
+            if (statsData.joinedCommunities) {
+                const communitiesEl = document.querySelector('[data-stat="joined-communities"]');
+                if (communitiesEl) communitiesEl.textContent = statsData.joinedCommunities;
+            }
+            
+            // Update weekly progress chart
+            if (statsData.weeklyProgress) {
+                updateWeeklyProgressChart(statsData.weeklyProgress);
+            }
+            
+            // Update skill breakdown
+            if (statsData.topSkills) {
+                updateSkillBreakdown(statsData.topSkills);
+            }
+        }
+        
+        function updateWeeklyProgressChart(weeklyData) {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            days.forEach(day => {
+                const dayEl = document.querySelector(`[data-day="${day}"]`);
+                if (dayEl && weeklyData[day] !== undefined) {
+                    const height = Math.max(10, (weeklyData[day] / 8) * 100);
+                    dayEl.style.height = `${height}%`;
+                }
+            });
+        }
+        
+        function updateSkillBreakdown(skills) {
+            const skillsContainer = document.querySelector('.skills-breakdown');
+            if (skillsContainer) {
+                skillsContainer.innerHTML = skills.map(skill => `
+                    <div class="skill-item">
+                        <div class="skill-name">${skill.name}</div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" style="width: ${skill.percentage}%"></div>
+                        </div>
+                        <div class="skill-percentage">${skill.percentage}%</div>
+                    </div>
+                `).join('');
             }
         }
 

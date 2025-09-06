@@ -14,18 +14,8 @@ class APIService {
     }
 
     async init() {
-        // Get CSRF token on initialization
-        try {
-            const response = await fetch(window.Config ? window.Config.csrfTokenURL : 'http://localhost:5001/api/csrf-token', {
-                credentials: 'include'
-            });
-            const data = await response.json();
-            if (data.success) {
-                this.csrfToken = data.data.csrfToken;
-            }
-        } catch (error) {
-            console.warn('Failed to get CSRF token:', error);
-        }
+        // Firebase-only approach - no CSRF token needed
+        console.log('🌐 API Service: Using Firebase-only approach - no CSRF token needed');
     }
 
     // Refresh CSRF token
@@ -46,11 +36,23 @@ class APIService {
     }
 
     // Get authentication headers
-    getAuthHeaders() {
+    async getAuthHeaders() {
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         };
+        
+        // Add Firebase ID token if user is authenticated
+        if (window.authManager && window.authManager.isAuthenticated) {
+            try {
+                const idToken = await window.authManager.getIdToken();
+                if (idToken) {
+                    headers['Authorization'] = `Bearer ${idToken}`;
+                }
+            } catch (error) {
+                console.warn('Failed to get Firebase ID token:', error);
+            }
+        }
         
         // Add CSRF token for non-GET requests
         if (this.csrfToken) {
@@ -64,7 +66,7 @@ class APIService {
     async makeRequest(url, options = {}) {
         const config = {
             method: 'GET',
-            headers: this.getAuthHeaders(),
+            headers: await this.getAuthHeaders(),
             credentials: 'include', // Include cookies in requests
             timeout: this.timeout,
             ...options
@@ -183,13 +185,16 @@ class APIService {
         });
     }
 
-    // Authentication endpoints
+    // Authentication endpoints - now handled by Firebase
+    // These methods are kept for compatibility but redirect to Firebase Auth
     async login(email, password) {
-        return this.post('/auth/login', { email, password });
+        console.warn('API Service: login() is deprecated, use Firebase Auth directly');
+        throw new Error('Use Firebase Auth for login instead of API service');
     }
 
     async register(userData) {
-        return this.post('/auth/register', userData);
+        console.warn('API Service: register() is deprecated, use Firebase Auth directly');
+        throw new Error('Use Firebase Auth for registration instead of API service');
     }
 
     async getUserProfile() {

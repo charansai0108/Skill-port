@@ -7,14 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="../js/apiService.js"></script>
-    <script src="../js/notifications.js"></script>
-    <script src="../js/authManager.js"></script>
-    <script src="../js/contextManager.js"></script>
-    <script src="../js/dataLoader.js"></script>
-    <script src="../js/uiHelpers.js"></script>
-    <script src="../js/pageController.js"></script>
-    <script src="../js/personalProjectsController.js"></script>
+    <script type="module" src="/js/apiService.js"></script>
+    <script type="module" src="/js/notifications.js"></script>
+    <script type="module" src="/js/authManager.js"></script>
+    <script type="module" src="/js/contextManager.js"></script>
+    <script type="module" src="/js/dataLoader.js"></script>
+    <script type="module" src="/js/uiHelpers.js"></script>
+    <script type="module" src="/js/pageController.js"></script>
+    <script type="module" src="/js/personalProjectsController.js"></script>
+    <script type="module" src="/js/firebaseService.js"></script>
+    <script type="module" src="/js/firebaseApiService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -862,7 +864,7 @@
             try {
                 console.log('Loading projects...');
                 showProjectsLoadingState();
-                const response = await window.SkillPortAPI.getProjects();
+                const response = await window.APIService.getProjects();
                 if (response.success) {
                     displayProjects(response.data);
                 } else {
