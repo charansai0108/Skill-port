@@ -177,6 +177,6 @@ describe('Join Community Flow', () => {
     cy.get('#joinSubmitButton').click();
 
     // Should redirect to community dashboard
-    cy.url().should('include', '/pages/community/dashboard.html');
+    cy.url().should('include', '/pages/student/dashboard.html');
   });
 });

@@ -158,7 +158,7 @@ class ContextManager {
         const rolePaths = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/community/user-dashboard.html',
+            'student': '/pages/student/user-dashboard.html',
             'personal': '/pages/personal/student-dashboard.html'
         };
         
@@ -169,7 +169,7 @@ class ContextManager {
     canAccessPage(pagePath) {
         const adminPages = ['/pages/admin/'];
         const mentorPages = ['/pages/mentor/', '/pages/admin/'];
-        const studentPages = ['/pages/community/', '/pages/mentor/'];
+        const studentPages = ['/pages/student/', '/pages/mentor/'];
         const personalPages = ['/pages/personal/'];
         
         switch (this.userRole) {

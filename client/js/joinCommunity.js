@@ -161,7 +161,7 @@ class JoinCommunityHandler {
                 await this.refreshUserData();
                 
                 // Redirect to community dashboard
-                window.location.href = `/pages/community/user-dashboard.html`;
+                window.location.href = `/pages/student/user-dashboard.html`;
             } else {
                 alert(data.message || 'OTP verification failed.');
             }

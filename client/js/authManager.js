@@ -398,7 +398,7 @@ class AuthManager {
         const redirects = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/community/user-dashboard.html',
+            'student': '/pages/student/user-dashboard.html',
             'personal': '/pages/personal/student-dashboard.html'
         };
 
@@ -413,7 +413,7 @@ class AuthManager {
         const protectedPaths = [
             'pages/admin/',
             'pages/mentor/',
-            'pages/community/',
+            'pages/student/',
             'pages/personal/'
         ];
         

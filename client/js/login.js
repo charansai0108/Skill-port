@@ -222,7 +222,7 @@ class LoginHandler {
         const redirectUrls = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/community/user-dashboard.html',
+            'student': '/pages/student/user-dashboard.html',
             'personal': '/pages/personal/student-dashboard.html'
         };
 

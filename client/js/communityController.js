@@ -305,7 +305,7 @@ class CommunityController extends PageController {
         
         try {
             // Redirect to event details page
-            window.location.href = `/pages/community/event-details.html?id=${eventId}`;
+            window.location.href = `/pages/student/event-details.html?id=${eventId}`;
             
         } catch (error) {
             console.error('🏘️ Community Controller: Error viewing event details:', error);
@@ -318,7 +318,7 @@ class CommunityController extends PageController {
         
         try {
             // Redirect to post creation page
-            window.location.href = '/pages/community/create-post.html';
+            window.location.href = '/pages/student/create-post.html';
             
         } catch (error) {
             console.error('🏘️ Community Controller: Error creating post:', error);
@@ -359,7 +359,7 @@ class CommunityController extends PageController {
                 window.uiHelpers.showSuccess('Success', 'Successfully left the community');
                 // Redirect to community selection page
                 setTimeout(() => {
-                    window.location.href = '/pages/community/select-community.html';
+                    window.location.href = '/pages/student/select-community.html';
                 }, 2000);
             } else {
                 window.uiHelpers.showError('Error', response.error || 'Failed to leave community');

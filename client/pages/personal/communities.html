@@ -337,7 +337,7 @@
                 if (response.success) {
                     showSuccess('Successfully joined community! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = '/pages/community/user-dashboard.html';
+                        window.location.href = '/pages/student/user-dashboard.html';
                     }, 2000);
                 } else {
                     showError(response.error || 'Invalid OTP');
