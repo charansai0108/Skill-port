@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unauthorized Access - SkillPort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .unauthorized-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .unauthorized-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .unauthorized-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen flex items-center justify-center p-4">
+    <div class="unauthorized-container w-full max-w-md">
+        <div class="unauthorized-card rounded-2xl p-8 text-center">
+            <!-- Icon -->
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="shield-x" class="w-10 h-10 text-red-600"></i>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
+            
+            <!-- Message -->
+            <p class="text-gray-600 mb-2">
+                You don't have permission to access this page.
+            </p>
+            <p class="text-sm text-gray-500 mb-8">
+                Please contact your administrator or log in with the correct account.
+            </p>
+            
+            <!-- Actions -->
+            <div class="space-y-4">
+                <a href="../login.html" 
+                   class="btn-primary text-white px-6 py-3 rounded-xl font-semibold inline-flex items-center justify-center w-full hover:shadow-lg transition-all duration-300">
+                    <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
+                    Back to Login
+                </a>
+                
+                <a href="../../index.html" 
+                   class="text-gray-500 hover:text-gray-700 text-sm font-medium inline-flex items-center justify-center w-full transition-colors duration-200">
+                    <i data-lucide="home" class="w-4 h-4 mr-2"></i>
+                    Return to Home
+                </a>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-xs text-gray-400">
+                    If you believe this is an error, please contact support.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // Auto-redirect after 10 seconds
+        setTimeout(() => {
+            window.location.href = '../login.html';
+        }, 10000);
+        
+        // Show countdown
+        let countdown = 10;
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'text-xs text-gray-400 mt-2';
+        countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
+        document.querySelector('.unauthorized-card').appendChild(countdownElement);
+        
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = `Redirecting in ${countdown} seconds...`;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

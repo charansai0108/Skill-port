@@ -720,7 +720,7 @@
     // Initialize mobile navigation
     populateMobileNav();
     
-    // Load contests from backend on page load
+    // Load contests from Firebase on page load
     loadContests();
     
     // Update stats with real data
@@ -757,13 +757,13 @@
           };
 
           try {
-            // Send data to backend API
+            // Send data to Firebase
             const response = await window.APIService.createContest(contestData);
             if (response.success) {
               alert('Contest created successfully!');
               closeCreateContestModal();
               e.target.reset();
-              // Reload contests from backend to show the new contest
+              // Reload contests from Firebase to show the new contest
               loadContests();
             } else {
               alert('Failed to create contest: ' + response.message);
@@ -808,10 +808,10 @@
       });
     });
 
-    // Load contests from backend
+    // Load contests from Firebase
     async function loadContests() {
       try {
-        console.log('Loading contests from backend...');
+        console.log('Loading contests from Firebase...');
         
         // Show loading notification
         const loadingNotification = window.notifications?.showLoading(
@@ -839,7 +839,7 @@
           console.error('Failed to load contests:', response.error);
           window.notifications?.error(
             'Load Failed',
-            response.error || 'Failed to load contests from backend'
+            response.error || 'Failed to load contests from Firebase'
           );
           // Show static contests as fallback
           showStaticContests();
@@ -848,7 +848,7 @@
         console.error('Error loading contests:', error);
         window.notifications?.error(
           'Load Error',
-          'Error loading contests from backend'
+          'Error loading contests from Firebase'
         );
         // Show static contests as fallback
         showStaticContests();
@@ -1055,7 +1055,7 @@
     async function editContest(contestId) {
       console.log('Editing contest:', contestId);
       try {
-        // Fetch contest data from backend
+        // Fetch contest data from Firebase
         const response = await window.APIService.getContestById(contestId);
         if (response.success) {
           // Show edit modal with contest data
@@ -1072,7 +1072,7 @@
     async function viewContest(contestId) {
       console.log('Viewing contest:', contestId);
       try {
-        // Fetch contest details from backend
+        // Fetch contest details from Firebase
         const response = await window.APIService.getContestById(contestId);
         if (response.success) {
           // Show contest details modal
@@ -1095,7 +1095,7 @@
         const response = await window.APIService.deleteContest(contestId);
         if (response.success) {
           window.notifications?.success('Contest Deleted', `Contest deleted successfully!`);
-          // Reload contests from backend to update the display
+          // Reload contests from Firebase to update the display
           loadContests();
         } else {
           window.notifications?.error('Delete Failed', response.error || 'Failed to delete contest');
@@ -1125,7 +1125,7 @@
             return;
         }
 
-        // Load contests from backend
+        // Load contests from Firebase
         loadContests();
         
         // Initialize DataManager if available

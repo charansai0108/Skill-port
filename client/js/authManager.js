@@ -64,18 +64,7 @@ class AuthManager {
         // Update UI to show authenticated state
         this.updateAuthUI();
         
-        // Force redirect for community-admin users
-        if (this.currentUser && this.currentUser.role === 'community-admin') {
-            console.log('🔐 AuthManager: Community-admin detected, forcing redirect to admin dashboard');
-            const currentPath = window.location.pathname;
-            if (!currentPath.includes('admin-dashboard')) {
-                console.log('🔐 AuthManager: Redirecting community-admin to admin dashboard');
-                window.location.href = '/pages/admin/admin-dashboard.html';
-                return;
-            }
-        }
-        
-        // Always check for redirect, regardless of current page
+        // Always check for redirect based on user role
         console.log('🔐 AuthManager: Checking if should redirect...');
         if (this.shouldRedirect()) {
             console.log('🔐 AuthManager: Should redirect, calling redirectByRole');
@@ -134,7 +123,7 @@ class AuthManager {
     logout() {
         console.log('🔐 AuthManager: Logging out user...');
         
-        // Clear local data (cookies are handled by backend)
+        // Clear local data
         localStorage.removeItem('user_data');
         sessionStorage.clear();
         
@@ -434,7 +423,8 @@ class AuthManager {
 
     redirectByRole() {
         if (!this.currentUser) {
-            console.log('🔐 AuthManager: No current user, skipping redirect');
+            console.log('🔐 AuthManager: No current user, redirecting to login');
+            window.location.href = '/pages/auth/login.html';
             return;
         }
 
@@ -467,6 +457,12 @@ class AuthManager {
 
         const redirectUrl = redirects[role];
         console.log('🔐 AuthManager: Redirect URL for role', role, ':', redirectUrl);
+        
+        if (!role || role === 'undefined') {
+            console.warn('🔐 AuthManager: User role is undefined, redirecting to login');
+            window.location.href = '/pages/auth/login.html';
+            return;
+        }
         
         if (redirectUrl && currentPath !== redirectUrl) {
             console.log('🔐 AuthManager: Redirecting to:', redirectUrl);

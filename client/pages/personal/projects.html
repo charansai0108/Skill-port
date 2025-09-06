@@ -16,7 +16,6 @@
     <script type="module" src="/js/pageController.js"></script>
     <script type="module" src="/js/personalProjectsController.js"></script>
     <script type="module" src="/js/firebaseService.js"></script>
-    <script type="module" src="/js/firebaseApiService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -808,7 +807,7 @@
                 return;
             }
 
-            // Here you would typically save the project to your backend
+            // Here you would typically save the project to Firebase
             const projectData = {
                 name,
                 description,

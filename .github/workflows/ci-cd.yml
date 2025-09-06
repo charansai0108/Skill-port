@@ -1,0 +1,219 @@
+name: Skill-Port CI/CD Pipeline
+
+# Trigger the workflow on push and pull requests to main and dev branches
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+# Set environment variables for the entire workflow
+env:
+  NODE_VERSION: '18'
+  FIREBASE_PROJECT_ID: 'skillport-a0c39'  # Your actual Firebase project ID
+
+jobs:
+  # Job 1: Lint and Build
+  lint-and-build:
+    name: 🔍 Lint & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: Setup Node.js environment
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+          
+      # Step 3: Install dependencies with npm ci (faster and more reliable than npm install)
+      - name: 📦 Install dependencies
+        run: |
+          cd client
+          npm ci
+          
+      # Step 4: Run linting (if lint script exists)
+      - name: 🔍 Run linter
+        run: |
+          cd client
+          if npm run | grep -q "lint"; then
+            npm run lint
+          else
+            echo "No lint script found, skipping linting"
+          fi
+        continue-on-error: false
+        
+      # Step 5: Run build process
+      - name: 🏗️ Build project
+        run: |
+          cd client
+          npm run build
+        continue-on-error: false
+        
+      # Step 6: Upload build artifacts for potential use in deployment
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build
+          path: client/
+          retention-days: 1
+
+  # Job 2: Run Tests
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-build  # Only run tests if lint and build succeed
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: Setup Node.js environment
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+          
+      # Step 3: Install dependencies
+      - name: 📦 Install dependencies
+        run: |
+          cd client
+          npm ci
+          
+      # Step 4: Run tests (if test script exists)
+      - name: 🧪 Run tests
+        run: |
+          cd client
+          if npm run | grep -q "test" && npm run test | grep -q "No tests specified"; then
+            echo "Test script exists but no tests are configured, skipping tests"
+          elif npm run | grep -q "test"; then
+            npm test
+          else
+            echo "No test script found, skipping tests"
+          fi
+        continue-on-error: false
+
+  # Job 3: Firebase Deployment (only on push to main)
+  deploy:
+    name: 🚀 Deploy to Firebase
+    runs-on: ubuntu-latest
+    needs: [lint-and-build, test]  # Only deploy if lint, build, and tests pass
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'  # Only deploy on push to main
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: Setup Node.js environment
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+          
+      # Step 3: Install dependencies
+      - name: 📦 Install dependencies
+        run: |
+          cd client
+          npm ci
+          
+      # Step 4: Install Firebase CLI globally
+      - name: 🔥 Install Firebase CLI
+        run: npm install -g firebase-tools@latest
+        
+      # Step 5: Create Firebase service account key file from GitHub secret
+      - name: 🔐 Setup Firebase authentication
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+          firebase use ${{ env.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          
+      # Step 6: Deploy to Firebase Hosting
+      - name: 🚀 Deploy to Firebase Hosting
+        run: |
+          firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          
+      # Step 7: Clean up sensitive files
+      - name: 🧹 Clean up
+        run: |
+          rm -f firebase-service-account.json
+        if: always()
+
+  # Job 4: Security Scan (optional but recommended)
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-build
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: Setup Node.js environment
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+          
+      # Step 3: Install dependencies
+      - name: 📦 Install dependencies
+        run: |
+          cd client
+          npm ci
+          
+      # Step 4: Run security audit
+      - name: 🔒 Run security audit
+        run: |
+          cd client
+          npm audit --audit-level moderate
+        continue-on-error: true  # Don't fail the build for security warnings, just report them
+
+  # Job 5: Notify deployment status (optional)
+  notify:
+    name: 📢 Notify Status
+    runs-on: ubuntu-latest
+    needs: [lint-and-build, test, deploy]
+    if: always()  # Run regardless of previous job status
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      # Step 2: Determine deployment status
+      - name: 📊 Check deployment status
+        id: check-status
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "status=✅ Deployed successfully to Firebase Hosting" >> $GITHUB_OUTPUT
+            echo "color=good" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.lint-and-build.result }}" == "failure" ] || [ "${{ needs.test.result }}" == "failure" ]; then
+            echo "status=❌ Build or tests failed" >> $GITHUB_OUTPUT
+            echo "color=danger" >> $GITHUB_OUTPUT
+          else
+            echo "status=ℹ️ Pipeline completed (no deployment on this branch)" >> $GITHUB_OUTPUT
+            echo "color=warning" >> $GITHUB_OUTPUT
+          fi
+          
+      # Step 3: Display status (you can extend this to send notifications to Slack, Discord, etc.)
+      - name: 📢 Display status
+        run: |
+          echo "::notice::${{ steps.check-status.outputs.status }}"
+          echo "Pipeline Status: ${{ steps.check-status.outputs.status }}"

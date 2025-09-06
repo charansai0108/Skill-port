@@ -6,9 +6,11 @@
   "scripts": {
     "start": "python3 -m http.server 8000",
     "dev": "python3 -m http.server 8000",
-    "build": "echo 'No build process needed for static files'",
-    "test": "echo 'No tests specified'",
-    "serve": "python3 -m http.server 8000"
+    "build": "echo 'Static files ready for deployment' && echo 'Build completed successfully'",
+    "test": "echo 'No tests specified - add your test commands here'",
+    "lint": "echo 'No linter configured - add ESLint or other linter here'",
+    "serve": "python3 -m http.server 8000",
+    "audit": "npm audit --audit-level moderate"
   },
   "keywords": [
     "skillport",

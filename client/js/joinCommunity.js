@@ -3,6 +3,8 @@
  * Handles the complete community joining process
  */
 
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
 class JoinCommunityHandler {
     constructor() {
         this.currentStep = 'checkEmail';
@@ -63,23 +65,30 @@ class JoinCommunityHandler {
 
     async checkEmailExists(email) {
         try {
-            const response = await fetch(`/api/v1/communities/${this.currentCommunity.id}/check-email`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json();
+            // Import Firebase service
+            const firebaseService = await import('./firebaseService.js');
             
-            if (response.ok && data.success) {
-                if (data.userType === 'student' && data.community && data.community._id === this.currentCommunity.id) {
+            // Check if user exists in Firestore
+            const usersQuery = query(
+                collection(firebaseService.default.db, 'users'),
+                where('email', '==', email),
+                where('communityId', '==', this.currentCommunity.id)
+            );
+            
+            const querySnapshot = await getDocs(usersQuery);
+            
+            if (!querySnapshot.empty) {
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                if (userData.role === 'student') {
                     this.currentStep = 'setPassword';
                     this.promptPasswordSetup();
                 } else {
-                    alert('This email is already registered with a different role or community.');
+                    alert('This email is already registered with a different role.');
                 }
             } else {
-                alert(data.message || 'Email not found in pre-registered student list for this community.');
+                alert('Email not found in pre-registered student list for this community.');
             }
         } catch (error) {
             console.error('Check email error:', error);
@@ -102,33 +111,42 @@ class JoinCommunityHandler {
 
     async setPasswordAndSendOTP(password, confirmPassword) {
         try {
-            const response = await fetch('/api/v1/auth/join-community', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    email: this.currentEmail,
-                    communityCode: this.currentCommunity.code,
-                    password,
-                    confirmPassword,
-                    firstName: window.__CURRENT_USER__?.firstName || 'User',
-                    lastName: window.__CURRENT_USER__?.lastName || 'User',
-                    batch: 'Default'
-                }),
-            });
-
-            const data = await response.json();
+            // Import Firebase service
+            const firebaseService = await import('./firebaseService.js');
             
-            if (response.ok && data.success) {
-                this.currentStep = 'verifyOtp';
-                alert('Password set successfully. Please check your email for OTP.');
-                this.promptOTPVerification();
-            } else {
-                alert(data.message || 'Failed to set password and send OTP.');
-            }
+            // Create user account with Firebase Auth
+            const userCredential = await firebaseService.default.createUserWithEmailAndPassword(
+                this.currentEmail, 
+                password
+            );
+            
+            // Update user profile
+            await firebaseService.default.updateProfile({
+                displayName: `${window.__CURRENT_USER__?.firstName || 'User'} ${window.__CURRENT_USER__?.lastName || 'User'}`
+            });
+            
+            // Create user document in Firestore
+            await firebaseService.default.createUserDocument({
+                uid: userCredential.user.uid,
+                email: this.currentEmail,
+                firstName: window.__CURRENT_USER__?.firstName || 'User',
+                lastName: window.__CURRENT_USER__?.lastName || 'User',
+                role: 'student',
+                communityId: this.currentCommunity.id,
+                batch: 'Default',
+                createdAt: new Date()
+            });
+            
+            // Send email verification
+            await firebaseService.default.sendEmailVerification();
+            
+            this.currentStep = 'verifyOtp';
+            alert('Account created successfully! Please check your email for verification.');
+            this.promptOTPVerification();
+            
         } catch (error) {
             console.error('Set password error:', error);
-            alert('Error setting password. Please try again.');
+            alert('Error creating account: ' + error.message);
         }
     }
 
@@ -141,64 +159,57 @@ class JoinCommunityHandler {
 
     async verifyOTP(otp) {
         try {
-            const response = await fetch('/api/v1/auth/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    email: this.currentEmail,
-                    otp,
-                    password: 'already_set'
-                }),
-            });
-
-            const data = await response.json();
+            // Import Firebase service
+            const firebaseService = await import('./firebaseService.js');
             
-            if (response.ok && data.success) {
-                alert('OTP verified successfully! You have joined the community.');
+            // Check if user is already verified
+            const user = firebaseService.default.getCurrentUser();
+            if (user && user.emailVerified) {
+                alert('Email already verified! You have joined the community.');
                 
                 // Refresh user data
                 await this.refreshUserData();
                 
                 // Redirect to community dashboard
                 window.location.href = `/pages/student/user-dashboard.html`;
-            } else {
-                alert(data.message || 'OTP verification failed.');
+                return;
             }
+            
+            // For now, just redirect since Firebase handles email verification
+            alert('Please check your email and click the verification link, then try logging in.');
+            window.location.href = `/pages/auth/login.html`;
+            
         } catch (error) {
             console.error('OTP verification error:', error);
-            alert('Error verifying OTP. Please try again.');
+            alert('Error verifying email. Please try again.');
         }
     }
 
     async resendOTP() {
         try {
-            const response = await fetch('/api/v1/auth/resend-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: this.currentEmail }),
-            });
-
-            const data = await response.json();
+            // Import Firebase service
+            const firebaseService = await import('./firebaseService.js');
             
-            if (response.ok && data.success) {
-                alert('OTP resent successfully. Please check your email.');
-            } else {
-                alert(data.message || 'Failed to resend OTP.');
-            }
+            // Resend email verification
+            await firebaseService.default.sendEmailVerification();
+            alert('Verification email resent successfully. Please check your email.');
+            
         } catch (error) {
-            console.error('Resend OTP error:', error);
-            alert('Error resending OTP. Please try again.');
+            console.error('Resend verification error:', error);
+            alert('Error resending verification email. Please try again.');
         }
     }
 
     async refreshUserData() {
         try {
-            const response = await fetch('/api/v1/auth/me', { credentials: 'include' });
-            if (response.ok) {
-                const data = await response.json();
-                window.__CURRENT_USER__ = data.user;
-                window.dispatchEvent(new CustomEvent('auth-ready', { detail: data.user }));
+            // Import Firebase service
+            const firebaseService = await import('./firebaseService.js');
+            
+            // Get current user from Firebase
+            const user = firebaseService.default.getCurrentUser();
+            if (user) {
+                window.__CURRENT_USER__ = user;
+                window.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
             }
         } catch (error) {
             console.error('Refresh user data error:', error);

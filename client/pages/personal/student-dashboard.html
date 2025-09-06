@@ -7,16 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script type="module" src="/js/apiService.js"></script>
-    <script type="module" src="/js/notifications.js"></script>
-    <script type="module" src="/js/authManager.js"></script>
-    <script type="module" src="/js/contextManager.js"></script>
-    <script type="module" src="/js/dataLoader.js"></script>
-    <script type="module" src="/js/uiHelpers.js"></script>
-    <script type="module" src="/js/pageController.js"></script>
-    <script type="module" src="/js/personalDashboardController.js"></script>
-    <script type="module" src="/js/firebaseService.js"></script>
-    <script type="module" src="/js/firebaseApiService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -154,6 +144,19 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
+
+        /* Ensure icons are visible */
+        [data-lucide] {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+        }
+
+        /* Debug styling for icons */
+        .icon-debug {
+            border: 2px solid red;
+            background: yellow;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
@@ -191,39 +194,6 @@
                         <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
                     </a>
                 </div>
-
-                <!-- Mobile Navigation Button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
-                        <i data-lucide="menu" class="w-6 h-6"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mobile Navigation Menu -->
-            <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white">
-                <div class="px-4 py-2 space-y-1">
-                    <a href="student-dashboard.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium bg-blue-50 text-blue-700">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-                    </a>
-                    <a href="projects.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                        <i data-lucide="folder" class="w-5 h-5"></i> Projects
-                    </a>
-                    <a href="tracker.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                        <i data-lucide="activity" class="w-5 h-5"></i> Tracker
-                    </a>
-                    <a href="stats.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Stats
-                    </a>
-                    <a href="communities.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                        <i data-lucide="users" class="w-5 h-5"></i> Communities
-                    </a>
-                    <a href="profile.html" class="mobile-nav-link flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=24&h=24&fit=crop&crop=face" alt="Profile" class="w-6 h-6 rounded-full object-cover">
-                        <span>Profile</span>
-                    </a>
-                </div>
-            </div>
             </div>
         </nav>
     </header>
@@ -237,7 +207,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-slate-800 mb-1">Dashboard</h1>
-                <p class="text-sm text-slate-600">Welcome back, <span id="userFirstName">User</span>! Here's your learning overview</p>
+                <p class="text-sm text-slate-600">Welcome back! Here's your learning overview</p>
             </div>
         </div>
 
@@ -254,25 +224,25 @@
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="trophy" class="w-5 h-5 text-blue-600"></i>
-                        <span class="text-2xl font-bold text-blue-600" id="problems-solved-student">0</span>
+                        <span class="text-2xl font-bold text-blue-600">247</span>
                     </div>
                     <div class="text-sm text-slate-600">Problems Solved</div>
-                    <div class="text-xs text-blue-600 mt-1">+0 this week</div>
+                    <div class="text-xs text-blue-600 mt-1">+12 this week</div>
                 </div>
                 
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="star" class="w-5 h-5 text-green-600"></i>
-                        <span class="text-2xl font-bold text-green-600" id="total-points-student">1000</span>
+                        <span class="text-2xl font-bold text-green-600">1,850</span>
                     </div>
                     <div class="text-sm text-slate-600">Skill Rating</div>
-                    <div class="text-xs text-green-600 mt-1">+0 this month</div>
+                    <div class="text-xs text-green-600 mt-1">+45 this month</div>
                 </div>
                 
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
-                        <span class="text-2xl font-bold text-purple-600" id="communities-student">0</span>
+                        <span class="text-2xl font-bold text-purple-600">8</span>
                     </div>
                     <div class="text-sm text-slate-600">Communities</div>
                     <div class="text-xs text-purple-600 mt-1">Active member</div>
@@ -281,7 +251,7 @@
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
-                        <span class="text-2xl font-bold text-orange-600" id="day-streak-student">0</span>
+                        <span class="text-2xl font-bold text-orange-600">23</span>
                     </div>
                     <div class="text-sm text-slate-600">Day Streak</div>
                     <div class="text-xs text-orange-600 mt-1">Keep it up!</div>
@@ -308,10 +278,10 @@
                     </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-blue-600" id="algorithms-goal">0/5</span>
+                        <span class="text-sm font-semibold text-blue-600">3/5</span>
                     </div>
                     <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 0%" data-progress="algorithms" id="algorithms-progress"></div>
+                        <div class="progress-fill h-full rounded-full" style="width: 60%"></div>
                     </div>
                 </div>
                 
@@ -324,10 +294,10 @@
                     </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-green-600" id="data-structures-goal">0/1</span>
+                        <span class="text-sm font-semibold text-green-600">1/1</span>
                     </div>
                     <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 0%" data-progress="dataStructures"></div>
+                        <div class="progress-fill h-full rounded-full" style="width: 100%"></div>
                     </div>
                 </div>
                 
@@ -340,10 +310,10 @@
                     </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-purple-600" id="projects-goal">0/1</span>
+                        <span class="text-sm font-semibold text-purple-600">0/1</span>
                     </div>
                     <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 0%" data-progress="projects"></div>
+                        <div class="progress-fill h-full rounded-full" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
@@ -366,12 +336,12 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-slate-800">Algorithms</h3>
-                            <p class="text-sm text-blue-600">Beginner</p>
+                            <p class="text-sm text-blue-600">Intermediate</p>
                         </div>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-600">Problems Solved</span>
-                        <span class="text-sm font-bold text-blue-600" id="recent-points-1">0</span>
+                        <span class="text-sm font-bold text-blue-600">156</span>
                     </div>
                 </div>
                 
@@ -382,12 +352,12 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-slate-800">Web Dev</h3>
-                            <p class="text-sm text-green-600">Beginner</p>
+                            <p class="text-sm text-green-600">Advanced</p>
                         </div>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-600">Projects Built</span>
-                        <span class="text-sm font-bold text-green-600" id="recent-points-2">0</span>
+                        <span class="text-sm font-bold text-green-600">12</span>
                     </div>
                 </div>
                 
@@ -403,7 +373,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-600">Concepts Learned</span>
-                        <span class="text-sm font-bold text-amber-600" id="recent-points-3">0</span>
+                        <span class="text-sm font-bold text-amber-600">8</span>
                     </div>
                 </div>
                 
@@ -414,12 +384,12 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-slate-800">Database</h3>
-                            <p class="text-sm text-purple-600">Beginner</p>
+                            <p class="text-sm text-purple-600">Intermediate</p>
                         </div>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-600">Queries Mastered</span>
-                        <span class="text-sm font-bold text-purple-600" id="recent-points-4">0</span>
+                        <span class="text-sm font-bold text-purple-600">45</span>
                     </div>
                 </div>
             </div>
@@ -436,14 +406,44 @@
                     <h3 class="text-xl font-bold text-slate-800">Recent Activity</h3>
                 </div>
                 
-                <div class="space-y-4" id="recent-activity">
+                <div class="space-y-4">
                     <div class="activity-item flex items-center gap-3 p-3 hover:bg-green-50/50 rounded-xl transition-colors">
                         <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                             <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">Welcome to SkillPort!</h4>
-                            <p class="text-xs text-slate-600">Start your learning journey • Just now</p>
+                            <h4 class="font-semibold text-slate-800 text-sm">Solved LeetCode Problem</h4>
+                            <p class="text-xs text-slate-600">Two Sum - Easy • 2 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-amber-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Won Weekly Contest</h4>
+                            <p class="text-xs text-slate-600">Ranked #15 out of 200 • 1 day ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-purple-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Joined Community</h4>
+                            <p class="text-xs text-slate-600">Data Structures Masters • 2 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-blue-50/50 rounded-xl transition-colors">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-800 text-sm">Completed Course</h4>
+                            <p class="text-xs text-slate-600">Advanced JavaScript • 3 days ago</p>
                         </div>
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                     <h3 class="text-xl font-bold text-slate-800">Upcoming Contests</h3>
                 </div>
                 
-                <div class="space-y-4" id="upcoming-contests">
+                <div class="space-y-4">
                     <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
                         <div class="flex items-center gap-3 mb-2">
                             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -470,6 +470,20 @@
                         <div class="flex items-center gap-2 text-xs text-blue-600">
                             <i data-lucide="clock" class="w-3 h-3"></i>
                             <span>Tomorrow at 2:00 PM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-green-50 rounded-xl border border-green-200">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="code" class="w-4 h-4 text-green-600"></i>
+                            </div>
+                            <span class="font-semibold text-slate-800 text-sm">Code Sprint</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">Fast-paced coding competition</p>
+                        <div class="flex items-center gap-2 text-xs text-green-600">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            <span>Saturday at 10:00 AM</span>
                         </div>
                     </div>
                 </div>
@@ -537,9 +551,173 @@
                 <h2 class="text-xl font-bold text-slate-800">Recent Achievements</h2>
             </div>
             
-            <div class="flex flex-wrap gap-2" id="achievements">
-                <span class="achievement-badge">🎯 New User</span>
-                <span class="achievement-badge">🚀 Getting Started</span>
+            <div class="flex flex-wrap gap-2">
+                <span class="achievement-badge">🏆 Problem Solver</span>
+                <span class="achievement-badge">🔥 7-Day Streak</span>
+                <span class="achievement-badge">⭐ Top 10%</span>
+                <span class="achievement-badge">🚀 Speed Demon</span>
+                <span class="achievement-badge">📚 Course Master</span>
+                <span class="achievement-badge">👥 Community Leader</span>
+            </div>
+        </div>
+
+        <!-- Coding Platforms Section -->
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="code" class="w-5 h-5 text-white"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Coding Platforms Progress</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- LeetCode Card -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="leetcode">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="code" class="w-6 h-6 text-orange-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">LeetCode</h3>
+                            <p class="text-sm text-orange-600">Premium Member</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Easy</span>
+                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Medium</span>
+                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Hard</span>
+                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-slate-700">Total</span>
+                            <span class="text-2xl font-bold text-orange-600" data-total="0">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GeeksforGeeks Card -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="gfg">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">GeeksforGeeks</h3>
+                            <p class="text-sm text-green-600">Free User</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Easy</span>
+                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Medium</span>
+                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Hard</span>
+                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-slate-700">Total</span>
+                            <span class="text-2xl font-bold text-green-600" data-total="0">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HackerRank Card -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="hackerrank">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="trophy" class="w-6 h-6 text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">HackerRank</h3>
+                            <p class="text-sm text-emerald-600">6★ Python</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Easy</span>
+                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Medium</span>
+                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Hard</span>
+                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-slate-700">Total</span>
+                            <span class="text-2xl font-bold text-emerald-600" data-total="0">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- InterviewBit Card -->
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="interviewbit">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">InterviewBit</h3>
+                            <p class="text-sm text-purple-600">Scaler Academy</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Easy</span>
+                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Medium</span>
+                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-600">Hard</span>
+                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-slate-700">Total</span>
+                            <span class="text-2xl font-bold text-purple-600" data-total="0">0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -590,211 +768,100 @@
     </main>
 
     <script>
-        lucide.createIcons();
-
-        // Load dashboard data from Firebase
-        async function loadDashboardData() {
-            try {
-                console.log('Loading dashboard data from Firebase...');
-                
-                // Check if APIService is available
-                if (!window.APIService) {
-                    console.error('APIService not available');
-                    return;
-                }
-                
-                // Load user stats
-                const statsResponse = await window.APIService.getUserStats();
-                if (statsResponse.success) {
-                    updateStatsDisplay(statsResponse.data);
-                } else {
-                    console.error('Failed to load stats:', statsResponse.message);
-                }
-
-                // Load user profile
-                const profileResponse = await window.APIService.getUserProfile();
-                if (profileResponse.success) {
-                    updateUserProfile(profileResponse.data);
-                } else {
-                    console.error('Failed to load profile:', profileResponse.message);
-                }
-
-                // Load recent activity
-                await loadRecentActivity();
-
-                // Load upcoming contests
-                await loadUpcomingContests();
-
-                console.log('Dashboard data loaded successfully');
-
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                // Show a fallback message
-                const container = document.querySelector('.min-h-screen');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="flex items-center justify-center min-h-screen">
-                            <div class="text-center">
-                                <h2 class="text-2xl font-bold text-gray-800 mb-4">Dashboard Loading...</h2>
-                                <p class="text-gray-600">Please wait while we load your data.</p>
-                                <p class="text-sm text-gray-500 mt-2">If this persists, please refresh the page.</p>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        function updateStatsDisplay(stats) {
-            console.log('Updating stats display:', stats);
-            
-            // Update main stats
-            document.getElementById('problems-solved-student').textContent = stats.problemsSolved || 0;
-            document.getElementById('total-points-student').textContent = stats.skillRating || 1000;
-            document.getElementById('communities-student').textContent = stats.joinedCommunities || 0;
-            document.getElementById('day-streak-student').textContent = stats.dayStreak || 0;
-
-            // Update skill progress
-            document.getElementById('recent-points-1').textContent = Math.floor((stats.problemsSolved || 0) * 0.6);
-            document.getElementById('recent-points-2').textContent = stats.totalProjects || 0;
-            document.getElementById('recent-points-3').textContent = Math.floor((stats.problemsSolved || 0) * 0.3);
-            document.getElementById('recent-points-4').textContent = Math.floor((stats.problemsSolved || 0) * 0.2);
-
-            // Update goals progress
-            updateGoalsProgress(stats);
-        }
-
-        function updateUserProfile(user) {
-            const firstName = user.displayName ? user.displayName.split(' ')[0] : 'User';
-            document.getElementById('userFirstName').textContent = firstName;
-        }
-
-        function updateGoalsProgress(stats) {
-            // Update algorithms goal (problems solved)
-            const algorithmsProgress = Math.min(100, ((stats.problemsSolved || 0) / 5) * 100);
-            document.getElementById('algorithms-goal').textContent = `${Math.min(5, stats.problemsSolved || 0)}/5`;
-            document.getElementById('algorithms-progress').style.width = `${algorithmsProgress}%`;
-
-            // Update data structures goal (learning)
-            const dataStructuresProgress = Math.min(100, ((stats.totalProjects || 0) / 1) * 100);
-            document.getElementById('data-structures-goal').textContent = `${Math.min(1, stats.totalProjects || 0)}/1`;
-            document.querySelector('[data-progress="dataStructures"]').style.width = `${dataStructuresProgress}%`;
-
-            // Update projects goal (contests)
-            const projectsProgress = Math.min(100, ((stats.totalContests || 0) / 1) * 100);
-            document.getElementById('projects-goal').textContent = `${Math.min(1, stats.totalContests || 0)}/1`;
-            document.querySelector('[data-progress="projects"]').style.width = `${projectsProgress}%`;
-        }
-
-        async function loadRecentActivity() {
-            try {
-                const activityContainer = document.getElementById('recent-activity');
-                const activities = [
-                    {
-                        icon: 'check-circle',
-                        iconColor: 'green',
-                        title: 'Welcome to SkillPort!',
-                        description: 'Start your learning journey • Just now',
-                        bgColor: 'green'
-                    }
-                ];
-
-                // Add more activities based on user data
-                const statsResponse = await window.APIService.getUserStats();
-                if (statsResponse.success && statsResponse.data.problemsSolved > 0) {
-                    activities.unshift({
-                        icon: 'trophy',
-                        iconColor: 'amber',
-                        title: 'Solved Problems',
-                        description: `${statsResponse.data.problemsSolved} problems completed • Today`,
-                        bgColor: 'amber'
-                    });
-                }
-
-                activityContainer.innerHTML = activities.map(activity => `
-                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-${activity.bgColor}-50/50 rounded-xl transition-colors">
-                        <div class="w-10 h-10 bg-${activity.bgColor}-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="${activity.icon}" class="w-5 h-5 text-${activity.iconColor}-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">${activity.title}</h4>
-                            <p class="text-xs text-slate-600">${activity.description}</p>
-                        </div>
-                    </div>
-                `).join('');
-
-                // Recreate icons
-                lucide.createIcons();
-            } catch (error) {
-                console.error('Error loading recent activity:', error);
-            }
-        }
-
-        async function loadUpcomingContests() {
-            try {
-                const contestsResponse = await window.APIService.getContests();
-                const contestsContainer = document.getElementById('upcoming-contests');
-                
-                if (contestsResponse.success && contestsResponse.data.length > 0) {
-                    const contests = contestsResponse.data.slice(0, 2); // Show first 2 contests
-                    
-                    contestsContainer.innerHTML = contests.map(contest => `
-                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                            <div class="flex items-center gap-3 mb-2">
-                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="zap" class="w-4 h-4 text-blue-600"></i>
-                                </div>
-                                <span class="font-semibold text-slate-800 text-sm">${contest.title}</span>
-                            </div>
-                            <p class="text-xs text-slate-600 mb-2">${contest.description}</p>
-                            <div class="flex items-center gap-2 text-xs text-blue-600">
-                                <i data-lucide="clock" class="w-3 h-3"></i>
-                                <span>${new Date(contest.startDate).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                // Recreate icons
-                lucide.createIcons();
-            } catch (error) {
-                console.error('Error loading upcoming contests:', error);
-            }
-        }
-
-        // Initialize dashboard when page loads
+        // Initialize icons when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard page loaded, initializing...');
+            console.log('DOM loaded, initializing icons...');
+            if (typeof lucide !== 'undefined') {
+                try {
+                    lucide.createIcons();
+                    console.log('✅ Lucide icons initialized successfully');
+                    
+                    // Verify icons are rendered
+                    const iconElements = document.querySelectorAll('[data-lucide]');
+                    console.log('📊 Found', iconElements.length, 'icon elements');
+                    
+                    // Check if any icons are actually SVG elements
+                    const svgIcons = document.querySelectorAll('[data-lucide] svg');
+                    console.log('🎨 Rendered SVG icons:', svgIcons.length);
+                    
+                    // If no SVG icons are rendered, show fallback text
+                    if (svgIcons.length === 0) {
+                        console.warn('⚠️ No SVG icons found, showing fallback text');
+                        showIconFallbacks();
+                    }
+                } catch (error) {
+                    console.error('❌ Error initializing Lucide icons:', error);
+                    showIconFallbacks();
+                }
+            } else {
+                console.error('❌ Lucide library not available');
+                showIconFallbacks();
+            }
             
-            // Initialize Lucide icons
-            lucide.createIcons();
-            
-            // Initialize mobile menu
-            initMobileMenu();
-            
-            // Wait a bit for all scripts to load
-            setTimeout(() => {
-                loadDashboardData();
-            }, 100);
+            loadDashboardData();
         });
 
-        // Mobile menu functionality
-        function initMobileMenu() {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    
-                    // Update menu icon
-                    const menuIcon = mobileMenuButton.querySelector('i');
-                    if (mobileMenu.classList.contains('hidden')) {
-                        menuIcon.setAttribute('data-lucide', 'menu');
-                    } else {
-                        menuIcon.setAttribute('data-lucide', 'x');
-                    }
-                    lucide.createIcons();
-                });
+        // Fallback function to show text instead of icons
+        function showIconFallbacks() {
+            const iconMap = {
+                'target': '🎯',
+                'layout-dashboard': '📊',
+                'folder': '📁',
+                'activity': '📈',
+                'bar-chart-3': '📊',
+                'users': '👥',
+                'trophy': '🏆',
+                'star': '⭐',
+                'flame': '🔥',
+                'edit-3': '✏️',
+                'book-open': '📖',
+                'trending-up': '📈',
+                'code': '💻',
+                'globe': '🌐',
+                'layout': '🏗️',
+                'database': '🗄️',
+                'clock': '🕐',
+                'check-circle': '✅',
+                'calendar': '📅',
+                'zap': '⚡',
+                'award': '🏅',
+                'lightbulb': '💡',
+                'book': '📚'
+            };
+
+            const iconElements = document.querySelectorAll('[data-lucide]');
+            iconElements.forEach(element => {
+                const iconName = element.getAttribute('data-lucide');
+                const fallback = iconMap[iconName] || '❓';
+                element.textContent = fallback;
+                element.style.fontSize = '1.2em';
+                element.classList.add('icon-debug');
+            });
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load sample data for development
+                const sampleData = {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'john@example.com',
+                    progress: 75,
+                    skills: ['JavaScript', 'Python', 'React'],
+                    recentActivity: [
+                        { type: 'Problem Solved', title: 'Two Sum', date: '2024-01-15' },
+                        { type: 'Contest Joined', title: 'Weekly Challenge', date: '2024-01-14' },
+                        { type: 'Skill Updated', title: 'React', date: '2024-01-13' }
+                    ]
+                };
+                
+                updateDashboard(sampleData);
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
             }
+        }
+
+        function updateDashboard(userData) {
+            // Update dashboard with user data
+            console.log('Dashboard updated with:', userData);
         }

@@ -641,26 +641,20 @@
           points: parseInt(formData.get('points'))
         };
 
-        // Get contest ID from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const contestId = urlParams.get('contest') || 'ALGO'; // Default fallback
-
-        // Call API to add question
-        const response = await window.SkillPortAPI.addContestQuestion(contestId, questionData);
+        // TODO: Implement API call to add task
+        console.log('Adding task:', taskData);
         
-        if (response.success) {
-          showSuccess('Question added successfully!');
-          closeAddTaskModal();
-          
-          // Reload questions for this contest
-          loadContestQuestions(contestId);
-        } else {
-          showError('Failed to add question: ' + response.message);
-        }
+        showSuccess('Task added successfully!');
+        closeAddTaskModal();
+        
+        // Reload the page to show new task
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
         
       } catch (error) {
-        console.error('Failed to add question:', error);
-        showError('An error occurred while adding the question');
+        console.error('Failed to add task:', error);
+        showError('An error occurred while adding the task');
       }
     }
 

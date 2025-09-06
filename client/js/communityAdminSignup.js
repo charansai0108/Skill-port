@@ -1,51 +1,45 @@
 /**
- * Registration Handler - Firebase Integration
- * Handles user registration using Firebase Authentication
+ * Community Admin Signup Handler - Firebase Integration
+ * Handles community admin registration and community creation
  */
 import firebaseService from './firebaseService.js';
 
-class RegisterHandler {
+class CommunityAdminSignupHandler {
     constructor() {
         this.isSubmitting = false;
         this.init();
     }
 
     init() {
-        console.log('📝 RegisterHandler: Initializing with Firebase...');
-        
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.setupEventListeners());
-        } else {
-            this.setupEventListeners();
-        }
+        console.log('🏢 CommunityAdminSignupHandler: Initializing...');
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
-        const registerForm = document.getElementById('register-form');
-        if (registerForm) {
-            registerForm.addEventListener('submit', (e) => this.handleRegister(e));
+        const signupForm = document.getElementById('community-admin-signup-form');
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
         }
 
         // Add real-time validation
-        const inputs = document.querySelectorAll('#register-form input');
+        const inputs = document.querySelectorAll('#community-admin-signup-form input, #community-admin-signup-form textarea');
         inputs.forEach(input => {
             input.addEventListener('blur', () => this.validateField(input));
         });
     }
 
-    async handleRegister(event) {
+    async handleSignup(event) {
         event.preventDefault();
         
         if (this.isSubmitting) {
-            console.log('📝 RegisterHandler: Already submitting, ignoring...');
+            console.log('🏢 CommunityAdminSignupHandler: Already submitting, ignoring...');
             return;
         }
 
         this.isSubmitting = true;
         
         try {
-            console.log('📝 RegisterHandler: Starting Firebase registration...');
+            console.log('🏢 CommunityAdminSignupHandler: Starting community admin signup...');
             
             const formData = new FormData(event.target);
             const userData = {
@@ -54,13 +48,21 @@ class RegisterHandler {
                 email: formData.get('email'),
                 password: formData.get('password'),
                 confirmPassword: formData.get('confirmPassword'),
-                role: formData.get('role') || 'personal',
-                experience: formData.get('experience') || 'beginner',
+                role: 'community-admin',
+                experience: formData.get('experience') || 'intermediate',
                 skills: formData.get('skills') ? formData.get('skills').split(',').map(s => s.trim()) : []
             };
 
+            const communityData = {
+                name: formData.get('communityName'),
+                code: formData.get('communityCode'),
+                description: formData.get('communityDescription') || '',
+                website: formData.get('communityWebsite') || '',
+                category: formData.get('communityCategory') || 'general'
+            };
+
             // Validate form data
-            const validation = this.validateForm(userData);
+            const validation = this.validateForm(userData, communityData);
             if (!validation.isValid) {
                 this.showError(validation.message);
                 return;
@@ -69,35 +71,48 @@ class RegisterHandler {
             // Show loading state
             this.showLoading(true);
 
-            // Use Firebase registration
-            const response = await firebaseService.register(userData);
+            // Step 1: Register user with Firebase
+            const userResponse = await firebaseService.register(userData);
             
-            if (response.success) {
-                console.log('📝 RegisterHandler: Firebase registration successful');
-                this.showSuccess('Registration successful! Please check your email for verification.');
-                
-                // Redirect to login page after a delay
-                setTimeout(() => {
-                    window.location.href = '../login.html';
-                }, 3000);
-            } else {
-                console.error('📝 RegisterHandler: Firebase registration failed:', response.message);
-                this.showError(response.message || 'Registration failed. Please try again.');
+            if (!userResponse.success) {
+                this.showError(userResponse.message || 'Failed to create admin account');
+                return;
             }
+
+            // Step 2: Create community in Firestore
+            const communityResponse = await firebaseService.createCommunity(communityData);
+            
+            if (!communityResponse.success) {
+                this.showError(communityResponse.message || 'Failed to create community');
+                return;
+            }
+
+            console.log('🏢 CommunityAdminSignupHandler: Community admin signup successful');
+            this.showSuccess('Community and admin account created successfully! Please check your email for verification.');
+            
+            // Redirect to admin dashboard after a delay
+            setTimeout(() => {
+                window.location.href = '/pages/admin/admin-dashboard.html';
+            }, 3000);
             
         } catch (error) {
-            console.error('📝 RegisterHandler: Registration error:', error);
-            this.showError('An error occurred during registration. Please try again.');
+            console.error('🏢 CommunityAdminSignupHandler: Signup error:', error);
+            this.showError('An error occurred during signup. Please try again.');
         } finally {
             this.isSubmitting = false;
             this.showLoading(false);
         }
     }
 
-    validateForm(userData) {
-        // Check required fields
+    validateForm(userData, communityData) {
+        // Validate user data
         if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
-            return { isValid: false, message: 'All fields are required.' };
+            return { isValid: false, message: 'All personal fields are required.' };
+        }
+
+        // Validate community data
+        if (!communityData.name || !communityData.code) {
+            return { isValid: false, message: 'Community name and code are required.' };
         }
 
         // Check email format
@@ -114,6 +129,12 @@ class RegisterHandler {
         // Check password confirmation
         if (userData.password !== userData.confirmPassword) {
             return { isValid: false, message: 'Passwords do not match.' };
+        }
+
+        // Check community code format (alphanumeric, 3-10 characters)
+        const codeRegex = /^[A-Za-z0-9]{3,10}$/;
+        if (!codeRegex.test(communityData.code)) {
+            return { isValid: false, message: 'Community code must be 3-10 alphanumeric characters.' };
         }
 
         return { isValid: true };
@@ -150,20 +171,28 @@ class RegisterHandler {
                     return false;
                 }
                 break;
+
+            case 'communityCode':
+                const codeRegex = /^[A-Za-z0-9]{3,10}$/;
+                if (value && !codeRegex.test(value)) {
+                    field.classList.add('border-red-500');
+                    return false;
+                }
+                break;
         }
 
         return true;
     }
 
     showLoading(show) {
-        const submitBtn = document.querySelector('#register-form button[type="submit"]');
+        const submitBtn = document.querySelector('#community-admin-signup-form button[type="submit"]');
         if (submitBtn) {
             if (show) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Registering...';
+                submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Creating Community...';
             } else {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Create Account';
+                submitBtn.innerHTML = 'Create Community';
             }
         }
     }
@@ -193,5 +222,5 @@ class RegisterHandler {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.registerHandler = new RegisterHandler();
+    window.communityAdminSignupHandler = new CommunityAdminSignupHandler();
 });

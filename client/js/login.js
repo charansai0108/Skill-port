@@ -125,7 +125,7 @@ class LoginHandler {
             
             // Handle specific error types
             if (error.message && error.message.includes('Failed to fetch')) {
-                this.handleLoginError('Backend server not running. Please start the backend server first.');
+                this.handleLoginError('Firebase service not available. Please check your connection.');
             } else if (error.message && error.message.includes('NetworkError')) {
                 this.handleLoginError('Network error. Please check your internet connection.');
             } else {
@@ -139,27 +139,18 @@ class LoginHandler {
 
     async handleLoginSuccess(response) {
         console.log('🔐 LoginHandler: Processing successful Firebase login...');
-        console.log('🔐 LoginHandler: Response data:', response.data);
+        console.log('🔐 LoginHandler: Response data:', response);
         
         try {
             // Firebase handles authentication state automatically
             console.log('🔐 LoginHandler: Firebase authentication successful');
 
-            // Update AuthManager if available
-            if (window.authManager) {
-                console.log('🔐 LoginHandler: Updating AuthManager...');
-                // AuthManager will be updated automatically via Firebase auth state changes
-                console.log('🔐 LoginHandler: AuthManager will be updated via Firebase auth state changes');
-            }
-
             // Show success message
             this.showSuccess('Login successful! Redirecting...');
 
-            // Redirect after a short delay
-            setTimeout(() => {
-                console.log('🔐 LoginHandler: About to redirect by role...');
-                this.redirectByRole(response.data);
-            }, 1000);
+            // Firebase auth state change will handle the redirect automatically
+            // No need for manual redirect here as AuthManager will handle it
+            console.log('🔐 LoginHandler: Firebase auth state change will handle redirect');
             
         } catch (error) {
             console.error('🔐 LoginHandler: Error in handleLoginSuccess:', error);
@@ -201,7 +192,7 @@ class LoginHandler {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
             'student': '/pages/student/user-dashboard.html',
-            'personal': '/pages/personal/index.html'
+            'personal': '/pages/personal/student-dashboard.html'
         };
 
         const redirectUrl = redirectUrls[user.role];
@@ -367,7 +358,7 @@ class LoginHandler {
     // Utility method to clear authentication
     static clearAuth() {
         console.log('🔐 LoginHandler: Clearing authentication...');
-        // Clear local data (cookies are handled by backend)
+        // Clear local data
         localStorage.removeItem('user_data');
         if (window.authManager) {
             window.authManager.currentUser = null;

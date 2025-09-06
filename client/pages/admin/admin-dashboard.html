@@ -550,7 +550,7 @@
 
       async loadDashboardData() {
         try {
-          // Load real analytics data from backend
+          // Load real analytics data from Firebase
           const response = await window.APIService.getAdminAnalytics();
           
           if (response.success) {

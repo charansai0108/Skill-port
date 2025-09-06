@@ -21,7 +21,7 @@ async function routeGuard(targetRoute) {
   }
 
   if (targetRoute.roles && (!user || !targetRoute.roles.includes(user.role))) {
-    window.location.href = '/pages/auth/unauthorized.html';
+    window.location.href = '../auth/unauthorized.html';
     return false;
   }
 

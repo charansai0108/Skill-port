@@ -9,11 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/suppress-warnings.js"></script>
-    <script src="js/config.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/routeGuard.js"></script>
     <script type="module" src="js/firebaseService.js"></script>
-    <script type="module" src="js/firebaseApiService.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
@@ -367,15 +365,29 @@
         
         // Initialize dynamic data loading
         document.addEventListener('DOMContentLoaded', function() {
-            // Load dynamic stats from backend API
+            // Load dynamic stats from Firebase
             loadDynamicStats();
         });
         
         async function loadDynamicStats() {
             try {
                 // Load stats from Firebase
-                const firebaseApiService = await import('./js/firebaseApiService.js');
-                const response = await firebaseApiService.default.getAnalytics();
+                const firebaseService = await import('./js/firebaseService.js');
+                const [communities, contests, submissions] = await Promise.all([
+                    firebaseService.default.getCommunities(),
+                    firebaseService.default.getContests(),
+                    firebaseService.default.getSubmissions()
+                ]);
+                
+                const response = {
+                    success: true,
+                    data: {
+                        totalCommunities: communities.success ? communities.data.length : 0,
+                        totalContests: contests.success ? contests.data.length : 0,
+                        totalSubmissions: submissions.success ? submissions.data.length : 0,
+                        totalUsers: 1
+                    }
+                };
                 
                 if (response.success) {
                     const data = response.data;

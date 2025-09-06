@@ -1,7 +1,9 @@
 /**
- * Personal Dashboard Controller
- * Handles personal dashboard functionality for individual users
+ * Personal Dashboard Controller - Firebase Integration
+ * Handles personal dashboard functionality using Firebase Firestore
  */
+import firebaseService from './firebaseService.js';
+
 class PersonalDashboardController extends PageController {
     constructor() {
         super();
@@ -9,10 +11,11 @@ class PersonalDashboardController extends PageController {
         this.recentActivity = [];
         this.goals = [];
         this.achievements = [];
+        this.codingPlatforms = [];
     }
 
     async init() {
-        console.log('🎯 PersonalDashboardController: Initializing...');
+        console.log('🎯 PersonalDashboardController: Initializing with Firebase...');
         
         // Wait for AuthManager to be available
         let retries = 0;
@@ -60,6 +63,9 @@ class PersonalDashboardController extends PageController {
             // Load achievements
             await this.loadAchievements();
             
+            // Load coding platforms
+            await this.loadCodingPlatforms();
+            
             this.hideLoading();
         } catch (error) {
             console.error('🎯 PersonalDashboardController: Error loading dashboard data:', error);
@@ -69,10 +75,19 @@ class PersonalDashboardController extends PageController {
 
     async loadUserStats() {
         try {
-            const response = await window.APIService.getUserProfile();
-            if (response.success) {
-                // Handle different response formats from different endpoints
-                this.userStats = response.data.user || response.data;
+            // Get user data from Firebase Auth and Firestore
+            const currentUser = firebaseService.getCurrentUser();
+            if (currentUser) {
+                this.userStats = {
+                    firstName: currentUser.firstName || currentUser.displayName?.split(' ')[0] || 'User',
+                    lastName: currentUser.lastName || currentUser.displayName?.split(' ')[1] || '',
+                    email: currentUser.email,
+                    totalPoints: currentUser.totalPoints || 0,
+                    streak: currentUser.streak || 0,
+                    problemsSolved: currentUser.problemsSolved || 0,
+                    skillRating: currentUser.skillRating || 0,
+                    communities: currentUser.communities || 0
+                };
                 this.renderUserStats();
             }
         } catch (error) {
@@ -82,9 +97,14 @@ class PersonalDashboardController extends PageController {
 
     async loadRecentActivity() {
         try {
-            const response = await window.APIService.getUserProgress();
+            // Load recent activity from Firestore
+            const response = await firebaseService.getTasks();
             if (response.success) {
-                this.recentActivity = response.data.progress || [];
+                this.recentActivity = response.data.slice(0, 5).map(task => ({
+                    type: task.title || 'Task Completed',
+                    createdAt: task.createdAt?.toDate() || new Date(),
+                    description: task.description || ''
+                }));
                 this.renderRecentActivity();
             }
         } catch (error) {
@@ -94,11 +114,30 @@ class PersonalDashboardController extends PageController {
 
     async loadGoals() {
         try {
-            // Mock goals data - in real implementation, this would come from API
+            // Load goals from Firestore or use default goals
+            const currentUser = firebaseService.getCurrentUser();
             this.goals = [
-                { id: 1, title: 'Solve 50 LeetCode problems', progress: 35, target: 50, type: 'leetcode' },
-                { id: 2, title: 'Complete 10 HackerRank challenges', progress: 7, target: 10, type: 'hackerrank' },
-                { id: 3, title: 'Master 5 data structures', progress: 3, target: 5, type: 'learning' }
+                { 
+                    id: 1, 
+                    title: 'Solve 50 LeetCode problems', 
+                    progress: currentUser?.leetcodeProblems || 0, 
+                    target: 50, 
+                    type: 'leetcode' 
+                },
+                { 
+                    id: 2, 
+                    title: 'Complete 10 HackerRank challenges', 
+                    progress: currentUser?.hackerrankProblems || 0, 
+                    target: 10, 
+                    type: 'hackerrank' 
+                },
+                { 
+                    id: 3, 
+                    title: 'Master 5 data structures', 
+                    progress: currentUser?.dataStructuresLearned || 0, 
+                    target: 5, 
+                    type: 'learning' 
+                }
             ];
             this.renderGoals();
         } catch (error) {
@@ -108,15 +147,74 @@ class PersonalDashboardController extends PageController {
 
     async loadAchievements() {
         try {
-            // Mock achievements data
+            // Load achievements from Firestore or use default achievements
+            const currentUser = firebaseService.getCurrentUser();
             this.achievements = [
-                { id: 1, title: 'First Problem Solved', description: 'Solved your first coding problem', icon: 'trophy', earned: true },
-                { id: 2, title: 'Week Streak', description: 'Solved problems for 7 consecutive days', icon: 'flame', earned: true },
-                { id: 3, title: 'Algorithm Master', description: 'Solved 100 algorithm problems', icon: 'brain', earned: false }
+                { 
+                    id: 1, 
+                    title: 'First Problem Solved', 
+                    description: 'Solved your first coding problem', 
+                    icon: 'trophy', 
+                    earned: (currentUser?.problemsSolved || 0) > 0 
+                },
+                { 
+                    id: 2, 
+                    title: 'Week Streak', 
+                    description: 'Solved problems for 7 consecutive days', 
+                    icon: 'flame', 
+                    earned: (currentUser?.streak || 0) >= 7 
+                },
+                { 
+                    id: 3, 
+                    title: 'Algorithm Master', 
+                    description: 'Solved 100 algorithm problems', 
+                    icon: 'brain', 
+                    earned: (currentUser?.problemsSolved || 0) >= 100 
+                }
             ];
             this.renderAchievements();
         } catch (error) {
             console.error('🎯 PersonalDashboardController: Error loading achievements:', error);
+        }
+    }
+
+    async loadCodingPlatforms() {
+        try {
+            // Load coding platform progress from Firestore
+            const currentUser = firebaseService.getCurrentUser();
+            this.codingPlatforms = [
+                {
+                    name: 'LeetCode',
+                    easy: currentUser?.leetcodeEasy || 0,
+                    medium: currentUser?.leetcodeMedium || 0,
+                    hard: currentUser?.leetcodeHard || 0,
+                    total: (currentUser?.leetcodeEasy || 0) + (currentUser?.leetcodeMedium || 0) + (currentUser?.leetcodeHard || 0)
+                },
+                {
+                    name: 'GeeksforGeeks',
+                    easy: currentUser?.gfgEasy || 0,
+                    medium: currentUser?.gfgMedium || 0,
+                    hard: currentUser?.gfgHard || 0,
+                    total: (currentUser?.gfgEasy || 0) + (currentUser?.gfgMedium || 0) + (currentUser?.gfgHard || 0)
+                },
+                {
+                    name: 'HackerRank',
+                    easy: currentUser?.hackerrankEasy || 0,
+                    medium: currentUser?.hackerrankMedium || 0,
+                    hard: currentUser?.hackerrankHard || 0,
+                    total: (currentUser?.hackerrankEasy || 0) + (currentUser?.hackerrankMedium || 0) + (currentUser?.hackerrankHard || 0)
+                },
+                {
+                    name: 'InterviewBit',
+                    easy: currentUser?.interviewbitEasy || 0,
+                    medium: currentUser?.interviewbitMedium || 0,
+                    hard: currentUser?.interviewbitHard || 0,
+                    total: (currentUser?.interviewbitEasy || 0) + (currentUser?.interviewbitMedium || 0) + (currentUser?.interviewbitHard || 0)
+                }
+            ];
+            this.renderCodingPlatforms();
+        } catch (error) {
+            console.error('🎯 PersonalDashboardController: Error loading coding platforms:', error);
         }
     }
 
@@ -222,6 +320,71 @@ class PersonalDashboardController extends PageController {
         `).join('');
 
         lucide.createIcons();
+    }
+
+    renderCodingPlatforms() {
+        // Update the coding platforms section with dynamic data
+        const platforms = this.codingPlatforms || [];
+        
+        // Update LeetCode card
+        const leetcodeCard = document.querySelector('[data-platform="leetcode"]');
+        if (leetcodeCard && platforms[0]) {
+            const leetcode = platforms[0];
+            const easySpan = leetcodeCard.querySelector('[data-difficulty="easy"]');
+            const mediumSpan = leetcodeCard.querySelector('[data-difficulty="medium"]');
+            const hardSpan = leetcodeCard.querySelector('[data-difficulty="hard"]');
+            const totalSpan = leetcodeCard.querySelector('[data-total]');
+            
+            if (easySpan) easySpan.textContent = leetcode.easy;
+            if (mediumSpan) mediumSpan.textContent = leetcode.medium;
+            if (hardSpan) hardSpan.textContent = leetcode.hard;
+            if (totalSpan) totalSpan.textContent = leetcode.total;
+        }
+        
+        // Update GeeksforGeeks card
+        const gfgCard = document.querySelector('[data-platform="gfg"]');
+        if (gfgCard && platforms[1]) {
+            const gfg = platforms[1];
+            const easySpan = gfgCard.querySelector('[data-difficulty="easy"]');
+            const mediumSpan = gfgCard.querySelector('[data-difficulty="medium"]');
+            const hardSpan = gfgCard.querySelector('[data-difficulty="hard"]');
+            const totalSpan = gfgCard.querySelector('[data-total]');
+            
+            if (easySpan) easySpan.textContent = gfg.easy;
+            if (mediumSpan) mediumSpan.textContent = gfg.medium;
+            if (hardSpan) hardSpan.textContent = gfg.hard;
+            if (totalSpan) totalSpan.textContent = gfg.total;
+        }
+        
+        // Update HackerRank card
+        const hackerrankCard = document.querySelector('[data-platform="hackerrank"]');
+        if (hackerrankCard && platforms[2]) {
+            const hackerrank = platforms[2];
+            const easySpan = hackerrankCard.querySelector('[data-difficulty="easy"]');
+            const mediumSpan = hackerrankCard.querySelector('[data-difficulty="medium"]');
+            const hardSpan = hackerrankCard.querySelector('[data-difficulty="hard"]');
+            const totalSpan = hackerrankCard.querySelector('[data-total]');
+            
+            if (easySpan) easySpan.textContent = hackerrank.easy;
+            if (mediumSpan) mediumSpan.textContent = hackerrank.medium;
+            if (hardSpan) hardSpan.textContent = hackerrank.hard;
+            if (totalSpan) totalSpan.textContent = hackerrank.total;
+        }
+        
+        // Update InterviewBit card
+        const interviewbitCard = document.querySelector('[data-platform="interviewbit"]');
+        if (interviewbitCard && platforms[3]) {
+            const interviewbit = platforms[3];
+            const easySpan = interviewbitCard.querySelector('[data-difficulty="easy"]');
+            const mediumSpan = interviewbitCard.querySelector('[data-difficulty="medium"]');
+            const hardSpan = interviewbitCard.querySelector('[data-difficulty="hard"]');
+            const totalSpan = interviewbitCard.querySelector('[data-total]');
+            
+            if (easySpan) easySpan.textContent = interviewbit.easy;
+            if (mediumSpan) mediumSpan.textContent = interviewbit.medium;
+            if (hardSpan) hardSpan.textContent = interviewbit.hard;
+            if (totalSpan) totalSpan.textContent = interviewbit.total;
+        }
     }
 
     setupEventListeners() {

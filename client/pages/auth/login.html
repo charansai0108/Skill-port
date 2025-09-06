@@ -10,10 +10,9 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="../../js/bootstrap.js"></script>
     <script src="../../js/routeGuard.js"></script>
-    <script src="../../js/apiService.js"></script>
+    <script type="module" src="../../js/apiService.js"></script>
     <script src="../../js/notifications.js"></script>
     <script type="module" src="../../js/firebaseService.js"></script>
-    <script type="module" src="../../js/firebaseApiService.js"></script>
     <script type="module" src="../../js/authManager.js"></script>
     <style>
         body { 
@@ -287,7 +286,7 @@
                     
                     // Redirect based on role
                     const user = response.user;
-                    let redirectUrl = '/pages/personal/index.html'; // Default
+                    let redirectUrl = '/pages/personal/student-dashboard.html'; // Default
                     
                     if (user.role === 'community-admin') {
                         redirectUrl = '/pages/admin/admin-dashboard.html';

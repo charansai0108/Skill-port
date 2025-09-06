@@ -89,7 +89,8 @@ class ContextManager {
             console.log('🎯 ContextManager: Loading community data for:', this.communityId);
             
             // Load community summary data
-            const summaryResponse = await window.APIService.getCommunitySummary(this.communityId);
+            const firebaseService = await import('./firebaseService.js');
+            const summaryResponse = await firebaseService.default.getCommunitySummary(this.communityId);
             if (summaryResponse.success) {
                 this.communityData = {
                     ...this.communityData,
@@ -98,7 +99,7 @@ class ContextManager {
             }
             
             // Load community insights
-            const insightsResponse = await window.APIService.getCommunityInsights(this.communityId);
+            const insightsResponse = await firebaseService.default.getCommunityInsights(this.communityId);
             if (insightsResponse.success) {
                 this.communityData = {
                     ...this.communityData,
@@ -159,7 +160,7 @@ class ContextManager {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
             'student': '/pages/student/user-dashboard.html',
-            'personal': '/pages/personal/index.html'
+            'personal': '/pages/personal/student-dashboard.html'
         };
         
         return rolePaths[this.userRole] || '/pages/auth/login.html';

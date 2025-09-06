@@ -1,6 +1,6 @@
 /**
  * Dynamic Data Loader
- * Handles loading and caching of dynamic data from backend APIs
+ * Handles loading and caching of dynamic data from Firebase
  */
 
 class DataLoader {
@@ -83,7 +83,10 @@ class DataLoader {
 
         return this.getData(
             `community-summary-${communityId}`,
-            () => window.APIService.getCommunitySummary(communityId),
+            async () => {
+                const firebaseService = await import('./firebaseService.js');
+                return await firebaseService.default.getCommunitySummary(communityId);
+            },
             forceRefresh
         );
     }
@@ -97,7 +100,10 @@ class DataLoader {
 
         return this.getData(
             `community-insights-${communityId}`,
-            () => window.APIService.getCommunityInsights(communityId),
+            async () => {
+                const firebaseService = await import('./firebaseService.js');
+                return await firebaseService.default.getCommunityInsights(communityId);
+            },
             forceRefresh
         );
     }
@@ -111,7 +117,10 @@ class DataLoader {
 
         return this.getData(
             `recent-activity-${communityId}`,
-            () => window.APIService.getRecentActivity(communityId),
+            async () => {
+                const firebaseService = await import('./firebaseService.js');
+                return await firebaseService.default.getRecentActivity(communityId);
+            },
             forceRefresh
         );
     }

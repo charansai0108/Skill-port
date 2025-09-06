@@ -206,12 +206,19 @@ class FirebaseService {
                 const userData = userDoc.data();
                 console.log('🔍 FirebaseService: User data from Firestore:', userData);
                 
+                // Merge Firestore data with Firebase Auth user data
                 this.currentUser = {
                     ...this.currentUser,
-                    ...userData
+                    ...userData,
+                    // Ensure Firebase Auth properties are preserved
+                    uid: this.currentUser.uid,
+                    email: this.currentUser.email,
+                    displayName: this.currentUser.displayName,
+                    emailVerified: this.currentUser.emailVerified
                 };
                 
                 console.log('🔍 FirebaseService: Updated currentUser:', this.currentUser);
+                console.log('🔍 FirebaseService: User role after merge:', this.currentUser.role);
                 return userData;
             } else {
                 console.log('🔍 FirebaseService: No user document found for UID:', uid);
@@ -464,6 +471,144 @@ class FirebaseService {
         }
     }
 
+    // Get feedback requests
+    async getFeedbackRequests() {
+        try {
+            if (!this.isUserAuthenticated()) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const feedbackQuery = query(
+                collection(db, 'feedbackRequests'),
+                where('mentorId', '==', this.currentUser.uid),
+                orderBy('createdAt', 'desc')
+            );
+
+            const querySnapshot = await getDocs(feedbackQuery);
+            const feedbackRequests = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            return {
+                success: true,
+                data: feedbackRequests
+            };
+        } catch (error) {
+            console.error('Error getting feedback requests:', error);
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Community Analytics
+    async getCommunitySummary(communityId) {
+        try {
+            const communityDoc = await getDoc(doc(db, 'communities', communityId));
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            const communityData = communityDoc.data();
+            
+            // Get member count
+            const membersQuery = query(
+                collection(db, 'users'),
+                where('communityId', '==', communityId)
+            );
+            const membersSnapshot = await getDocs(membersQuery);
+            
+            // Get contest count
+            const contestsQuery = query(
+                collection(db, 'contests'),
+                where('communityId', '==', communityId)
+            );
+            const contestsSnapshot = await getDocs(contestsQuery);
+
+            return {
+                success: true,
+                data: {
+                    ...communityData,
+                    memberCount: membersSnapshot.size,
+                    contestCount: contestsSnapshot.size,
+                    id: communityDoc.id
+                }
+            };
+        } catch (error) {
+            console.error('Error getting community summary:', error);
+            return { success: false, message: error.message };
+        }
+    }
+
+    async getCommunityInsights(communityId) {
+        try {
+            // Get community data
+            const communityDoc = await getDoc(doc(db, 'communities', communityId));
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            // Get member statistics
+            const membersQuery = query(
+                collection(db, 'users'),
+                where('communityId', '==', communityId)
+            );
+            const membersSnapshot = await getDocs(membersQuery);
+            const members = membersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            // Get contest statistics
+            const contestsQuery = query(
+                collection(db, 'contests'),
+                where('communityId', '==', communityId)
+            );
+            const contestsSnapshot = await getDocs(contestsQuery);
+            const contests = contestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            // Calculate insights
+            const roleStats = members.reduce((acc, member) => {
+                acc[member.role] = (acc[member.role] || 0) + 1;
+                return acc;
+            }, {});
+
+            const activeContests = contests.filter(contest => contest.status === 'active').length;
+
+            return {
+                success: true,
+                data: {
+                    totalMembers: members.length,
+                    roleStats,
+                    totalContests: contests.length,
+                    activeContests,
+                    recentActivity: members.slice(0, 5) // Last 5 members
+                }
+            };
+        } catch (error) {
+            console.error('Error getting community insights:', error);
+            return { success: false, message: error.message };
+        }
+    }
+
+    async getRecentActivity(communityId) {
+        try {
+            // Get recent submissions
+            const submissionsQuery = query(
+                collection(db, 'submissions'),
+                where('communityId', '==', communityId),
+                orderBy('createdAt', 'desc'),
+                limit(10)
+            );
+            const submissionsSnapshot = await getDocs(submissionsQuery);
+            const submissions = submissionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            return {
+                success: true,
+                data: submissions
+            };
+        } catch (error) {
+            console.error('Error getting recent activity:', error);
+            return { success: false, message: error.message };
+        }
+    }
+
     async updateTask(taskId, taskData) {
         try {
             if (!this.isUserAuthenticated()) {
@@ -536,6 +681,240 @@ class FirebaseService {
         }
     }
 
+    // Community Management (Enhanced)
+    async getCommunityMembers(communityId) {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const communityDoc = await getDoc(doc(db, COLLECTIONS.COMMUNITIES, communityId));
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            const communityData = communityDoc.data();
+            const memberIds = communityData.members || [];
+            
+            // Get user details for each member
+            const memberPromises = memberIds.map(memberId => 
+                getDoc(doc(db, COLLECTIONS.USERS, memberId))
+            );
+            
+            const memberDocs = await Promise.all(memberPromises);
+            const members = memberDocs
+                .filter(doc => doc.exists())
+                .map(doc => ({ id: doc.id, ...doc.data() }));
+
+            return { success: true, data: members };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async addUserToCommunity(userId, communityId, role = 'student') {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const communityRef = doc(db, COLLECTIONS.COMMUNITIES, communityId);
+            const communityDoc = await getDoc(communityRef);
+            
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            const communityData = communityDoc.data();
+            const updatedMembers = [...(communityData.members || []), userId];
+            
+            const updateData = {
+                members: updatedMembers,
+                updatedAt: serverTimestamp()
+            };
+
+            // Add to role-specific array
+            if (role === 'mentor') {
+                updateData.mentors = [...(communityData.mentors || []), userId];
+            } else if (role === 'student') {
+                updateData.students = [...(communityData.students || []), userId];
+            }
+
+            await updateDoc(communityRef, updateData);
+
+            // Update user's community and role
+            await this.updateUserProfile({ 
+                community: communityId,
+                role: role
+            });
+
+            return { success: true, message: 'User added to community successfully' };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async removeUserFromCommunity(userId, communityId) {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const communityRef = doc(db, COLLECTIONS.COMMUNITIES, communityId);
+            const communityDoc = await getDoc(communityRef);
+            
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            const communityData = communityDoc.data();
+            const updatedMembers = (communityData.members || []).filter(id => id !== userId);
+            const updatedMentors = (communityData.mentors || []).filter(id => id !== userId);
+            const updatedStudents = (communityData.students || []).filter(id => id !== userId);
+            
+            await updateDoc(communityRef, {
+                members: updatedMembers,
+                mentors: updatedMentors,
+                students: updatedStudents,
+                updatedAt: serverTimestamp()
+            });
+
+            return { success: true, message: 'User removed from community successfully' };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // User Management
+    async getAllUsers() {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const querySnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+            const users = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            
+            return { success: true, data: users };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async getUserById(userId) {
+        try {
+            const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, userId));
+            if (userDoc.exists()) {
+                return { 
+                    success: true, 
+                    data: { id: userDoc.id, ...userDoc.data() } 
+                };
+            } else {
+                return { success: false, message: 'User not found' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async updateUserRole(userId, newRole) {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            await updateDoc(doc(db, COLLECTIONS.USERS, userId), {
+                role: newRole,
+                updatedAt: serverTimestamp()
+            });
+
+            return { success: true, message: 'User role updated successfully' };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async deleteUser(userId) {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            await deleteDoc(doc(db, COLLECTIONS.USERS, userId));
+            return { success: true, message: 'User deleted successfully' };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Analytics and Statistics
+    async getCommunityStats(communityId) {
+        try {
+            if (!this.isAuthenticated) {
+                return { success: false, message: 'User not authenticated' };
+            }
+
+            const communityDoc = await getDoc(doc(db, COLLECTIONS.COMMUNITIES, communityId));
+            if (!communityDoc.exists()) {
+                return { success: false, message: 'Community not found' };
+            }
+
+            const communityData = communityDoc.data();
+            const memberCount = (communityData.members || []).length;
+            const mentorCount = (communityData.mentors || []).length;
+            const studentCount = (communityData.students || []).length;
+            const contestCount = (communityData.contests || []).length;
+
+            return {
+                success: true,
+                data: {
+                    memberCount,
+                    mentorCount,
+                    studentCount,
+                    contestCount,
+                    createdAt: communityData.createdAt
+                }
+            };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    async getUserStats(userId) {
+        try {
+            const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, userId));
+            if (!userDoc.exists()) {
+                return { success: false, message: 'User not found' };
+            }
+
+            const userData = userDoc.data();
+            
+            // Get user's submissions
+            const submissionsQuery = query(
+                collection(db, COLLECTIONS.SUBMISSIONS),
+                where('userId', '==', userId)
+            );
+            const submissionsSnapshot = await getDocs(submissionsQuery);
+            const submissionCount = submissionsSnapshot.size;
+
+            return {
+                success: true,
+                data: {
+                    ...userData,
+                    submissionCount,
+                    problemsSolved: userData.problemsSolved || 0,
+                    totalPoints: userData.totalPoints || 0,
+                    streak: userData.streak || 0
+                }
+            };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
     // Utility Methods
     getErrorMessage(error) {
         const errorMessages = {
@@ -557,7 +936,18 @@ class FirebaseService {
 
     // Getters
     getCurrentUser() {
-        return this.currentUser;
+        if (!this.currentUser) {
+            return null;
+        }
+        
+        // Ensure role is set, default to 'personal' if not found
+        if (!this.currentUser.role) {
+            console.warn('🔍 FirebaseService: User role not found, defaulting to personal');
+            this.currentUser.role = 'personal';
+        }
+        
+        // Return a copy to prevent external modification
+        return { ...this.currentUser };
     }
 
     isUserAuthenticated() {

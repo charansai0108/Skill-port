@@ -1,6 +1,6 @@
 /**
  * Dynamic Admin Dashboard Controller
- * Fetches real data from backend APIs and renders dynamic content
+ * Fetches real data from Firebase and renders dynamic content
  */
 
 class DynamicAdminDashboard extends PageController {
@@ -187,28 +187,28 @@ class DynamicAdminDashboard extends PageController {
 
     // Render alerts and notifications
     renderAlertsAndNotifications() {
-        // This would render real alert data from the backend
+        // This would render real alert data from Firebase
         console.log('📊 Dynamic Dashboard: Rendering alerts and notifications...');
         // Implementation would go here
     }
 
     // Render contest management
     renderContestManagement() {
-        // This would render real contest data from the backend
+        // This would render real contest data from Firebase
         console.log('📊 Dynamic Dashboard: Rendering contest management...');
         // Implementation would go here
     }
 
     // Render performance metrics
     renderPerformanceMetrics() {
-        // This would render real performance data from the backend
+        // This would render real performance data from Firebase
         console.log('📊 Dynamic Dashboard: Rendering performance metrics...');
         // Implementation would go here
     }
 
     // Render community health
     renderCommunityHealth() {
-        // This would render real community health data from the backend
+        // This would render real community health data from Firebase
         console.log('📊 Dynamic Dashboard: Rendering community health...');
         // Implementation would go here
     }
