@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Community = require('../models/Community');
-const emailService = require('../services/emailService');
+const { sendOTPEmail, sendMentorWelcomeEmail, sendStudentInvitationEmail } = require('../utils/mailer');
 const logger = require('../config/logger');
 const crypto = require('crypto');
 
@@ -75,21 +75,17 @@ exports.register = async (req, res, next) => {
     }
 
     // Generate OTP
-    const otp = crypto.randomInt(100000, 999999).toString();
-    const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const otp = user.generateOTP();
+    await user.save({ validateBeforeSave: false });
 
-    user.otp = otp;
-    user.otpExpire = otpExpire;
-    await user.save();
-
-    // Send OTP email
-    try {
-      await emailService.sendOTPEmail(email, otp, firstName);
-      logger.info(`OTP sent to ${email} for user ${user._id}`);
-    } catch (emailError) {
-      logger.error('Email sending failed:', emailError);
-      // Continue with registration even if email fails
-    }
+        // Send OTP email
+        try {
+            await sendOTPEmail(email, otp, firstName);
+            logger.info(`OTP sent to ${email} for user ${user._id}`);
+        } catch (emailError) {
+            logger.error('Email sending failed:', emailError);
+            // Continue with registration even if email fails
+        }
 
     res.status(201).json({
       success: true,
@@ -290,4 +286,118 @@ exports.logout = async (req, res, next) => {
     success: true,
     message: 'Logged out successfully'
   });
+};
+
+// @desc    Join community
+// @route   POST /api/v1/auth/join-community
+// @access  Public
+exports.joinCommunity = async (req, res) => {
+  try {
+    const { email, password, communityId } = req.body;
+
+    // Check if user exists and is a student in the community
+    const user = await User.findOne({ 
+      email, 
+      role: 'student',
+      community: communityId 
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email not found in this community' 
+      });
+    }
+
+    // Set password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.isEmailVerified = true;
+    user.status = 'active';
+    await user.save();
+
+    // Generate tokens
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE || '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: process.env.JWT_REFRESH_EXPIRE || '7d' }
+    );
+
+    // Set cookies
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000 // 1 hour
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Successfully joined community',
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        community: user.community
+      }
+    });
+  } catch (error) {
+    logger.error('Join community error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during community join' 
+    });
+  }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/v1/auth/resend-otp
+// @access  Public
+exports.resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+
+    // Send OTP email
+    await sendOTPEmail(email, otp);
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP resent successfully'
+    });
+  } catch (error) {
+    logger.error('Resend OTP error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during OTP resend' 
+    });
+  }
 };

@@ -2,15 +2,14 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
-const SessionService = require('../services/sessionService');
 
-// Protect routes - authenticate user using database sessions
+// Protect routes - authenticate user using JWT
 exports.protect = asyncHandler(async (req, res, next) => {
     let token;
 
-    // Check for token in cookies first (primary method)
-    if (req.cookies && req.cookies.token) {
-        token = req.cookies.token;
+    // Check for access token in cookies (primary method)
+    if (req.cookies && req.cookies.accessToken) {
+        token = req.cookies.accessToken;
     }
     // Check for token in headers (fallback for API calls)
     else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -23,11 +22,14 @@ exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        // Verify session in database
-        const user = await SessionService.verifySession(token);
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Get user from database
+        const user = await User.findById(decoded.id).select('-password');
 
         if (!user) {
-            return next(new ErrorResponse('Invalid or expired session', 401));
+            return next(new ErrorResponse('User not found', 401));
         }
 
         // Check if user is active
@@ -44,7 +46,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        console.error('🔐 Auth Middleware: Session verification error:', err);
+        console.error('🔐 Auth Middleware: JWT verification error:', err);
         return next(new ErrorResponse('Not authorized to access this route', 401));
     }
 });

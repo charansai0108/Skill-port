@@ -5,7 +5,7 @@
     <title>Redirecting...</title>
     <script>
         // Redirect to the correct URL with .html extension
-        window.location.replace('/skillport-personal/student-dashboard.html');
+        window.location.replace('/pages/personal/student-dashboard.html');
     </script>
 </head>
 <body>

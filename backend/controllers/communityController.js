@@ -1,7 +1,8 @@
+const mongoose = require('mongoose');
 const Community = require('../models/Community');
 const User = require('../models/User');
 const Contest = require('../models/Contest');
-const emailService = require('../services/emailService');
+const { sendOTPEmail, sendMentorWelcomeEmail, sendStudentInvitationEmail } = require('../utils/mailer');
 const logger = require('../config/logger');
 
 // @desc    Get all communities
@@ -114,7 +115,7 @@ exports.addMentor = async (req, res, next) => {
     // Send welcome email to mentor
     try {
       const loginUrl = `${process.env.FRONTEND_URL}/pages/auth/login.html`;
-      await emailService.sendMentorWelcomeEmail(mentor.email, mentor.firstName, loginUrl, password);
+      await sendMentorWelcomeEmail(mentor.email, mentor.firstName, loginUrl, password);
     } catch (emailError) {
       logger.error('Mentor welcome email failed:', emailError);
     }
@@ -164,8 +165,8 @@ exports.addStudent = async (req, res, next) => {
 
     // Send invitation email to student
     try {
-      const joinUrl = `${process.env.FRONTEND_URL}/skillport-personal/communities.html?action=join&email=${encodeURIComponent(email)}&communityCode=${community.code}`;
-      await emailService.sendStudentInvitationEmail(student.email, student.firstName, community.name, joinUrl);
+      const joinUrl = `${process.env.FRONTEND_URL}/pages/personal/communities.html?action=join&email=${encodeURIComponent(email)}&communityCode=${community.code}`;
+      await sendStudentInvitationEmail(student.email, student.firstName, community.name, joinUrl);
     } catch (emailError) {
       logger.error('Student invitation email failed:', emailError);
     }
@@ -214,5 +215,53 @@ exports.getCommunityStats = async (req, res, next) => {
   } catch (error) {
     logger.error('Get community stats error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// @desc    Check if email exists in community
+// @route   POST /api/v1/communities/:id/check-email
+// @access  Public
+exports.checkEmailInCommunity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.body;
+
+    // Check if community exists
+    const community = await Community.findById(id);
+    if (!community) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Community not found' 
+      });
+    }
+
+    // Check if user exists with this email in this community
+    const user = await User.findOne({ 
+      email, 
+      community: id 
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email not found in this community' 
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Email found in community',
+      userType: user.role,
+      community: {
+        _id: community._id,
+        name: community.name
+      }
+    });
+  } catch (error) {
+    logger.error('Check email in community error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error' 
+    });
   }
 };

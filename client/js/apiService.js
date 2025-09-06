@@ -5,7 +5,7 @@
 
 class APIService {
     constructor() {
-        this.baseURL = 'http://localhost:5001/api/v1';
+        this.baseURL = window.Config ? window.Config.apiBaseURL : 'http://localhost:5001/api/v1';
         this.timeout = 10000; // 10 seconds
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 1 second
@@ -16,7 +16,7 @@ class APIService {
     async init() {
         // Get CSRF token on initialization
         try {
-            const response = await fetch('http://localhost:5001/api/csrf-token', {
+            const response = await fetch(window.Config ? window.Config.csrfTokenURL : 'http://localhost:5001/api/csrf-token', {
                 credentials: 'include'
             });
             const data = await response.json();
@@ -31,7 +31,7 @@ class APIService {
     // Refresh CSRF token
     async refreshCSRFToken() {
         try {
-            const response = await fetch('http://localhost:5001/api/csrf-token', {
+            const response = await fetch(window.Config ? window.Config.csrfTokenURL : 'http://localhost:5001/api/csrf-token', {
                 credentials: 'include'
             });
             const data = await response.json();
@@ -193,7 +193,7 @@ class APIService {
     }
 
     async getUserProfile() {
-        return this.get('/users/profile');
+        return this.get('/auth/me');
     }
 
     // Community endpoints
@@ -627,7 +627,7 @@ class APIService {
     // Health check
     async healthCheck() {
         try {
-            const response = await fetch('http://localhost:5001/health');
+            const response = await fetch(window.Config ? window.Config.healthCheckURL : 'http://localhost:5001/health');
             const data = await response.json();
             return data;
         } catch (error) {
@@ -638,7 +638,7 @@ class APIService {
     // Get server status
     async getServerStatus() {
         try {
-            const response = await fetch('http://localhost:5001/api/v1/health');
+            const response = await fetch(window.Config ? window.Config.getApiHealthURL() : 'http://localhost:5001/api/v1/health');
             const data = await response.json();
             return data;
         } catch (error) {

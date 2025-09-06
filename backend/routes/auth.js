@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const asyncHandler = require('../middleware/async');
-const requireAuth = require('../middleware/authMiddleware');
+const { protect: requireAuth } = require('../middleware/auth');
 const ErrorResponse = require('../utils/errorResponse');
 const authController = require('../controllers/authController');
 
@@ -79,5 +79,17 @@ router.post('/refresh', authController.refreshToken);
 // @route   POST /api/v1/auth/logout
 // @access  Private
 router.post('/logout', requireAuth, authController.logout);
+
+// Join community endpoint
+router.post('/join-community', [
+    body('email').isEmail().normalizeEmail(),
+    body('password').isLength({ min: 6 }),
+    body('communityId').isMongoId()
+], asyncHandler(authController.joinCommunity));
+
+// Resend OTP endpoint
+router.post('/resend-otp', [
+    body('email').isEmail().normalizeEmail()
+], asyncHandler(authController.resendOTP));
 
 module.exports = router;

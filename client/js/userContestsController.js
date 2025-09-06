@@ -270,7 +270,7 @@ class UserContestsController extends PageController {
         
         try {
             // Redirect to contest page
-            window.location.href = `/pages/user/contest-participation.html?id=${contestId}`;
+            window.location.href = `/pages/community/contest-participation.html?id=${contestId}`;
             
         } catch (error) {
             console.error('🏆 User Contests Controller: Error entering contest:', error);
@@ -283,7 +283,7 @@ class UserContestsController extends PageController {
         
         try {
             // Redirect to contest details page
-            window.location.href = `/pages/user/contest-details.html?id=${contestId}`;
+            window.location.href = `/pages/community/contest-details.html?id=${contestId}`;
             
         } catch (error) {
             console.error('🏆 User Contests Controller: Error viewing contest:', error);
@@ -296,7 +296,7 @@ class UserContestsController extends PageController {
         
         try {
             // Redirect to contest results page
-            window.location.href = `/pages/user/contest-results.html?id=${contestId}`;
+            window.location.href = `/pages/community/contest-results.html?id=${contestId}`;
             
         } catch (error) {
             console.error('🏆 User Contests Controller: Error viewing results:', error);

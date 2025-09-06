@@ -14,13 +14,15 @@ const { csrfMiddleware, generateCSRFToken, getCSRFToken } = require('./middlewar
 dotenv.config({ path: './config.env' });
 
 // Connect to database
-const connectDB = require('./config/database');
+const connectDB = require('./config/db');
 connectDB();
 
 // Route files
 const authRoutes = require('./routes/auth');
 const communityRoutes = require('./routes/communities');
 const contestRoutes = require('./routes/contests');
+const adminRoutes = require('./routes/admin');
+const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
 // Middleware files
@@ -127,6 +129,8 @@ const apiVersion = process.env.API_VERSION || 'v1';
 app.use(`/api/${apiVersion}/auth`, authRoutes);
 app.use(`/api/${apiVersion}/communities`, communityRoutes);
 app.use(`/api/${apiVersion}/contests`, contestRoutes);
+app.use(`/api/${apiVersion}/admin`, adminRoutes);
+app.use(`/api/${apiVersion}`, contactRoutes);
 app.use(`/api/${apiVersion}/health`, healthRoutes);
 
 // Handle undefined routes

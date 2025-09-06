@@ -490,7 +490,7 @@
             // Password will be set after OTP verification
             
             try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/register', {
+                const response = await fetch(window.Config ? window.Config.apiBaseURL + '/auth/register' : 'http://localhost:5001/api/v1/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -542,7 +542,7 @@
             // Password will be set after OTP verification
             
             try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/register', {
+                const response = await fetch(window.Config ? window.Config.apiBaseURL + '/auth/register' : 'http://localhost:5001/api/v1/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -601,7 +601,7 @@
             const otp = document.getElementById('otpInput').value;
             
             try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/verify-otp', {
+                const response = await fetch(window.Config ? window.Config.apiBaseURL + '/auth/verify-otp' : 'http://localhost:5001/api/v1/auth/verify-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -635,7 +635,7 @@
         // Resend OTP handler
         document.getElementById('resendOTPBtn').addEventListener('click', async function() {
             try {
-                const response = await fetch('http://localhost:5001/api/v1/auth/resend-otp', {
+                const response = await fetch(window.Config ? window.Config.apiBaseURL + '/auth/resend-otp' : 'http://localhost:5001/api/v1/auth/resend-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

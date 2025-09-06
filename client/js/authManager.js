@@ -398,8 +398,8 @@ class AuthManager {
         const redirects = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/user/user-dashboard.html',
-            'personal': '/skillport-personal/student-dashboard.html'
+            'student': '/pages/community/user-dashboard.html',
+            'personal': '/pages/personal/student-dashboard.html'
         };
 
         const redirectUrl = redirects[role];
@@ -413,8 +413,8 @@ class AuthManager {
         const protectedPaths = [
             'pages/admin/',
             'pages/mentor/',
-            'pages/user/',
-            'skillport-personal/'
+            'pages/community/',
+            'pages/personal/'
         ];
         
         const isProtected = protectedPaths.some(path => currentPath.includes(path));

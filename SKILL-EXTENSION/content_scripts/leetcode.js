@@ -82,7 +82,7 @@
         return false;
       }
 
-      const response = await fetch('http://localhost:5001/api/submissions/extension', {
+      const response = await fetch('http://localhost:5001/api/v1/extension/submission', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

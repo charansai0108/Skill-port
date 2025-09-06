@@ -222,8 +222,8 @@ class LoginHandler {
         const redirectUrls = {
             'community-admin': '/pages/admin/admin-dashboard.html',
             'mentor': '/pages/mentor/mentor-dashboard.html',
-            'student': '/pages/user/user-dashboard.html',
-            'personal': '/skillport-personal/student-dashboard.html'
+            'student': '/pages/community/user-dashboard.html',
+            'personal': '/pages/personal/student-dashboard.html'
         };
 
         const redirectUrl = redirectUrls[user.role];

@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const asyncHandler = require('../middleware/async');
-const requireAuth = require('../middleware/authMiddleware');
+const { protect: requireAuth } = require('../middleware/auth');
 const ErrorResponse = require('../utils/errorResponse');
 const communityController = require('../controllers/communityController');
 
@@ -63,5 +63,10 @@ router.post('/:id/students', requireAuth, [
 // @route   GET /api/v1/communities/:id/stats
 // @access  Private (Community Admin, Mentor)
 router.get('/:id/stats', requireAuth, communityController.getCommunityStats);
+
+// Check if email exists in community
+router.post('/:id/check-email', [
+    body('email').isEmail().normalizeEmail()
+], asyncHandler(communityController.checkEmailInCommunity));
 
 module.exports = router;

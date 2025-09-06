@@ -1006,7 +1006,7 @@
             // If user is personal, redirect to personal dashboard
             if (authManager.isPersonalUser()) {
               console.log('🔐 Admin Dashboard: Personal user detected, redirecting to personal dashboard');
-              window.location.href = '/skillport-personal/student-dashboard.html';
+              window.location.href = '/pages/personal/student-dashboard.html';
               return;
             }
             
@@ -1020,7 +1020,7 @@
             // If user is student, redirect to student dashboard
             if (authManager.isStudent()) {
               console.log('🔐 Admin Dashboard: Student user detected, redirecting to student dashboard');
-              window.location.href = '/pages/user/user-dashboard';
+              window.location.href = '/pages/community/user-dashboard.html';
               return;
             }
             

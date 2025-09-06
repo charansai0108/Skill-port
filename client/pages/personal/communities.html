@@ -31,13 +31,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="student-dashboard.html" class="flex-shrink-0 flex items-center">
+                    <a href="pages/personal/student-dashboard.html" class="flex-shrink-0 flex items-center">
                         <i class="fas fa-code text-2xl text-blue-600 mr-2"></i>
-                        <span class="text-xl font-bold text-gray-900">SkillPort</span>
+                        <span class="text-xl font-bold text-gray-900">SkillPort Personal</span>
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="student-dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="pages/personal/student-dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
                         <i class="fas fa-home mr-1"></i> Dashboard
                     </a>
                     <a href="communities.html" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -337,7 +337,7 @@
                 if (response.success) {
                     showSuccess('Successfully joined community! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = '/pages/user/user-dashboard.html';
+                        window.location.href = '/pages/community/user-dashboard.html';
                     }, 2000);
                 } else {
                     showError(response.error || 'Invalid OTP');
@@ -409,5 +409,15 @@
             }
         }
     </script>
+    
+    <!-- Include necessary scripts -->
+    <script src="../../js/suppress-warnings.js"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/bootstrap.js"></script>
+    <script src="../../js/routeGuard.js"></script>
+    <script src="../../js/apiService.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/joinCommunity.js"></script>
 </body>
 </html>

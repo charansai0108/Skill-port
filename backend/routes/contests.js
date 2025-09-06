@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const asyncHandler = require('../middleware/async');
-const requireAuth = require('../middleware/authMiddleware');
+const { protect: requireAuth } = require('../middleware/auth');
 const ErrorResponse = require('../utils/errorResponse');
 const contestController = require('../controllers/contestController');
 

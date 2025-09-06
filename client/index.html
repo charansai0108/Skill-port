@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/suppress-warnings.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/routeGuard.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -138,7 +139,7 @@
                 <a href="pages/auth/register.html" class="btn-primary px-8 py-3 rounded-xl text-lg font-semibold text-white">
                     Start Learning Today
                 </a>
-                <a href="skillport-personal/student-dashboard.html" class="btn-secondary px-8 py-3 rounded-xl text-lg font-semibold">
+                <a href="pages/personal/student-dashboard.html" class="btn-secondary px-8 py-3 rounded-xl text-lg font-semibold">
                     Personal Dashboard
                 </a>
                 <a href="#features" class="btn-secondary px-8 py-3 rounded-xl text-lg font-semibold">
@@ -327,7 +328,7 @@
                     <ul class="space-y-2 text-slate-400">
                         <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
                         <li><a href="pages/auth/register.html" class="hover:text-white transition-colors">Get Started</a></li>
-                        <li><a href="skillport-personal/student-dashboard.html" class="hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="pages/personal/student-dashboard.html" class="hover:text-white transition-colors">Dashboard</a></li>
                         <li><a href="pages/auth/login.html" class="hover:text-white transition-colors">Login</a></li>
                     </ul>
                 </div>
@@ -374,7 +375,7 @@
                 const token = localStorage.getItem('jwt_token');
                 if (token) {
                     try {
-                        const response = await fetch('http://localhost:5001/api/v1/admin/analytics', {
+                        const response = await fetch(window.Config ? window.Config.apiBaseURL + '/admin/analytics' : 'http://localhost:5001/api/v1/admin/analytics', {
                             headers: {
                                 'Authorization': `Bearer ${token}`,
                                 'Content-Type': 'application/json'
@@ -418,7 +419,7 @@
             
             // Handle contact form submission
             try {
-                const response = await fetch('http://localhost:5001/api/v1/contact', {
+                const response = await fetch(window.Config ? window.Config.apiBaseURL + '/contact' : 'http://localhost:5001/api/v1/contact', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

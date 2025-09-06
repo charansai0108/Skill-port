@@ -273,7 +273,7 @@ class UserLeaderboardController extends PageController {
         
         try {
             // Redirect to full contest leaderboard page
-            window.location.href = `/pages/user/contest-leaderboard.html?id=${contestId}`;
+            window.location.href = `/pages/community/contest-leaderboard.html?id=${contestId}`;
             
         } catch (error) {
             console.error('🏆 User Leaderboard Controller: Error viewing full leaderboard:', error);
