@@ -57,9 +57,9 @@ class AuthManager {
             const response = await window.APIService.get('/auth/me');
             console.log('🔐 AuthManager: Authentication response:', response);
             
-            if (response.success) {
-                // Handle different response formats from different endpoints
-                this.currentUser = response.data.user || response.data;
+            // Standardized format: {success: true, data: {user: ...}}
+            if (response && response.success && response.data && response.data.user) {
+                this.currentUser = response.data.user;
                 this.isAuthenticated = true;
                 console.log('🔐 AuthManager: Authentication verified, user:', this.currentUser);
                 this.handleAuthenticated();
@@ -187,22 +187,22 @@ class AuthManager {
             
             window.notifications?.hideLoading(loadingNotification);
 
-            if (response.success) {
+            if (response.success && response.data && response.data.user) {
                 // Token is automatically set by APIService
                 await this.checkAuthStatus();
                 
                 window.notifications?.success(
                     'Welcome back!',
-                    `Successfully logged in as ${response.data.firstName}`
+                    `Successfully logged in as ${response.data.user.firstName}`
                 );
 
-                return { success: true, user: response.data };
+                return { success: true, user: response.data.user };
             } else {
                 window.notifications?.error(
                     'Login Failed',
-                    response.error || 'Invalid email or password'
+                    response.message || 'Invalid email or password'
                 );
-                return { success: false, error: response.error };
+                return { success: false, error: response.message };
             }
         } catch (error) {
             window.notifications?.hideLoading(loadingNotification);

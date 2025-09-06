@@ -4,6 +4,7 @@ const asyncHandler = require('../middleware/async');
 const { protect: requireAuth } = require('../middleware/auth');
 const ErrorResponse = require('../utils/errorResponse');
 const authController = require('../controllers/authController');
+const { loginLimiter, otpLimiter, extensionLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post('/register', [
 // @desc    Login user
 // @route   POST /api/v1/auth/login
 // @access  Public
-router.post('/login', [
+router.post('/login', loginLimiter, [
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('password').notEmpty().withMessage('Password is required')
 ], asyncHandler(async (req, res, next) => {
@@ -52,7 +53,7 @@ router.post('/login', [
 // @desc    Verify OTP
 // @route   POST /api/v1/auth/verify-otp
 // @access  Public
-router.post('/verify-otp', [
+router.post('/verify-otp', otpLimiter, [
     body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
     body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
 ], asyncHandler(async (req, res, next) => {
@@ -88,11 +89,43 @@ router.post('/join-community', [
 ], asyncHandler(authController.joinCommunity));
 
 // Resend OTP endpoint
-router.post('/resend-otp', [
+router.post('/resend-otp', otpLimiter, [
     body('email').isEmail().normalizeEmail()
 ], asyncHandler(authController.resendOTP));
 
 // Extension submission endpoint
-router.post('/extension/submission', requireAuth, asyncHandler(authController.extensionSubmission));
+router.post('/extension/submission', extensionLimiter, requireAuth, asyncHandler(authController.extensionSubmission));
+
+// @desc    Forgot password - send reset OTP
+// @route   POST /api/v1/auth/forgot-password
+// @access  Public
+router.post('/forgot-password', otpLimiter, [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email')
+], asyncHandler(async (req, res, next) => {
+    // Check validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    await authController.forgotPassword(req, res, next);
+}));
+
+// @desc    Reset password with OTP
+// @route   POST /api/v1/auth/reset-password
+// @access  Public
+router.post('/reset-password', [
+    body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+    body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], asyncHandler(async (req, res, next) => {
+    // Check validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array().map(err => err.msg).join(', '), 400));
+    }
+
+    await authController.resetPassword(req, res, next);
+}));
 
 module.exports = router;

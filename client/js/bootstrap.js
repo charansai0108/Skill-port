@@ -10,25 +10,52 @@ window.__CURRENT_USER__ = undefined;
  */
 async function bootstrapAuth() {
   try {
-    const res = await fetch('/api/v1/auth/me', { credentials: 'include' });
+    console.log('🔐 Bootstrap: Starting authentication check...');
+    
+    // First attempt: try to get current user
+    const res = await fetch('/api/v1/auth/me', { 
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
     if (res.ok) {
       const data = await res.json();
-      // Handle both response formats: {ok: true, user: ...} and {success: true, data: {user: ...}}
-      const user = data.user || (data.data && data.data.user) || data.data;
-      window.__CURRENT_USER__ = user;
-      window.__AUTH_BOOTSTRAP_DONE__ = true;
-      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
-      return;
+      console.log('🔐 Bootstrap: /me response:', data);
+      
+      // Standardized format: {success: true, data: {user: ...}}
+      if (data.success && data.data && data.data.user) {
+        const user = data.data.user;
+        console.log('🔐 Bootstrap: User authenticated:', user);
+        window.__CURRENT_USER__ = user;
+        window.__AUTH_BOOTSTRAP_DONE__ = true;
+        document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
+        return;
+      } else {
+        console.warn('🔐 Bootstrap: Invalid response format:', data);
+        throw new Error('Invalid response format');
+      }
     }
 
+    // If 401, try refresh token
     if (res.status === 401) {
-      const ref = await fetch('/api/v1/auth/refresh', { method: 'POST', credentials: 'include' });
-      if (ref.ok) {
-        const me = await fetch('/api/v1/auth/me', { credentials: 'include' });
-        if (me.ok) {
-          const data2 = await me.json();
-          // Handle both response formats
-          const user = data2.user || (data2.data && data2.data.user) || data2.data;
+      console.log('🔐 Bootstrap: 401 received, attempting refresh...');
+      const refreshRes = await fetch('/api/v1/auth/refresh', { 
+        method: 'POST', 
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (refreshRes.ok) {
+        const refreshData = await refreshRes.json();
+        console.log('🔐 Bootstrap: Refresh response:', refreshData);
+        
+        if (refreshData.success && refreshData.data && refreshData.data.user) {
+          const user = refreshData.data.user;
+          console.log('🔐 Bootstrap: User authenticated after refresh:', user);
           window.__CURRENT_USER__ = user;
           window.__AUTH_BOOTSTRAP_DONE__ = true;
           document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
@@ -37,11 +64,15 @@ async function bootstrapAuth() {
       }
     }
 
+    // If all attempts fail, set unauthenticated state
+    console.log('🔐 Bootstrap: Authentication failed, setting unauthenticated state');
     window.__CURRENT_USER__ = null;
     window.__AUTH_BOOTSTRAP_DONE__ = true;
     document.dispatchEvent(new CustomEvent('auth-ready', { detail: null }));
-  } catch (err) {
-    console.error('bootstrapAuth error', err);
+    
+  } catch (error) {
+    console.error('🔐 Bootstrap: Authentication error:', error);
+    // Always set bootstrap done to prevent hanging
     window.__CURRENT_USER__ = null;
     window.__AUTH_BOOTSTRAP_DONE__ = true;
     document.dispatchEvent(new CustomEvent('auth-ready', { detail: null }));

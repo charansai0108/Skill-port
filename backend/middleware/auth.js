@@ -18,7 +18,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
     // Make sure token exists
     if (!token) {
-        return next(new ErrorResponse('Not authorized to access this route', 401));
+        return res.status(401).json({
+            success: false,
+            message: 'Not authorized to access this route'
+        });
     }
 
     try {
@@ -29,17 +32,26 @@ exports.protect = asyncHandler(async (req, res, next) => {
         const user = await User.findById(decoded.id).select('-password');
 
         if (!user) {
-            return next(new ErrorResponse('User not found', 401));
+            return res.status(401).json({
+                success: false,
+                message: 'User not found'
+            });
         }
 
         // Check if user is active
         if (user.status !== 'active') {
-            return next(new ErrorResponse('Account is not active', 401));
+            return res.status(401).json({
+                success: false,
+                message: 'Account is not active'
+            });
         }
 
         // Check if user is locked
         if (user.isLocked) {
-            return next(new ErrorResponse('Account is temporarily locked', 401));
+            return res.status(401).json({
+                success: false,
+                message: 'Account is temporarily locked'
+            });
         }
 
         // Add user to request object
@@ -47,7 +59,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
         next();
     } catch (err) {
         console.error('🔐 Auth Middleware: JWT verification error:', err);
-        return next(new ErrorResponse('Not authorized to access this route', 401));
+        return res.status(401).json({
+            success: false,
+            message: 'Not authorized to access this route'
+        });
     }
 });
 

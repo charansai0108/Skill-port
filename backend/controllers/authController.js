@@ -174,18 +174,21 @@ exports.login = async (req, res, next) => {
     });
 
     res.status(200).json({
-      ok: true,
+      success: true,
       message: 'Login successful',
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        community: user.community,
-        status: user.status,
-        avatar: user.avatar,
-        extensionInstalled: user.extensionInstalled
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          community: user.community,
+          status: user.status,
+          avatar: user.avatar,
+          extensionInstalled: user.extensionInstalled,
+          requirePasswordChange: requirePasswordChange
+        }
       }
     });
 
@@ -234,58 +237,133 @@ exports.verifyOTP = async (req, res, next) => {
 
 // @desc    Get current user
 exports.getMe = async (req, res, next) => {
-  res.status(200).json({
-    ok: true,
-    user: req.user
-  });
+  try {
+    const user = req.user;
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authenticated'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User data retrieved successfully',
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          community: user.community,
+          status: user.status,
+          avatar: user.avatar,
+          extensionInstalled: user.extensionInstalled,
+          createdAt: user.createdAt,
+          lastActivity: user.lastActivity
+        }
+      }
+    });
+    
+  } catch (error) {
+    logger.error('GetMe error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving user data'
+    });
+  }
 };
 
 // @desc    Refresh access token
 exports.refreshToken = async (req, res, next) => {
   try {
-    const token = req.cookies && req.cookies.refreshToken;
-    if (!token) return res.status(401).json({ ok: false, message: 'No refresh token' });
+    const { refreshToken } = req.cookies;
 
-    let payload;
-    try {
-      payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    } catch (err) {
-      return res.status(401).json({ ok: false, message: 'Refresh token invalid or expired' });
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token not provided'
+      });
     }
 
-    const user = await User.findById(payload.id);
-    if (!user) return res.status(401).json({ ok: false, message: 'User not found' });
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.id);
 
-    const newAccess = createAccessToken(user._id);
-    res.cookie('accessToken', newAccess, {
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token invalid or expired'
+      });
+    }
+
+    // Generate new tokens
+    const newAccessToken = createAccessToken(user._id);
+    const newRefreshToken = createRefreshToken(user._id);
+
+    // Set new cookies
+    res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 15 * 60 * 1000,
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    return res.json({ ok: true });
-  } catch (err) {
-    console.error('refresh error', err);
-    return res.status(500).json({ ok: false, message: 'Server error' });
+    // Return consistent format with full user data
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          community: user.community,
+          status: user.status,
+          avatar: user.avatar,
+          extensionInstalled: user.extensionInstalled
+        }
+      }
+    });
+
+  } catch (error) {
+    logger.error('Refresh token error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Refresh token invalid or expired'
+    });
   }
 };
 
 // @desc    Logout user
 exports.logout = async (req, res, next) => {
-  res.cookie('accessToken', '', {
-    httpOnly: true,
-    expires: new Date(0)
-  });
-  res.cookie('refreshToken', '', {
-    httpOnly: true,
-    expires: new Date(0)
-  });
+  try {
+    // Clear cookies
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
 
-  res.status(200).json({
-    success: true,
-    message: 'Logged out successfully'
-  });
+    res.status(200).json({
+      success: true,
+      message: 'Logout successful'
+    });
+
+  } catch (error) {
+    logger.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during logout'
+    });
+  }
 };
 
 // @desc    Join community
@@ -347,13 +425,15 @@ exports.joinCommunity = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Successfully joined community',
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        community: user.community
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          community: user.community
+        }
       }
     });
   } catch (error) {
@@ -424,11 +504,107 @@ exports.extensionSubmission = async (req, res, next) => {
       message: 'Submission received successfully',
       data: {
         submissionId: Date.now().toString(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        platform: submissionData.platform,
+        status: 'received'
       }
     });
   } catch (error) {
     logger.error('Extension submission error:', error);
     res.status(500).json({ success: false, message: 'Server error during submission processing' });
+  }
+};
+
+// @desc    Forgot password - send reset OTP
+// @route   POST /api/v1/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Generate OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Create OTP record using the new Otp model
+    const Otp = require('../models/Otp');
+    await Otp.createOtp(email, otpCode, 15, 'password-reset');
+
+    // Send OTP email
+    await sendOTPEmail(email, otpCode, 'Password Reset');
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset OTP sent to your email',
+      data: { email }
+    });
+  } catch (error) {
+    logger.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send password reset OTP'
+    });
+  }
+};
+
+// @desc    Reset password with OTP
+// @route   POST /api/v1/auth/reset-password
+// @access  Public
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    // Verify OTP
+    const Otp = require('../models/Otp');
+    const isValidOtp = await Otp.verifyOtp(email, otp, 'password-reset');
+    
+    if (!isValidOtp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired OTP'
+      });
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    user.password = hashedPassword;
+    user.passwordChangedAt = new Date();
+    await user.save();
+
+    // Invalidate all refresh tokens
+    user.refreshTokens = [];
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully',
+      data: { email }
+    });
+  } catch (error) {
+    logger.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset password'
+    });
   }
 };
