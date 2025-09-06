@@ -13,9 +13,11 @@ async function bootstrapAuth() {
     const res = await fetch('/api/v1/auth/me', { credentials: 'include' });
     if (res.ok) {
       const data = await res.json();
-      window.__CURRENT_USER__ = data.user;
+      // Handle both response formats: {ok: true, user: ...} and {success: true, data: {user: ...}}
+      const user = data.user || (data.data && data.data.user) || data.data;
+      window.__CURRENT_USER__ = user;
       window.__AUTH_BOOTSTRAP_DONE__ = true;
-      document.dispatchEvent(new CustomEvent('auth-ready', { detail: data.user }));
+      document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
       return;
     }
 
@@ -25,9 +27,11 @@ async function bootstrapAuth() {
         const me = await fetch('/api/v1/auth/me', { credentials: 'include' });
         if (me.ok) {
           const data2 = await me.json();
-          window.__CURRENT_USER__ = data2.user;
+          // Handle both response formats
+          const user = data2.user || (data2.data && data2.data.user) || data2.data;
+          window.__CURRENT_USER__ = user;
           window.__AUTH_BOOTSTRAP_DONE__ = true;
-          document.dispatchEvent(new CustomEvent('auth-ready', { detail: data2.user }));
+          document.dispatchEvent(new CustomEvent('auth-ready', { detail: user }));
           return;
         }
       }

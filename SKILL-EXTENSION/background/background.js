@@ -193,11 +193,22 @@ class BackgroundController {
 
     async sendToAPI(submissionData) {
         try {
+            // Check authentication first
+            const authResponse = await fetch('http://localhost:5001/api/v1/auth/me', {
+                credentials: 'include'
+            });
+            
+            if (!authResponse.ok) {
+                console.log('🔧 BackgroundController: User not authenticated, skipping API call');
+                return;
+            }
+
             const response = await fetch('http://localhost:5001/api/v1/extension/submission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(submissionData)
             });
             

@@ -92,4 +92,7 @@ router.post('/resend-otp', [
     body('email').isEmail().normalizeEmail()
 ], asyncHandler(authController.resendOTP));
 
+// Extension submission endpoint
+router.post('/extension/submission', requireAuth, asyncHandler(authController.extensionSubmission));
+
 module.exports = router;

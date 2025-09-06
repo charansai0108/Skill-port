@@ -54,7 +54,7 @@ class AuthManager {
             }
             
             // Verify authentication with backend (uses httpOnly cookies)
-            const response = await window.APIService.getUserProfile();
+            const response = await window.APIService.get('/auth/me');
             console.log('🔐 AuthManager: Authentication response:', response);
             
             if (response.success) {

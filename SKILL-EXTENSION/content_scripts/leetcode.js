@@ -74,20 +74,22 @@
   // ✅ Send data to SkillPort backend
   async function sendToSkillPort(submissionData) {
     try {
-      // Get SkillPort token from localStorage (if user is logged in)
-      const skillportToken = localStorage.getItem('skillport_token');
+      // Check if user is authenticated by calling /me endpoint
+      const authResponse = await fetch('http://localhost:5001/api/v1/auth/me', {
+        credentials: 'include'
+      });
       
-      if (!skillportToken) {
-        console.log('⚠ SkillPort: User not logged in, storing locally only');
+      if (!authResponse.ok) {
+        console.log('⚠ SkillPort: User not authenticated, storing locally only');
         return false;
       }
 
       const response = await fetch('http://localhost:5001/api/v1/extension/submission', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${skillportToken}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(submissionData)
       });
 

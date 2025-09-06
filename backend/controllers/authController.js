@@ -401,3 +401,34 @@ exports.resendOTP = async (req, res) => {
     });
   }
 };
+
+// @desc    Handle extension submission
+// @route   POST /api/v1/auth/extension/submission
+// @access  Private
+exports.extensionSubmission = async (req, res, next) => {
+  try {
+    const submissionData = req.body;
+    const user = req.user;
+
+    // Log the submission for debugging
+    logger.info(`Extension submission from user ${user._id}:`, {
+      platform: submissionData.platform,
+      problemTitle: submissionData.problemTitle,
+      status: submissionData.status
+    });
+
+    // Here you would typically save to database or process the submission
+    // For now, just acknowledge receipt
+    res.status(200).json({
+      success: true,
+      message: 'Submission received successfully',
+      data: {
+        submissionId: Date.now().toString(),
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    logger.error('Extension submission error:', error);
+    res.status(500).json({ success: false, message: 'Server error during submission processing' });
+  }
+};

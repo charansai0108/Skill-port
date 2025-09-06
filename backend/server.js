@@ -43,7 +43,10 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Extension-Token', 'X-CSRF-Token']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Extension-Token', 'X-CSRF-Token'],
+    // Add sameSite and secure for production
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    secure: process.env.NODE_ENV === 'production'
 };
 app.use(cors(corsOptions));
 
