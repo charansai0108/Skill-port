@@ -387,7 +387,36 @@
 
     <!-- JavaScript -->
     <script>
-        lucide.createIcons();
+        // Initialize Lucide icons with error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                    console.log('✅ Lucide icons initialized successfully');
+                } else {
+                    console.warn('⚠️ Lucide not available, using fallback icons');
+                    // Fallback: Replace icon elements with text/emoji
+                    document.querySelectorAll('[data-lucide]').forEach(icon => {
+                        const iconName = icon.getAttribute('data-lucide');
+                        const fallbackMap = {
+                            'target': '🎯',
+                            'user-plus': '👤',
+                            'user': '👤',
+                            'users': '👥',
+                            'eye': '👁️',
+                            'eye-off': '🙈',
+                            'x': '❌'
+                        };
+                        if (fallbackMap[iconName]) {
+                            icon.innerHTML = fallbackMap[iconName];
+                            icon.style.fontSize = '1.2em';
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error initializing icons:', error);
+            }
+        });
         
         // Simple form switching
         function showForm(role) {
