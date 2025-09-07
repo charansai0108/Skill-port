@@ -6,14 +6,7 @@
     <title>Login - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../../js/suppress-warnings.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="../../js/bootstrap.js"></script>
-    <script src="../../js/routeGuard.js"></script>
-    <script type="module" src="../../js/apiService.js"></script>
-    <script src="../../js/notifications.js"></script>
-    <script type="module" src="../../js/firebaseService.js"></script>
-    <script type="module" src="../../js/authManager.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -142,8 +135,7 @@
                             id="togglePassword"
                             class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg"
                             onclick="togglePassword('password')"
-
-                            >
+                        >
                             <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
                         </button>
                     </div>
@@ -159,7 +151,6 @@
 
                 <button 
                     type="submit" 
-                    id="loginButton"
                     class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
                 >
                     <i data-lucide="log-in" class="w-5 h-5"></i>
@@ -244,6 +235,12 @@
     <!-- Alert Container -->
     <div id="alert-container" class="fixed top-4 right-4 z-50"></div>
 
+    <!-- Firebase Integration Scripts -->
+    <script type="module" src="../../js/apiService.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script type="module" src="../../js/firebaseService.js"></script>
+    <script type="module" src="../../js/authManager.js"></script>
+
     <script>
         lucide.createIcons();
         
@@ -263,42 +260,58 @@
             lucide.createIcons();
         }
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
+            
             try {
+                console.log('🔐 Attempting login for:', email);
+                
                 // Use Firebase service for login
                 const firebaseService = await import('../../js/firebaseService.js');
                 const response = await firebaseService.default.login(email, password);
                 
                 if (response.success) {
-                    // Show success message
                     if (window.notifications) {
                         window.notifications.success({
                             title: 'Login Successful',
-                            message: 'Welcome back!'
+                            message: 'Welcome back! Redirecting...'
                         });
+                    } else {
+                        showAlert('🎉 Login successful! Redirecting...', 'success');
                     }
                     
-                    // Redirect based on role
-                    const user = response.user;
-                    let redirectUrl = '/pages/personal/student-dashboard.html'; // Default
-                    
-                    if (user.role === 'community-admin') {
-                        redirectUrl = '/pages/admin/admin-dashboard.html';
-                    } else if (user.role === 'mentor') {
-                        redirectUrl = '/pages/mentor/mentor-dashboard.html';
-                    } else if (user.role === 'student') {
-                        redirectUrl = '/pages/student/user-dashboard.html';
-                    }
-                    
+                    // Redirect based on user role
                     setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1000);
+                        const user = response.user;
+                        if (user && user.role) {
+                            let redirectUrl = '';
+                            switch (user.role) {
+                                case 'personal':
+                                    redirectUrl = '/pages/personal/student-dashboard.html';
+                                    break;
+                                case 'student':
+                                    redirectUrl = '/pages/student/user-dashboard.html';
+                                    break;
+                                case 'mentor':
+                                    redirectUrl = '/pages/mentor/mentor-dashboard.html';
+                                    break;
+                                case 'community-admin':
+                                    redirectUrl = '/pages/admin/admin-dashboard.html';
+                                    break;
+                                default:
+                                    redirectUrl = '/pages/personal/student-dashboard.html';
+                            }
+                            console.log('🔄 Redirecting to:', redirectUrl);
+                            window.location.href = redirectUrl;
+                        } else {
+                            console.log('🔄 No role found, redirecting to default dashboard');
+                            window.location.href = '/pages/personal/student-dashboard.html';
+                        }
+                    }, 1500);
                 } else {
                     throw new Error(response.message);
                 }
@@ -309,7 +322,48 @@
                         title: 'Login Failed',
                         message: error.message || 'An error occurred during login'
                     });
+                } else {
+                    showAlert('Login failed: ' + (error.message || 'Unknown error'), 'error');
                 }
+            }
+        });
+
+        // Alert system
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 
+                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            
+            alert.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-4 max-w-sm`;
+            alert.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            
+            alertContainer.appendChild(alert);
+            lucide.createIcons();
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            if (typeof window.authManager !== 'undefined' && window.authManager.currentUser) {
+                console.log('User already logged in, redirecting...');
+                window.authManager.redirectByRole();
             }
         });
     </script>
