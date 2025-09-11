@@ -1,0 +1,81 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'community-admin';
+    }
+    
+    function isMentor() {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['mentor', 'community-admin'];
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+        request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+    
+    function isValidDocumentFile() {
+      return request.resource.contentType in ['application/pdf', 'text/plain', 'application/json'] &&
+        request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+    
+    // User profile images
+    match /users/{userId}/profile_{timestamp}.{extension} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isValidImageFile();
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+    
+    // Community images
+    match /communities/{communityId}/image_{timestamp}.{extension} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/communities/$(communityId)).data.admin == request.auth.uid &&
+        isValidImageFile();
+      allow delete: if isAuthenticated() && 
+        (firestore.get(/databases/(default)/documents/communities/$(communityId)).data.admin == request.auth.uid || isAdmin());
+    }
+    
+    // Contest attachments
+    match /contests/{contestId}/attachments/{userId}_{timestamp}.{extension} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && 
+        (isValidImageFile() || isValidDocumentFile());
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+    
+    // Submission files
+    match /submissions/{submissionId}/files/{userId}_{timestamp}.{extension} {
+      allow read: if isAuthenticated() && 
+        (firestore.get(/databases/(default)/documents/submissions/$(submissionId)).data.userId == request.auth.uid ||
+         isMentor() || isAdmin());
+      allow write: if isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/submissions/$(submissionId)).data.userId == request.auth.uid &&
+        (isValidImageFile() || isValidDocumentFile());
+      allow delete: if isAuthenticated() && 
+        (firestore.get(/databases/(default)/documents/submissions/$(submissionId)).data.userId == request.auth.uid || isAdmin());
+    }
+    
+    // Admin uploads
+    match /admin/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Default deny rule
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

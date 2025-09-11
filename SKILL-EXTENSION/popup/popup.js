@@ -13,6 +13,7 @@ class PopupController {
                 interviewbit: 0
             }
         };
+        this.flags = [];
         this.init();
     }
 
@@ -28,6 +29,7 @@ class PopupController {
             
             // Update UI
             this.updateUI();
+            this.renderFlags();
             
             // Hide loading, show content
             document.getElementById('loading').style.display = 'none';
@@ -41,7 +43,7 @@ class PopupController {
 
     async loadStoredData() {
         try {
-            const result = await chrome.storage.local.get(['userStats', 'submissions']);
+            const result = await chrome.storage.local.get(['userStats', 'submissions', 'flags']);
             
             if (result.userStats) {
                 this.userStats = { ...this.userStats, ...result.userStats };
@@ -49,6 +51,10 @@ class PopupController {
             
             if (result.submissions) {
                 this.calculateTodayStats(result.submissions);
+            }
+            
+            if (result.flags) {
+                this.flags = result.flags;
             }
             
             console.log('🔧 PopupController: Stored data loaded:', this.userStats);
@@ -115,6 +121,11 @@ class PopupController {
         document.getElementById('syncBtn').addEventListener('click', () => {
             this.syncWithPlatforms();
         });
+        
+        // Test flag button
+        document.getElementById('testFlagBtn').addEventListener('click', () => {
+            this.testFlagDetection();
+        });
     }
 
     updateUI() {
@@ -131,6 +142,52 @@ class PopupController {
         document.getElementById('interviewbitCount').textContent = this.userStats.platformStats.interviewbit;
     }
 
+    renderFlags() {
+        const container = document.getElementById('flagsContainer');
+        const section = document.getElementById('flagsSection');
+        
+        if (!container || !section) return;
+        
+        if (!this.flags || this.flags.length === 0) {
+            container.innerHTML = '<div class="no-flags">No flags detected</div>';
+            section.style.display = 'none';
+            return;
+        }
+        
+        // Show flags section
+        section.style.display = 'block';
+        
+        // Render flags (show last 5)
+        container.innerHTML = this.flags.slice(0, 5).map(flag => `
+            <div class="flag-item">
+                <div class="flag-time">${new Date(flag.flaggedAt).toLocaleString()}</div>
+                <div class="flag-reason">${flag.reason}</div>
+                <div class="flag-questions">
+                    <div>Previous: ${flag.previous?.title || 'Unknown'} (${flag.previous?.difficulty || 'Unknown'})</div>
+                    <div>Current: ${flag.current?.title || 'Unknown'} (${flag.current?.difficulty || 'Unknown'})</div>
+                </div>
+                <div class="flag-gap">Time gap: ${(flag.gapMs / 60000).toFixed(1)} minutes</div>
+                <div class="flag-codes">
+                    <details class="code-details">
+                        <summary class="code-summary">View Code Comparison</summary>
+                        <div class="code-comparison">
+                            <div class="code-section">
+                                <h4>Previous Code (${flag.previous?.title || 'Unknown'}):</h4>
+                                <pre class="code-block">${flag.previousCode || 'No code available'}</pre>
+                            </div>
+                            <div class="code-section">
+                                <h4>Current Code (${flag.current?.title || 'Unknown'}):</h4>
+                                <pre class="code-block">${flag.currentCode || 'No code available'}</pre>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        `).join('');
+        
+        console.log('🚩 PopupController: Rendered', this.flags.length, 'flags');
+    }
+
     async refreshStats() {
         try {
             document.getElementById('refreshBtn').textContent = 'Refreshing...';
@@ -139,6 +196,7 @@ class PopupController {
             // Reload data
             await this.loadStoredData();
             this.updateUI();
+            this.renderFlags();
             
             document.getElementById('refreshBtn').textContent = 'Refresh Stats';
             document.getElementById('refreshBtn').disabled = false;
@@ -160,6 +218,7 @@ class PopupController {
                     // Reload data after sync
                     this.loadStoredData().then(() => {
                         this.updateUI();
+                        this.renderFlags();
                         document.getElementById('syncBtn').textContent = 'Sync with Platforms';
                         document.getElementById('syncBtn').disabled = false;
                     });
@@ -175,6 +234,36 @@ class PopupController {
             this.showError('Failed to sync with platforms');
             document.getElementById('syncBtn').textContent = 'Sync with Platforms';
             document.getElementById('syncBtn').disabled = false;
+        }
+    }
+
+    async testFlagDetection() {
+        try {
+            document.getElementById('testFlagBtn').textContent = 'Testing...';
+            document.getElementById('testFlagBtn').disabled = true;
+            
+            // Send message to background script to test flag detection
+            chrome.runtime.sendMessage({ action: 'testFlagDetection' }, (response) => {
+                if (response && response.success) {
+                    console.log('🧪 PopupController: Flag test completed');
+                    // Reload data after test
+                    this.loadStoredData().then(() => {
+                        this.updateUI();
+                        this.renderFlags();
+                        document.getElementById('testFlagBtn').textContent = 'Test Flag Detection';
+                        document.getElementById('testFlagBtn').disabled = false;
+                    });
+                } else {
+                    console.log('🧪 PopupController: Flag test failed');
+                    document.getElementById('testFlagBtn').textContent = 'Test Flag Detection';
+                    document.getElementById('testFlagBtn').disabled = false;
+                }
+            });
+            
+        } catch (error) {
+            console.error('🔧 PopupController: Error testing flag detection:', error);
+            document.getElementById('testFlagBtn').textContent = 'Test Flag Detection';
+            document.getElementById('testFlagBtn').disabled = false;
         }
     }
 

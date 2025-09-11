@@ -74,12 +74,23 @@ class RegisterHandler {
             
             if (response.success) {
                 console.log('📝 RegisterHandler: Firebase registration successful');
-                this.showSuccess('Registration successful! Please check your email for verification.');
                 
-                // Redirect to login page after a delay
-                setTimeout(() => {
-                    window.location.href = '../login.html';
-                }, 3000);
+                // Send OTP to user's email
+                const otpResponse = await this.sendOTP(userData);
+                
+                if (otpResponse.success) {
+                    this.showSuccess('Registration successful! Please check your email for the verification code.');
+                    
+                    // Redirect to OTP verification page
+                    setTimeout(() => {
+                        window.location.href = 'verify-otp.html';
+                    }, 2000);
+                } else {
+                    this.showError('Registration successful, but failed to send verification code. Please try logging in.');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                }
             } else {
                 console.error('📝 RegisterHandler: Firebase registration failed:', response.message);
                 this.showError(response.message || 'Registration failed. Please try again.');
@@ -91,6 +102,30 @@ class RegisterHandler {
         } finally {
             this.isSubmitting = false;
             this.showLoading(false);
+        }
+    }
+
+    async sendOTP(userData) {
+        try {
+            // Use Firebase Functions endpoint instead of local OTP server
+            const apiBaseUrl = config.getApiConfig().baseUrl;
+            const response = await fetch(`${apiBaseUrl}/otp/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userData.email,
+                    firstName: userData.firstName,
+                    lastName: userData.lastName
+                })
+            });
+            
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error sending OTP:', error);
+            return { success: false, message: 'Failed to send verification code' };
         }
     }
 

@@ -34,19 +34,14 @@ import {
     startAfter,
     Timestamp
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import config from './config.js';
+import authService from './authService.js';
+import logger from './logger.js';
+import errorHandler from './errorHandler.js';
+import validationService from './validation.js';
 
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAxcvIYVzwk8_0tX4fErmUxP0auFNyReFc",
-    authDomain: "skillport-a0c39.firebaseapp.com",
-    projectId: "skillport-a0c39",
-    storageBucket: "skillport-a0c39.firebasestorage.app",
-    messagingSenderId: "625176486393",
-    appId: "1:625176486393:web:9a832be086afbcaeb05d28"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase with environment-specific config
+const app = initializeApp(config.getFirebaseConfig());
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -70,11 +65,24 @@ class FirebaseService {
             console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
             
             if (user) {
+                // Load user data from Firestore first to check OTP verification status
+                const userData = await this.loadUserData(user.uid);
+                
+                // Check if user is OTP verified
+                if (!userData || !userData.otpVerified) {
+                    console.log('❌ User not OTP verified, signing out...');
+                    await signOut(auth);
+                    this.currentUser = null;
+                    this.isAuthenticated = false;
+                    
+                    // Notify listeners with unverified status
+                    this.authStateListeners.forEach(listener => listener(null, false, 'otp-not-verified'));
+                    return;
+                }
+                
+                console.log('✅ User verified via OTP');
                 this.currentUser = user;
                 this.isAuthenticated = true;
-                
-                // Load additional user data from Firestore
-                await this.loadUserData(user.uid);
                 
                 // Notify listeners
                 this.authStateListeners.forEach(listener => listener(user, true));
@@ -94,33 +102,66 @@ class FirebaseService {
     }
 
     // Authentication Methods
-    async register(userData) {
+    async register(userPayload) {
+        let userData = null; // Declare early to avoid TDZ issues
+        
         try {
+            // Validate input data
+            const validation = validationService.validateUserProfile(userPayload);
+            if (!validation.valid) {
+                return {
+                    success: false,
+                    message: 'Validation failed',
+                    errors: validation.errors
+                };
+            }
+
+            const sanitizedData = validation.data;
+            logger.auth('User registration attempt', { email: sanitizedData.email });
+
+            // Create Firebase Auth user
             const userCredential = await createUserWithEmailAndPassword(
                 auth, 
-                userData.email, 
-                userData.password
+                sanitizedData.email, 
+                userPayload.password
             );
             
             const user = userCredential.user;
             
             // Update user profile
             await updateProfile(user, {
-                displayName: `${userData.firstName} ${userData.lastName}`
+                displayName: `${sanitizedData.firstName} ${sanitizedData.lastName}`
             });
 
-            // Send email verification
-            await sendEmailVerification(user);
+            // Create Firestore document with otpVerified: false initially
+            userData = {
+                ...sanitizedData,
+                uid: user.uid,
+                emailVerified: false, // Keep for compatibility
+                otpVerified: false,   // Our custom OTP verification flag
+                role: sanitizedData.role || 'personal',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Create user document in Firestore
+            await setDoc(doc(db, 'users', user.uid), userData);
+            console.log('✅ User document created in Firestore with otpVerified: false');
+            
+            // Store in session storage for OTP verification
+            sessionStorage.setItem('pendingVerification', JSON.stringify(userData));
 
-            // Store additional user data in Firestore
-            await this.createUserDocument(user.uid, userData);
+            logger.auth('User registration successful', { userId: user.uid, email: sanitizedData.email });
 
             return {
                 success: true,
                 message: 'Registration successful! Please check your email for verification.',
-                user: user
+                user: user,
+                userData: userData
             };
         } catch (error) {
+            logger.error('User registration failed', { error: error.message, email: userPayload?.email });
+            errorHandler.handleFirebaseError(error);
+            
             return {
                 success: false,
                 message: this.getErrorMessage(error),
@@ -193,6 +234,49 @@ class FirebaseService {
                 message: this.getErrorMessage(error),
                 error: error
             };
+        }
+    }
+
+    // OTP Verification Methods
+    async markUserAsOTPVerified(uid) {
+        try {
+            const userRef = doc(db, 'users', uid);
+            await updateDoc(userRef, {
+                otpVerified: true,
+                otpVerifiedAt: new Date().toISOString()
+            });
+            console.log('✅ User marked as OTP verified in Firestore');
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Error marking user as OTP verified:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Complete registration after OTP verification
+    async completeRegistration(profileData) {
+        try {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (!user) {
+                throw new Error("No authenticated user when completing registration");
+            }
+
+            const db = getFirestore();
+            const data = {
+                ...profileData,
+                otpVerified: true,
+                updatedAt: new Date().toISOString()
+            };
+            
+            await setDoc(doc(db, "users", user.uid), data, { merge: true });
+            console.log('✅ Registration completed successfully with OTP verification');
+            
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Error completing registration:', error);
+            logger.error('Registration completion failed', { error: error.message });
+            return { success: false, error: error.message };
         }
     }
 
@@ -990,8 +1074,127 @@ class FirebaseService {
         }
         return null;
     }
+
+    // New methods for the standard Firestore structure
+    async getUserDocument(uid) {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', uid));
+            if (userDoc.exists()) {
+                return userDoc.data();
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting user document:', error);
+            logger.error('FirebaseService: Error getting user document', error);
+            return null;
+        }
+    }
+
+    async getUserTasks(uid) {
+        try {
+            const tasksRef = collection(db, 'users', uid, 'tasks');
+            const tasksSnapshot = await getDocs(tasksRef);
+            const tasks = [];
+            
+            tasksSnapshot.forEach((doc) => {
+                tasks.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            return tasks;
+        } catch (error) {
+            console.error('Error getting user tasks:', error);
+            logger.error('FirebaseService: Error getting user tasks', error);
+            return [];
+        }
+    }
+
+    async getUserProjects(uid) {
+        try {
+            const projectsRef = collection(db, 'users', uid, 'projects');
+            const projectsSnapshot = await getDocs(projectsRef);
+            const projects = [];
+            
+            projectsSnapshot.forEach((doc) => {
+                projects.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            return projects;
+        } catch (error) {
+            console.error('Error getting user projects:', error);
+            logger.error('FirebaseService: Error getting user projects', error);
+            return [];
+        }
+    }
+
+    async getUserAchievements(uid) {
+        try {
+            const achievementsRef = collection(db, 'users', uid, 'achievements');
+            const achievementsSnapshot = await getDocs(achievementsRef);
+            const achievements = [];
+            
+            achievementsSnapshot.forEach((doc) => {
+                achievements.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            return achievements;
+        } catch (error) {
+            console.error('Error getting user achievements:', error);
+            logger.error('FirebaseService: Error getting user achievements', error);
+            return [];
+        }
+    }
+
+    async createUserDocument(uid, userData) {
+        try {
+            const userDoc = {
+                name: userData.name || userData.displayName || 'User',
+                email: userData.email || '',
+                profileImage: userData.photoURL || '',
+                streak: 0,
+                submissions: 0,
+                problemsSolved: 0,
+                skillRating: 0,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            };
+
+            await setDoc(doc(db, 'users', uid), userDoc);
+            console.log('User document created successfully');
+            return { success: true, data: userDoc };
+        } catch (error) {
+            console.error('Error creating user document:', error);
+            logger.error('FirebaseService: Error creating user document', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async updateUserStats(uid, stats) {
+        try {
+            const userRef = doc(db, 'users', uid);
+            await updateDoc(userRef, {
+                ...stats,
+                updatedAt: serverTimestamp()
+            });
+            console.log('User stats updated successfully');
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating user stats:', error);
+            logger.error('FirebaseService: Error updating user stats', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 // Create and export singleton instance
 const firebaseService = new FirebaseService();
-export default firebaseService;
+export default firebaseService;// Force reload: 1757559898
+// Force reload: 1757560257801950000

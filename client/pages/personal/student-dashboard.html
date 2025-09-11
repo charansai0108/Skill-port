@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Dashboard - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../css/tailwind.min.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="../../js/pageController.js"></script>
+    <script type="module" src="../../js/personalDashboardController.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -841,23 +843,42 @@
 
         async function loadDashboardData() {
             try {
-                // Load sample data for development
-                const sampleData = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'john@example.com',
-                    progress: 75,
-                    skills: ['JavaScript', 'Python', 'React'],
-                    recentActivity: [
-                        { type: 'Problem Solved', title: 'Two Sum', date: '2024-01-15' },
-                        { type: 'Contest Joined', title: 'Weekly Challenge', date: '2024-01-14' },
-                        { type: 'Skill Updated', title: 'React', date: '2024-01-13' }
-                    ]
-                };
-                
-                updateDashboard(sampleData);
+                // Initialize the personal dashboard controller
+                if (window.PersonalDashboardController) {
+                    const controller = new window.PersonalDashboardController();
+                    await controller.init();
+                } else {
+                    console.error('PersonalDashboardController not available');
+                    // Fallback to basic data loading
+                    await loadBasicDashboardData();
+                }
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
+                await loadBasicDashboardData();
+            }
+        }
+
+        async function loadBasicDashboardData() {
+            try {
+                // Basic fallback data loading
+                const user = window.authManager?.currentUser;
+                if (user) {
+                    const basicData = {
+                        firstName: user.displayName?.split(' ')[0] || 'User',
+                        lastName: user.displayName?.split(' ')[1] || '',
+                        email: user.email || 'N/A',
+                        progress: 0,
+                        skills: [],
+                        recentActivity: []
+                    };
+                    updateDashboard(basicData);
+                } else {
+                    // Redirect to login if no user
+                    window.location.href = '/pages/auth/login.html';
+                }
+            } catch (error) {
+                console.error('Failed to load basic dashboard data:', error);
+                window.location.href = '/pages/auth/login.html';
             }
         }
 

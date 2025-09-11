@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SkillPort</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -103,6 +106,19 @@
                 </div>
                 <h2 class="text-xl font-semibold text-slate-800 mb-2">Welcome Back</h2>
                 <p class="text-slate-600">Sign in to your SkillPort account</p>
+            </div>
+
+            <!-- Message Area -->
+            <div id="messageArea" class="mb-6 hidden">
+                <div id="emailVerificationMessage" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+                    <div class="flex items-center">
+                        <i data-lucide="mail" class="w-5 h-5 text-blue-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-blue-800">Email Verification Required</h3>
+                            <p class="text-sm text-blue-700 mt-1">Please check your email and click the verification link before signing in.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Login Form -->
@@ -399,12 +415,71 @@
 
         // Check authentication status on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for email verification message in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            
+            if (message === 'verification-required') {
+                showVerificationRequiredMessage();
+            } else if (message === 'otp-not-verified') {
+                showOTPVerificationMessage();
+            } else if (message === 'email-not-verified') {
+                showEmailVerificationMessage();
+            }
+            
             // Check if user is already logged in
             if (typeof window.authManager !== 'undefined' && window.authManager.currentUser) {
                 console.log('User already logged in, redirecting...');
                 window.authManager.redirectByRole();
             }
         });
+
+        function showVerificationRequiredMessage() {
+            const messageArea = document.getElementById('messageArea');
+            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
+            
+            if (messageArea && emailVerificationMessage) {
+                messageArea.classList.remove('hidden');
+                emailVerificationMessage.classList.remove('hidden');
+                
+                // Update the message text for verification required
+                const messageText = emailVerificationMessage.querySelector('p');
+                if (messageText) {
+                    messageText.textContent = 'Please complete email or OTP verification before logging in.';
+                }
+                
+                lucide.createIcons();
+            }
+        }
+
+        function showOTPVerificationMessage() {
+            const messageArea = document.getElementById('messageArea');
+            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
+            
+            if (messageArea && emailVerificationMessage) {
+                messageArea.classList.remove('hidden');
+                emailVerificationMessage.classList.remove('hidden');
+                
+                // Update the message text for OTP verification
+                const messageText = emailVerificationMessage.querySelector('p');
+                if (messageText) {
+                    messageText.textContent = 'Please complete OTP verification before logging in.';
+                }
+                
+                lucide.createIcons();
+            }
+        }
+
+        function showEmailVerificationMessage() {
+            const messageArea = document.getElementById('messageArea');
+            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
+            
+            if (messageArea && emailVerificationMessage) {
+                messageArea.classList.remove('hidden');
+                emailVerificationMessage.classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
     </script>
 </body>
 </html>

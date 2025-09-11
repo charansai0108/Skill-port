@@ -278,6 +278,8 @@ class PageController {
 }
 
 // Export for module systems
+export default PageController;
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = PageController;
 }

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - SkillPort</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .auth-card:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .otp-input:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        .otp-input.filled {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="auth-card rounded-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-red-600 to-pink-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="mail" class="w-6 h-6 text-white"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Verify Your Email</h2>
+                <p class="text-slate-600">Enter the 6-digit code sent to</p>
+                <p class="text-slate-800 font-medium" id="userEmail">user@example.com</p>
+            </div>
+
+            <!-- Message Area -->
+            <div id="messageArea" class="mb-6 hidden">
+                <div id="successMessage" class="bg-green-50 border border-green-200 rounded-lg p-4 hidden">
+                    <div class="flex items-center">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-green-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-green-800">Verification Successful!</h3>
+                            <p class="text-sm text-green-700 mt-1">Redirecting to your dashboard...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 hidden">
+                    <div class="flex items-center">
+                        <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-red-800">Verification Failed</h3>
+                            <p class="text-sm text-red-700 mt-1" id="errorText">Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTP Form -->
+            <form id="otpForm" class="space-y-6">
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-slate-700">Verification Code</label>
+                    <div class="flex justify-center space-x-3" id="otpInputs">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold">
+                    Verify Email
+                </button>
+            </form>
+
+            <!-- Resend Section -->
+            <div class="mt-6 text-center">
+                <p class="text-slate-600 text-sm mb-3">Didn't receive the code?</p>
+                <button id="resendBtn" class="text-red-600 hover:text-red-700 font-medium text-sm">
+                    Resend Code
+                </button>
+                <p class="text-slate-500 text-xs mt-2" id="resendTimer"></p>
+            </div>
+
+            <!-- Back to Login -->
+            <div class="mt-6 text-center">
+                <a href="login.html" class="text-slate-600 hover:text-slate-800 text-sm">
+                    ← Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class OTPVerifier {
+            constructor() {
+                this.userEmail = '';
+                this.userData = null;
+                this.resendTimer = null;
+                this.resendCountdown = 0;
+                this.init();
+            }
+
+            init() {
+                this.getUserDataFromStorage();
+                this.setupOTPInputs();
+                this.setupEventListeners();
+                this.startResendTimer();
+            }
+
+            getUserDataFromStorage() {
+                // Get user data from session storage (set during registration)
+                const userData = sessionStorage.getItem('pendingUserData');
+                if (userData) {
+                    this.userData = JSON.parse(userData);
+                    this.userEmail = this.userData.email;
+                    document.getElementById('userEmail').textContent = this.userEmail;
+                } else {
+                    // Check URL parameters for email
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const email = urlParams.get('email');
+                    if (email) {
+                        this.userEmail = email;
+                        document.getElementById('userEmail').textContent = this.userEmail;
+                    } else {
+                        // Redirect to registration if no pending verification
+                        window.location.href = 'register.html';
+                    }
+                }
+            }
+
+            setupOTPInputs() {
+                const inputs = document.querySelectorAll('.otp-input');
+                
+                inputs.forEach((input, index) => {
+                    input.addEventListener('input', (e) => {
+                        const value = e.target.value;
+                        
+                        // Only allow numbers
+                        if (!/^\d$/.test(value)) {
+                            e.target.value = '';
+                            return;
+                        }
+                        
+                        // Move to next input
+                        if (value && index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                        
+                        // Update visual state
+                        e.target.classList.add('filled');
+                        
+                        // Check if all inputs are filled
+                        this.checkOTPComplete();
+                    });
+                    
+                    input.addEventListener('keydown', (e) => {
+                        // Handle backspace
+                        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    });
+                    
+                    input.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const pastedData = e.clipboardData.getData('text');
+                        const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+                        
+                        digits.split('').forEach((digit, i) => {
+                            if (inputs[i]) {
+                                inputs[i].value = digit;
+                                inputs[i].classList.add('filled');
+                            }
+                        });
+                        
+                        this.checkOTPComplete();
+                    });
+                });
+            }
+
+            setupEventListeners() {
+                document.getElementById('otpForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.verifyOTP();
+                });
+                
+                document.getElementById('resendBtn').addEventListener('click', () => {
+                    this.resendOTP();
+                });
+            }
+
+            checkOTPComplete() {
+                const inputs = document.querySelectorAll('.otp-input');
+                const otp = Array.from(inputs).map(input => input.value).join('');
+                
+                if (otp.length === 6) {
+                    // Auto-submit when all digits are entered
+                    setTimeout(() => this.verifyOTP(), 100);
+                }
+            }
+
+            async verifyOTP() {
+                const inputs = document.querySelectorAll('.otp-input');
+                const otp = Array.from(inputs).map(input => input.value).join('');
+                
+                if (otp.length !== 6) {
+                    this.showError('Please enter all 6 digits');
+                    return;
+                }
+                
+                this.showLoading(true);
+                
+                try {
+                    // Use our local OTP server
+                    const response = await fetch('http://localhost:5002/api/otp/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: this.userEmail,
+                            otp: otp
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Complete the registration process with Firebase
+                        try {
+                            await this.completeRegistration();
+                            
+                            this.showSuccess();
+                            // Clear pending verification
+                            sessionStorage.removeItem('pendingUserData');
+                            
+                            // Redirect to dashboard after successful OTP verification
+                            setTimeout(() => {
+                                window.location.href = '/pages/personal/student-dashboard.html';
+                            }, 2000);
+                        } catch (registrationError) {
+                            console.error('Registration completion failed:', registrationError);
+                            this.showError('Registration failed. Please try again or contact support.');
+                            this.clearOTPInputs();
+                            return;
+                        }
+                    } else {
+                        // Show specific error message
+                        let errorMessage = result.message;
+                        if (result.message === 'No OTP found for this email') {
+                            errorMessage = 'OTP has expired or already used. Please request a new one.';
+                        } else if (result.message === 'OTP has expired') {
+                            errorMessage = 'OTP has expired. Please request a new one.';
+                        } else if (result.message === 'Too many failed attempts') {
+                            errorMessage = 'Too many failed attempts. Please request a new OTP.';
+                        }
+                        this.showError(errorMessage);
+                        this.clearOTPInputs();
+                    }
+                } catch (error) {
+                    console.error('OTP verification error:', error);
+                    this.showError('Network error. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async resendOTP() {
+                if (this.resendCountdown > 0) {
+                    return;
+                }
+                
+                this.showLoading(true);
+                
+                try {
+                    // Use our local OTP server
+                    const userData = JSON.parse(sessionStorage.getItem('pendingUserData') || '{}');
+                    const response = await fetch('http://localhost:5002/api/otp/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: this.userEmail,
+                            firstName: userData.firstName,
+                            lastName: userData.lastName
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSuccess('New verification code sent!');
+                        this.startResendTimer();
+                    } else {
+                        this.showError(result.message);
+                    }
+                } catch (error) {
+                    console.error('Resend OTP error:', error);
+                    this.showError('Failed to resend code. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            startResendTimer() {
+                this.resendCountdown = 60; // 60 seconds
+                const timerElement = document.getElementById('resendTimer');
+                const resendBtn = document.getElementById('resendBtn');
+                
+                resendBtn.disabled = true;
+                resendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                this.resendTimer = setInterval(() => {
+                    this.resendCountdown--;
+                    timerElement.textContent = `Resend available in ${this.resendCountdown}s`;
+                    
+                    if (this.resendCountdown <= 0) {
+                        clearInterval(this.resendTimer);
+                        timerElement.textContent = '';
+                        resendBtn.disabled = false;
+                        resendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                }, 1000);
+            }
+
+            clearOTPInputs() {
+                const inputs = document.querySelectorAll('.otp-input');
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                inputs[0].focus();
+            }
+
+            showLoading(show) {
+                const submitBtn = document.querySelector('#otpForm button[type="submit"]');
+                if (show) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i>Verifying...';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Verify Email';
+                }
+                lucide.createIcons();
+            }
+
+            showSuccess(message = 'Email verified successfully!') {
+                this.hideMessages();
+                const messageArea = document.getElementById('messageArea');
+                const successMessage = document.getElementById('successMessage');
+                
+                messageArea.classList.remove('hidden');
+                successMessage.classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            showError(message) {
+                this.hideMessages();
+                const messageArea = document.getElementById('messageArea');
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                
+                errorText.textContent = message;
+                messageArea.classList.remove('hidden');
+                errorMessage.classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            hideMessages() {
+                const messageArea = document.getElementById('messageArea');
+                const successMessage = document.getElementById('successMessage');
+                const errorMessage = document.getElementById('errorMessage');
+                
+                messageArea.classList.add('hidden');
+                successMessage.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+            }
+
+            async completeRegistration() {
+                try {
+                    // Import Firebase service dynamically
+                    const { default: firebaseService } = await import('../../js/firebaseService.js?v=' + Date.now() + '&bust=' + Math.random());
+                    
+                    // Get user data from session storage
+                    const userData = JSON.parse(sessionStorage.getItem('pendingUserData') || '{}');
+                    
+                    if (!userData.email) {
+                        throw new Error('No user data found in session storage');
+                    }
+                    
+                    // Create Firebase user account using the service
+                    const result = await firebaseService.register(userData);
+                    
+                    if (result.success) {
+                        console.log('✅ Registration completed successfully');
+                        
+                        // Complete registration with OTP verification
+                        const completeResult = await firebaseService.completeRegistration(userData);
+                        
+                        if (completeResult.success) {
+                            console.log('✅ User marked as OTP verified');
+                            
+                            // Send welcome email
+                            try {
+                                await fetch('http://localhost:5002/api/email/registration-welcome', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        email: userData.email,
+                                        firstName: userData.firstName,
+                                        lastName: userData.lastName
+                                    })
+                                });
+                            } catch (emailError) {
+                                console.warn('Failed to send welcome email:', emailError);
+                                // Don't fail registration for email errors
+                            }
+                        } else {
+                            throw new Error(completeResult.error || 'Failed to complete registration');
+                        }
+                    } else {
+                        // Handle specific error cases
+                        if (result.message && result.message.includes('email-already-in-use')) {
+                            console.log('✅ Email already registered, attempting to complete registration');
+                            
+                            // Try to complete registration for existing user
+                            const completeResult = await firebaseService.completeRegistration(userData);
+                            if (!completeResult.success) {
+                                throw new Error(completeResult.error || 'Failed to complete registration for existing user');
+                            }
+                        } else {
+                            throw new Error(result.message || 'Failed to create user account');
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error completing registration:', error);
+                    throw error; // Re-throw to be handled by caller
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('OTP Verifier initializing at:', Date.now());
+            new OTPVerifier();
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,10 @@
  * Personal Stats Controller
  * Handles personal statistics and analytics for individual users
  */
+import firebaseService from './firebaseService.js';
+import logger from './logger.js';
+import PageController from './pageController.js';
+
 class PersonalStatsController extends PageController {
     constructor() {
         super();
@@ -28,19 +32,44 @@ class PersonalStatsController extends PageController {
         try {
             this.showLoading();
             
-            // Load user stats
-            await this.loadUserStats();
+            // Get current user
+            const user = window.authManager.currentUser;
+            if (!user) {
+                throw new Error('No authenticated user found');
+            }
+
+            // Load user stats from Firestore
+            const userDoc = await firebaseService.getUserDocument(user.uid);
             
-            // Load progress data
-            await this.loadProgressData();
-            
-            // Load platform stats
-            await this.loadPlatformStats();
+            if (userDoc) {
+                this.statsData = {
+                    streak: userDoc.streak || 0,
+                    submissions: userDoc.submissions || 0,
+                    problemsSolved: userDoc.problemsSolved || 0,
+                    skillRating: userDoc.skillRating || 0,
+                    createdAt: userDoc.createdAt,
+                    updatedAt: userDoc.updatedAt
+                };
+                this.renderStats();
+            } else {
+                // Create default stats if document doesn't exist
+                this.statsData = {
+                    streak: 0,
+                    submissions: 0,
+                    problemsSolved: 0,
+                    skillRating: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                this.renderStats();
+            }
             
             this.hideLoading();
         } catch (error) {
-            console.error('📊 PersonalStatsController: Error loading stats data:', error);
-            this.showError('Failed to load statistics data');
+            console.error('📊 PersonalStatsController: Error loading stats:', error);
+            logger.error('PersonalStatsController: Error loading stats', error);
+            this.hideLoading();
+            this.showError('Failed to load stats data');
         }
     }
 
@@ -320,6 +349,9 @@ class PersonalStatsController extends PageController {
         }
     }
 }
+
+// Make PersonalStatsController available globally
+window.PersonalStatsController = PersonalStatsController;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

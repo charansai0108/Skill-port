@@ -1,59 +1,195 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection - users can read/write their own data
+    
+    // Helper functions for role checking
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'community-admin';
+    }
+    
+    function isMentor() {
+      return isAuthenticated() && getUserRole() == 'mentor';
+    }
+    
+    function isStudent() {
+      return isAuthenticated() && getUserRole() == 'student';
+    }
+    
+    function isPersonal() {
+      return isAuthenticated() && getUserRole() == 'personal';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function belongsToCommunity(communityId) {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.community == communityId;
+    }
+    
+    function isValidUserData(data) {
+      return data.keys().hasAll(['firstName', 'lastName', 'email', 'role']) &&
+        data.firstName is string && data.firstName.size() >= 2 && data.firstName.size() <= 50 &&
+        data.lastName is string && data.lastName.size() >= 2 && data.lastName.size() <= 50 &&
+        data.email is string && data.email.matches('.*@.*\\..*') &&
+        data.role in ['community-admin', 'mentor', 'student', 'personal'];
+    }
+    
+    // Users collection - enhanced security
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null && 
-        (resource.data.role == 'community-admin' || 
-         resource.data.role == 'mentor' || 
-         resource.data.role == 'student');
+      // Users can read/write their own data
+      allow read, write: if isOwner(userId);
+      
+      // Admins can read all users
+      allow read: if isAdmin();
+      
+      // Mentors can read users in their community
+      allow read: if isMentor() && belongsToCommunity(resource.data.community);
+      
+      // Validate user data on create/update
+      allow create: if isAuthenticated() && 
+        isValidUserData(request.resource.data) &&
+        request.resource.data.uid == request.auth.uid;
+        
+      allow update: if isOwner(userId) && 
+        isValidUserData(request.resource.data);
     }
     
-    // Communities collection - authenticated users can read, admins can write
+    // Communities collection - enhanced security
     match /communities/{communityId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (request.auth.uid == resource.data.admin || 
-         request.auth.uid in resource.data.members);
-      allow create: if request.auth != null;
+      // Authenticated users can read communities
+      allow read: if isAuthenticated();
+      
+      // Only authenticated users can create communities
+      allow create: if isAuthenticated() && 
+        request.resource.data.keys().hasAll(['name', 'code', 'admin']) &&
+        request.resource.data.admin == request.auth.uid &&
+        request.resource.data.name is string && request.resource.data.name.size() >= 3 &&
+        request.resource.data.code is string && request.resource.data.code.size() >= 3;
+      
+      // Only community admin can update
+      allow update: if isAuthenticated() && 
+        request.auth.uid == resource.data.admin;
+      
+      // Only community admin can delete
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.admin;
     }
     
-    // Contests collection - authenticated users can read, creators and admins can write
+    // Contests collection - enhanced security
     match /contests/{contestId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        (request.auth.uid == resource.data.createdBy || 
-         request.auth.uid == resource.data.admin);
-      allow create: if request.auth != null;
+      // Authenticated users can read contests
+      allow read: if isAuthenticated();
+      
+      // Only authenticated users can create contests
+      allow create: if isAuthenticated() && 
+        request.resource.data.keys().hasAll(['title', 'createdBy', 'community']) &&
+        request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.title is string && request.resource.data.title.size() >= 3;
+      
+      // Contest creators and admins can update
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == resource.data.createdBy || isAdmin());
+      
+      // Only contest creators and admins can delete
+      allow delete: if isAuthenticated() && 
+        (request.auth.uid == resource.data.createdBy || isAdmin());
     }
     
-    // Submissions collection - users can read/write their own submissions
+    // Submissions collection - enhanced security
     match /submissions/{submissionId} {
-      allow read: if request.auth != null && 
-        (request.auth.uid == resource.data.userId || 
-         request.auth.uid == resource.data.contestAdmin);
-      allow write: if request.auth != null && 
+      // Users can read their own submissions
+      allow read: if isAuthenticated() && 
         request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null;
+      
+      // Mentors can read submissions in their community
+      allow read: if isMentor() && 
+        belongsToCommunity(resource.data.community);
+      
+      // Admins can read all submissions
+      allow read: if isAdmin();
+      
+      // Users can create their own submissions
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['title', 'userId', 'contestId']);
+      
+      // Users can update their own submissions
+      allow update: if isAuthenticated() && 
+        request.auth.uid == resource.data.userId;
+      
+      // Only submission owners can delete
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.userId;
     }
     
-    // Notifications collection - users can read their own notifications
+    // Notifications collection - enhanced security
     match /notifications/{notificationId} {
-      allow read: if request.auth != null && 
+      // Users can read their own notifications
+      allow read: if isAuthenticated() && 
         request.auth.uid == resource.data.userId;
-      allow write: if request.auth != null && 
+      
+      // Users can create notifications for themselves
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own notifications
+      allow update: if isAuthenticated() && 
         request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null;
+      
+      // Users can delete their own notifications
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.userId;
     }
     
-    // Admin collections - only admins can access
+    // Flags collection - enhanced security with rate limiting
+    match /flags/{flagId} {
+      // Authenticated users can create flags
+      allow create: if isAuthenticated() && 
+        request.resource.data.keys().hasAll(['userId', 'platform', 'title', 'difficulty']) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.platform in ['leetcode', 'geeksforgeeks', 'hackerrank', 'interviewbit'] &&
+        request.resource.data.difficulty in ['easy', 'medium', 'hard'] &&
+        request.resource.data.title is string && request.resource.data.title.size() <= 200;
+      
+      // Authenticated users can read flags
+      allow read: if isAuthenticated();
+      
+      // Only admins can update flags (resolve them)
+      allow update: if isAdmin() && 
+        request.resource.data.keys().hasAll(['status']) &&
+        request.resource.data.status in ['open', 'resolved'];
+      
+      // Only admins can delete flags
+      allow delete: if isAdmin();
+    }
+    
+    // Admin collections - strict admin-only access
     match /admin/{document=**} {
-      allow read, write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'community-admin';
+      allow read, write: if isAdmin();
     }
     
-    // Default deny rule
+    // Analytics collection - read-only for authenticated users
+    match /analytics/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Audit logs - admin only
+    match /audit_logs/{document=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Default deny rule - explicit deny for any unmatched paths
     match /{document=**} {
       allow read, write: if false;
     }

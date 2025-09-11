@@ -2,6 +2,10 @@
  * Personal Tracker Controller
  * Handles problem tracking and submission monitoring for personal users
  */
+import firebaseService from './firebaseService.js';
+import logger from './logger.js';
+import PageController from './pageController.js';
+
 class PersonalTrackerController extends PageController {
     constructor() {
         super();
@@ -30,15 +34,39 @@ class PersonalTrackerController extends PageController {
         try {
             this.showLoading();
             
-            // Load user submissions
-            await this.loadSubmissions();
+            // Get current user
+            const user = window.authManager.currentUser;
+            if (!user) {
+                throw new Error('No authenticated user found');
+            }
+
+            // Load tasks from Firestore
+            this.tasks = await firebaseService.getUserTasks(user.uid);
             
-            // Load tracking statistics
-            await this.loadTrackingStats();
+            // Load user stats for tracking
+            const userDoc = await firebaseService.getUserDocument(user.uid);
+            if (userDoc) {
+                this.trackingStats = {
+                    streak: userDoc.streak || 0,
+                    submissions: userDoc.submissions || 0,
+                    problemsSolved: userDoc.problemsSolved || 0,
+                    skillRating: userDoc.skillRating || 0
+                };
+            } else {
+                this.trackingStats = {
+                    streak: 0,
+                    submissions: 0,
+                    problemsSolved: 0,
+                    skillRating: 0
+                };
+            }
             
+            this.renderTrackingData();
             this.hideLoading();
         } catch (error) {
             console.error('📈 PersonalTrackerController: Error loading tracking data:', error);
+            logger.error('PersonalTrackerController: Error loading tracking data', error);
+            this.hideLoading();
             this.showError('Failed to load tracking data');
         }
     }
@@ -443,6 +471,9 @@ class PersonalTrackerController extends PageController {
         }
     }
 }
+
+// Make PersonalTrackerController available globally
+window.PersonalTrackerController = PersonalTrackerController;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

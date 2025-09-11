@@ -2,6 +2,10 @@
  * Personal Projects Controller
  * Handles personal project management for individual users
  */
+import firebaseService from './firebaseService.js';
+import logger from './logger.js';
+import PageController from './pageController.js';
+
 class PersonalProjectsController extends PageController {
     constructor() {
         super();
@@ -28,17 +32,21 @@ class PersonalProjectsController extends PageController {
         try {
             this.showLoading();
             
-            const response = await window.APIService.getUserProjects();
-            if (response.success) {
-                this.projects = response.data.projects || [];
-                this.renderProjects();
-            } else {
-                this.showError('Failed to load projects');
+            // Get current user
+            const user = window.authManager.currentUser;
+            if (!user) {
+                throw new Error('No authenticated user found');
             }
+
+            // Load projects from Firestore
+            this.projects = await firebaseService.getUserProjects(user.uid);
+            this.renderProjects();
             
             this.hideLoading();
         } catch (error) {
             console.error('📁 PersonalProjectsController: Error loading projects:', error);
+            logger.error('PersonalProjectsController: Error loading projects', error);
+            this.hideLoading();
             this.showError('Failed to load projects');
         }
     }
@@ -392,6 +400,9 @@ class PersonalProjectsController extends PageController {
         }
     }
 }
+
+// Make PersonalProjectsController available globally
+window.PersonalProjectsController = PersonalProjectsController;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

@@ -48,7 +48,7 @@
     return 'unknown-user';
   }
 
-  // ✅ Extract problem details
+  // ✅ Extract problem details with robust difficulty detection
   function getProblemDetails() {
     const titleElement = document.querySelector('.problem-title') ||
                         document.querySelector('.title') ||
@@ -56,14 +56,134 @@
     
     const title = titleElement ? titleElement.textContent.trim() : 'Unknown Problem';
     
-    // Try to extract difficulty
-    const difficultyElement = document.querySelector('.difficulty') ||
-                             document.querySelector('.problem-difficulty') ||
-                             document.querySelector('[data-testid="difficulty"]');
-    
-    const difficulty = difficultyElement ? difficultyElement.textContent.trim().toLowerCase() : 'unknown';
+    // Robust difficulty extraction
+    const difficulty = getDifficulty();
     
     return { title, difficulty };
+  }
+
+  // ✅ Robust difficulty extraction function
+  function getDifficulty() {
+    console.log('🔍 InterviewBit: Starting difficulty extraction...');
+    
+    // Try multiple selectors for difficulty
+    const selectors = [
+      '[data-difficulty]', // Data attribute
+      '.difficulty', '.problem-difficulty', '[data-testid="difficulty"]', // Common selectors
+      '.tag', '[class*="tag"]', // Tag elements
+      '.badge', '[class*="badge"]', // Badge elements
+      '.label', '[class*="label"]', // Label elements
+      '[class*="difficulty"]', // Any element with difficulty in class
+      '.text-sm', '.text-xs', // Small text elements
+      '.font-medium', '.font-semibold', // Font weight elements
+      '.problem-difficulty-badge', '.difficulty-badge' // InterviewBit specific
+    ];
+    
+    // Debug: Log all elements with difficulty-related classes
+    const allDifficultyElements = document.querySelectorAll('[class*="difficulty"], [class*="tag"], [data-difficulty]');
+    console.log(`🔍 InterviewBit: Found ${allDifficultyElements.length} difficulty-related elements`);
+    
+    // Additional debugging: Look for any element containing difficulty text
+    const allElements = document.querySelectorAll('*');
+    const difficultyTextElements = [];
+    for (const element of allElements) {
+      const text = element.textContent?.toLowerCase().trim();
+      if (text && (text === 'easy' || text === 'medium' || text === 'hard')) {
+        difficultyTextElements.push({
+          element: element,
+          text: text,
+          classes: (element.className || '').toString(),
+          tagName: element.tagName
+        });
+      }
+    }
+    console.log(`🔍 InterviewBit: Found ${difficultyTextElements.length} elements with difficulty text:`, difficultyTextElements);
+    
+    // Use the difficulty text elements we found
+    if (difficultyTextElements.length > 0) {
+      const firstElement = difficultyTextElements[0];
+      console.log(`✅ InterviewBit: Difficulty extracted from text element: ${firstElement.text}`);
+      return firstElement.text;
+    }
+    
+    for (const element of allDifficultyElements) {
+      const classes = (element.className || '').toString();
+      const text = element.textContent?.toLowerCase().trim() || '';
+      
+      console.log(`🔍 InterviewBit: Checking element with classes: ${classes}, text: "${text}"`);
+      
+      // Check CSS classes
+      if (classes.includes('difficulty-easy') || classes.includes('text-difficulty-easy')) {
+        console.log('✅ InterviewBit: Difficulty extracted from CSS class: easy');
+        return 'easy';
+      }
+      if (classes.includes('difficulty-medium') || classes.includes('text-difficulty-medium')) {
+        console.log('✅ InterviewBit: Difficulty extracted from CSS class: medium');
+        return 'medium';
+      }
+      if (classes.includes('difficulty-hard') || classes.includes('text-difficulty-hard')) {
+        console.log('✅ InterviewBit: Difficulty extracted from CSS class: hard');
+        return 'hard';
+      }
+      
+      // Check data attributes
+      const dataDiff = element.getAttribute('data-difficulty');
+      if (dataDiff) {
+        const diff = dataDiff.toLowerCase().trim();
+        if (['easy', 'medium', 'hard'].includes(diff)) {
+          console.log('✅ InterviewBit: Difficulty extracted from data attribute:', diff);
+          return diff;
+        }
+      }
+      
+      // Check text content
+      if (['easy', 'medium', 'hard'].includes(text)) {
+        console.log('✅ InterviewBit: Difficulty extracted from text:', text);
+        return text;
+      }
+    }
+    
+    // Try the original selectors as fallback
+    for (const selector of selectors) {
+      const elements = document.querySelectorAll(selector);
+      for (const element of elements) {
+        const classes = (element.className || '').toString();
+        const text = element.textContent?.toLowerCase().trim() || '';
+        
+        // Check CSS classes
+        if (classes.includes('difficulty-easy') || classes.includes('text-difficulty-easy')) {
+          console.log('✅ InterviewBit: Difficulty extracted from CSS class: easy');
+          return 'easy';
+        }
+        if (classes.includes('difficulty-medium') || classes.includes('text-difficulty-medium')) {
+          console.log('✅ InterviewBit: Difficulty extracted from CSS class: medium');
+          return 'medium';
+        }
+        if (classes.includes('difficulty-hard') || classes.includes('text-difficulty-hard')) {
+          console.log('✅ InterviewBit: Difficulty extracted from CSS class: hard');
+          return 'hard';
+        }
+        
+        // Check data attributes
+        const dataDiff = element.getAttribute('data-difficulty');
+        if (dataDiff) {
+          const diff = dataDiff.toLowerCase().trim();
+          if (['easy', 'medium', 'hard'].includes(diff)) {
+            console.log('✅ InterviewBit: Difficulty extracted from data attribute:', diff);
+            return diff;
+          }
+        }
+        
+        // Check text content
+        if (['easy', 'medium', 'hard'].includes(text)) {
+          console.log('✅ InterviewBit: Difficulty extracted from text:', text);
+          return text;
+        }
+      }
+    }
+    
+    console.log('⚠️ InterviewBit: Difficulty not found, defaulting to medium');
+    return 'medium';
   }
 
   // ✅ Extract submission details

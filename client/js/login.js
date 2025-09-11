@@ -370,7 +370,7 @@ class LoginHandler {
     // Utility method to test redirect
     static testRedirect() {
         console.log('🔐 LoginHandler: Testing redirect...');
-        window.location.href = 'pages/admin/admin-dashboard.html';
+        window.location.href = '/pages/admin/admin-dashboard.html';
     }
 }
 

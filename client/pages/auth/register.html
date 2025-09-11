@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - SkillPort</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -450,6 +453,17 @@
             e.preventDefault();
             console.log('Personal form submitted');
             
+            // Prevent multiple submissions
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) {
+                console.log('Form already being submitted, ignoring...');
+                return;
+            }
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending OTP...';
+            
             const formData = new FormData(e.target);
             const userData = {
                 role: 'personal',
@@ -479,23 +493,38 @@
             }
             
             try {
-                const firebaseService = await import('../../js/firebaseService.js');
-                const response = await firebaseService.default.register(userData);
+                // Store user data for OTP verification
+                sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
                 
-                if (response.success) {
+                // Send OTP via our OTP server
+                const otpResponse = await fetch('http://localhost:5002/api/otp/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: userData.email,
+                        firstName: userData.firstName,
+                        lastName: userData.lastName
+                    })
+                });
+                
+                const otpResult = await otpResponse.json();
+                
+                if (otpResult.success) {
                     if (window.notifications) {
                         window.notifications.success({
-                            title: 'Registration Successful',
-                            message: 'Please check your email for verification'
+                            title: 'OTP Sent!',
+                            message: 'Please check your email for the verification code'
                         });
                     }
                     
-                    // Redirect to login page
+                    // Redirect to OTP verification page
                     setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                        window.location.href = 'verify-otp.html?email=' + encodeURIComponent(userData.email);
+                    }, 1500);
                 } else {
-                    throw new Error(response.message);
+                    throw new Error(otpResult.message || 'Failed to send OTP');
                 }
             } catch (error) {
                 console.error('Registration error:', error);
@@ -507,12 +536,27 @@
                 } else {
                     alert('Registration failed: ' + (error.message || 'An error occurred during registration'));
                 }
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
             }
         });
         
         document.getElementById('communityRegistrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             console.log('Community form submitted');
+            
+            // Prevent multiple submissions
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) {
+                console.log('Form already being submitted, ignoring...');
+                return;
+            }
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending OTP...';
             
             const formData = new FormData(e.target);
             const userData = {
@@ -544,23 +588,38 @@
             }
             
             try {
-                const firebaseService = await import('../../js/firebaseService.js');
-                const response = await firebaseService.default.register(userData);
+                // Store user data for OTP verification
+                sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
                 
-                if (response.success) {
+                // Send OTP via our OTP server
+                const otpResponse = await fetch('http://localhost:5002/api/otp/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: userData.email,
+                        firstName: userData.firstName,
+                        lastName: userData.lastName
+                    })
+                });
+                
+                const otpResult = await otpResponse.json();
+                
+                if (otpResult.success) {
                     if (window.notifications) {
                         window.notifications.success({
-                            title: 'Registration Successful',
-                            message: 'Please check your email for verification'
+                            title: 'OTP Sent!',
+                            message: 'Please check your email for the verification code'
                         });
                     }
                     
-                    // Redirect to login page
+                    // Redirect to OTP verification page
                     setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                        window.location.href = 'verify-otp.html?email=' + encodeURIComponent(userData.email);
+                    }, 1500);
                 } else {
-                    throw new Error(response.message);
+                    throw new Error(otpResult.message || 'Failed to send OTP');
                 }
             } catch (error) {
                 console.error('Community registration error:', error);
@@ -572,14 +631,32 @@
                 } else {
                     alert('Registration failed: ' + (error.message || 'An error occurred during registration'));
                 }
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
             }
         });
         
         // Password toggle functionality
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const toggleBtn = input.parentNode.querySelector('.password-toggle');
-            const eyeIcon = toggleBtn.querySelector('i');
+            if (!input) {
+                console.error('Input element not found:', inputId);
+                return;
+            }
+            
+            const toggleBtn = input.parentNode?.querySelector('.password-toggle');
+            if (!toggleBtn) {
+                console.error('Toggle button not found for input:', inputId);
+                return;
+            }
+            
+            const eyeIcon = toggleBtn.querySelector('i, svg, .eye-icon');
+            if (!eyeIcon) {
+                console.error('Eye icon not found for input:', inputId);
+                return;
+            }
 
             if (input.type === 'password') {
                 input.type = 'text';
@@ -588,7 +665,11 @@
                 input.type = 'password';
                 eyeIcon.setAttribute('data-lucide', 'eye');
             }
-            lucide.createIcons();
+            
+            // Re-initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
         
         console.log('Registration page loaded successfully with Firebase integration!');

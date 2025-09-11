@@ -3,6 +3,8 @@
  * Manages user profile and settings functionality
  */
 
+import storageService from './services/storageService.js';
+
 class UserProfileController extends PageController {
     constructor() {
         super();
@@ -527,6 +529,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 2000);
 });
+
+// Profile Image Upload Methods
+UserProfileController.prototype.handleProfileImageUpload = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = storageService.validateFile(file, {
+        maxSize: 5 * 1024 * 1024, // 5MB for profile images
+        allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    });
+
+    if (!validation.valid) {
+        window.uiHelpers.showError('Upload Error', validation.error);
+        return;
+    }
+
+    try {
+        const userId = window.authManager.getUserId();
+        const result = await storageService.uploadProfileImage(file, userId);
+        
+        if (result.success) {
+            // Update user profile with new image URL
+            await this.updateProfileImage(result.downloadURL);
+            window.uiHelpers.showSuccess('Success', 'Profile image updated successfully');
+        } else {
+            window.uiHelpers.showError('Upload Error', result.error);
+        }
+    } catch (error) {
+        console.error('Profile image upload error:', error);
+        window.uiHelpers.showError('Upload Error', 'Failed to upload profile image');
+    }
+};
+
+UserProfileController.prototype.updateProfileImage = async function(imageURL) {
+    try {
+        const userId = window.authManager.getUserId();
+        await firebaseService.updateUserProfile(userId, { photoURL: imageURL });
+        
+        // Update UI
+        const profileImage = document.querySelector('.profile-image');
+        if (profileImage) {
+            profileImage.src = imageURL;
+        }
+    } catch (error) {
+        console.error('Update profile image error:', error);
+        throw error;
+    }
+};
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

@@ -3,6 +3,8 @@
  * Handles personal dashboard functionality using Firebase Firestore
  */
 import firebaseService from './firebaseService.js';
+import logger from './logger.js';
+import PageController from './pageController.js';
 
 class PersonalDashboardController extends PageController {
     constructor() {
@@ -49,172 +51,181 @@ class PersonalDashboardController extends PageController {
 
     async loadDashboardData() {
         try {
+            console.log('🎯 PersonalDashboardController: Loading dashboard data...');
             this.showLoading();
             
-            // Load user stats
-            await this.loadUserStats();
+            // Get current user
+            const user = window.authManager.currentUser;
+            if (!user) {
+                throw new Error('No authenticated user found');
+            }
+
+            // Load user profile and stats from Firestore
+            await this.loadUserProfile(user.uid);
             
-            // Load recent activity
-            await this.loadRecentActivity();
+            // Load tasks
+            await this.loadTasks(user.uid);
             
-            // Load goals
-            await this.loadGoals();
+            // Load projects
+            await this.loadProjects(user.uid);
             
             // Load achievements
-            await this.loadAchievements();
+            await this.loadAchievements(user.uid);
             
-            // Load coding platforms
-            await this.loadCodingPlatforms();
+            // Update UI with loaded data
+            this.updateDashboardUI();
             
             this.hideLoading();
+            console.log('🎯 PersonalDashboardController: Dashboard data loaded successfully');
+            
         } catch (error) {
-            console.error('🎯 PersonalDashboardController: Error loading dashboard data:', error);
-            this.showError('Failed to load dashboard data');
+            console.error('🎯 PersonalDashboardController: Failed to load dashboard data:', error);
+            logger.error('PersonalDashboardController: Failed to load dashboard data', error);
+            this.hideLoading();
+            this.handleError(error);
         }
     }
 
-    async loadUserStats() {
+    async loadUserProfile(uid) {
         try {
-            // Get user data from Firebase Auth and Firestore
-            const currentUser = firebaseService.getCurrentUser();
-            if (currentUser) {
+            console.log('🎯 PersonalDashboardController: Loading user profile for:', uid);
+            
+            // Get user document from Firestore
+            const userDoc = await firebaseService.getUserDocument(uid);
+            
+            if (userDoc) {
                 this.userStats = {
-                    firstName: currentUser.firstName || currentUser.displayName?.split(' ')[0] || 'User',
-                    lastName: currentUser.lastName || currentUser.displayName?.split(' ')[1] || '',
-                    email: currentUser.email,
-                    totalPoints: currentUser.totalPoints || 0,
-                    streak: currentUser.streak || 0,
-                    problemsSolved: currentUser.problemsSolved || 0,
-                    skillRating: currentUser.skillRating || 0,
-                    communities: currentUser.communities || 0
+                    firstName: userDoc.name?.split(' ')[0] || 'User',
+                    lastName: userDoc.name?.split(' ')[1] || '',
+                    email: userDoc.email || 'N/A',
+                    profileImage: userDoc.profileImage || '',
+                    streak: userDoc.streak || 0,
+                    submissions: userDoc.submissions || 0,
+                    problemsSolved: userDoc.problemsSolved || 0,
+                    skillRating: userDoc.skillRating || 0,
+                    createdAt: userDoc.createdAt,
+                    updatedAt: userDoc.updatedAt
                 };
-                this.renderUserStats();
+                console.log('🎯 PersonalDashboardController: User profile loaded:', this.userStats);
+            } else {
+                // Create default user stats if document doesn't exist
+                this.userStats = {
+                    firstName: 'User',
+                    lastName: '',
+                    email: 'N/A',
+                    profileImage: '',
+                    streak: 0,
+                    submissions: 0,
+                    problemsSolved: 0,
+                    skillRating: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                console.log('🎯 PersonalDashboardController: Using default user stats');
             }
         } catch (error) {
-            console.error('🎯 PersonalDashboardController: Error loading user stats:', error);
+            console.error('🎯 PersonalDashboardController: Error loading user profile:', error);
+            logger.error('PersonalDashboardController: Error loading user profile', error);
+            
+            // Fallback to basic user data
+            this.userStats = {
+                firstName: 'User',
+                lastName: '',
+                email: 'N/A',
+                profileImage: '',
+                streak: 0,
+                submissions: 0,
+                problemsSolved: 0,
+                skillRating: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
         }
     }
 
-    async loadRecentActivity() {
+    async loadTasks(uid) {
         try {
-            // Load recent activity from Firestore
-            const response = await firebaseService.getTasks();
-            if (response.success) {
-                this.recentActivity = response.data.slice(0, 5).map(task => ({
-                    type: task.title || 'Task Completed',
-                    createdAt: task.createdAt?.toDate() || new Date(),
-                    description: task.description || ''
-                }));
-                this.renderRecentActivity();
+            console.log('🎯 PersonalDashboardController: Loading tasks for:', uid);
+            
+            // Load tasks from Firestore subcollection
+            const tasks = await firebaseService.getUserTasks(uid);
+            
+            if (tasks && tasks.length > 0) {
+                this.tasks = tasks;
+                console.log('🎯 PersonalDashboardController: Tasks loaded:', tasks.length);
+            } else {
+                this.tasks = [];
+                console.log('🎯 PersonalDashboardController: No tasks found');
             }
         } catch (error) {
-            console.error('🎯 PersonalDashboardController: Error loading recent activity:', error);
+            console.error('🎯 PersonalDashboardController: Error loading tasks:', error);
+            logger.error('PersonalDashboardController: Error loading tasks', error);
+            this.tasks = [];
         }
     }
 
-    async loadGoals() {
+    async loadProjects(uid) {
         try {
-            // Load goals from Firestore or use default goals
-            const currentUser = firebaseService.getCurrentUser();
-            this.goals = [
-                { 
-                    id: 1, 
-                    title: 'Solve 50 LeetCode problems', 
-                    progress: currentUser?.leetcodeProblems || 0, 
-                    target: 50, 
-                    type: 'leetcode' 
-                },
-                { 
-                    id: 2, 
-                    title: 'Complete 10 HackerRank challenges', 
-                    progress: currentUser?.hackerrankProblems || 0, 
-                    target: 10, 
-                    type: 'hackerrank' 
-                },
-                { 
-                    id: 3, 
-                    title: 'Master 5 data structures', 
-                    progress: currentUser?.dataStructuresLearned || 0, 
-                    target: 5, 
-                    type: 'learning' 
-                }
-            ];
-            this.renderGoals();
+            console.log('🎯 PersonalDashboardController: Loading projects for:', uid);
+            
+            // Load projects from Firestore subcollection
+            const projects = await firebaseService.getUserProjects(uid);
+            
+            if (projects && projects.length > 0) {
+                this.projects = projects;
+                console.log('🎯 PersonalDashboardController: Projects loaded:', projects.length);
+            } else {
+                this.projects = [];
+                console.log('🎯 PersonalDashboardController: No projects found');
+            }
         } catch (error) {
-            console.error('🎯 PersonalDashboardController: Error loading goals:', error);
+            console.error('🎯 PersonalDashboardController: Error loading projects:', error);
+            logger.error('PersonalDashboardController: Error loading projects', error);
+            this.projects = [];
         }
     }
 
-    async loadAchievements() {
+    async loadAchievements(uid) {
         try {
-            // Load achievements from Firestore or use default achievements
-            const currentUser = firebaseService.getCurrentUser();
-            this.achievements = [
-                { 
-                    id: 1, 
-                    title: 'First Problem Solved', 
-                    description: 'Solved your first coding problem', 
-                    icon: 'trophy', 
-                    earned: (currentUser?.problemsSolved || 0) > 0 
-                },
-                { 
-                    id: 2, 
-                    title: 'Week Streak', 
-                    description: 'Solved problems for 7 consecutive days', 
-                    icon: 'flame', 
-                    earned: (currentUser?.streak || 0) >= 7 
-                },
-                { 
-                    id: 3, 
-                    title: 'Algorithm Master', 
-                    description: 'Solved 100 algorithm problems', 
-                    icon: 'brain', 
-                    earned: (currentUser?.problemsSolved || 0) >= 100 
-                }
-            ];
-            this.renderAchievements();
+            console.log('🎯 PersonalDashboardController: Loading achievements for:', uid);
+            
+            // Load achievements from Firestore subcollection
+            const achievements = await firebaseService.getUserAchievements(uid);
+            
+            if (achievements && achievements.length > 0) {
+                this.achievements = achievements;
+                console.log('🎯 PersonalDashboardController: Achievements loaded:', achievements.length);
+            } else {
+                this.achievements = [];
+                console.log('🎯 PersonalDashboardController: No achievements found');
+            }
         } catch (error) {
             console.error('🎯 PersonalDashboardController: Error loading achievements:', error);
+            logger.error('PersonalDashboardController: Error loading achievements', error);
+            this.achievements = [];
         }
     }
 
-    async loadCodingPlatforms() {
+    updateDashboardUI() {
         try {
-            // Load coding platform progress from Firestore
-            const currentUser = firebaseService.getCurrentUser();
-            this.codingPlatforms = [
-                {
-                    name: 'LeetCode',
-                    easy: currentUser?.leetcodeEasy || 0,
-                    medium: currentUser?.leetcodeMedium || 0,
-                    hard: currentUser?.leetcodeHard || 0,
-                    total: (currentUser?.leetcodeEasy || 0) + (currentUser?.leetcodeMedium || 0) + (currentUser?.leetcodeHard || 0)
-                },
-                {
-                    name: 'GeeksforGeeks',
-                    easy: currentUser?.gfgEasy || 0,
-                    medium: currentUser?.gfgMedium || 0,
-                    hard: currentUser?.gfgHard || 0,
-                    total: (currentUser?.gfgEasy || 0) + (currentUser?.gfgMedium || 0) + (currentUser?.gfgHard || 0)
-                },
-                {
-                    name: 'HackerRank',
-                    easy: currentUser?.hackerrankEasy || 0,
-                    medium: currentUser?.hackerrankMedium || 0,
-                    hard: currentUser?.hackerrankHard || 0,
-                    total: (currentUser?.hackerrankEasy || 0) + (currentUser?.hackerrankMedium || 0) + (currentUser?.hackerrankHard || 0)
-                },
-                {
-                    name: 'InterviewBit',
-                    easy: currentUser?.interviewbitEasy || 0,
-                    medium: currentUser?.interviewbitMedium || 0,
-                    hard: currentUser?.interviewbitHard || 0,
-                    total: (currentUser?.interviewbitEasy || 0) + (currentUser?.interviewbitMedium || 0) + (currentUser?.interviewbitHard || 0)
-                }
-            ];
-            this.renderCodingPlatforms();
+            console.log('🎯 PersonalDashboardController: Updating dashboard UI...');
+            
+            // Update user stats
+            this.renderUserStats();
+            
+            // Update tasks
+            this.renderTasks();
+            
+            // Update projects
+            this.renderProjects();
+            
+            // Update achievements
+            this.renderAchievements();
+            
+            console.log('🎯 PersonalDashboardController: Dashboard UI updated successfully');
         } catch (error) {
-            console.error('🎯 PersonalDashboardController: Error loading coding platforms:', error);
+            console.error('🎯 PersonalDashboardController: Error updating dashboard UI:', error);
+            logger.error('PersonalDashboardController: Error updating dashboard UI', error);
         }
     }
 
@@ -230,17 +241,22 @@ class PersonalDashboardController extends PageController {
         // Update stats - use actual element IDs from HTML
         const problemsSolvedElement = document.getElementById('problems-solved-student');
         if (problemsSolvedElement) {
-            problemsSolvedElement.textContent = this.userStats.totalPoints || 0;
+            problemsSolvedElement.textContent = this.userStats.problemsSolved || 0;
         }
         
-        const totalPointsElement = document.getElementById('total-points-student');
-        if (totalPointsElement) {
-            totalPointsElement.textContent = this.userStats.totalPoints || 0;
+        const submissionsElement = document.getElementById('total-submissions-student');
+        if (submissionsElement) {
+            submissionsElement.textContent = this.userStats.submissions || 0;
         }
         
         const dayStreakElement = document.getElementById('day-streak-student');
         if (dayStreakElement) {
             dayStreakElement.textContent = this.userStats.streak || 0;
+        }
+        
+        const skillRatingElement = document.getElementById('skill-rating-student');
+        if (skillRatingElement) {
+            skillRatingElement.textContent = this.userStats.skillRating || 0;
         }
         
         // Update page title
@@ -252,74 +268,86 @@ class PersonalDashboardController extends PageController {
             firstName: this.userStats.firstName,
             lastName: this.userStats.lastName,
             email: this.userStats.email,
-            totalPoints: this.userStats.totalPoints,
-            streak: this.userStats.streak
+            problemsSolved: this.userStats.problemsSolved,
+            submissions: this.userStats.submissions,
+            streak: this.userStats.streak,
+            skillRating: this.userStats.skillRating
         });
     }
 
-    renderRecentActivity() {
-        const container = document.getElementById('recent-activity-list');
+    renderTasks() {
+        const container = document.getElementById('recent-tasks-list');
         if (!container) return;
 
-        if (this.recentActivity.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 text-center py-4">No recent activity</p>';
+        if (!this.tasks || this.tasks.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-4">No tasks found</p>';
             return;
         }
 
-        container.innerHTML = this.recentActivity.slice(0, 5).map(activity => `
+        container.innerHTML = this.tasks.slice(0, 5).map(task => `
             <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                <div class="w-8 h-8 ${task.status === 'completed' ? 'bg-green-100' : 'bg-yellow-100'} rounded-full flex items-center justify-center">
+                    <i data-lucide="${task.status === 'completed' ? 'check-circle' : 'clock'}" class="w-4 h-4 ${task.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}"></i>
                 </div>
                 <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">${activity.type || 'Problem Solved'}</p>
-                    <p class="text-xs text-gray-500">${window.uiHelpers.formatDateTime(activity.createdAt)}</p>
+                    <p class="text-sm font-medium text-gray-900">${task.title || 'Untitled Task'}</p>
+                    <p class="text-xs text-gray-500">${task.dueDate ? new Date(task.dueDate.seconds * 1000).toLocaleDateString() : 'No due date'}</p>
                 </div>
             </div>
         `).join('');
 
-        lucide.createIcons();
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
-    renderGoals() {
-        const container = document.getElementById('goals-list');
+    renderProjects() {
+        const container = document.getElementById('recent-projects-list');
         if (!container) return;
 
-        container.innerHTML = this.goals.map(goal => {
-            const percentage = Math.round((goal.progress / goal.target) * 100);
-            return `
-                <div class="goal-card p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all">
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="font-medium text-gray-900">${goal.title}</h4>
-                        <span class="text-sm text-gray-500">${goal.progress}/${goal.target}</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: ${percentage}%"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">${percentage}% complete</p>
+        if (!this.projects || this.projects.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-4">No projects found</p>';
+            return;
+        }
+
+        container.innerHTML = this.projects.slice(0, 3).map(project => `
+            <div class="project-card p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-gray-900">${project.title || 'Untitled Project'}</h4>
+                    <span class="text-xs px-2 py-1 rounded-full ${project.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${project.status || 'active'}</span>
                 </div>
-            `;
-        }).join('');
+                <p class="text-sm text-gray-600 mb-2">${project.description || 'No description available'}</p>
+                ${project.repoUrl ? `<a href="${project.repoUrl}" target="_blank" class="text-blue-600 text-xs hover:underline">View Repository</a>` : ''}
+            </div>
+        `).join('');
     }
 
     renderAchievements() {
         const container = document.getElementById('achievements-list');
         if (!container) return;
 
+        if (!this.achievements || this.achievements.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-4">No achievements found</p>';
+            return;
+        }
+
         container.innerHTML = this.achievements.map(achievement => `
-            <div class="flex items-center space-x-3 p-3 rounded-lg ${achievement.earned ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-200'}">
-                <div class="w-10 h-10 ${achievement.earned ? 'bg-yellow-100' : 'bg-gray-100'} rounded-full flex items-center justify-center">
-                    <i data-lucide="${achievement.icon}" class="w-5 h-5 ${achievement.earned ? 'text-yellow-600' : 'text-gray-400'}"></i>
+            <div class="flex items-center space-x-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="trophy" class="w-5 h-5 text-yellow-600"></i>
                 </div>
                 <div class="flex-1">
-                    <h4 class="font-medium ${achievement.earned ? 'text-yellow-900' : 'text-gray-500'}">${achievement.title}</h4>
-                    <p class="text-sm ${achievement.earned ? 'text-yellow-700' : 'text-gray-400'}">${achievement.description}</p>
+                    <h4 class="font-medium text-yellow-900">${achievement.title || 'Achievement'}</h4>
+                    <p class="text-sm text-yellow-700">${achievement.description || 'No description available'}</p>
+                    <p class="text-xs text-yellow-600">Earned: ${achievement.earnedAt ? new Date(achievement.earnedAt.seconds * 1000).toLocaleDateString() : 'Recently'}</p>
                 </div>
-                ${achievement.earned ? '<i data-lucide="check-circle" class="w-5 h-5 text-yellow-600"></i>' : ''}
+                <i data-lucide="check-circle" class="w-5 h-5 text-yellow-600"></i>
             </div>
         `).join('');
 
-        lucide.createIcons();
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
     renderCodingPlatforms() {
@@ -438,6 +466,9 @@ class PersonalDashboardController extends PageController {
         }
     }
 }
+
+// Make PersonalDashboardController available globally
+window.PersonalDashboardController = PersonalDashboardController;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

@@ -36,14 +36,43 @@ class AuthManager {
         window.addEventListener('auth:logout', () => this.handleLogout());
     }
 
-    handleAuthStateChange(isAuthenticated, user) {
-        console.log('🔐 AuthManager: Auth state changed:', isAuthenticated ? 'User logged in' : 'User logged out');
+    handleAuthStateChange(isAuthenticated, user, status) {
+        console.log('🔐 AuthManager: Auth state changed:', isAuthenticated ? 'User logged in' : 'User logged out', 'Status:', status);
+        
+        // Handle verification status first
+        if (status === 'otp-not-verified') {
+            console.log('⚠️ AuthManager: OTP not verified, redirecting to login...');
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            
+            // Redirect to login page with verification message
+            if (window.location.pathname !== '/pages/auth/login.html') {
+                window.location.href = '/pages/auth/login.html?message=otp-not-verified';
+            }
+            return;
+        }
+        
+        // Handle legacy email verification status
+        if (status === 'email-not-verified') {
+            console.log('⚠️ AuthManager: Email not verified, redirecting to login...');
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            
+            // Redirect to login page with verification message
+            if (window.location.pathname !== '/pages/auth/login.html') {
+                window.location.href = '/pages/auth/login.html?message=email-not-verified';
+            }
+            return;
+        }
         
         this.isAuthenticated = isAuthenticated;
         this.currentUser = user;
         
         if (isAuthenticated) {
-            this.handleAuthenticated();
+            this.handleAuthenticated().catch(error => {
+                console.error('🔐 AuthManager: Error in handleAuthenticated:', error);
+                this.handleUnauthenticated();
+            });
         } else {
             this.handleUnauthenticated();
         }
@@ -57,9 +86,36 @@ class AuthManager {
         return this.isAuthenticated;
     }
 
-    handleAuthenticated() {
+    async handleAuthenticated() {
         console.log('🔐 AuthManager: handleAuthenticated called');
         console.log('🔐 AuthManager: Current user in handleAuthenticated:', this.currentUser);
+        
+        try {
+            // Check if user is verified (OTP or email)
+            const isVerified = await this.isUserVerified();
+            
+            if (!isVerified) {
+                console.log('🔐 AuthManager: User not verified, signing out and redirecting to login');
+                // Sign out the user
+                if (typeof window.firebaseService !== 'undefined') {
+                    await window.firebaseService.logout();
+                }
+                window.location.href = '/pages/auth/login.html?message=verification-required';
+                return;
+            }
+            
+            console.log('✅ AuthManager: User verified, proceeding with authentication');
+            
+            // Check if user is on a protected page
+            if (this.isProtectedPage(window.location.pathname)) {
+                console.log('🔐 AuthManager: User on protected page and verified, allowing access');
+            }
+        } catch (error) {
+            console.error('🔐 AuthManager: Error in handleAuthenticated:', error);
+            // Fallback: redirect to login on error
+            window.location.href = '/pages/auth/login.html?message=internal-error';
+            return;
+        }
         
         // Update UI to show authenticated state
         this.updateAuthUI();
@@ -83,6 +139,13 @@ class AuthManager {
         console.log('🔐 AuthManager: handleUnauthenticated called');
         this.currentUser = null;
         this.isAuthenticated = false;
+        
+        // Check if user is on a protected page and redirect to login
+        if (this.isProtectedPage(window.location.pathname)) {
+            console.log('🔐 AuthManager: User on protected page but not authenticated, redirecting to login');
+            window.location.href = '/pages/auth/login.html';
+            return;
+        }
         
         // Update UI to show unauthenticated state
         this.updateAuthUI();
@@ -569,6 +632,62 @@ class AuthManager {
         return false;
     }
 
+    // Check if a page requires authentication
+    isProtectedPage(path = window.location.pathname) {
+        const protectedPaths = [
+            '/pages/personal/',
+            '/pages/admin/',
+            '/pages/mentor/',
+            '/pages/student/'
+        ];
+        
+        return protectedPaths.some(protectedPath => path.startsWith(protectedPath));
+    }
+
+    // Get user data from Firestore
+    async getUserDataFromFirestore() {
+        try {
+            if (!this.currentUser) return null;
+            
+            const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+            const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+            const db = getFirestore();
+            
+            const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
+            return userDoc.exists() ? userDoc.data() : null;
+        } catch (error) {
+            console.error('Error getting user data from Firestore:', error);
+            return null;
+        }
+    }
+
+    // Check if user is verified (OTP or email)
+    async isUserVerified() {
+        try {
+            if (!this.currentUser) return false;
+            
+            // Reload user to get fresh emailVerified status
+            await this.currentUser.reload();
+            
+            // Get user data from Firestore
+            const userData = await this.getUserDataFromFirestore();
+            
+            const isOtpVerified = userData?.otpVerified === true;
+            const isEmailVerified = this.currentUser.emailVerified === true;
+            
+            console.log('🔐 AuthManager: Verification status:', {
+                isOtpVerified,
+                isEmailVerified,
+                userId: this.currentUser.uid
+            });
+            
+            return isOtpVerified || isEmailVerified;
+        } catch (error) {
+            console.error('🔐 AuthManager: Error checking verification status:', error);
+            return false;
+        }
+    }
+
     // Check if user can view specific user profile
     canViewProfile(userId) {
         if (!this.isAuthenticated) return false;
@@ -614,3 +733,5 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AuthManager;
 }
+// Cache buster: 1757559542
+// Force reload: 1757560254274560000

@@ -2,6 +2,10 @@
  * Personal Profile Controller
  * Handles personal profile management for individual users
  */
+import firebaseService from './firebaseService.js';
+import logger from './logger.js';
+import PageController from './pageController.js';
+
 class PersonalProfileController extends PageController {
     constructor() {
         super();
@@ -28,17 +32,51 @@ class PersonalProfileController extends PageController {
         try {
             this.showLoading();
             
-            const response = await window.APIService.getUserProfilePersonal();
-            if (response.success) {
-                this.userProfile = response.data;
+            // Get current user
+            const user = window.authManager.currentUser;
+            if (!user) {
+                throw new Error('No authenticated user found');
+            }
+
+            // Load user profile from Firestore
+            const userDoc = await firebaseService.getUserDocument(user.uid);
+            
+            if (userDoc) {
+                this.userProfile = {
+                    firstName: userDoc.name?.split(' ')[0] || 'User',
+                    lastName: userDoc.name?.split(' ')[1] || '',
+                    email: userDoc.email || 'N/A',
+                    profileImage: userDoc.profileImage || '',
+                    streak: userDoc.streak || 0,
+                    submissions: userDoc.submissions || 0,
+                    problemsSolved: userDoc.problemsSolved || 0,
+                    skillRating: userDoc.skillRating || 0,
+                    createdAt: userDoc.createdAt,
+                    updatedAt: userDoc.updatedAt
+                };
                 this.renderProfile();
             } else {
-                this.showError('Failed to load profile data');
+                // Create default profile if document doesn't exist
+                this.userProfile = {
+                    firstName: 'User',
+                    lastName: '',
+                    email: 'N/A',
+                    profileImage: '',
+                    streak: 0,
+                    submissions: 0,
+                    problemsSolved: 0,
+                    skillRating: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                this.renderProfile();
             }
             
             this.hideLoading();
         } catch (error) {
             console.error('👤 PersonalProfileController: Error loading profile:', error);
+            logger.error('PersonalProfileController: Error loading profile', error);
+            this.hideLoading();
             this.showError('Failed to load profile data');
         }
     }
@@ -334,6 +372,9 @@ class PersonalProfileController extends PageController {
         }
     }
 }
+
+// Make PersonalProfileController available globally
+window.PersonalProfileController = PersonalProfileController;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

@@ -527,13 +527,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Check authentication first
       if (window.authManager && !window.authManager.isAuthenticated) {
-        window.location.href = 'pages/auth/login.html';
+        window.location.href = '/pages/auth/login.html';
         return;
       }
 
       // Check if user is mentor
       if (window.authManager && !window.authManager.isMentor()) {
-        window.location.href = 'pages/auth/login.html';
+        window.location.href = '/pages/auth/login.html';
         return;
       }
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../css/tailwind.min.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script type="module" src="/js/apiService.js"></script>
     <script type="module" src="/js/notifications.js"></script>
@@ -548,13 +548,13 @@
         document.addEventListener('DOMContentLoaded', () => {
           // Check authentication first
           if (window.authManager && !window.authManager.isAuthenticated) {
-            window.location.href = '../pages/auth/login.html';
+            window.location.href = '/pages/auth/login.html';
             return;
           }
 
           // Check if user is personal user
           if (window.authManager && !window.authManager.isPersonalUser()) {
-            window.location.href = '../pages/auth/login.html';
+            window.location.href = '/pages/auth/login.html';
             return;
           }
 

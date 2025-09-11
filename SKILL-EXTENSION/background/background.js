@@ -15,11 +15,12 @@ class BackgroundController {
             }
         };
         this.submissions = [];
+        this.flags = [];
         this.init();
     }
 
     async init() {
-        console.log('🔧 BackgroundController: Initializing...');
+        // BackgroundController: Initializing...
         
         // Load stored data
         await this.loadStoredData();
@@ -30,12 +31,12 @@ class BackgroundController {
         // Check connection to SkillPort API
         await this.checkAPIConnection();
         
-        console.log('🔧 BackgroundController: Initialization complete');
+        // BackgroundController: Initialization complete
     }
 
     async loadStoredData() {
         try {
-            const result = await chrome.storage.local.get(['userStats', 'submissions']);
+            const result = await chrome.storage.local.get(['userStats', 'submissions', 'flags']);
             
             if (result.userStats) {
                 this.userStats = { ...this.userStats, ...result.userStats };
@@ -43,6 +44,9 @@ class BackgroundController {
             
             if (result.submissions) {
                 this.submissions = result.submissions;
+            }
+            if (result.flags) {
+                this.flags = result.flags;
             }
             
             console.log('🔧 BackgroundController: Stored data loaded');
@@ -55,7 +59,8 @@ class BackgroundController {
         try {
             await chrome.storage.local.set({
                 userStats: this.userStats,
-                submissions: this.submissions
+                submissions: this.submissions,
+                flags: this.flags
             });
             console.log('🔧 BackgroundController: Data saved to storage');
         } catch (error) {
@@ -107,11 +112,32 @@ class BackgroundController {
                     break;
                     
                 case 'trackSubmission':
+                    console.log('🔧 BackgroundController: Received submission from content script:', message.data);
                     this.handleSubmissionTracking(message.data, sendResponse);
+                    break;
+                case 'getFlags':
+                    sendResponse({ success: true, data: this.flags });
                     break;
                     
                 case 'updateStats':
                     this.updateStats(message.data, sendResponse);
+                    break;
+                    
+                case 'testFlagDetection':
+                    try {
+                        const testFlag = this.testFlagDetection();
+                        sendResponse({ 
+                            success: true, 
+                            flagDetected: !!testFlag,
+                            message: testFlag ? 'Test flag detected!' : 'No test flag detected'
+                        });
+                    } catch (error) {
+                        console.error('🔧 BackgroundController: Error in test flag detection:', error);
+                        sendResponse({ 
+                            success: false, 
+                            error: error.message 
+                        });
+                    }
                     break;
                     
                 default:
@@ -125,12 +151,79 @@ class BackgroundController {
         });
     }
 
+    // Validate submission data
+    validateSubmissionData(data) {
+        if (!data || typeof data !== 'object') {
+            return { valid: false, error: 'Invalid submission data' };
+        }
+
+        const required = ['platform', 'difficulty'];
+        for (const field of required) {
+            if (!data[field] || typeof data[field] !== 'string') {
+                return { valid: false, error: `Missing or invalid ${field}` };
+            }
+        }
+        
+        // Check for title (can be 'title' or 'problemTitle')
+        const title = data.title || data.problemTitle;
+        if (!title || typeof title !== 'string') {
+            return { valid: false, error: 'Missing or invalid title' };
+        }
+
+        const validPlatforms = ['leetcode', 'geeksforgeeks', 'hackerrank', 'interviewbit'];
+        if (!validPlatforms.includes(data.platform)) {
+            return { valid: false, error: 'Invalid platform' };
+        }
+
+        const validDifficulties = ['easy', 'medium', 'hard'];
+        if (!validDifficulties.includes(data.difficulty)) {
+            return { valid: false, error: 'Invalid difficulty' };
+        }
+
+        if (title.length > 200) {
+            return { valid: false, error: 'Title too long' };
+        }
+        if (data.code && data.code.length > 10000) {
+            return { valid: false, error: 'Code too long' };
+        }
+
+        return { valid: true };
+    }
+
+    // Sanitize submission data
+    sanitizeSubmissionData(data) {
+        const title = data.title || data.problemTitle || '';
+        return {
+            userId: data.userId?.toString().trim() || 'anonymous',
+            platform: data.platform?.toString().toLowerCase().trim() || 'leetcode',
+            questionId: data.questionId?.toString().trim() || data.slug?.toString().trim() || '',
+            title: title.toString().trim().substring(0, 200),
+            difficulty: data.difficulty?.toString().toLowerCase().trim() || 'easy',
+            code: data.code?.toString().substring(0, 10000) || '',
+            verdict: data.verdict?.toString().trim() || 'Unknown',
+            timestamp: data.timestamp || Date.now()
+        };
+    }
+
     async handleSubmissionTracking(submissionData, sendResponse) {
         try {
             console.log('🔧 BackgroundController: Tracking submission:', submissionData);
             
+            // Validate input data
+            const validation = this.validateSubmissionData(submissionData);
+            if (!validation.valid) {
+                console.error('🔧 BackgroundController: Validation failed:', validation.error);
+                sendResponse({ success: false, error: validation.error });
+                return;
+            }
+
+            // Sanitize data
+            const sanitizedData = this.sanitizeSubmissionData(submissionData);
+            const normalized = this.normalizeSubmission(sanitizedData);
+            
             // Add submission to local storage
-            this.submissions.unshift(submissionData);
+            const previous = this.submissions[0];
+            this.submissions.unshift(normalized);
             
             // Keep only last 100 submissions
             if (this.submissions.length > 100) {
@@ -138,14 +231,82 @@ class BackgroundController {
             }
             
             // Update stats
-            this.updateStatsFromSubmission(submissionData);
+            this.updateStatsFromSubmission(normalized);
+            
+            // Only process successful submissions for flag detection
+            if (normalized.status === 'accepted' || normalized.verdict === 'Accepted') {
+                // Evaluate flag heuristic
+                console.log('🔍 BackgroundController: Evaluating flag for submission:', {
+                    current: normalized,
+                    previous: previous,
+                    hasPrevious: !!previous
+                });
+                
+                const flag = this.evaluateFlag(previous, normalized);
+                if (flag) {
+                    console.log('🚩 BackgroundController: FLAG DETECTED!', flag);
+                    
+                    // Add code to flag data
+                    flag.currentCode = normalized.code || '';
+                    flag.previousCode = previous?.code || '';
+                    
+                    this.flags.unshift(flag);
+                    // keep last 100 flags
+                    if (this.flags.length > 100) this.flags = this.flags.slice(0, 100);
+                
+                    // Try to POST to local API with validation
+                try {
+                    const flagData = {
+                        userId: normalized.userId || 'anonymous',
+                        platform: normalized.platform,
+                        questionId: normalized.questionId,
+                        title: normalized.title,
+                        difficulty: normalized.difficulty,
+                        codePrev: previous?.code || '',
+                        codeCurr: normalized.code || '',
+                        previous,
+                        current: normalized,
+                        gapMs: flag.gapMs,
+                        // Additional code data for UI display
+                        currentCode: normalized.code || '',
+                        previousCode: previous?.code || '',
+                        currentSubmissionId: normalized.id || normalized.submissionId || '',
+                        previousSubmissionId: previous?.id || previous?.submissionId || '',
+                        // Flag-specific data
+                        flaggedAt: flag.flaggedAt,
+                        reason: flag.reason
+                    };
+
+                    // Validate flag data before sending
+                    const flagValidation = this.validateSubmissionData(flagData);
+                    if (flagValidation.valid) {
+                        const response = await fetch('http://localhost:5001/api/v1/flags', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(flagData)
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.warn('🔧 BackgroundController: API error:', response.status, errorText);
+                        } else {
+                            console.log('🔧 BackgroundController: Flag sent successfully');
+                        }
+                    } else {
+                        console.warn('🔧 BackgroundController: Flag validation failed:', flagValidation.error);
+                    }
+                } catch (e) {
+                    console.warn('🔧 BackgroundController: Failed to POST flag to API', e);
+                }
+                } // Close the if (flag) block
+            }
             
             // Save to storage
             await this.saveStoredData();
             
             // Send to SkillPort API if connected
             if (this.isConnected) {
-                await this.sendToAPI(submissionData);
+                await this.sendToAPI(normalized);
             }
             
             sendResponse({ 
@@ -159,6 +320,73 @@ class BackgroundController {
                 success: false, 
                 error: error.message 
             });
+        }
+    }
+
+    normalizeSubmission(sub) {
+        const ts = sub.submittedAt || sub.timestamp || Date.now();
+        return {
+            id: sub.id || sub.submissionId || `${Date.now()}`,
+            questionId: sub.questionId || sub.slug || sub.title || 'unknown',
+            title: sub.title || sub.name || String(sub.questionId || 'Unknown'),
+            difficulty: (sub.difficulty || '').toLowerCase(),
+            platform: (sub.platform || '').toLowerCase(),
+            status: sub.status || 'accepted',
+            code: sub.code || sub.source || '',
+            submittedAt: ts,
+            timestamp: ts
+        };
+    }
+
+    evaluateFlag(previous, current) {
+        try {
+            if (!previous) {
+                console.log('🔍 BackgroundController: No previous submission, skipping flag evaluation');
+                return null;
+            }
+            
+            const tenMinutesMs = 10 * 60 * 1000;
+            const prevTime = new Date(previous.submittedAt || previous.timestamp).getTime();
+            const currTime = new Date(current.submittedAt || current.timestamp).getTime();
+            if (isNaN(prevTime) || isNaN(currTime)) {
+                console.log('🔍 BackgroundController: Invalid timestamps, skipping flag evaluation');
+                return null;
+            }
+            
+            const gap = Math.abs(currTime - prevTime);
+            const isRapid = gap <= tenMinutesMs;
+            const isDifferentQuestion = (previous.questionId || previous.title) !== (current.questionId || current.title);
+            const isMediumOrHard = ['medium','hard'].includes((current.difficulty || '').toLowerCase()) && ['medium','hard'].includes((previous.difficulty || '').toLowerCase());
+            
+            console.log('🔍 BackgroundController: Flag evaluation details:', {
+                gap: gap,
+                gapMinutes: Math.round(gap / 60000),
+                isRapid: isRapid,
+                isDifferentQuestion: isDifferentQuestion,
+                isMediumOrHard: isMediumOrHard,
+                previousQuestion: previous.questionId || previous.title,
+                currentQuestion: current.questionId || current.title,
+                previousDifficulty: previous.difficulty,
+                currentDifficulty: current.difficulty
+            });
+            
+            if (isRapid && isDifferentQuestion && isMediumOrHard) {
+                console.log('🚩 BackgroundController: FLAG CONDITIONS MET!');
+                console.log('🚩 BackgroundController: Both questions are medium/hard difficulty');
+                return {
+                    flaggedAt: Date.now(),
+                    reason: 'Rapid different medium/hard submissions within 10 minutes',
+                    previous: previous,
+                    current: current,
+                    gapMs: gap
+                };
+            }
+            
+            console.log('🔍 BackgroundController: No flag detected - conditions not met');
+            return null;
+        } catch (e) {
+            console.error('🔧 BackgroundController: evaluateFlag error', e);
+            return null;
         }
     }
 
@@ -238,6 +466,46 @@ class BackgroundController {
                 error: error.message 
             });
         }
+    }
+
+    // Test function to manually create flags for testing
+    testFlagDetection() {
+        console.log('🧪 BackgroundController: Testing flag detection...');
+        
+        // Create test submissions
+        const testSubmission1 = {
+            id: 'test1',
+            questionId: 'two-sum',
+            title: 'Two Sum',
+            difficulty: 'medium',
+            platform: 'leetcode',
+            status: 'accepted',
+            code: 'test code 1',
+            submittedAt: Date.now() - 5 * 60 * 1000, // 5 minutes ago
+            timestamp: Date.now() - 5 * 60 * 1000
+        };
+        
+        const testSubmission2 = {
+            id: 'test2',
+            questionId: 'three-sum',
+            title: 'Three Sum',
+            difficulty: 'hard',
+            platform: 'leetcode',
+            status: 'accepted',
+            code: 'test code 2',
+            submittedAt: Date.now(), // now
+            timestamp: Date.now()
+        };
+        
+        // Test flag evaluation
+        const flag = this.evaluateFlag(testSubmission1, testSubmission2);
+        if (flag) {
+            console.log('🧪 BackgroundController: Test flag detected!', flag);
+        } else {
+            console.log('🧪 BackgroundController: Test flag not detected');
+        }
+        
+        return flag;
     }
 }
 

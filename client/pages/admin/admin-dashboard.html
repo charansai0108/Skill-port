@@ -974,7 +974,7 @@
       const token = localStorage.getItem('jwt_token');
       if (!token) {
         console.log('🔐 Admin Dashboard: No token found, redirecting to login');
-        window.location.href = '/pages/auth/login';
+        window.location.href = '/pages/auth/login.html';
         return;
       }
       
@@ -996,7 +996,7 @@
           // Check authentication after async check
           if (!authManager.isAuthenticated) {
             console.log('🔐 Admin Dashboard: Not authenticated, redirecting to login');
-            window.location.href = '/pages/auth/login';
+            window.location.href = '/pages/auth/login.html';
             return;
           }
 
@@ -1014,7 +1014,7 @@
             // If user is mentor, redirect to mentor dashboard
             if (authManager.isMentor()) {
               console.log('🔐 Admin Dashboard: Mentor user detected, redirecting to mentor dashboard');
-              window.location.href = '/pages/mentor/mentor-dashboard';
+              window.location.href = '/pages/mentor/mentor-dashboard.html';
               return;
             }
             
@@ -1027,14 +1027,14 @@
             
             // If no recognized role, redirect to login
             console.log('🔐 Admin Dashboard: Unknown role, redirecting to login');
-            window.location.href = '/pages/auth/login';
+            window.location.href = '/pages/auth/login.html';
             return;
           }
           
           console.log('🔐 Admin Dashboard: Authentication successful, user is admin, initializing dashboard...');
         } catch (error) {
           console.error('🔐 Admin Dashboard: Auth check failed:', error);
-          window.location.href = '/pages/auth/login';
+          window.location.href = '/pages/auth/login.html';
           return;
         }
       } else {
@@ -1059,7 +1059,7 @@
             setTimeout(checkAuthManager, 200);
           } else {
             console.log('🔐 Admin Dashboard: AuthManager not available after waiting, redirecting to login');
-            window.location.href = '/pages/auth/login';
+            window.location.href = '/pages/auth/login.html';
           }
         };
         
