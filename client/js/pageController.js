@@ -3,6 +3,15 @@
  * Base class for all dynamic pages with authentication, data loading, and error handling
  */
 
+// Simple APIError class for error handling
+class APIError extends Error {
+    constructor(message, status = 500) {
+        super(message);
+        this.name = 'APIError';
+        this.status = status;
+    }
+}
+
 class PageController {
     constructor() {
         this.isInitialized = false;
@@ -73,8 +82,8 @@ class PageController {
         }
         
         if (!window.authManager.isAuthenticated) {
-            console.log(`🎮 ${this.constructor.name}: User not authenticated, redirecting to login`);
-            window.location.href = '/pages/auth/login.html';
+            console.log(`🎮 ${this.constructor.name}: User not authenticated, showing login prompt`);
+            this.showLoginPrompt();
             return;
         }
 
@@ -273,6 +282,88 @@ class PageController {
                 }
             };
             checkReady();
+        });
+    }
+
+    // Show login prompt for unauthenticated users
+    showLoginPrompt() {
+        console.log(`🎮 ${this.constructor.name}: Showing login prompt`);
+        
+        // Create a login overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'login-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        `;
+        
+        const loginCard = document.createElement('div');
+        loginCard.style.cssText = `
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        `;
+        
+        loginCard.innerHTML = `
+            <h2 style="margin-bottom: 1rem; color: #1f2937; font-size: 1.5rem; font-weight: 600;">
+                🔐 Login Required
+            </h2>
+            <p style="margin-bottom: 1.5rem; color: #6b7280;">
+                Please log in to access your dashboard
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="login-btn" style="
+                    background: #3b82f6;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                ">Login</button>
+                <button id="register-btn" style="
+                    background: #10b981;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                ">Register</button>
+            </div>
+        `;
+        
+        overlay.appendChild(loginCard);
+        document.body.appendChild(overlay);
+        
+        // Add event listeners
+        document.getElementById('login-btn').addEventListener('click', () => {
+            window.location.href = '/pages/auth/login.html';
+        });
+        
+        document.getElementById('register-btn').addEventListener('click', () => {
+            window.location.href = '/pages/auth/register.html';
+        });
+        
+        // Close overlay when clicking outside
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+            }
         });
     }
 }

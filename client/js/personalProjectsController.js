@@ -1,410 +1,363 @@
-/**
- * Personal Projects Controller
- * Handles personal project management for individual users
- */
-import firebaseService from './firebaseService.js';
-import logger from './logger.js';
-import PageController from './pageController.js';
+import EnhancedPageController from './enhancedPageController.js';
 
-class PersonalProjectsController extends PageController {
+class PersonalProjectsController extends EnhancedPageController {
     constructor() {
         super();
-        this.projects = [];
-        this.currentProject = null;
+        this.realTimeListeners = [];
     }
 
-    async init() {
-        console.log('📁 PersonalProjectsController: Initializing...');
-        await super.init();
+    getRequiredRole() {
+        return 'personal';
+    }
+
+    async renderDashboardContent() {
+        console.log('📁 PersonalProjectsController: Rendering projects page content...');
         
-        if (!this.isAuthenticated) {
-            console.log('📁 PersonalProjectsController: User not authenticated, redirecting to login');
-            window.location.href = '/pages/auth/login.html';
-            return;
-        }
-
-        await this.loadProjects();
-        this.setupEventListeners();
-        console.log('📁 PersonalProjectsController: Initialization complete');
-    }
-
-    async loadProjects() {
         try {
-            this.showLoading();
+            await this.renderProjectsList();
+            await this.renderProjectStats();
+            await this.renderProjectCategories();
             
-            // Get current user
-            const user = window.authManager.currentUser;
-            if (!user) {
-                throw new Error('No authenticated user found');
-            }
-
-            // Load projects from Firestore
-            this.projects = await firebaseService.getUserProjects(user.uid);
-            this.renderProjects();
+            this.setupFormHandlers();
+            this.setupRealTimeListeners();
             
-            this.hideLoading();
+            console.log('✅ PersonalProjectsController: Projects page content rendered successfully');
+            
         } catch (error) {
-            console.error('📁 PersonalProjectsController: Error loading projects:', error);
-            logger.error('PersonalProjectsController: Error loading projects', error);
-            this.hideLoading();
-            this.showError('Failed to load projects');
+            console.error('❌ PersonalProjectsController: Error rendering projects content:', error);
+            throw error;
         }
     }
 
-    renderProjects() {
+    async renderProjectsList() {
+        try {
+            const projects = await this.dataLoader.loadUserProjects(this.currentUser.uid);
+            this.updateProjectsListUI(projects);
+        } catch (error) {
+            console.error('Error loading projects list:', error);
+            this.showDefaultProjectsList();
+        }
+    }
+
+    async renderProjectStats() {
+        try {
+            const stats = await this.dataLoader.loadProjectStats(this.currentUser.uid);
+            this.updateProjectStatsUI(stats);
+        } catch (error) {
+            console.error('Error loading project stats:', error);
+            this.showDefaultProjectStats();
+        }
+    }
+
+    async renderProjectCategories() {
+        try {
+            const categories = await this.dataLoader.loadProjectCategories(this.currentUser.uid);
+            this.updateCategoriesUI(categories);
+        } catch (error) {
+            console.error('Error loading project categories:', error);
+            this.showDefaultCategories();
+        }
+    }
+
+    updateProjectsListUI(projects) {
         const container = document.getElementById('projects-list');
         if (!container) return;
 
-        if (this.projects.length === 0) {
+        if (projects.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="folder-plus" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
-                    <p class="text-gray-500 mb-4">Start building your portfolio by creating your first project</p>
-                    <button onclick="window.personalProjectsController.showCreateProjectModal()" 
-                            class="btn-primary px-4 py-2 rounded-lg text-white">
-                        Create Project
+                <div class="text-center py-8">
+                    <i data-lucide="folder-plus" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-500">No projects yet</p>
+                    <button class="mt-2 text-blue-600 hover:text-blue-700 font-medium" onclick="showCreateProjectModal()">
+                        Create your first project
                     </button>
                 </div>
             `;
-            lucide.createIcons();
             return;
         }
 
-        container.innerHTML = this.projects.map(project => `
-            <div class="project-card p-6 rounded-lg border border-gray-200 hover:border-blue-300 transition-all cursor-pointer"
-                 onclick="window.personalProjectsController.viewProject('${project.id}')">
+        container.innerHTML = projects.map(project => `
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">${project.title}</h3>
-                        <p class="text-gray-600 text-sm mb-3">${project.description || 'No description provided'}</p>
+                        <p class="text-gray-600 mb-3">${project.description || 'No description'}</p>
                         <div class="flex items-center space-x-4 text-sm text-gray-500">
                             <span class="flex items-center">
                                 <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
-                                ${window.uiHelpers.formatDateTime(project.createdAt)}
+                                ${this.formatDate(project.createdAt)}
                             </span>
                             <span class="flex items-center">
                                 <i data-lucide="tag" class="w-4 h-4 mr-1"></i>
                                 ${project.category || 'General'}
                             </span>
                             <span class="flex items-center">
-                                <i data-lucide="git-branch" class="w-4 h-4 mr-1"></i>
-                                ${project.status || 'In Progress'}
+                                <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                                ${project.estimatedHours || 0}h
                             </span>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="event.stopPropagation(); window.personalProjectsController.editProject('${project.id}')"
-                                class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                            <i data-lucide="edit" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="event.stopPropagation(); window.personalProjectsController.deleteProject('${project.id}')"
-                                class="p-2 text-gray-400 hover:text-red-600 transition-colors">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
+                    <div class="ml-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${this.getStatusColor(project.status)}">
+                            ${project.status || 'In Progress'}
+                        </span>
                     </div>
                 </div>
+                
+                <div class="mb-4">
+                    <div class="flex items-center justify-between text-sm text-gray-600 mb-1">
+                        <span>Progress</span>
+                        <span>${project.progress || 0}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: ${project.progress || 0}%"></div>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        ${project.technologies ? project.technologies.map(tech => `
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${tech}</span>
-                        `).join('') : ''}
+                        <button class="text-blue-600 hover:text-blue-700 text-sm font-medium" onclick="viewProject('${project.id}')">
+                            View
+                        </button>
+                        <button class="text-green-600 hover:text-green-700 text-sm font-medium" onclick="editProject('${project.id}')">
+                            Edit
+                        </button>
+                        <button class="text-red-600 hover:text-red-700 text-sm font-medium" onclick="deleteProject('${project.id}')">
+                            Delete
+                        </button>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        ${project.githubUrl ? `
-                            <a href="${project.githubUrl}" target="_blank" 
-                               onclick="event.stopPropagation()"
-                               class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                <i data-lucide="github" class="w-4 h-4"></i>
-                            </a>
-                        ` : ''}
-                        ${project.liveUrl ? `
-                            <a href="${project.liveUrl}" target="_blank" 
-                               onclick="event.stopPropagation()"
-                               class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                                <i data-lucide="external-link" class="w-4 h-4"></i>
-                            </a>
-                        ` : ''}
+                    <div class="text-xs text-gray-500">
+                        Last updated: ${this.formatDate(project.updatedAt)}
                     </div>
                 </div>
             </div>
         `).join('');
 
-        lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons();
     }
 
-    setupEventListeners() {
-        // Create project button
-        const createBtn = document.getElementById('create-project-btn');
-        if (createBtn) {
-            createBtn.addEventListener('click', () => this.showCreateProjectModal());
-        }
+    updateProjectStatsUI(stats) {
+        const statsElements = {
+            'total-projects': stats.totalProjects || 0,
+            'completed-projects': stats.completedProjects || 0,
+            'in-progress-projects': stats.inProgressProjects || 0,
+            'total-hours': stats.totalHours || 0,
+            'average-completion-time': `${(stats.averageCompletionTime || 0).toFixed(1)} days`,
+            'success-rate': `${(stats.successRate || 0).toFixed(1)}%`
+        };
 
-        // Search functionality
-        const searchInput = document.getElementById('project-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => this.filterProjects(e.target.value));
-        }
-
-        // Filter buttons
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => this.filterByCategory(e.target.dataset.category));
+        Object.entries(statsElements).forEach(([id, value]) => {
+            this.updateElement(id, value);
         });
     }
 
-    showCreateProjectModal() {
-        // Create modal HTML
-        const modalHTML = `
-            <div id="create-project-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Create New Project</h3>
-                        <button onclick="window.personalProjectsController.hideCreateProjectModal()"
-                                class="text-gray-400 hover:text-gray-600">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    <form id="create-project-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
-                            <input type="text" name="title" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea name="description" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                <select name="category"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Web Development">Web Development</option>
-                                    <option value="Mobile App">Mobile App</option>
-                                    <option value="Desktop App">Desktop App</option>
-                                    <option value="Data Science">Data Science</option>
-                                    <option value="Machine Learning">Machine Learning</option>
-                                    <option value="Game Development">Game Development</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select name="status"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Planning">Planning</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="On Hold">On Hold</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Technologies (comma-separated)</label>
-                            <input type="text" name="technologies" placeholder="React, Node.js, MongoDB"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
-                                <input type="url" name="githubUrl"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Live URL</label>
-                                <input type="url" name="liveUrl"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-3 pt-4">
-                            <button type="button" onclick="window.personalProjectsController.hideCreateProjectModal()"
-                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                Create Project
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        lucide.createIcons();
-
-        // Add form submit handler
-        document.getElementById('create-project-form').addEventListener('submit', (e) => this.handleCreateProject(e));
-    }
-
-    hideCreateProjectModal() {
-        const modal = document.getElementById('create-project-modal');
-        if (modal) {
-            modal.remove();
-        }
-    }
-
-    async handleCreateProject(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(event.target);
-        const projectData = {
-            title: formData.get('title'),
-            description: formData.get('description'),
-            category: formData.get('category'),
-            status: formData.get('status'),
-            technologies: formData.get('technologies').split(',').map(t => t.trim()).filter(t => t),
-            githubUrl: formData.get('githubUrl'),
-            liveUrl: formData.get('liveUrl')
-        };
-
-        try {
-            const response = await window.APIService.createProject(projectData);
-            if (response.success) {
-                this.projects.unshift(response.data.project);
-                this.renderProjects();
-                this.hideCreateProjectModal();
-                this.showSuccess('Project created successfully');
-            } else {
-                this.showError('Failed to create project');
-            }
-        } catch (error) {
-            console.error('📁 PersonalProjectsController: Error creating project:', error);
-            this.showError('Failed to create project');
-        }
-    }
-
-    async editProject(projectId) {
-        const project = this.projects.find(p => p.id === projectId);
-        if (!project) return;
-
-        // Similar to create modal but with pre-filled data
-        console.log('📁 PersonalProjectsController: Edit project', projectId);
-        // Implementation would be similar to create modal
-    }
-
-    async deleteProject(projectId) {
-        if (!confirm('Are you sure you want to delete this project?')) return;
-
-        try {
-            const response = await window.APIService.deleteProject(projectId);
-            if (response.success) {
-                this.projects = this.projects.filter(p => p.id !== projectId);
-                this.renderProjects();
-                this.showSuccess('Project deleted successfully');
-            } else {
-                this.showError('Failed to delete project');
-            }
-        } catch (error) {
-            console.error('📁 PersonalProjectsController: Error deleting project:', error);
-            this.showError('Failed to delete project');
-        }
-    }
-
-    viewProject(projectId) {
-        const project = this.projects.find(p => p.id === projectId);
-        if (!project) return;
-
-        // Navigate to project detail view or show in modal
-        console.log('📁 PersonalProjectsController: View project', projectId);
-    }
-
-    filterProjects(searchTerm) {
-        const filteredProjects = this.projects.filter(project =>
-            project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (project.technologies && project.technologies.some(tech => 
-                tech.toLowerCase().includes(searchTerm.toLowerCase())
-            ))
-        );
-        
-        this.renderFilteredProjects(filteredProjects);
-    }
-
-    filterByCategory(category) {
-        if (category === 'all') {
-            this.renderProjects();
-            return;
-        }
-        
-        const filteredProjects = this.projects.filter(project => project.category === category);
-        this.renderFilteredProjects(filteredProjects);
-    }
-
-    renderFilteredProjects(projects) {
-        const container = document.getElementById('projects-list');
+    updateCategoriesUI(categories) {
+        const container = document.getElementById('project-categories');
         if (!container) return;
 
-        if (projects.length === 0) {
+        if (categories.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="search" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
-                    <p class="text-gray-500">Try adjusting your search or filter criteria</p>
+                <div class="text-center py-4">
+                    <p class="text-gray-500 text-sm">No categories yet</p>
                 </div>
             `;
-            lucide.createIcons();
             return;
         }
 
-        // Use the same rendering logic as renderProjects but with filtered data
-        const originalProjects = this.projects;
-        this.projects = projects;
-        this.renderProjects();
-        this.projects = originalProjects;
+        container.innerHTML = categories.map(category => `
+            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full" style="background-color: ${category.color || '#3b82f6'}"></div>
+                    <span class="text-sm text-gray-900">${category.name}</span>
+                </div>
+                <span class="text-xs text-gray-500">${category.count} projects</span>
+            </div>
+        `).join('');
     }
 
-    showLoading() {
+    setupFormHandlers() {
+        // Create project form
+        const createForm = document.getElementById('create-project-form');
+        if (createForm) {
+            createForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.createProject();
+            });
+        }
+
+        // Filter projects
+        const filterSelect = document.getElementById('project-filter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', (e) => {
+                this.filterProjects(e.target.value);
+            });
+        }
+
+        // Search projects
+        const searchInput = document.getElementById('project-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.searchProjects(e.target.value);
+            });
+        }
+    }
+
+    async createProject() {
+        try {
+            const formData = new FormData(document.getElementById('create-project-form'));
+            const projectData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                category: formData.get('category'),
+                estimatedHours: parseInt(formData.get('estimatedHours')),
+                status: 'In Progress',
+                progress: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            await this.firebaseService.createProject(this.currentUser.uid, projectData);
+            this.showSuccessMessage('Project created successfully!');
+            document.getElementById('create-project-form').reset();
+            this.renderProjectsList(); // Refresh the list
+            
+        } catch (error) {
+            console.error('Error creating project:', error);
+            this.showErrorMessage('Failed to create project. Please try again.');
+        }
+    }
+
+    async filterProjects(filter) {
+        try {
+            const projects = await this.dataLoader.loadUserProjects(this.currentUser.uid);
+            let filteredProjects = projects;
+
+            if (filter !== 'all') {
+                filteredProjects = projects.filter(project => project.status === filter);
+            }
+
+            this.updateProjectsListUI(filteredProjects);
+            
+        } catch (error) {
+            console.error('Error filtering projects:', error);
+        }
+    }
+
+    async searchProjects(query) {
+        try {
+            const projects = await this.dataLoader.loadUserProjects(this.currentUser.uid);
+            let filteredProjects = projects;
+
+            if (query.trim()) {
+                filteredProjects = projects.filter(project => 
+                    project.title.toLowerCase().includes(query.toLowerCase()) ||
+                    project.description.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+
+            this.updateProjectsListUI(filteredProjects);
+            
+        } catch (error) {
+            console.error('Error searching projects:', error);
+        }
+    }
+
+    getStatusColor(status) {
+        const colors = {
+            'completed': 'bg-green-100 text-green-800',
+            'in-progress': 'bg-blue-100 text-blue-800',
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'cancelled': 'bg-red-100 text-red-800',
+            'on-hold': 'bg-gray-100 text-gray-800'
+        };
+        return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    }
+
+    showSuccessMessage(message) {
+        this.showMessage(message, 'success');
+    }
+
+    showErrorMessage(message) {
+        this.showMessage(message, 'error');
+    }
+
+    showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        messageDiv.textContent = message;
+        
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            document.body.removeChild(messageDiv);
+        }, 3000);
+    }
+
+    // Default states
+    showDefaultProjectsList() {
         const container = document.getElementById('projects-list');
         if (container) {
             container.innerHTML = `
-                <div class="space-y-4">
-                    ${Array(3).fill().map(() => `
-                        <div class="p-6 rounded-lg border border-gray-200 animate-pulse">
-                            <div class="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/3"></div>
-                        </div>
-                    `).join('')}
+                <div class="text-center py-8">
+                    <i data-lucide="loader" class="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-500">Loading projects...</p>
                 </div>
             `;
         }
     }
 
-    hideLoading() {
-        // Loading is handled by renderProjects
+    showDefaultProjectStats() {
+        const defaultStats = {
+            totalProjects: 0,
+            completedProjects: 0,
+            inProgressProjects: 0,
+            totalHours: 0,
+            averageCompletionTime: 0,
+            successRate: 0
+        };
+        this.updateProjectStatsUI(defaultStats);
     }
 
-    showSuccess(message) {
-        if (window.notifications) {
-            window.notifications.success({
-                title: 'Success',
-                message: message
-            });
+    showDefaultCategories() {
+        const container = document.getElementById('project-categories');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i data-lucide="loader" class="w-4 h-4 text-gray-400 mx-auto mb-2 animate-spin"></i>
+                    <p class="text-gray-500 text-sm">Loading categories...</p>
+                </div>
+            `;
         }
     }
 
-    showError(message) {
-        if (window.notifications) {
-            window.notifications.error({
-                title: 'Error',
-                message: message
+    setupRealTimeListeners() {
+        console.log('📁 PersonalProjectsController: Setting up real-time listeners...');
+        
+        try {
+            const projectsListener = this.dataLoader.setupUserProjectsListener(this.currentUser.uid, (projects) => {
+                console.log('📁 Projects updated:', projects);
+                this.updateProjectsListUI(projects);
             });
+            this.realTimeListeners.push(projectsListener);
+
+            console.log('✅ PersonalProjectsController: Real-time listeners setup completed');
+            
+        } catch (error) {
+            console.error('❌ PersonalProjectsController: Error setting up real-time listeners:', error);
         }
+    }
+
+    destroy() {
+        console.log('📁 PersonalProjectsController: Cleaning up...');
+        this.realTimeListeners.forEach(unsubscribe => unsubscribe());
+        this.realTimeListeners = [];
     }
 }
 
-// Make PersonalProjectsController available globally
-window.PersonalProjectsController = PersonalProjectsController;
-
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.personalProjectsController = new PersonalProjectsController();
+    new PersonalProjectsController();
 });
+
+export default PersonalProjectsController;

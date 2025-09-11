@@ -8,7 +8,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../../css/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
@@ -106,6 +106,14 @@
                 </div>
                 <h2 class="text-xl font-semibold text-slate-800 mb-2">Welcome Back</h2>
                 <p class="text-slate-600">Sign in to your SkillPort account</p>
+                
+                <!-- Logout Button (shown if user is already authenticated) -->
+                <div id="logoutSection" class="mt-4 hidden">
+                    <p class="text-sm text-slate-500 mb-2">Already logged in?</p>
+                    <button id="logoutBtn" class="text-sm text-red-600 hover:text-red-700 font-medium underline">
+                        Logout and use different account
+                    </button>
+                </div>
             </div>
 
             <!-- Message Area -->
@@ -480,6 +488,39 @@
                 lucide.createIcons();
             }
         }
+
+        // Check if user is already authenticated and show logout option
+        async function checkAuthStatus() {
+            try {
+                const { default: firebaseService } = await import('../../js/firebaseService.js');
+                if (firebaseService.currentUser) {
+                    console.log('🔐 User already authenticated, showing logout option');
+                    document.getElementById('logoutSection').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.log('🔐 No authenticated user found');
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            try {
+                console.log('🔐 Logging out user...');
+                const { default: firebaseService } = await import('../../js/firebaseService.js');
+                await firebaseService.logout();
+                console.log('✅ User logged out successfully');
+                
+                // Hide logout section and reload page
+                document.getElementById('logoutSection').classList.add('hidden');
+                window.location.reload();
+            } catch (error) {
+                console.error('❌ Logout failed:', error);
+                alert('Logout failed. Please try again.');
+            }
+        });
+
+        // Check auth status when page loads
+        checkAuthStatus();
     </script>
 </body>
 </html>

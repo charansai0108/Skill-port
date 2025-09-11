@@ -1,359 +1,239 @@
-/**
- * Personal Stats Controller
- * Handles personal statistics and analytics for individual users
- */
-import firebaseService from './firebaseService.js';
-import logger from './logger.js';
-import PageController from './pageController.js';
+import EnhancedPageController from './enhancedPageController.js';
 
-class PersonalStatsController extends PageController {
+class PersonalStatsController extends EnhancedPageController {
     constructor() {
         super();
-        this.statsData = null;
-        this.chartData = null;
+        this.realTimeListeners = [];
     }
 
-    async init() {
-        console.log('📊 PersonalStatsController: Initializing...');
-        await super.init();
+    getRequiredRole() {
+        return 'personal';
+    }
+
+    async renderDashboardContent() {
+        console.log('📊 PersonalStatsController: Rendering stats page content...');
         
-        if (!this.isAuthenticated) {
-            console.log('📊 PersonalStatsController: User not authenticated, redirecting to login');
-            window.location.href = '/pages/auth/login.html';
+        try {
+            await this.renderStatsOverview();
+            await this.renderProgressCharts();
+            await this.renderAchievements();
+            await this.renderActivityTimeline();
+            
+            this.setupRealTimeListeners();
+            
+            console.log('✅ PersonalStatsController: Stats page content rendered successfully');
+            
+        } catch (error) {
+            console.error('❌ PersonalStatsController: Error rendering stats content:', error);
+            throw error;
+        }
+    }
+
+    async renderStatsOverview() {
+        try {
+            const stats = await this.dataLoader.loadUserStats(this.currentUser.uid);
+            this.updateStatsOverviewUI(stats);
+        } catch (error) {
+            console.error('Error loading stats overview:', error);
+            this.showDefaultStatsOverview();
+        }
+    }
+
+    async renderProgressCharts() {
+        try {
+            const progressData = await this.dataLoader.loadProgressData(this.currentUser.uid);
+            this.renderCharts(progressData);
+        } catch (error) {
+            console.error('Error loading progress data:', error);
+            this.showDefaultCharts();
+        }
+    }
+
+    async renderAchievements() {
+        try {
+            const achievements = await this.dataLoader.loadUserAchievements(this.currentUser.uid);
+            this.updateAchievementsUI(achievements);
+        } catch (error) {
+            console.error('Error loading achievements:', error);
+            this.showDefaultAchievements();
+        }
+    }
+
+    async renderActivityTimeline() {
+        try {
+            const timeline = await this.dataLoader.loadActivityTimeline(this.currentUser.uid);
+            this.updateTimelineUI(timeline);
+        } catch (error) {
+            console.error('Error loading activity timeline:', error);
+            this.showDefaultTimeline();
+        }
+    }
+
+    updateStatsOverviewUI(stats) {
+        const statsElements = {
+            'total-problems': stats.totalProblems || 0,
+            'problems-solved': stats.problemsSolved || 0,
+            'accuracy-rate': `${(stats.accuracyRate || 0).toFixed(1)}%`,
+            'current-streak': stats.currentStreak || 0,
+            'longest-streak': stats.longestStreak || 0,
+            'total-hours': stats.totalHours || 0,
+            'average-time': `${(stats.averageTime || 0).toFixed(1)} min`,
+            'skill-level': stats.skillLevel || 'Beginner'
+        };
+
+        Object.entries(statsElements).forEach(([id, value]) => {
+            this.updateElement(id, value);
+        });
+    }
+
+    renderCharts(progressData) {
+        // Implementation for charts (Chart.js, D3.js, etc.)
+        console.log('📊 Rendering progress charts:', progressData);
+    }
+
+    updateAchievementsUI(achievements) {
+        const container = document.getElementById('achievements-stats-list');
+        if (!container) return;
+
+        if (achievements.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i data-lucide="award" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-500">No achievements yet</p>
+                </div>
+            `;
             return;
         }
 
-        await this.loadStatsData();
-        this.setupEventListeners();
-        console.log('📊 PersonalStatsController: Initialization complete');
-    }
-
-    async loadStatsData() {
-        try {
-            this.showLoading();
-            
-            // Get current user
-            const user = window.authManager.currentUser;
-            if (!user) {
-                throw new Error('No authenticated user found');
-            }
-
-            // Load user stats from Firestore
-            const userDoc = await firebaseService.getUserDocument(user.uid);
-            
-            if (userDoc) {
-                this.statsData = {
-                    streak: userDoc.streak || 0,
-                    submissions: userDoc.submissions || 0,
-                    problemsSolved: userDoc.problemsSolved || 0,
-                    skillRating: userDoc.skillRating || 0,
-                    createdAt: userDoc.createdAt,
-                    updatedAt: userDoc.updatedAt
-                };
-                this.renderStats();
-            } else {
-                // Create default stats if document doesn't exist
-                this.statsData = {
-                    streak: 0,
-                    submissions: 0,
-                    problemsSolved: 0,
-                    skillRating: 0,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                };
-                this.renderStats();
-            }
-            
-            this.hideLoading();
-        } catch (error) {
-            console.error('📊 PersonalStatsController: Error loading stats:', error);
-            logger.error('PersonalStatsController: Error loading stats', error);
-            this.hideLoading();
-            this.showError('Failed to load stats data');
-        }
-    }
-
-    async loadUserStats() {
-        try {
-            const response = await window.APIService.getUserProfilePersonal();
-            if (response.success) {
-                this.statsData = response.data;
-                this.renderUserStats();
-            }
-        } catch (error) {
-            console.error('📊 PersonalStatsController: Error loading user stats:', error);
-        }
-    }
-
-    async loadProgressData() {
-        try {
-            const response = await window.APIService.getUserProgress();
-            if (response.success) {
-                this.chartData = response.data.progress || [];
-                this.renderProgressCharts();
-            }
-        } catch (error) {
-            console.error('📊 PersonalStatsController: Error loading progress data:', error);
-        }
-    }
-
-    async loadPlatformStats() {
-        try {
-            // Mock platform stats - in real implementation, this would come from API
-            const platformStats = {
-                leetcode: { solved: 45, total: 2000, difficulty: { easy: 20, medium: 20, hard: 5 } },
-                hackerrank: { solved: 12, total: 500, difficulty: { easy: 8, medium: 3, hard: 1 } },
-                gfg: { solved: 8, total: 300, difficulty: { easy: 5, medium: 2, hard: 1 } },
-                interviewbit: { solved: 3, total: 150, difficulty: { easy: 2, medium: 1, hard: 0 } }
-            };
-            
-            this.renderPlatformStats(platformStats);
-        } catch (error) {
-            console.error('📊 PersonalStatsController: Error loading platform stats:', error);
-        }
-    }
-
-    renderUserStats() {
-        if (!this.statsData) return;
-
-        // Update main stats
-        window.uiHelpers.updateText('total-problems-solved', this.statsData.problemsSolved || 0);
-        window.uiHelpers.updateText('current-streak', this.statsData.streak || 0);
-        window.uiHelpers.updateText('user-level', this.statsData.level || 1);
-        window.uiHelpers.updateText('total-points', this.statsData.totalPoints || 0);
-        window.uiHelpers.updateText('contests-participated', this.statsData.contestsParticipated || 0);
-        window.uiHelpers.updateText('average-rating', this.statsData.averageRating || 0);
-        
-        // Update progress bars
-        this.updateProgressBars();
-    }
-
-    updateProgressBars() {
-        const totalProblems = this.statsData.problemsSolved || 0;
-        const level = this.statsData.level || 1;
-        const nextLevelProblems = level * 50; // Assuming 50 problems per level
-        
-        const progressPercentage = Math.min((totalProblems / nextLevelProblems) * 100, 100);
-        const progressBar = document.getElementById('level-progress-bar');
-        if (progressBar) {
-            progressBar.style.width = `${progressPercentage}%`;
-        }
-        
-        const progressText = document.getElementById('level-progress-text');
-        if (progressText) {
-            progressText.textContent = `${totalProblems}/${nextLevelProblems} problems`;
-        }
-    }
-
-    renderProgressCharts() {
-        // Render weekly progress chart
-        this.renderWeeklyChart();
-        
-        // Render difficulty distribution
-        this.renderDifficultyChart();
-        
-        // Render platform comparison
-        this.renderPlatformChart();
-    }
-
-    renderWeeklyChart() {
-        const container = document.getElementById('weekly-progress-chart');
-        if (!container) return;
-
-        // Mock weekly data
-        const weeklyData = [
-            { day: 'Mon', problems: 3 },
-            { day: 'Tue', problems: 5 },
-            { day: 'Wed', problems: 2 },
-            { day: 'Thu', problems: 7 },
-            { day: 'Fri', problems: 4 },
-            { day: 'Sat', problems: 6 },
-            { day: 'Sun', problems: 1 }
-        ];
-
-        const maxProblems = Math.max(...weeklyData.map(d => d.problems));
-        
-        container.innerHTML = weeklyData.map(day => {
-            const height = (day.problems / maxProblems) * 100;
-            return `
-                <div class="flex flex-col items-center space-y-2">
-                    <div class="w-8 bg-blue-200 rounded-t" style="height: ${height}px; min-height: 4px;">
-                        <div class="w-full bg-blue-600 rounded-t" style="height: 100%;"></div>
-                    </div>
-                    <span class="text-xs text-gray-600">${day.day}</span>
-                    <span class="text-xs font-medium text-gray-900">${day.problems}</span>
-                </div>
-            `;
-        }).join('');
-    }
-
-    renderDifficultyChart() {
-        const container = document.getElementById('difficulty-chart');
-        if (!container) return;
-
-        const difficultyData = [
-            { level: 'Easy', count: 25, color: 'bg-green-500' },
-            { level: 'Medium', count: 15, color: 'bg-yellow-500' },
-            { level: 'Hard', count: 5, color: 'bg-red-500' }
-        ];
-
-        const total = difficultyData.reduce((sum, item) => sum + item.count, 0);
-
-        container.innerHTML = difficultyData.map(item => {
-            const percentage = (item.count / total) * 100;
-            return `
-                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 ${item.color} rounded"></div>
-                        <span class="font-medium text-gray-900">${item.level}</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-gray-600">${item.count}</span>
-                        <span class="text-xs text-gray-500">(${percentage.toFixed(1)}%)</span>
+        container.innerHTML = achievements.map(achievement => `
+            <div class="flex items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <i data-lucide="award" class="w-5 h-5 text-yellow-600"></i>
                     </div>
                 </div>
-            `;
-        }).join('');
-    }
-
-    renderPlatformChart() {
-        const container = document.getElementById('platform-chart');
-        if (!container) return;
-
-        const platformData = [
-            { name: 'LeetCode', solved: 45, total: 2000, color: 'bg-orange-500' },
-            { name: 'HackerRank', solved: 12, total: 500, color: 'bg-green-500' },
-            { name: 'GeeksforGeeks', solved: 8, total: 300, color: 'bg-blue-500' },
-            { name: 'InterviewBit', solved: 3, total: 150, color: 'bg-purple-500' }
-        ];
-
-        container.innerHTML = platformData.map(platform => {
-            const percentage = (platform.solved / platform.total) * 100;
-            return `
-                <div class="p-4 rounded-lg border border-gray-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-3 h-3 ${platform.color} rounded"></div>
-                            <span class="font-medium text-gray-900">${platform.name}</span>
-                        </div>
-                        <span class="text-sm text-gray-600">${platform.solved}/${platform.total}</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="${platform.color} h-2 rounded-full transition-all duration-300" style="width: ${percentage}%"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">${percentage.toFixed(1)}% complete</p>
-                </div>
-            `;
-        }).join('');
-    }
-
-    renderPlatformStats(platformStats) {
-        const container = document.getElementById('platform-stats');
-        if (!container) return;
-
-        container.innerHTML = Object.entries(platformStats).map(([platform, stats]) => `
-            <div class="p-6 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 capitalize">${platform}</h3>
-                    <span class="text-2xl font-bold text-blue-600">${stats.solved}</span>
-                </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Easy</span>
-                        <span class="font-medium">${stats.difficulty.easy}</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Medium</span>
-                        <span class="font-medium">${stats.difficulty.medium}</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Hard</span>
-                        <span class="font-medium">${stats.difficulty.hard}</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Total Available</span>
-                        <span class="font-medium">${stats.total}</span>
-                    </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900">${achievement.title}</p>
+                    <p class="text-xs text-gray-600">${achievement.description}</p>
+                    <p class="text-xs text-gray-500 mt-1">${this.formatDate(achievement.earnedAt)}</p>
                 </div>
             </div>
         `).join('');
+
+        if (window.lucide) window.lucide.createIcons();
     }
 
-    setupEventListeners() {
-        // Add any interactive elements
-        const exportBtn = document.getElementById('export-stats-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportStats());
+    updateTimelineUI(timeline) {
+        const container = document.getElementById('activity-timeline');
+        if (!container) return;
+
+        if (timeline.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i data-lucide="timeline" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-500">No activity timeline available</p>
+                </div>
+            `;
+            return;
         }
 
-        const refreshBtn = document.getElementById('refresh-stats-btn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => this.loadStatsData());
+        container.innerHTML = timeline.map(item => `
+            <div class="flex items-start space-x-3 p-3 bg-white rounded-lg border border-gray-200">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i data-lucide="${this.getTimelineIcon(item.type)}" class="w-4 h-4 text-blue-600"></i>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-900">${item.description}</p>
+                    <p class="text-xs text-gray-500 mt-1">${this.formatDateTime(item.timestamp)}</p>
+                </div>
+            </div>
+        `).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    getTimelineIcon(type) {
+        const icons = {
+            'problem_solved': 'check-circle',
+            'streak_milestone': 'flame',
+            'achievement_earned': 'award',
+            'skill_improved': 'trending-up',
+            'project_completed': 'folder-check'
+        };
+        return icons[type] || 'activity';
+    }
+
+    // Default states
+    showDefaultStatsOverview() {
+        const defaultStats = {
+            totalProblems: 0,
+            problemsSolved: 0,
+            accuracyRate: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            totalHours: 0,
+            averageTime: 0,
+            skillLevel: 'Beginner'
+        };
+        this.updateStatsOverviewUI(defaultStats);
+    }
+
+    showDefaultCharts() {
+        console.log('📊 Showing default charts');
+    }
+
+    showDefaultAchievements() {
+        const container = document.getElementById('achievements-stats-list');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i data-lucide="loader" class="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-500">Loading achievements...</p>
+                </div>
+            `;
         }
     }
 
-    async exportStats() {
+    showDefaultTimeline() {
+        const container = document.getElementById('activity-timeline');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i data-lucide="loader" class="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-500">Loading timeline...</p>
+                </div>
+            `;
+        }
+    }
+
+    setupRealTimeListeners() {
+        console.log('📊 PersonalStatsController: Setting up real-time listeners...');
+        
         try {
-            const response = await window.APIService.exportUserData();
-            if (response.success) {
-                // Create download link
-                const blob = new Blob([JSON.stringify(this.statsData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'skillport-stats.json';
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                this.showSuccess('Statistics exported successfully');
-            } else {
-                this.showError('Failed to export statistics');
-            }
+            const statsListener = this.dataLoader.setupUserStatsListener(this.currentUser.uid, (stats) => {
+                console.log('📊 Stats updated:', stats);
+                this.updateStatsOverviewUI(stats);
+            });
+            this.realTimeListeners.push(statsListener);
+
+            console.log('✅ PersonalStatsController: Real-time listeners setup completed');
+            
         } catch (error) {
-            console.error('📊 PersonalStatsController: Error exporting stats:', error);
-            this.showError('Failed to export statistics');
+            console.error('❌ PersonalStatsController: Error setting up real-time listeners:', error);
         }
     }
 
-    showLoading() {
-        const loadingElements = document.querySelectorAll('.loading-placeholder');
-        loadingElements.forEach(el => {
-            el.innerHTML = '<div class="animate-pulse bg-gray-200 h-4 rounded"></div>';
-        });
-    }
-
-    hideLoading() {
-        const loadingElements = document.querySelectorAll('.loading-placeholder');
-        loadingElements.forEach(el => {
-            el.innerHTML = '';
-        });
-    }
-
-    showSuccess(message) {
-        if (window.notifications) {
-            window.notifications.success({
-                title: 'Success',
-                message: message
-            });
-        }
-    }
-
-    showError(message) {
-        if (window.notifications) {
-            window.notifications.error({
-                title: 'Error',
-                message: message
-            });
-        }
+    destroy() {
+        console.log('📊 PersonalStatsController: Cleaning up...');
+        this.realTimeListeners.forEach(unsubscribe => unsubscribe());
+        this.realTimeListeners = [];
     }
 }
 
-// Make PersonalStatsController available globally
-window.PersonalStatsController = PersonalStatsController;
-
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.personalStatsController = new PersonalStatsController();
+    new PersonalStatsController();
 });
+
+export default PersonalStatsController;

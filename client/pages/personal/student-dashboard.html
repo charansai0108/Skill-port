@@ -7,6 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../css/tailwind.min.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="../../js/authManager.js"></script>
+    <script type="module" src="../../js/contextManager.js"></script>
+    <script type="module" src="../../js/dataLoader.js"></script>
+    <script type="module" src="../../js/uiHelpers.js"></script>
     <script type="module" src="../../js/pageController.js"></script>
     <script type="module" src="../../js/personalDashboardController.js"></script>
     <style>
@@ -209,7 +213,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-slate-800 mb-1">Dashboard</h1>
-                <p class="text-sm text-slate-600">Welcome back! Here's your learning overview</p>
+                <p class="text-sm text-slate-600">Welcome back, <span id="userFirstName">User</span>! Here's your learning overview</p>
             </div>
         </div>
 
@@ -226,34 +230,34 @@
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="trophy" class="w-5 h-5 text-blue-600"></i>
-                        <span class="text-2xl font-bold text-blue-600">247</span>
+                        <span id="problems-solved-student" class="text-2xl font-bold text-blue-600">0</span>
                     </div>
                     <div class="text-sm text-slate-600">Problems Solved</div>
-                    <div class="text-xs text-blue-600 mt-1">+12 this week</div>
+                    <div class="text-xs text-blue-600 mt-1">+0 this week</div>
                 </div>
                 
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="star" class="w-5 h-5 text-green-600"></i>
-                        <span class="text-2xl font-bold text-green-600">1,850</span>
+                        <span id="skill-rating-student" class="text-2xl font-bold text-green-600">0</span>
                     </div>
                     <div class="text-sm text-slate-600">Skill Rating</div>
-                    <div class="text-xs text-green-600 mt-1">+45 this month</div>
+                    <div class="text-xs text-green-600 mt-1">+0 this month</div>
                 </div>
                 
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
-                        <span class="text-2xl font-bold text-purple-600">8</span>
+                        <span id="total-submissions-student" class="text-2xl font-bold text-purple-600">0</span>
                     </div>
-                    <div class="text-sm text-slate-600">Communities</div>
+                    <div class="text-sm text-slate-600">Total Submissions</div>
                     <div class="text-xs text-purple-600 mt-1">Active member</div>
                 </div>
                 
                 <div class="stat-card rounded-xl p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
-                        <span class="text-2xl font-bold text-orange-600">23</span>
+                        <span id="day-streak-student" class="text-2xl font-bold text-orange-600">0</span>
                     </div>
                     <div class="text-sm text-slate-600">Day Streak</div>
                     <div class="text-xs text-orange-600 mt-1">Keep it up!</div>
@@ -408,46 +412,8 @@
                     <h3 class="text-xl font-bold text-slate-800">Recent Activity</h3>
                 </div>
                 
-                <div class="space-y-4">
-                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-green-50/50 rounded-xl transition-colors">
-                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">Solved LeetCode Problem</h4>
-                            <p class="text-xs text-slate-600">Two Sum - Easy • 2 hours ago</p>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-amber-50/50 rounded-xl transition-colors">
-                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">Won Weekly Contest</h4>
-                            <p class="text-xs text-slate-600">Ranked #15 out of 200 • 1 day ago</p>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-purple-50/50 rounded-xl transition-colors">
-                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">Joined Community</h4>
-                            <p class="text-xs text-slate-600">Data Structures Masters • 2 days ago</p>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item flex items-center gap-3 p-3 hover:bg-blue-50/50 rounded-xl transition-colors">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-slate-800 text-sm">Completed Course</h4>
-                            <p class="text-xs text-slate-600">Advanced JavaScript • 3 days ago</p>
-                        </div>
-                    </div>
+                <div id="recent-tasks-list" class="space-y-4">
+                    <p class="text-gray-500 text-center py-4">Loading recent tasks...</p>
                 </div>
             </div>
 
@@ -553,13 +519,8 @@
                 <h2 class="text-xl font-bold text-slate-800">Recent Achievements</h2>
             </div>
             
-            <div class="flex flex-wrap gap-2">
-                <span class="achievement-badge">🏆 Problem Solver</span>
-                <span class="achievement-badge">🔥 7-Day Streak</span>
-                <span class="achievement-badge">⭐ Top 10%</span>
-                <span class="achievement-badge">🚀 Speed Demon</span>
-                <span class="achievement-badge">📚 Course Master</span>
-                <span class="achievement-badge">👥 Community Leader</span>
+            <div id="achievements-list" class="flex flex-wrap gap-2">
+                <p class="text-gray-500 text-center py-4 w-full">Loading achievements...</p>
             </div>
         </div>
 

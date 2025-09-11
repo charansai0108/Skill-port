@@ -1,481 +1,403 @@
-/**
- * Personal Tracker Controller
- * Handles problem tracking and submission monitoring for personal users
- */
-import firebaseService from './firebaseService.js';
-import logger from './logger.js';
-import PageController from './pageController.js';
+import EnhancedPageController from './enhancedPageController.js';
 
-class PersonalTrackerController extends PageController {
+class PersonalTrackerController extends EnhancedPageController {
     constructor() {
         super();
-        this.submissions = [];
-        this.trackingStats = {};
-        this.platforms = ['leetcode', 'hackerrank', 'gfg', 'interviewbit'];
+        this.realTimeListeners = [];
     }
 
-    async init() {
-        console.log('📈 PersonalTrackerController: Initializing...');
-        await super.init();
+    getRequiredRole() {
+        return 'personal';
+    }
+
+    async renderDashboardContent() {
+        console.log('📋 PersonalTrackerController: Rendering tracker page content...');
         
-        if (!this.isAuthenticated) {
-            console.log('📈 PersonalTrackerController: User not authenticated, redirecting to login');
-            window.location.href = '/pages/auth/login.html';
-            return;
-        }
-
-        await this.loadTrackingData();
-        this.setupEventListeners();
-        this.initializeExtensionConnection();
-        console.log('📈 PersonalTrackerController: Initialization complete');
-    }
-
-    async loadTrackingData() {
         try {
-            this.showLoading();
+            await this.renderTasksList();
+            await this.renderTaskStats();
+            await this.renderTaskCategories();
+            await this.renderTaskCalendar();
             
-            // Get current user
-            const user = window.authManager.currentUser;
-            if (!user) {
-                throw new Error('No authenticated user found');
-            }
-
-            // Load tasks from Firestore
-            this.tasks = await firebaseService.getUserTasks(user.uid);
+            this.setupFormHandlers();
+            this.setupRealTimeListeners();
             
-            // Load user stats for tracking
-            const userDoc = await firebaseService.getUserDocument(user.uid);
-            if (userDoc) {
-                this.trackingStats = {
-                    streak: userDoc.streak || 0,
-                    submissions: userDoc.submissions || 0,
-                    problemsSolved: userDoc.problemsSolved || 0,
-                    skillRating: userDoc.skillRating || 0
-                };
-            } else {
-                this.trackingStats = {
-                    streak: 0,
-                    submissions: 0,
-                    problemsSolved: 0,
-                    skillRating: 0
-                };
-            }
+            console.log('✅ PersonalTrackerController: Tracker page content rendered successfully');
             
-            this.renderTrackingData();
-            this.hideLoading();
         } catch (error) {
-            console.error('📈 PersonalTrackerController: Error loading tracking data:', error);
-            logger.error('PersonalTrackerController: Error loading tracking data', error);
-            this.hideLoading();
-            this.showError('Failed to load tracking data');
+            console.error('❌ PersonalTrackerController: Error rendering tracker content:', error);
+            throw error;
         }
     }
 
-    async loadSubmissions() {
+    async renderTasksList() {
         try {
-            const response = await window.APIService.getUserSubmissions();
-            if (response.success) {
-                this.submissions = response.data.submissions || [];
-                this.renderSubmissions();
-            }
+            const tasks = await this.dataLoader.loadUserTasks(this.currentUser.uid);
+            this.updateTasksListUI(tasks);
         } catch (error) {
-            console.error('📈 PersonalTrackerController: Error loading submissions:', error);
+            console.error('Error loading tasks list:', error);
+            this.showDefaultTasksList();
         }
     }
 
-    async loadTrackingStats() {
+    async renderTaskStats() {
         try {
-            // Mock tracking stats - in real implementation, this would come from API
-            this.trackingStats = {
-                totalSubmissions: this.submissions.length,
-                successfulSubmissions: this.submissions.filter(s => s.status === 'accepted').length,
-                platformStats: {
-                    leetcode: { total: 45, accepted: 40, rejected: 5 },
-                    hackerrank: { total: 12, accepted: 10, rejected: 2 },
-                    gfg: { total: 8, accepted: 6, rejected: 2 },
-                    interviewbit: { total: 3, accepted: 2, rejected: 1 }
-                },
-                dailyStreak: 7,
-                weeklyGoal: 10,
-                weeklyProgress: 7
-            };
-            
-            this.renderTrackingStats();
+            const stats = await this.dataLoader.loadTaskStats(this.currentUser.uid);
+            this.updateTaskStatsUI(stats);
         } catch (error) {
-            console.error('📈 PersonalTrackerController: Error loading tracking stats:', error);
+            console.error('Error loading task stats:', error);
+            this.showDefaultTaskStats();
         }
     }
 
-    renderSubmissions() {
-        const container = document.getElementById('submissions-list');
+    async renderTaskCategories() {
+        try {
+            const categories = await this.dataLoader.loadTaskCategories(this.currentUser.uid);
+            this.updateCategoriesUI(categories);
+        } catch (error) {
+            console.error('Error loading task categories:', error);
+            this.showDefaultCategories();
+        }
+    }
+
+    async renderTaskCalendar() {
+        try {
+            const calendarData = await this.dataLoader.loadTaskCalendar(this.currentUser.uid);
+            this.renderCalendar(calendarData);
+        } catch (error) {
+            console.error('Error loading task calendar:', error);
+            this.showDefaultCalendar();
+        }
+    }
+
+    updateTasksListUI(tasks) {
+        const container = document.getElementById('tasks-list');
         if (!container) return;
 
-        if (this.submissions.length === 0) {
+        if (tasks.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="code" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No submissions yet</h3>
-                    <p class="text-gray-500 mb-4">Start solving problems to see your submissions here</p>
-                    <div class="flex justify-center space-x-4">
-                        <a href="https://leetcode.com" target="_blank" 
-                           class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                            LeetCode
-                        </a>
-                        <a href="https://hackerrank.com" target="_blank" 
-                           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                            HackerRank
-                        </a>
-                    </div>
+                <div class="text-center py-8">
+                    <i data-lucide="check-square" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-500">No tasks yet</p>
+                    <button class="mt-2 text-blue-600 hover:text-blue-700 font-medium" onclick="showCreateTaskModal()">
+                        Create your first task
+                    </button>
                 </div>
             `;
-            lucide.createIcons();
             return;
         }
 
-        container.innerHTML = this.submissions.slice(0, 20).map(submission => `
-            <div class="submission-card p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 ${this.getPlatformColor(submission.platform)} rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">${submission.platform.charAt(0).toUpperCase()}</span>
+        container.innerHTML = tasks.map(task => `
+            <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-1">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                               onchange="toggleTask('${task.id}', this.checked)">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-medium text-gray-900 ${task.completed ? 'line-through text-gray-500' : ''}">
+                                ${task.title}
+                            </h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${this.getPriorityColor(task.priority)}">
+                                    ${task.priority || 'Medium'}
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${this.getStatusColor(task.status)}">
+                                    ${task.status || 'Pending'}
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-medium text-gray-900">${submission.problemTitle}</h4>
-                            <p class="text-sm text-gray-500 capitalize">${submission.platform}</p>
+                        <p class="text-sm text-gray-600 mt-1">${task.description || 'No description'}</p>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            <span class="flex items-center">
+                                <i data-lucide="calendar" class="w-3 h-3 mr-1"></i>
+                                ${this.formatDate(task.dueDate)}
+                            </span>
+                            <span class="flex items-center">
+                                <i data-lucide="tag" class="w-3 h-3 mr-1"></i>
+                                ${task.category || 'General'}
+                            </span>
+                            <span class="flex items-center">
+                                <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
+                                ${task.estimatedTime || 0} min
+                            </span>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2 py-1 ${this.getStatusColor(submission.status)} text-xs rounded-full">
-                            ${submission.status}
-                        </span>
-                        <span class="text-sm text-gray-500">
-                            ${window.uiHelpers.formatDateTime(submission.submittedAt)}
-                        </span>
+                    <div class="flex-shrink-0 flex items-center space-x-1">
+                        <button class="text-blue-600 hover:text-blue-700 text-xs font-medium" onclick="editTask('${task.id}')">
+                            Edit
+                        </button>
+                        <button class="text-red-600 hover:text-red-700 text-xs font-medium" onclick="deleteTask('${task.id}')">
+                            Delete
+                        </button>
                     </div>
-                </div>
-                <div class="flex items-center justify-between text-sm text-gray-600">
-                    <span>Language: ${submission.language}</span>
-                    <span>Runtime: ${submission.runtime || 'N/A'}</span>
-                    <span>Memory: ${submission.memory || 'N/A'}</span>
                 </div>
             </div>
         `).join('');
 
-        lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons();
     }
 
-    renderTrackingStats() {
-        // Render main stats
-        window.uiHelpers.updateText('total-submissions', this.trackingStats.totalSubmissions);
-        window.uiHelpers.updateText('successful-submissions', this.trackingStats.successfulSubmissions);
-        window.uiHelpers.updateText('daily-streak', this.trackingStats.dailyStreak);
-        
-        // Calculate success rate
-        const successRate = this.trackingStats.totalSubmissions > 0 
-            ? Math.round((this.trackingStats.successfulSubmissions / this.trackingStats.totalSubmissions) * 100)
-            : 0;
-        window.uiHelpers.updateText('success-rate', `${successRate}%`);
+    updateTaskStatsUI(stats) {
+        const statsElements = {
+            'total-tasks': stats.totalTasks || 0,
+            'completed-tasks': stats.completedTasks || 0,
+            'pending-tasks': stats.pendingTasks || 0,
+            'overdue-tasks': stats.overdueTasks || 0,
+            'completion-rate': `${(stats.completionRate || 0).toFixed(1)}%`,
+            'average-completion-time': `${(stats.averageCompletionTime || 0).toFixed(1)} min`
+        };
 
-        // Render platform stats
-        this.renderPlatformStats();
-        
-        // Render weekly progress
-        this.renderWeeklyProgress();
+        Object.entries(statsElements).forEach(([id, value]) => {
+            this.updateElement(id, value);
+        });
     }
 
-    renderPlatformStats() {
-        const container = document.getElementById('platform-stats');
+    updateCategoriesUI(categories) {
+        const container = document.getElementById('task-categories');
         if (!container) return;
 
-        container.innerHTML = Object.entries(this.trackingStats.platformStats).map(([platform, stats]) => {
-            const successRate = stats.total > 0 ? Math.round((stats.accepted / stats.total) * 100) : 0;
-            return `
-                <div class="platform-stat p-4 rounded-lg border border-gray-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-6 h-6 ${this.getPlatformColor(platform)} rounded flex items-center justify-center">
-                                <span class="text-white font-bold text-xs">${platform.charAt(0).toUpperCase()}</span>
-                            </div>
-                            <span class="font-medium text-gray-900 capitalize">${platform}</span>
-                        </div>
-                        <span class="text-sm text-gray-600">${successRate}%</span>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Total</span>
-                            <span class="font-medium">${stats.total}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Accepted</span>
-                            <span class="font-medium text-green-600">${stats.accepted}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Rejected</span>
-                            <span class="font-medium text-red-600">${stats.rejected}</span>
-                        </div>
-                    </div>
+        if (categories.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <p class="text-gray-500 text-sm">No categories yet</p>
                 </div>
             `;
-        }).join('');
-    }
+            return;
+        }
 
-    renderWeeklyProgress() {
-        const container = document.getElementById('weekly-progress');
-        if (!container) return;
-
-        const progress = this.trackingStats.weeklyProgress;
-        const goal = this.trackingStats.weeklyGoal;
-        const percentage = Math.min((progress / goal) * 100, 100);
-
-        container.innerHTML = `
-            <div class="p-4 rounded-lg border border-gray-200">
-                <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-medium text-gray-900">Weekly Goal</h4>
-                    <span class="text-sm text-gray-600">${progress}/${goal}</span>
+        container.innerHTML = categories.map(category => `
+            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full" style="background-color: ${category.color || '#3b82f6'}"></div>
+                    <span class="text-sm text-gray-900">${category.name}</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                    <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: ${percentage}%"></div>
-                </div>
-                <p class="text-xs text-gray-500">${Math.round(percentage)}% complete</p>
+                <span class="text-xs text-gray-500">${category.count} tasks</span>
             </div>
-        `;
+        `).join('');
     }
 
-    getPlatformColor(platform) {
+    renderCalendar(calendarData) {
+        // Implementation for calendar view
+        console.log('📅 Rendering task calendar:', calendarData);
+    }
+
+    setupFormHandlers() {
+        // Create task form
+        const createForm = document.getElementById('create-task-form');
+        if (createForm) {
+            createForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.createTask();
+            });
+        }
+
+        // Filter tasks
+        const filterSelect = document.getElementById('task-filter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', (e) => {
+                this.filterTasks(e.target.value);
+            });
+        }
+
+        // Search tasks
+        const searchInput = document.getElementById('task-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.searchTasks(e.target.value);
+            });
+        }
+    }
+
+    async createTask() {
+        try {
+            const formData = new FormData(document.getElementById('create-task-form'));
+            const taskData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                category: formData.get('category'),
+                priority: formData.get('priority'),
+                dueDate: formData.get('dueDate'),
+                estimatedTime: parseInt(formData.get('estimatedTime')),
+                status: 'Pending',
+                completed: false,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            await this.firebaseService.createTask(this.currentUser.uid, taskData);
+            this.showSuccessMessage('Task created successfully!');
+            document.getElementById('create-task-form').reset();
+            this.renderTasksList(); // Refresh the list
+            
+        } catch (error) {
+            console.error('Error creating task:', error);
+            this.showErrorMessage('Failed to create task. Please try again.');
+        }
+    }
+
+    async toggleTask(taskId, completed) {
+        try {
+            await this.firebaseService.updateTask(this.currentUser.uid, taskId, { 
+                completed: completed,
+                status: completed ? 'Completed' : 'Pending',
+                updatedAt: new Date()
+            });
+            
+            this.showSuccessMessage(completed ? 'Task completed!' : 'Task marked as pending');
+            this.renderTasksList(); // Refresh the list
+            
+        } catch (error) {
+            console.error('Error toggling task:', error);
+            this.showErrorMessage('Failed to update task. Please try again.');
+        }
+    }
+
+    async filterTasks(filter) {
+        try {
+            const tasks = await this.dataLoader.loadUserTasks(this.currentUser.uid);
+            let filteredTasks = tasks;
+
+            if (filter !== 'all') {
+                filteredTasks = tasks.filter(task => task.status === filter);
+            }
+
+            this.updateTasksListUI(filteredTasks);
+            
+        } catch (error) {
+            console.error('Error filtering tasks:', error);
+        }
+    }
+
+    async searchTasks(query) {
+        try {
+            const tasks = await this.dataLoader.loadUserTasks(this.currentUser.uid);
+            let filteredTasks = tasks;
+
+            if (query.trim()) {
+                filteredTasks = tasks.filter(task => 
+                    task.title.toLowerCase().includes(query.toLowerCase()) ||
+                    task.description.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+
+            this.updateTasksListUI(filteredTasks);
+            
+        } catch (error) {
+            console.error('Error searching tasks:', error);
+        }
+    }
+
+    getPriorityColor(priority) {
         const colors = {
-            leetcode: 'bg-orange-500',
-            hackerrank: 'bg-green-500',
-            gfg: 'bg-blue-500',
-            interviewbit: 'bg-purple-500'
+            'high': 'bg-red-100 text-red-800',
+            'medium': 'bg-yellow-100 text-yellow-800',
+            'low': 'bg-green-100 text-green-800'
         };
-        return colors[platform] || 'bg-gray-500';
+        return colors[priority?.toLowerCase()] || 'bg-gray-100 text-gray-800';
     }
 
     getStatusColor(status) {
         const colors = {
-            accepted: 'bg-green-100 text-green-800',
-            rejected: 'bg-red-100 text-red-800',
-            pending: 'bg-yellow-100 text-yellow-800',
-            error: 'bg-gray-100 text-gray-800'
+            'completed': 'bg-green-100 text-green-800',
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'in-progress': 'bg-blue-100 text-blue-800',
+            'cancelled': 'bg-red-100 text-red-800'
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
     }
 
-    setupEventListeners() {
-        // Refresh data button
-        const refreshBtn = document.getElementById('refresh-tracker-btn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => this.loadTrackingData());
-        }
-
-        // Export data button
-        const exportBtn = document.getElementById('export-tracker-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportTrackingData());
-        }
-
-        // Platform filter buttons
-        const platformFilters = document.querySelectorAll('.platform-filter');
-        platformFilters.forEach(btn => {
-            btn.addEventListener('click', (e) => this.filterByPlatform(e.target.dataset.platform));
-        });
+    showSuccessMessage(message) {
+        this.showMessage(message, 'success');
     }
 
-    initializeExtensionConnection() {
-        // Check if extension is installed and connected
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-            this.checkExtensionStatus();
-        } else {
-            this.showExtensionNotInstalled();
+    showErrorMessage(message) {
+        this.showMessage(message, 'error');
+    }
+
+    showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        messageDiv.textContent = message;
+        
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            document.body.removeChild(messageDiv);
+        }, 3000);
+    }
+
+    // Default states
+    showDefaultTasksList() {
+        const container = document.getElementById('tasks-list');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <i data-lucide="loader" class="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin"></i>
+                    <p class="text-gray-500">Loading tasks...</p>
+                </div>
+            `;
         }
     }
 
-    async checkExtensionStatus() {
+    showDefaultTaskStats() {
+        const defaultStats = {
+            totalTasks: 0,
+            completedTasks: 0,
+            pendingTasks: 0,
+            overdueTasks: 0,
+            completionRate: 0,
+            averageCompletionTime: 0
+        };
+        this.updateTaskStatsUI(defaultStats);
+    }
+
+    showDefaultCategories() {
+        const container = document.getElementById('task-categories');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i data-lucide="loader" class="w-4 h-4 text-gray-400 mx-auto mb-2 animate-spin"></i>
+                    <p class="text-gray-500 text-sm">Loading categories...</p>
+                </div>
+            `;
+        }
+    }
+
+    showDefaultCalendar() {
+        console.log('📅 Showing default calendar');
+    }
+
+    setupRealTimeListeners() {
+        console.log('📋 PersonalTrackerController: Setting up real-time listeners...');
+        
         try {
-            // Send message to extension to check status
-            const response = await chrome.runtime.sendMessage({ action: 'getStatus' });
-            if (response && response.connected) {
-                this.showExtensionConnected();
-            } else {
-                this.showExtensionNotConnected();
-            }
-        } catch (error) {
-            console.log('📈 PersonalTrackerController: Extension not available');
-            this.showExtensionNotInstalled();
-        }
-    }
-
-    showExtensionConnected() {
-        const container = document.getElementById('extension-status');
-        if (container) {
-            container.innerHTML = `
-                <div class="p-4 rounded-lg border border-green-200 bg-green-50">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
-                        <span class="text-green-800 font-medium">Extension Connected</span>
-                    </div>
-                    <p class="text-green-700 text-sm mt-1">Your submissions are being tracked automatically</p>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-    }
-
-    showExtensionNotConnected() {
-        const container = document.getElementById('extension-status');
-        if (container) {
-            container.innerHTML = `
-                <div class="p-4 rounded-lg border border-yellow-200 bg-yellow-50">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-600"></i>
-                        <span class="text-yellow-800 font-medium">Extension Not Connected</span>
-                    </div>
-                    <p class="text-yellow-700 text-sm mt-1">Please refresh the extension or check your connection</p>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-    }
-
-    showExtensionNotInstalled() {
-        const container = document.getElementById('extension-status');
-        if (container) {
-            container.innerHTML = `
-                <div class="p-4 rounded-lg border border-blue-200 bg-blue-50">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="download" class="w-5 h-5 text-blue-600"></i>
-                        <span class="text-blue-800 font-medium">Install Extension</span>
-                    </div>
-                    <p class="text-blue-700 text-sm mt-1">Install the SkillPort extension to automatically track your submissions</p>
-                    <button onclick="window.personalTrackerController.installExtension()" 
-                            class="mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                        Install Extension
-                    </button>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-    }
-
-    installExtension() {
-        // Open extension installation page
-        window.open('https://chrome.google.com/webstore/detail/skillport-tracker', '_blank');
-    }
-
-    filterByPlatform(platform) {
-        if (platform === 'all') {
-            this.renderSubmissions();
-            return;
-        }
-
-        const filteredSubmissions = this.submissions.filter(s => s.platform === platform);
-        this.renderFilteredSubmissions(filteredSubmissions);
-    }
-
-    renderFilteredSubmissions(submissions) {
-        const container = document.getElementById('submissions-list');
-        if (!container) return;
-
-        if (submissions.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="search" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No submissions found</h3>
-                    <p class="text-gray-500">Try selecting a different platform or time period</p>
-                </div>
-            `;
-            lucide.createIcons();
-            return;
-        }
-
-        // Use the same rendering logic as renderSubmissions but with filtered data
-        const originalSubmissions = this.submissions;
-        this.submissions = submissions;
-        this.renderSubmissions();
-        this.submissions = originalSubmissions;
-    }
-
-    async exportTrackingData() {
-        try {
-            const response = await window.APIService.exportUserData();
-            if (response.success) {
-                // Create download link
-                const data = {
-                    submissions: this.submissions,
-                    stats: this.trackingStats,
-                    exportedAt: new Date().toISOString()
-                };
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'skillport-tracking-data.json';
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                this.showSuccess('Tracking data exported successfully');
-            } else {
-                this.showError('Failed to export tracking data');
-            }
-        } catch (error) {
-            console.error('📈 PersonalTrackerController: Error exporting data:', error);
-            this.showError('Failed to export tracking data');
-        }
-    }
-
-    showLoading() {
-        const container = document.getElementById('submissions-list');
-        if (container) {
-            container.innerHTML = `
-                <div class="space-y-4">
-                    ${Array(5).fill().map(() => `
-                        <div class="p-4 rounded-lg border border-gray-200 animate-pulse">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
-                                <div class="flex-1">
-                                    <div class="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-                                    <div class="h-3 bg-gray-200 rounded w-1/4"></div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-    }
-
-    hideLoading() {
-        // Loading is handled by renderSubmissions
-    }
-
-    showSuccess(message) {
-        if (window.notifications) {
-            window.notifications.success({
-                title: 'Success',
-                message: message
+            const tasksListener = this.dataLoader.setupUserTasksListener(this.currentUser.uid, (tasks) => {
+                console.log('📋 Tasks updated:', tasks);
+                this.updateTasksListUI(tasks);
             });
+            this.realTimeListeners.push(tasksListener);
+
+            console.log('✅ PersonalTrackerController: Real-time listeners setup completed');
+            
+        } catch (error) {
+            console.error('❌ PersonalTrackerController: Error setting up real-time listeners:', error);
         }
     }
 
-    showError(message) {
-        if (window.notifications) {
-            window.notifications.error({
-                title: 'Error',
-                message: message
-            });
-        }
+    destroy() {
+        console.log('📋 PersonalTrackerController: Cleaning up...');
+        this.realTimeListeners.forEach(unsubscribe => unsubscribe());
+        this.realTimeListeners = [];
     }
 }
 
-// Make PersonalTrackerController available globally
-window.PersonalTrackerController = PersonalTrackerController;
-
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.personalTrackerController = new PersonalTrackerController();
+    new PersonalTrackerController();
 });
+
+export default PersonalTrackerController;

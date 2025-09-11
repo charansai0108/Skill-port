@@ -60,39 +60,23 @@ class FirebaseService {
         this.isAuthenticated = false;
         this.authStateListeners = [];
         
-        // Set up auth state listener
+        // Clean onAuthStateChanged - no more auto-logout for unverified users
         onAuthStateChanged(auth, async (user) => {
             console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
             
-            if (user) {
-                // Load user data from Firestore first to check OTP verification status
-                const userData = await this.loadUserData(user.uid);
-                
-                // Check if user is OTP verified
-                if (!userData || !userData.otpVerified) {
-                    console.log('❌ User not OTP verified, signing out...');
-                    await signOut(auth);
-                    this.currentUser = null;
-                    this.isAuthenticated = false;
-                    
-                    // Notify listeners with unverified status
-                    this.authStateListeners.forEach(listener => listener(null, false, 'otp-not-verified'));
-                    return;
-                }
-                
-                console.log('✅ User verified via OTP');
-                this.currentUser = user;
-                this.isAuthenticated = true;
-                
-                // Notify listeners
-                this.authStateListeners.forEach(listener => listener(user, true));
-            } else {
+            if (!user) {
+                // user signed out - handle unauthenticated flow
                 this.currentUser = null;
                 this.isAuthenticated = false;
-                
-                // Notify listeners
-                this.authStateListeners.forEach(listener => listener(null, false));
+                this.authStateListeners.forEach(listener => listener(null, false, undefined));
+                return;
             }
+
+            // User is logged in - set as authenticated
+            console.log('✅ User authenticated:', user.email);
+            this.currentUser = user;
+            this.isAuthenticated = true;
+            this.authStateListeners.forEach(listener => listener(user, true, undefined));
         });
     }
 
@@ -102,71 +86,66 @@ class FirebaseService {
     }
 
     // Authentication Methods
-    async register(userPayload) {
-        let userData = null; // Declare early to avoid TDZ issues
-        
+    async register(email, password, extraData = {}) {
         try {
-            // Validate input data
-            const validation = validationService.validateUserProfile(userPayload);
-            if (!validation.valid) {
-                return {
-                    success: false,
-                    message: 'Validation failed',
-                    errors: validation.errors
-                };
-            }
-
-            const sanitizedData = validation.data;
-            logger.auth('User registration attempt', { email: sanitizedData.email });
-
-            // Create Firebase Auth user
-            const userCredential = await createUserWithEmailAndPassword(
-                auth, 
-                sanitizedData.email, 
-                userPayload.password
+            console.log('📝 Starting registration for:', email);
+            
+            // Check if user already exists in Firestore
+            const existingUserQuery = await getDocs(
+                query(collection(db, 'users'), where('email', '==', email))
             );
             
+            if (!existingUserQuery.empty) {
+                const existingUser = existingUserQuery.docs[0].data();
+                if (existingUser.otpVerified) {
+                    throw new Error('Email already registered and verified. Please login instead.');
+                } else {
+                    // User exists but not verified, proceed with OTP
+                    console.log('📧 User exists but not verified, sending OTP');
+                    await this.sendOtpForExistingUser(email);
+                    return { success: true, message: 'OTP sent to existing unverified account' };
+                }
+            }
+            
+            // Create Firebase Auth user
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            // Update user profile
-            await updateProfile(user, {
-                displayName: `${sanitizedData.firstName} ${sanitizedData.lastName}`
-            });
+            console.log('✅ Firebase user created:', user.uid);
 
-            // Create Firestore document with otpVerified: false initially
-            userData = {
-                ...sanitizedData,
-                uid: user.uid,
-                emailVerified: false, // Keep for compatibility
-                otpVerified: false,   // Our custom OTP verification flag
-                role: sanitizedData.role || 'personal',
-                createdAt: new Date().toISOString()
+            // Sign out immediately (prevent auto-login before OTP)
+            await signOut(auth);
+            console.log('🔐 User signed out to prevent auto-login');
+
+            // Create pending doc in Firestore
+            const userDocData = {
+                email,
+                otpVerified: false,
+                createdAt: serverTimestamp(),
+                ...extraData
             };
             
-            // Create user document in Firestore
-            await setDoc(doc(db, 'users', user.uid), userData);
-            console.log('✅ User document created in Firestore with otpVerified: false');
-            
-            // Store in session storage for OTP verification
-            sessionStorage.setItem('pendingVerification', JSON.stringify(userData));
+            await setDoc(doc(db, "users", user.uid), userDocData);
+            console.log('✅ Firestore document created with otpVerified: false');
 
-            logger.auth('User registration successful', { userId: user.uid, email: sanitizedData.email });
+            // Send OTP
+            const { default: otpService } = await import('./otpService.js');
+            await otpService.sendOtp(email, extraData.firstName || '', extraData.lastName || '');
+            console.log('📩 OTP sent successfully');
+
+            console.log("📩 OTP sent, redirecting...");
+            window.location.href = `/pages/auth/verify-otp.html?email=${encodeURIComponent(email)}`;
 
             return {
                 success: true,
                 message: 'Registration successful! Please check your email for verification.',
                 user: user,
-                userData: userData
+                userData: userDocData
             };
+
         } catch (error) {
-            logger.error('User registration failed', { error: error.message, email: userPayload?.email });
-            errorHandler.handleFirebaseError(error);
-            
-            return {
-                success: false,
-                message: this.getErrorMessage(error),
-                error: error
-            };
+            console.error("❌ Registration failed:", error);
+            throw error;
         }
     }
 
@@ -254,29 +233,74 @@ class FirebaseService {
     }
 
     // Complete registration after OTP verification
+    async sendOtpForExistingUser(email) {
+        try {
+            console.log('📧 Sending OTP for existing user:', email);
+            
+            // Send OTP via API
+            const response = await fetch('http://localhost:3001/api/otp/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to send OTP');
+            }
+            
+            console.log('✅ OTP sent for existing user');
+            return { success: true, message: 'OTP sent successfully' };
+            
+        } catch (error) {
+            console.error('❌ Error sending OTP for existing user:', error);
+            throw error;
+        }
+    }
+
     async completeRegistration(profileData) {
         try {
-            const auth = getAuth();
-            const user = auth.currentUser;
-            if (!user) {
-                throw new Error("No authenticated user when completing registration");
+            const db = getFirestore();
+            
+            // Get user data from session storage (stored during registration)
+            const pendingUserData = JSON.parse(sessionStorage.getItem('pendingUserData') || '{}');
+            
+            if (!pendingUserData.email) {
+                throw new Error("completeRegistration: no pending user data found");
             }
 
-            const db = getFirestore();
-            const data = {
-                ...profileData,
+            // We need to find the user's UID from Firestore since we don't have auth.currentUser
+            // The user document was created during registration with otpVerified: false
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('email', '==', pendingUserData.email));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                throw new Error("completeRegistration: no user document found for email");
+            }
+            
+            const userDoc = querySnapshot.docs[0];
+            const userId = userDoc.id;
+            
+            // Build userData with safe defaults
+            const userData = {
+                name: profileData.name || `${pendingUserData.firstName} ${pendingUserData.lastName}`,
+                email: pendingUserData.email,
+                role: profileData.role || pendingUserData.role || "personal",
                 otpVerified: true,
-                updatedAt: new Date().toISOString()
+                updatedAt: serverTimestamp(),
+                // copy any additional allowed profile fields
+                ...profileData,
             };
             
-            await setDoc(doc(db, "users", user.uid), data, { merge: true });
-            console.log('✅ Registration completed successfully with OTP verification');
+            await setDoc(doc(db, "users", userId), userData, { merge: true });
+            console.info("completeRegistration: users/%s written with otpVerified:true", userId);
             
-            return { success: true };
+            return { ok: true, uid: userId };
         } catch (error) {
-            console.error('❌ Error completing registration:', error);
-            logger.error('Registration completion failed', { error: error.message });
-            return { success: false, error: error.message };
+            console.error("completeRegistration: failed to write user doc", error);
+            throw error;
         }
     }
 

@@ -1,0 +1,120 @@
+*** Begin Patch
+*** Update File: client/js/firebaseService.js
+@@
+-import { getAuth } from "firebase/auth";
+-import { getFirestore } from "firebase/firestore";
++import { getAuth } from "firebase/auth";
++import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+ 
+ // ... existing code above ...
+ 
+-// existing onAuthStateChanged somewhere in this file:
+-getAuth().onAuthStateChanged(async (user) => {
+-  // existing logic (may have earlier signed out when user doc missing)
+-});
++// Enhanced onAuthStateChanged with registrationInProgress grace period
++getAuth().onAuthStateChanged(async (user) => {
++  const auth = getAuth();
++  const db = getFirestore();
++
++  if (!user) {
++    // user signed out - handle unauthenticated flow if you have one
++    if (typeof handleUnauthenticated === "function") {
++      try { handleUnauthenticated(); } catch(e){ console.warn("handleUnauthenticated error", e); }
++    }
++    return;
++  }
++
++  // If we are in the middle of client-side registration, give it a short grace period
++  const registrationFlag = sessionStorage.getItem("registrationInProgress");
++  if (registrationFlag) {
++    const start = Date.now();
++    let userDocSnap = null;
++    const timeoutMs = 3000; // wait up to 3 seconds
++    while (Date.now() - start < timeoutMs) {
++      try {
++        userDocSnap = await getDoc(doc(db, "users", user.uid));
++        if (userDocSnap.exists()) break;
++      } catch (err) {
++        console.warn("onAuthStateChanged: polling user doc error", err);
++      }
++      // small backoff
++      // eslint-disable-next-line no-await-in-loop
++      await new Promise((r) => setTimeout(r, 250));
++    }
++    // remove flag - we gave registration a chance
++    sessionStorage.removeItem("registrationInProgress");
++  }
++
++  // Now check user doc
++  let userDoc = null;
++  try {
++    userDoc = await getDoc(doc(db, "users", user.uid));
++  } catch (err) {
++    console.error("FirebaseService: error reading user doc", err);
++  }
++
++  const userDocData = userDoc && userDoc.exists() ? userDoc.data() : null;
++
++  // Verified if either otpVerified is true or Firebase emailVerified is true
++  const isOtpVerified = !!(userDocData && userDocData.otpVerified);
++  const isEmailVerified = !!user.emailVerified;
++
++  if (!isOtpVerified && !isEmailVerified) {
++    console.warn("❌ User not verified (no user doc or otp/email not verified) - signing out");
++    try {
++      await auth.signOut();
++    } catch (err) {
++      console.error("Error signing out unverified user", err);
++    }
++    try {
++      window.location.href = "/pages/auth/login.html?message=otp-not-verified";
++    } catch (err) { /* ignore in non-browser env */ }
++    return;
++  }
++
++  // If we get here, user is considered verified — proceed with authenticated flow
++  if (typeof handleAuthenticated === "function") {
++    try {
++      await handleAuthenticated(user, userDocData);
++    } catch (err) {
++      console.error("handleAuthenticated error", err);
++    }
++  }
++});
++
++/**
++ * completeRegistration
++ * Ensures users/{uid} doc exists and marks otpVerified:true
++ * profileData: object with fields like name, role, etc.
++ */
++export async function completeRegistration(profileData = {}) {
++  const auth = getAuth();
++  const db = getFirestore();
++  const user = auth.currentUser;
++  if (!user) {
++    throw new Error("completeRegistration: no authenticated user found");
++  }
++
++  // Build userData with safe defaults; declare early to avoid TDZ
++  const userData = {
++    name: profileData.name || "",
++    email: user.email || "",
++    role: profileData.role || "personal",
++    otpVerified: true,
++    createdAt: serverTimestamp(),
++    updatedAt: serverTimestamp(),
++    // copy any additional allowed profile fields
++    ...profileData,
++  };
++
++  try {
++    await setDoc(doc(db, "users", user.uid), userData, { merge: true });
++    console.info("completeRegistration: users/%s written with otpVerified:true", user.uid);
++    return { ok: true, uid: user.uid };
++  } catch (err) {
++    console.error("completeRegistration: failed to write user doc", err);
++    throw err;
++  }
++}
+*** End Patch

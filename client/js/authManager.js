@@ -91,24 +91,20 @@ class AuthManager {
         console.log('🔐 AuthManager: Current user in handleAuthenticated:', this.currentUser);
         
         try {
-            // Check if user is verified (OTP or email)
-            const isVerified = await this.isUserVerified();
+            console.log('✅ AuthManager: User authenticated, proceeding with authentication');
             
-            if (!isVerified) {
-                console.log('🔐 AuthManager: User not verified, signing out and redirecting to login');
-                // Sign out the user
-                if (typeof window.firebaseService !== 'undefined') {
-                    await window.firebaseService.logout();
-                }
-                window.location.href = '/pages/auth/login.html?message=verification-required';
-                return;
-            }
+            // Load user data from Firestore to get role and other profile information
+            console.log('🔐 AuthManager: Loading user data from Firestore...');
+            const { default: firebaseService } = await import('./firebaseService.js');
+            await firebaseService.loadUserData(this.currentUser.uid);
             
-            console.log('✅ AuthManager: User verified, proceeding with authentication');
+            // Update currentUser with Firestore data (including role)
+            this.currentUser = firebaseService.currentUser;
+            console.log('🔐 AuthManager: User data loaded, role:', this.currentUser?.role);
             
             // Check if user is on a protected page
             if (this.isProtectedPage(window.location.pathname)) {
-                console.log('🔐 AuthManager: User on protected page and verified, allowing access');
+                console.log('🔐 AuthManager: User on protected page, allowing access');
             }
         } catch (error) {
             console.error('🔐 AuthManager: Error in handleAuthenticated:', error);
@@ -119,6 +115,12 @@ class AuthManager {
         
         // Update UI to show authenticated state
         this.updateAuthUI();
+        
+        // Don't redirect during registration flow - let the registration process handle redirects
+        if (window.location.pathname.includes('/register.html')) {
+            console.log('🔐 AuthManager: On registration page, skipping redirect logic');
+            return;
+        }
         
         // Always check for redirect based on user role
         console.log('🔐 AuthManager: Checking if should redirect...');
@@ -140,10 +142,10 @@ class AuthManager {
         this.currentUser = null;
         this.isAuthenticated = false;
         
-        // Check if user is on a protected page and redirect to login
+        // Check if user is on a protected page
         if (this.isProtectedPage(window.location.pathname)) {
-            console.log('🔐 AuthManager: User on protected page but not authenticated, redirecting to login');
-            window.location.href = '/pages/auth/login.html';
+            console.log('🔐 AuthManager: User on protected page but not authenticated, letting page controller handle it');
+            // Let the page controller handle the authentication check
             return;
         }
         
@@ -448,11 +450,21 @@ class AuthManager {
         console.log('🔐 AuthManager: shouldRedirect check - currentPath:', currentPath);
         console.log('🔐 AuthManager: shouldRedirect check - currentUser:', this.currentUser);
         
-        // Always redirect from auth pages
-        if (currentPath.includes('login.html') || 
-            currentPath.includes('register.html') ||
+        // Always redirect from auth pages, but allow manual access to login
+        if (currentPath.includes('register.html') ||
             currentPath.includes('forgot-password.html')) {
             console.log('🔐 AuthManager: On auth page, should redirect');
+            return true;
+        }
+        
+        // For login page, allow access if user explicitly wants to login (with ?force=true)
+        if (currentPath.includes('login.html')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('force') === 'true') {
+                console.log('🔐 AuthManager: Force login requested, allowing access to login page');
+                return false;
+            }
+            console.log('🔐 AuthManager: On login page, should redirect to dashboard');
             return true;
         }
         
@@ -522,8 +534,10 @@ class AuthManager {
         console.log('🔐 AuthManager: Redirect URL for role', role, ':', redirectUrl);
         
         if (!role || role === 'undefined') {
-            console.warn('🔐 AuthManager: User role is undefined, redirecting to login');
-            window.location.href = '/pages/auth/login.html';
+            console.warn("No role found for user. Redirecting to profile completion page.");
+            // Prefer to send user to a safe profile completion page so they can set role and profile
+            // Create this page if it doesn't exist: /pages/auth/complete-profile.html
+            window.location.href = "/pages/auth/complete-profile.html?message=role-not-set";
             return;
         }
         

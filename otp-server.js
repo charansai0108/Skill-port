@@ -11,7 +11,7 @@ const { EmailService } = require('./email-templates/emailService');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.OTP_PORT || 5002;
+const PORT = process.env.OTP_PORT || 3001;
 
 // Middleware
 app.use(cors());

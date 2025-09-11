@@ -1,0 +1,5753 @@
+{
+  "timestamp": "2025-09-11T07:54:07.880Z",
+  "project": "SkillPort Community",
+  "stats": {
+    "totalFiles": 248,
+    "totalDirectories": 43,
+    "fileTypes": {},
+    "directorySizes": {}
+  },
+  "cleanup": {
+    "filesToDelete": 48,
+    "filesSkipped": 2,
+    "totalReferenced": 0,
+    "totalEssential": 17
+  },
+  "filesToDelete": [
+    {
+      "file": ".env",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/.env",
+      "size": 572,
+      "type": "no extension"
+    },
+    {
+      "file": ".env.development",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/.env.development",
+      "size": 855,
+      "type": ".development"
+    },
+    {
+      "file": ".env.production",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/.env.production",
+      "size": 929,
+      "type": ".production"
+    },
+    {
+      "file": ".nvmrc",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/.nvmrc",
+      "size": 3,
+      "type": "no extension"
+    },
+    {
+      "file": "ADMIN_CONTROLLERS_PROGRESS.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/ADMIN_CONTROLLERS_PROGRESS.md",
+      "size": 5521,
+      "type": ".md"
+    },
+    {
+      "file": "ALL_CONTROLLERS_COMPLETE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/ALL_CONTROLLERS_COMPLETE.md",
+      "size": 12950,
+      "type": ".md"
+    },
+    {
+      "file": "AUTHENTICATION_AND_PAGECONTROLLER_FIX_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/AUTHENTICATION_AND_PAGECONTROLLER_FIX_REPORT.md",
+      "size": 6982,
+      "type": ".md"
+    },
+    {
+      "file": "AUTHENTICATION_FIX_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/AUTHENTICATION_FIX_SUMMARY.md",
+      "size": 8476,
+      "type": ".md"
+    },
+    {
+      "file": "AUTHENTICATION_FLOW_FIX_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/AUTHENTICATION_FLOW_FIX_REPORT.md",
+      "size": 8448,
+      "type": ".md"
+    },
+    {
+      "file": "AUTHMANAGER_SCRIPT_LOADING_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/AUTHMANAGER_SCRIPT_LOADING_FIX.md",
+      "size": 6594,
+      "type": ".md"
+    },
+    {
+      "file": "BOLD_FONT_MAXIMUM_IMPACT_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/BOLD_FONT_MAXIMUM_IMPACT_SUMMARY.md",
+      "size": 8037,
+      "type": ".md"
+    },
+    {
+      "file": "CLEANUP_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/CLEANUP_REPORT.md",
+      "size": 9884,
+      "type": ".md"
+    },
+    {
+      "file": "CLEAN_MINIMAL_DESIGN_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/CLEAN_MINIMAL_DESIGN_SUMMARY.md",
+      "size": 8811,
+      "type": ".md"
+    },
+    {
+      "file": "COMPLETE_CONTROLLERS_LIST.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/COMPLETE_CONTROLLERS_LIST.md",
+      "size": 4668,
+      "type": ".md"
+    },
+    {
+      "file": "DASHBOARD_LOGIN_PROMPT_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/DASHBOARD_LOGIN_PROMPT_FIX.md",
+      "size": 6325,
+      "type": ".md"
+    },
+    {
+      "file": "DYNAMIC_CONTENT_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/DYNAMIC_CONTENT_FIX.md",
+      "size": 7422,
+      "type": ".md"
+    },
+    {
+      "file": "DYNAMIC_DASHBOARD_IMPLEMENTATION.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/DYNAMIC_DASHBOARD_IMPLEMENTATION.md",
+      "size": 7654,
+      "type": ".md"
+    },
+    {
+      "file": "DYNAMIC_PAGES_IMPLEMENTATION.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/DYNAMIC_PAGES_IMPLEMENTATION.md",
+      "size": 32412,
+      "type": ".md"
+    },
+    {
+      "file": "ELEGANT_FONT_RED_ORANGE_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/ELEGANT_FONT_RED_ORANGE_SUMMARY.md",
+      "size": 9069,
+      "type": ".md"
+    },
+    {
+      "file": "EMAIL_SYSTEM_DOCUMENTATION.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/EMAIL_SYSTEM_DOCUMENTATION.md",
+      "size": 9661,
+      "type": ".md"
+    },
+    {
+      "file": "GMAIL_OTP_TEST_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/GMAIL_OTP_TEST_REPORT.md",
+      "size": 7423,
+      "type": ".md"
+    },
+    {
+      "file": "INFINITE_LOOP_FINAL_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/INFINITE_LOOP_FINAL_FIX.md",
+      "size": 8308,
+      "type": ".md"
+    },
+    {
+      "file": "LOGIN_PAGE_REDIRECT_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/LOGIN_PAGE_REDIRECT_FIX.md",
+      "size": 7309,
+      "type": ".md"
+    },
+    {
+      "file": "MANUAL_TESTING_GUIDE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/MANUAL_TESTING_GUIDE.md",
+      "size": 12060,
+      "type": ".md"
+    },
+    {
+      "file": "MANUAL_VERIFICATION_GUIDE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/MANUAL_VERIFICATION_GUIDE.md",
+      "size": 7128,
+      "type": ".md"
+    },
+    {
+      "file": "MENTOR_CONTROLLERS_PROGRESS.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/MENTOR_CONTROLLERS_PROGRESS.md",
+      "size": 5362,
+      "type": ".md"
+    },
+    {
+      "file": "OTP_DEPLOYMENT_CHECKLIST.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/OTP_DEPLOYMENT_CHECKLIST.md",
+      "size": 7059,
+      "type": ".md"
+    },
+    {
+      "file": "OTP_FLOW_FIX_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/OTP_FLOW_FIX_SUMMARY.md",
+      "size": 7269,
+      "type": ".md"
+    },
+    {
+      "file": "OTP_TEST_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/OTP_TEST_REPORT.md",
+      "size": 8417,
+      "type": ".md"
+    },
+    {
+      "file": "OTP_VERIFICATION_COMPLETE_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/OTP_VERIFICATION_COMPLETE_FIX.md",
+      "size": 7875,
+      "type": ".md"
+    },
+    {
+      "file": "OTP_VERIFICATION_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/OTP_VERIFICATION_FIX.md",
+      "size": 6339,
+      "type": ".md"
+    },
+    {
+      "file": "PATCH_APPLICATION_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/PATCH_APPLICATION_SUMMARY.md",
+      "size": 9486,
+      "type": ".md"
+    },
+    {
+      "file": "PERSONAL_DASHBOARD_FIX_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/PERSONAL_DASHBOARD_FIX_REPORT.md",
+      "size": 6251,
+      "type": ".md"
+    },
+    {
+      "file": "PROFESSIONAL_EMAIL_DESIGN_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/PROFESSIONAL_EMAIL_DESIGN_SUMMARY.md",
+      "size": 7393,
+      "type": ".md"
+    },
+    {
+      "file": "PROJECT_STATUS_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/PROJECT_STATUS_REPORT.md",
+      "size": 9182,
+      "type": ".md"
+    },
+    {
+      "file": "QA_DEVOPS_VERIFICATION_REPORT.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/QA_DEVOPS_VERIFICATION_REPORT.md",
+      "size": 12958,
+      "type": ".md"
+    },
+    {
+      "file": "RED_ORANGE_EMAIL_DESIGN_SUMMARY.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/RED_ORANGE_EMAIL_DESIGN_SUMMARY.md",
+      "size": 7880,
+      "type": ".md"
+    },
+    {
+      "file": "REGISTRATION_FLOW_FIXES_APPLIED.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/REGISTRATION_FLOW_FIXES_APPLIED.md",
+      "size": 10011,
+      "type": ".md"
+    },
+    {
+      "file": "REGISTRATION_OTP_FLOW_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/REGISTRATION_OTP_FLOW_FIX.md",
+      "size": 7579,
+      "type": ".md"
+    },
+    {
+      "file": "REGISTRATION_REDIRECT_FIX.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/REGISTRATION_REDIRECT_FIX.md",
+      "size": 6738,
+      "type": ".md"
+    },
+    {
+      "file": "STUDENT_CONTROLLERS_COMPLETE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/STUDENT_CONTROLLERS_COMPLETE.md",
+      "size": 5565,
+      "type": ".md"
+    },
+    {
+      "file": "docs/CI_CD_SETUP_GUIDE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/CI_CD_SETUP_GUIDE.md",
+      "size": 5947,
+      "type": ".md"
+    },
+    {
+      "file": "docs/DEPLOYMENT_GUIDE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/DEPLOYMENT_GUIDE.md",
+      "size": 8491,
+      "type": ".md"
+    },
+    {
+      "file": "docs/MIGRATION_PLAN.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/MIGRATION_PLAN.md",
+      "size": 8468,
+      "type": ".md"
+    },
+    {
+      "file": "docs/PROJECT_STATUS.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/PROJECT_STATUS.md",
+      "size": 8670,
+      "type": ".md"
+    },
+    {
+      "file": "docs/TESTING_GUIDE.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/TESTING_GUIDE.md",
+      "size": 9956,
+      "type": ".md"
+    },
+    {
+      "file": "docs/deploy/checklist.md",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/docs/deploy/checklist.md",
+      "size": 3991,
+      "type": ".md"
+    },
+    {
+      "file": "test-results/.last-run.json",
+      "fullPath": "/Users/saicharan/Downloads/skillport-community/test-results/.last-run.json",
+      "size": 45,
+      "type": ".json"
+    }
+  ],
+  "filesSkipped": [
+    {
+      "file": "README.md",
+      "reason": "Referenced in code",
+      "references": []
+    },
+    {
+      "file": "scripts/README.md",
+      "reason": "Referenced in code",
+      "references": []
+    }
+  ],
+  "references": {
+    "SKILL-EXTENSION/background/background.js": [],
+    "SKILL-EXTENSION/content_scripts/gfg.js": [],
+    "SKILL-EXTENSION/content_scripts/hackerrank.js": [],
+    "SKILL-EXTENSION/content_scripts/interviewbit.js": [],
+    "SKILL-EXTENSION/content_scripts/leetcode.js": [],
+    "SKILL-EXTENSION/popup/popup.html": [
+      {
+        "path": "popup.js",
+        "type": "src",
+        "line": 337
+      },
+      {
+        "path": "https://skillport-a0c39.web.app",
+        "type": "href",
+        "line": 318
+      }
+    ],
+    "SKILL-EXTENSION/popup/popup.js": [],
+    "SKILL-EXTENSION/server.js": [],
+    "client/css/auth.css": [
+      {
+        "path": "%23grain",
+        "type": "url",
+        "line": 270
+      }
+    ],
+    "client/css/components.css": [],
+    "client/css/dashboard.css": [],
+    "client/css/main.css": [],
+    "client/css/notifications.css": [],
+    "client/css/tailwind.css": [],
+    "client/css/tailwind.min.css": [],
+    "client/index.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "js/suppress-warnings.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "js/bootstrap.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "js/routeGuard.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "js/firebaseService.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "/favicon.ico",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "/favicon.svg",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 9
+      },
+      {
+        "path": "#features",
+        "type": "href",
+        "line": 117
+      },
+      {
+        "path": "#about",
+        "type": "href",
+        "line": 118
+      },
+      {
+        "path": "#contact",
+        "type": "href",
+        "line": 119
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 120
+      },
+      {
+        "path": "pages/auth/register.html",
+        "type": "href",
+        "line": 121
+      },
+      {
+        "path": "pages/auth/register.html",
+        "type": "href",
+        "line": 139
+      },
+      {
+        "path": "pages/personal/student-dashboard.html",
+        "type": "href",
+        "line": 142
+      },
+      {
+        "path": "#features",
+        "type": "href",
+        "line": 145
+      },
+      {
+        "path": "#features",
+        "type": "href",
+        "line": 329
+      },
+      {
+        "path": "pages/auth/register.html",
+        "type": "href",
+        "line": 330
+      },
+      {
+        "path": "pages/personal/student-dashboard.html",
+        "type": "href",
+        "line": 331
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 332
+      },
+      {
+        "path": "#contact",
+        "type": "href",
+        "line": 339
+      },
+      {
+        "path": "pages/community.html",
+        "type": "href",
+        "line": 340
+      },
+      {
+        "path": "pages/features.html",
+        "type": "href",
+        "line": 341
+      },
+      {
+        "path": "pages/help-center.html",
+        "type": "href",
+        "line": 342
+      },
+      {
+        "path": "pages/privacy.html",
+        "type": "href",
+        "line": 349
+      },
+      {
+        "path": "pages/terms.html",
+        "type": "href",
+        "line": 350
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 351
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 352
+      }
+    ],
+    "client/js/adminAnalyticsController.js": [],
+    "client/js/adminContestsController.js": [],
+    "client/js/adminDashboardController.js": [],
+    "client/js/adminLeaderboardController.js": [],
+    "client/js/adminMentorsController.js": [],
+    "client/js/adminProfileController.js": [],
+    "client/js/adminSystemController.js": [],
+    "client/js/adminUsersController.js": [],
+    "client/js/apiService.js": [],
+    "client/js/authManager.js": [],
+    "client/js/authService.js": [],
+    "client/js/bootstrap.js": [],
+    "client/js/communityAdminSignup.js": [],
+    "client/js/communityController.js": [],
+    "client/js/config.js": [],
+    "client/js/contextManager.js": [],
+    "client/js/controllers/leaderboardController.js": [],
+    "client/js/dashboard.js": [],
+    "client/js/dataLoader.js": [],
+    "client/js/enhancedDataLoader.js": [],
+    "client/js/enhancedPageController.js": [],
+    "client/js/errorHandler.js": [],
+    "client/js/firebaseService.js": [],
+    "client/js/forgotPasswordController.js": [],
+    "client/js/joinCommunity.js": [],
+    "client/js/logger.js": [],
+    "client/js/login.js": [],
+    "client/js/mentorContestsController.js": [],
+    "client/js/mentorDashboardController.js": [],
+    "client/js/mentorFeedbackController.js": [],
+    "client/js/mentorLeaderboardController.js": [],
+    "client/js/mentorProfileController.js": [],
+    "client/js/mentorSessionsController.js": [],
+    "client/js/mentorStudentManagement.js": [],
+    "client/js/mentorStudentsController.js": [],
+    "client/js/notifications.js": [],
+    "client/js/otpService.js": [],
+    "client/js/pageController.js": [],
+    "client/js/personalCommunitiesController.js": [],
+    "client/js/personalDashboardController.js": [],
+    "client/js/personalProfileController.js": [],
+    "client/js/personalProjectsController.js": [],
+    "client/js/personalStatsController.js": [],
+    "client/js/personalTrackerController.js": [],
+    "client/js/register.js": [],
+    "client/js/resetPasswordController.js": [],
+    "client/js/routeGuard.js": [],
+    "client/js/services/firebaseClient.js": [],
+    "client/js/services/leaderboardService.js": [],
+    "client/js/services/notificationService.js": [],
+    "client/js/services/storageService.js": [],
+    "client/js/studentContestParticipationController.js": [],
+    "client/js/studentDashboardController.js": [],
+    "client/js/studentLearningController.js": [],
+    "client/js/studentMentorFeedbackController.js": [],
+    "client/js/studentProfileController.js": [],
+    "client/js/studentSubmissionsController.js": [],
+    "client/js/uiHelpers.js": [],
+    "client/js/unauthorizedController.js": [],
+    "client/js/userContestsController.js": [],
+    "client/js/userDashboard.js": [],
+    "client/js/userLeaderboardController.js": [],
+    "client/js/userProfileController.js": [],
+    "client/js/validation.js": [],
+    "client/pages/admin/admin-analytics.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://cdn.jsdelivr.net/npm/chart.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "../../js/adminAnalyticsController.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 223
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 204
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 207
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 210
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 213
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 216
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 219
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 222
+      },
+      {
+        "path": "${item.href}",
+        "type": "href",
+        "line": 518
+      }
+    ],
+    "client/pages/admin/admin-contests.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/adminContestsController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 275
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 256
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 259
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 262
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 265
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 268
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 271
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 274
+      },
+      {
+        "path": "${item.href}",
+        "type": "href",
+        "line": 689
+      }
+    ],
+    "client/pages/admin/admin-dashboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "../../js/suppress-warnings.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "../../js/dashboard.js",
+        "type": "src",
+        "line": 19
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 199
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 180
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 183
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 186
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 189
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 192
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 195
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 198
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 326
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 340
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 355
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 360
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 365
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 370
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 375
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 423
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 469
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 500
+      }
+    ],
+    "client/pages/admin/admin-leaderboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/adminLeaderboardController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 277
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 258
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 261
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 264
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 267
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 270
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 273
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 276
+      },
+      {
+        "path": "${item.href}",
+        "type": "href",
+        "line": 641
+      }
+    ],
+    "client/pages/admin/admin-mentors.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 218
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 433
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 434
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 435
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 199
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 202
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 205
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 208
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 211
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 214
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 217
+      }
+    ],
+    "client/pages/admin/admin-profile.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 111
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        "type": "src",
+        "line": 180
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 92
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 95
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 98
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 101
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 104
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 107
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 110
+      }
+    ],
+    "client/pages/admin/admin-users.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/adminUsersController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 202
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "admin-dashboard.html",
+        "type": "href",
+        "line": 183
+      },
+      {
+        "path": "admin-users.html",
+        "type": "href",
+        "line": 186
+      },
+      {
+        "path": "admin-mentors.html",
+        "type": "href",
+        "line": 189
+      },
+      {
+        "path": "admin-contests.html",
+        "type": "href",
+        "line": 192
+      },
+      {
+        "path": "admin-analytics.html",
+        "type": "href",
+        "line": 195
+      },
+      {
+        "path": "admin-leaderboard.html",
+        "type": "href",
+        "line": 198
+      },
+      {
+        "path": "admin-profile.html",
+        "type": "href",
+        "line": 201
+      },
+      {
+        "path": "${item.href}",
+        "type": "href",
+        "line": 611
+      }
+    ],
+    "client/pages/api.html": [
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 10
+      }
+    ],
+    "client/pages/auth/complete-profile.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/main.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "../../css/auth.css",
+        "type": "href",
+        "line": 9
+      },
+      {
+        "path": "/pages/personal/profile.html",
+        "type": "href",
+        "line": 57
+      },
+      {
+        "path": "/pages/personal/student-dashboard.html",
+        "type": "href",
+        "line": 63
+      },
+      {
+        "path": "/pages/auth/login.html",
+        "type": "href",
+        "line": 69
+      },
+      {
+        "path": "/pages/help-center.html",
+        "type": "href",
+        "line": 78
+      }
+    ],
+    "client/pages/auth/forgot-password.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 207
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 208
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 209
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 144
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 153
+      }
+    ],
+    "client/pages/auth/login.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 263
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 264
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 265
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 266
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 10
+      },
+      {
+        "path": "forgot-password.html",
+        "type": "href",
+        "line": 173
+      },
+      {
+        "path": "register.html",
+        "type": "href",
+        "line": 208
+      }
+    ],
+    "client/pages/auth/register.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 386
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 387
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 388
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 389
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 10
+      },
+      {
+        "path": "../terms.html",
+        "type": "href",
+        "line": 255
+      },
+      {
+        "path": "../privacy.html",
+        "type": "href",
+        "line": 255
+      },
+      {
+        "path": "../terms.html",
+        "type": "href",
+        "line": 364
+      },
+      {
+        "path": "../privacy.html",
+        "type": "href",
+        "line": 364
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 380
+      }
+    ],
+    "client/pages/auth/reset-password.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 248
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 249
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 250
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 173
+      },
+      {
+        "path": "forgot-password.html",
+        "type": "href",
+        "line": 186
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 194
+      }
+    ],
+    "client/pages/auth/unauthorized.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "/pages/auth/login.html",
+        "type": "href",
+        "line": 77
+      },
+      {
+        "path": "/index.html",
+        "type": "href",
+        "line": 83
+      }
+    ],
+    "client/pages/auth/verify-otp.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 10
+      },
+      {
+        "path": "login.html",
+        "type": "href",
+        "line": 145
+      }
+    ],
+    "client/pages/community.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../js/communityController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 57
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 58
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 59
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 60
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 61
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 119
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 122
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 148
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 149
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 150
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 151
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 158
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 159
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 160
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 161
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 168
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 169
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 170
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 171
+      }
+    ],
+    "client/pages/contact.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 97
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 98
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 99
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 100
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 101
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 256
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 259
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 286
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 287
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 288
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 289
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 296
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 297
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 298
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 299
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 306
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 307
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 308
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 309
+      }
+    ],
+    "client/pages/cookies.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 51
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 52
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 54
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 157
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 160
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 186
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 187
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 188
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 189
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 196
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 197
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 198
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 199
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 206
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 207
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 208
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 209
+      }
+    ],
+    "client/pages/documentation.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 49
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 51
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 52
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 175
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 178
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 204
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 205
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 206
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 207
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 214
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 215
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 216
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 217
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 224
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 225
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 226
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 227
+      }
+    ],
+    "client/pages/features.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 85
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 86
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 87
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 221
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 224
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 251
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 252
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 253
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 254
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 261
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 262
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 263
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 264
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 271
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 272
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 273
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 274
+      }
+    ],
+    "client/pages/gdpr.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 51
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 52
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 54
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 180
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 183
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 209
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 210
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 211
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 212
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 219
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 220
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 221
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 222
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 229
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 230
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 231
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 232
+      }
+    ],
+    "client/pages/help-center.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 49
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 51
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 52
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 143
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 146
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 172
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 173
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 174
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 175
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 182
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 183
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 184
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 185
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 192
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 193
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 194
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 195
+      }
+    ],
+    "client/pages/index.html": [
+      {
+        "path": "../",
+        "type": "href",
+        "line": 15
+      }
+    ],
+    "client/pages/mentor/mentor-contest-leaderboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 107
+      },
+      {
+        "path": "../js/api.js",
+        "type": "src",
+        "line": 741
+      },
+      {
+        "path": "../js/app.js",
+        "type": "src",
+        "line": 742
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 94
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 97
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 100
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 103
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 106
+      }
+    ],
+    "client/pages/mentor/mentor-contest-manage.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 177
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 567
+      },
+      {
+        "path": "../js/api.js",
+        "type": "src",
+        "line": 568
+      },
+      {
+        "path": "../js/app.js",
+        "type": "src",
+        "line": 569
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 164
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 167
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 170
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 173
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 176
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 229
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 245
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 261
+      },
+      {
+        "path": "mentor-contest-leaderboard.html?contest=ALGO",
+        "type": "href",
+        "line": 468
+      },
+      {
+        "path": "${question.link}",
+        "type": "href",
+        "line": 760
+      }
+    ],
+    "client/pages/mentor/mentor-contests.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/mentorContestsController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 200
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 335
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 336
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 337
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 187
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 190
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 193
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 196
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 199
+      },
+      {
+        "path": "mentor-contest-manage.html?contest=ALGO",
+        "type": "href",
+        "line": 265
+      },
+      {
+        "path": "mentor-contest-leaderboard.html?contest=ALGO",
+        "type": "href",
+        "line": 268
+      },
+      {
+        "path": "mentor-contest-manage.html?contest=SQLMAY",
+        "type": "href",
+        "line": 321
+      },
+      {
+        "path": "mentor-contest-leaderboard.html?contest=SQLMAY",
+        "type": "href",
+        "line": 324
+      },
+      {
+        "path": "mentor-contest-manage.html?contest=${contest._id}",
+        "type": "href",
+        "line": 447
+      },
+      {
+        "path": "mentor-contest-leaderboard.html?contest=${contest._id}",
+        "type": "href",
+        "line": 450
+      }
+    ],
+    "client/pages/mentor/mentor-dashboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "../../js/mentorDashboardController.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 182
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
+        "type": "src",
+        "line": 232
+      },
+      {
+        "path": "../js/api.js",
+        "type": "src",
+        "line": 394
+      },
+      {
+        "path": "../js/app.js",
+        "type": "src",
+        "line": 395
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 169
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 172
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 175
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 178
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 181
+      },
+      {
+        "path": "top-performing-students.html",
+        "type": "href",
+        "line": 255
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 292
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 369
+      },
+      {
+        "path": "#",
+        "type": "href",
+        "line": 374
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 379
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 384
+      }
+    ],
+    "client/pages/mentor/mentor-feedback.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 122
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 328
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 329
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 330
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 109
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 112
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 115
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 118
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 121
+      }
+    ],
+    "client/pages/mentor/mentor-leaderboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 201
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 188
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 191
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 194
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 197
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 200
+      }
+    ],
+    "client/pages/mentor/mentor-profile.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 102
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+        "type": "src",
+        "line": 171
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "mentor-dashboard.html",
+        "type": "href",
+        "line": 89
+      },
+      {
+        "path": "mentor-contests.html",
+        "type": "href",
+        "line": 92
+      },
+      {
+        "path": "mentor-feedback.html",
+        "type": "href",
+        "line": 95
+      },
+      {
+        "path": "mentor-leaderboard.html",
+        "type": "href",
+        "line": 98
+      },
+      {
+        "path": "mentor-profile.html",
+        "type": "href",
+        "line": 101
+      }
+    ],
+    "client/pages/personal/communities.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 230
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 214
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 217
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 220
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 223
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 226
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 229
+      }
+    ],
+    "client/pages/personal/profile.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "/js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "/js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "/js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "/js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "/js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "/js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "/js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "/js/personalProfileController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "/js/firebaseService.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 172
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        "type": "src",
+        "line": 251
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 156
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 159
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 162
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 165
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 168
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 171
+      }
+    ],
+    "client/pages/personal/projects.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "/js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "/js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "/js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "/js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "/js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "/js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "/js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "/js/personalProjectsController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "/js/firebaseService.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 123
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 107
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 110
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 113
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 116
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 119
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 122
+      },
+      {
+        "path": "${project.github}",
+        "type": "href",
+        "line": 759
+      },
+      {
+        "path": "${project.liveDemo}",
+        "type": "href",
+        "line": 763
+      }
+    ],
+    "client/pages/personal/stats.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "/js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "/js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "/js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "/js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "/js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "/js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "/js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "/js/personalStatsController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "/js/firebaseService.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 157
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 141
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 144
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 147
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 150
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 153
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 156
+      }
+    ],
+    "client/pages/personal/student-dashboard.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/personalDashboardController.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 200
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 184
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 187
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 190
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 193
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 196
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 199
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 470
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 480
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 490
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 500
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 705
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 716
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 727
+      }
+    ],
+    "client/pages/personal/tracker.html": [
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "/js/firebaseService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "/js/authManager.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "/js/contextManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "/js/dataLoader.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "/js/uiHelpers.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "/js/apiService.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "/js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "/js/personalTrackerController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 195
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../../css/tailwind.min.css",
+        "type": "href",
+        "line": 8
+      },
+      {
+        "path": "student-dashboard.html",
+        "type": "href",
+        "line": 179
+      },
+      {
+        "path": "projects.html",
+        "type": "href",
+        "line": 182
+      },
+      {
+        "path": "tracker.html",
+        "type": "href",
+        "line": 185
+      },
+      {
+        "path": "stats.html",
+        "type": "href",
+        "line": 188
+      },
+      {
+        "path": "communities.html",
+        "type": "href",
+        "line": 191
+      },
+      {
+        "path": "profile.html",
+        "type": "href",
+        "line": 194
+      }
+    ],
+    "client/pages/pricing.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 104
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 105
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 106
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 107
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 289
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 292
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 319
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 320
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 321
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 322
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 329
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 330
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 331
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 332
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 339
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 340
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 341
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 342
+      }
+    ],
+    "client/pages/privacy.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 77
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 78
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 79
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 80
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 81
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 296
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 299
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 326
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 327
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 328
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 329
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 336
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 337
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 338
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 339
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 346
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 347
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 348
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 349
+      }
+    ],
+    "client/pages/status.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 38
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 39
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 40
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 41
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 42
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 163
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 164
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 165
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 166
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 173
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 174
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 175
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 176
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 183
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 184
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 185
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 186
+      }
+    ],
+    "client/pages/student/contest-participation.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 95
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 529
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "user-dashboard.html",
+        "type": "href",
+        "line": 82
+      },
+      {
+        "path": "user-contests.html",
+        "type": "href",
+        "line": 85
+      },
+      {
+        "path": "user-leaderboard.html",
+        "type": "href",
+        "line": 88
+      },
+      {
+        "path": "user-mentor-feedback.html",
+        "type": "href",
+        "line": 91
+      },
+      {
+        "path": "user-profile.html",
+        "type": "href",
+        "line": 94
+      },
+      {
+        "path": "${problem.link}",
+        "type": "href",
+        "line": 424
+      }
+    ],
+    "client/pages/student/user-contests.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/userContestsController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 159
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 377
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 378
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 379
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 380
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 381
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 382
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 383
+      },
+      {
+        "path": "../../js/userContestsController.js",
+        "type": "src",
+        "line": 384
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "user-dashboard.html",
+        "type": "href",
+        "line": 147
+      },
+      {
+        "path": "user-contests.html",
+        "type": "href",
+        "line": 149
+      },
+      {
+        "path": "user-leaderboard.html",
+        "type": "href",
+        "line": 152
+      },
+      {
+        "path": "user-mentor-feedback.html",
+        "type": "href",
+        "line": 155
+      },
+      {
+        "path": "user-profile.html",
+        "type": "href",
+        "line": 158
+      },
+      {
+        "path": "contest-participation.html",
+        "type": "href",
+        "line": 222
+      },
+      {
+        "path": "contest-participation.html",
+        "type": "href",
+        "line": 278
+      },
+      {
+        "path": "contest-participation.html?contest=${contest._id}",
+        "type": "href",
+        "line": 688
+      }
+    ],
+    "client/pages/student/user-dashboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "../../js/suppress-warnings.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/firebaseService.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 18
+      },
+      {
+        "path": "../../js/userDashboard.js",
+        "type": "src",
+        "line": 19
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      }
+    ],
+    "client/pages/student/user-leaderboard.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/userLeaderboardController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 197
+      },
+      {
+        "path": "../js/api.js",
+        "type": "src",
+        "line": 605
+      },
+      {
+        "path": "../js/app.js",
+        "type": "src",
+        "line": 606
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "user-dashboard.html",
+        "type": "href",
+        "line": 184
+      },
+      {
+        "path": "user-contests.html",
+        "type": "href",
+        "line": 187
+      },
+      {
+        "path": "user-leaderboard.html",
+        "type": "href",
+        "line": 190
+      },
+      {
+        "path": "user-mentor-feedback.html",
+        "type": "href",
+        "line": 193
+      },
+      {
+        "path": "user-profile.html",
+        "type": "href",
+        "line": 196
+      }
+    ],
+    "client/pages/student/user-mentor-feedback.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 145
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 553
+      },
+      {
+        "path": "../js/api.js",
+        "type": "src",
+        "line": 554
+      },
+      {
+        "path": "../js/app.js",
+        "type": "src",
+        "line": 555
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "user-dashboard.html",
+        "type": "href",
+        "line": 132
+      },
+      {
+        "path": "user-contests.html",
+        "type": "href",
+        "line": 135
+      },
+      {
+        "path": "user-leaderboard.html",
+        "type": "href",
+        "line": 138
+      },
+      {
+        "path": "user-mentor-feedback.html",
+        "type": "href",
+        "line": 141
+      },
+      {
+        "path": "user-profile.html",
+        "type": "href",
+        "line": 144
+      }
+    ],
+    "client/pages/student/user-profile.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "../../js/apiService.js",
+        "type": "src",
+        "line": 10
+      },
+      {
+        "path": "../../js/notifications.js",
+        "type": "src",
+        "line": 11
+      },
+      {
+        "path": "../../js/authManager.js",
+        "type": "src",
+        "line": 12
+      },
+      {
+        "path": "../../js/contextManager.js",
+        "type": "src",
+        "line": 13
+      },
+      {
+        "path": "../../js/dataLoader.js",
+        "type": "src",
+        "line": 14
+      },
+      {
+        "path": "../../js/uiHelpers.js",
+        "type": "src",
+        "line": 15
+      },
+      {
+        "path": "../../js/pageController.js",
+        "type": "src",
+        "line": 16
+      },
+      {
+        "path": "../../js/userProfileController.js",
+        "type": "src",
+        "line": 17
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+        "type": "src",
+        "line": 60
+      },
+      {
+        "path": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        "type": "src",
+        "line": 129
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "user-dashboard.html",
+        "type": "href",
+        "line": 47
+      },
+      {
+        "path": "user-contests.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "user-leaderboard.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "user-mentor-feedback.html",
+        "type": "href",
+        "line": 56
+      },
+      {
+        "path": "user-profile.html",
+        "type": "href",
+        "line": 59
+      }
+    ],
+    "client/pages/terms.html": [
+      {
+        "path": "https://cdn.tailwindcss.com",
+        "type": "src",
+        "line": 8
+      },
+      {
+        "path": "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js",
+        "type": "src",
+        "line": 9
+      },
+      {
+        "path": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "type": "href",
+        "line": 7
+      },
+      {
+        "path": "../index.html",
+        "type": "href",
+        "line": 50
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 51
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 52
+      },
+      {
+        "path": "pages/auth/login.html",
+        "type": "href",
+        "line": 53
+      },
+      {
+        "path": "auth/register.html",
+        "type": "href",
+        "line": 54
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 149
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 152
+      },
+      {
+        "path": "features.html",
+        "type": "href",
+        "line": 178
+      },
+      {
+        "path": "pricing.html",
+        "type": "href",
+        "line": 179
+      },
+      {
+        "path": "api.html",
+        "type": "href",
+        "line": 180
+      },
+      {
+        "path": "documentation.html",
+        "type": "href",
+        "line": 181
+      },
+      {
+        "path": "help-center.html",
+        "type": "href",
+        "line": 188
+      },
+      {
+        "path": "contact.html",
+        "type": "href",
+        "line": 189
+      },
+      {
+        "path": "community.html",
+        "type": "href",
+        "line": 190
+      },
+      {
+        "path": "status.html",
+        "type": "href",
+        "line": 191
+      },
+      {
+        "path": "privacy.html",
+        "type": "href",
+        "line": 198
+      },
+      {
+        "path": "terms.html",
+        "type": "href",
+        "line": 199
+      },
+      {
+        "path": "cookies.html",
+        "type": "href",
+        "line": 200
+      },
+      {
+        "path": "gdpr.html",
+        "type": "href",
+        "line": 201
+      }
+    ],
+    "client/postcss.config.js": [],
+    "client/tailwind.config.js": [],
+    "email-templates/emailService.js": [],
+    "functions/src/analytics.js": [],
+    "functions/src/authHandlers.js": [],
+    "functions/src/communities.js": [],
+    "functions/src/contests.js": [],
+    "functions/src/index.js": [],
+    "functions/src/leaderboard.js": [],
+    "functions/src/notifications.js": [],
+    "functions/src/otp.js": [],
+    "functions/src/scheduled/analytics.js": [],
+    "functions/src/storageHelper.js": [],
+    "functions/src/submissions.js": [],
+    "functions/src/users.js": [],
+    "otp-server.js": [],
+    "otp-test-config.js": [],
+    "playwright-report/index.html": [],
+    "playwright.config.js": [],
+    "scripts/cleanup-project.js": [],
+    "scripts/smart-cleanup.js": [],
+    "scripts/test-all-email-types.js": [],
+    "scripts/test-complete-otp-flow.js": [],
+    "scripts/test-gmail-smtp.js": [],
+    "tests/authManager.unit.test.js": [],
+    "tests/e2e/user-flows/authentication.spec.js": [],
+    "tests/e2e/user-flows/community.spec.js": [],
+    "tests/fixtures/test-data.js": [],
+    "tests/integration/api/users.test.js": [],
+    "tests/integration/database/firestore.test.js": [],
+    "tests/otp-simple.test.js": [],
+    "tests/otp.e2e.test.js": [],
+    "tests/otp.integration.test.js": [],
+    "tests/otp.test.js": [],
+    "tests/unit/extension/background.test.js": [],
+    "tests/unit/frontend/authService.test.js": [],
+    "tests/unit/functions/otp.test.js": [],
+    "tests/unit/functions/users.test.js": [],
+    "tests/utils/global-setup.js": [],
+    "tests/utils/global-teardown.js": [],
+    "tests/utils/setup.js": []
+  },
+  "imports": {
+    "SKILL-EXTENSION/background/background.js": [],
+    "SKILL-EXTENSION/content_scripts/gfg.js": [],
+    "SKILL-EXTENSION/content_scripts/hackerrank.js": [],
+    "SKILL-EXTENSION/content_scripts/interviewbit.js": [],
+    "SKILL-EXTENSION/content_scripts/leetcode.js": [
+      {
+        "path": ") ||\n        code.includes(",
+        "type": "import",
+        "line": 200
+      },
+      {
+        "path": ") && code.includes(",
+        "type": "import",
+        "line": 228
+      }
+    ],
+    "SKILL-EXTENSION/popup/popup.html": [],
+    "SKILL-EXTENSION/popup/popup.js": [],
+    "SKILL-EXTENSION/server.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 4
+      },
+      {
+        "path": "cors",
+        "type": "import",
+        "line": 5
+      },
+      {
+        "path": "body-parser",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "express-rate-limit",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "helmet",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "validator",
+        "type": "import",
+        "line": 9
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 10
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 52
+      }
+    ],
+    "client/css/auth.css": [],
+    "client/css/components.css": [],
+    "client/css/dashboard.css": [],
+    "client/css/main.css": [],
+    "client/css/notifications.css": [],
+    "client/css/tailwind.css": [],
+    "client/css/tailwind.min.css": [],
+    "client/index.html": [],
+    "client/js/adminAnalyticsController.js": [],
+    "client/js/adminContestsController.js": [],
+    "client/js/adminDashboardController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/adminLeaderboardController.js": [],
+    "client/js/adminMentorsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/adminProfileController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/adminSystemController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/adminUsersController.js": [],
+    "client/js/apiService.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/authManager.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 98
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+        "type": "import",
+        "line": 666
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+        "type": "import",
+        "line": 667
+      }
+    ],
+    "client/js/authService.js": [
+      {
+        "path": "./services/firebaseClient.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 23
+      }
+    ],
+    "client/js/bootstrap.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 15
+      }
+    ],
+    "client/js/communityAdminSignup.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 5
+      }
+    ],
+    "client/js/communityController.js": [],
+    "client/js/config.js": [],
+    "client/js/contextManager.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 92
+      }
+    ],
+    "client/js/controllers/leaderboardController.js": [
+      {
+        "path": "../services/leaderboardService.js",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "client/js/dashboard.js": [],
+    "client/js/dataLoader.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 87
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 104
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 121
+      }
+    ],
+    "client/js/enhancedDataLoader.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 33
+      }
+    ],
+    "client/js/enhancedPageController.js": [],
+    "client/js/errorHandler.js": [
+      {
+        "path": "./logger.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "./config.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/firebaseService.js": [
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "./config.js",
+        "type": "import",
+        "line": 37
+      },
+      {
+        "path": "./authService.js",
+        "type": "import",
+        "line": 38
+      },
+      {
+        "path": "./logger.js",
+        "type": "import",
+        "line": 39
+      },
+      {
+        "path": "./errorHandler.js",
+        "type": "import",
+        "line": 40
+      },
+      {
+        "path": "./validation.js",
+        "type": "import",
+        "line": 41
+      },
+      {
+        "path": "./otpService.js",
+        "type": "import",
+        "line": 115
+      }
+    ],
+    "client/js/forgotPasswordController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/joinCommunity.js": [
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 69
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 115
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 163
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 191
+      },
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 206
+      }
+    ],
+    "client/js/logger.js": [
+      {
+        "path": "./config.js",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "client/js/login.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/mentorContestsController.js": [],
+    "client/js/mentorDashboardController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/mentorFeedbackController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/mentorLeaderboardController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/mentorProfileController.js": [],
+    "client/js/mentorSessionsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/mentorStudentManagement.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 5
+      }
+    ],
+    "client/js/mentorStudentsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/notifications.js": [],
+    "client/js/otpService.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "client/js/pageController.js": [],
+    "client/js/personalCommunitiesController.js": [],
+    "client/js/personalDashboardController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/personalProfileController.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 5
+      },
+      {
+        "path": "./logger.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "./pageController.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/personalProjectsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/personalStatsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/personalTrackerController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/register.js": [
+      {
+        "path": "./firebaseService.js",
+        "type": "import",
+        "line": 5
+      }
+    ],
+    "client/js/resetPasswordController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/routeGuard.js": [],
+    "client/js/services/firebaseClient.js": [
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js",
+        "type": "import",
+        "line": 14
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-storage.js",
+        "type": "import",
+        "line": 15
+      },
+      {
+        "path": "../config.js",
+        "type": "import",
+        "line": 16
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js",
+        "type": "import",
+        "line": 115
+      }
+    ],
+    "client/js/services/leaderboardService.js": [
+      {
+        "path": "./firebaseClient.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/services/notificationService.js": [
+      {
+        "path": "./firebaseClient.js",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "client/js/services/storageService.js": [
+      {
+        "path": "./firebaseClient.js",
+        "type": "import",
+        "line": 14
+      }
+    ],
+    "client/js/studentContestParticipationController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/studentDashboardController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/studentLearningController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/studentMentorFeedbackController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/studentProfileController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/studentSubmissionsController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/uiHelpers.js": [],
+    "client/js/unauthorizedController.js": [
+      {
+        "path": "./enhancedPageController.js",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "client/js/userContestsController.js": [],
+    "client/js/userDashboard.js": [],
+    "client/js/userLeaderboardController.js": [],
+    "client/js/userProfileController.js": [
+      {
+        "path": "./services/storageService.js",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "client/js/validation.js": [],
+    "client/pages/admin/admin-analytics.html": [],
+    "client/pages/admin/admin-contests.html": [],
+    "client/pages/admin/admin-dashboard.html": [],
+    "client/pages/admin/admin-leaderboard.html": [],
+    "client/pages/admin/admin-mentors.html": [],
+    "client/pages/admin/admin-profile.html": [],
+    "client/pages/admin/admin-users.html": [],
+    "client/pages/api.html": [],
+    "client/pages/auth/complete-profile.html": [],
+    "client/pages/auth/forgot-password.html": [],
+    "client/pages/auth/login.html": [],
+    "client/pages/auth/register.html": [],
+    "client/pages/auth/reset-password.html": [],
+    "client/pages/auth/unauthorized.html": [],
+    "client/pages/auth/verify-otp.html": [],
+    "client/pages/community.html": [],
+    "client/pages/contact.html": [],
+    "client/pages/cookies.html": [],
+    "client/pages/documentation.html": [],
+    "client/pages/features.html": [],
+    "client/pages/gdpr.html": [],
+    "client/pages/help-center.html": [],
+    "client/pages/index.html": [],
+    "client/pages/mentor/mentor-contest-leaderboard.html": [],
+    "client/pages/mentor/mentor-contest-manage.html": [],
+    "client/pages/mentor/mentor-contests.html": [],
+    "client/pages/mentor/mentor-dashboard.html": [],
+    "client/pages/mentor/mentor-feedback.html": [],
+    "client/pages/mentor/mentor-leaderboard.html": [],
+    "client/pages/mentor/mentor-profile.html": [],
+    "client/pages/personal/communities.html": [],
+    "client/pages/personal/profile.html": [],
+    "client/pages/personal/projects.html": [],
+    "client/pages/personal/stats.html": [],
+    "client/pages/personal/student-dashboard.html": [],
+    "client/pages/personal/tracker.html": [],
+    "client/pages/pricing.html": [],
+    "client/pages/privacy.html": [],
+    "client/pages/status.html": [],
+    "client/pages/student/contest-participation.html": [],
+    "client/pages/student/user-contests.html": [],
+    "client/pages/student/user-dashboard.html": [],
+    "client/pages/student/user-leaderboard.html": [],
+    "client/pages/student/user-mentor-feedback.html": [],
+    "client/pages/student/user-profile.html": [],
+    "client/pages/terms.html": [],
+    "client/postcss.config.js": [],
+    "client/tailwind.config.js": [
+      {
+        "path": "tailwindcss",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "email-templates/emailService.js": [
+      {
+        "path": "nodemailer",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "functions/src/analytics.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/authHandlers.js": [
+      {
+        "path": "firebase-functions",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      }
+    ],
+    "functions/src/communities.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/contests.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/index.js": [
+      {
+        "path": "firebase-functions",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "express",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "cors",
+        "type": "import",
+        "line": 3
+      },
+      {
+        "path": "helmet",
+        "type": "import",
+        "line": 4
+      },
+      {
+        "path": "express-rate-limit",
+        "type": "import",
+        "line": 5
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "./users",
+        "type": "import",
+        "line": 64
+      },
+      {
+        "path": "./communities",
+        "type": "import",
+        "line": 65
+      },
+      {
+        "path": "./contests",
+        "type": "import",
+        "line": 66
+      },
+      {
+        "path": "./otp",
+        "type": "import",
+        "line": 67
+      },
+      {
+        "path": "./submissions",
+        "type": "import",
+        "line": 68
+      },
+      {
+        "path": "./leaderboard",
+        "type": "import",
+        "line": 69
+      },
+      {
+        "path": "./notifications",
+        "type": "import",
+        "line": 70
+      },
+      {
+        "path": "./analytics",
+        "type": "import",
+        "line": 71
+      },
+      {
+        "path": "./scheduled/analytics",
+        "type": "import",
+        "line": 77
+      },
+      {
+        "path": "./authHandlers",
+        "type": "import",
+        "line": 80
+      },
+      {
+        "path": "./authHandlers",
+        "type": "import",
+        "line": 81
+      }
+    ],
+    "functions/src/leaderboard.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/notifications.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/otp.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "nodemailer",
+        "type": "import",
+        "line": 3
+      },
+      {
+        "path": "otp-generator",
+        "type": "import",
+        "line": 4
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 5
+      },
+      {
+        "path": "express-rate-limit",
+        "type": "import",
+        "line": 34
+      }
+    ],
+    "functions/src/scheduled/analytics.js": [
+      {
+        "path": "firebase-functions",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      }
+    ],
+    "functions/src/storageHelper.js": [
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 1
+      }
+    ],
+    "functions/src/submissions.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "functions/src/users.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 1
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 2
+      },
+      {
+        "path": "joi",
+        "type": "import",
+        "line": 3
+      }
+    ],
+    "otp-server.js": [
+      {
+        "path": "express",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "nodemailer",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "crypto",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "cors",
+        "type": "import",
+        "line": 9
+      },
+      {
+        "path": "./email-templates/emailService",
+        "type": "import",
+        "line": 10
+      },
+      {
+        "path": "dotenv",
+        "type": "import",
+        "line": 11
+      }
+    ],
+    "otp-test-config.js": [],
+    "playwright-report/index.html": [],
+    "playwright.config.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 5
+      }
+    ],
+    "scripts/cleanup-project.js": [
+      {
+        "path": "fs",
+        "type": "import",
+        "line": 3
+      },
+      {
+        "path": "path",
+        "type": "import",
+        "line": 4
+      }
+    ],
+    "scripts/smart-cleanup.js": [
+      {
+        "path": "fs",
+        "type": "import",
+        "line": 3
+      },
+      {
+        "path": "path",
+        "type": "import",
+        "line": 4
+      },
+      {
+        "path": "child_process",
+        "type": "import",
+        "line": 5
+      }
+    ],
+    "scripts/test-all-email-types.js": [
+      {
+        "path": "axios",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "scripts/test-complete-otp-flow.js": [
+      {
+        "path": "axios",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../otp-test-config",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "scripts/test-gmail-smtp.js": [
+      {
+        "path": "nodemailer",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../otp-test-config",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/authManager.unit.test.js": [
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 49
+      },
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 65
+      },
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 92
+      },
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 117
+      },
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 140
+      },
+      {
+        "path": "../client/js/authManager.js",
+        "type": "import",
+        "line": 163
+      }
+    ],
+    "tests/e2e/user-flows/authentication.spec.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/e2e/user-flows/community.spec.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/fixtures/test-data.js": [],
+    "tests/integration/api/users.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "supertest",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "express",
+        "type": "import",
+        "line": 11
+      }
+    ],
+    "tests/integration/database/firestore.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/otp-simple.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "tests/otp.e2e.test.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "tests/otp.integration.test.js": [
+      {
+        "path": "firebase/app",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "firebase/auth",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "firebase/firestore",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "firebase/auth",
+        "type": "import",
+        "line": 54
+      },
+      {
+        "path": "firebase/firestore",
+        "type": "import",
+        "line": 55
+      },
+      {
+        "path": "firebase/auth",
+        "type": "import",
+        "line": 96
+      },
+      {
+        "path": "firebase/firestore",
+        "type": "import",
+        "line": 97
+      },
+      {
+        "path": "firebase/auth",
+        "type": "import",
+        "line": 131
+      },
+      {
+        "path": "firebase/firestore",
+        "type": "import",
+        "line": 132
+      }
+    ],
+    "tests/otp.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "supertest",
+        "type": "import",
+        "line": 7
+      },
+      {
+        "path": "express",
+        "type": "import",
+        "line": 8
+      },
+      {
+        "path": "firebase-admin",
+        "type": "import",
+        "line": 9
+      },
+      {
+        "path": "nodemailer",
+        "type": "import",
+        "line": 10
+      },
+      {
+        "path": "otp-generator",
+        "type": "import",
+        "line": 42
+      },
+      {
+        "path": "express",
+        "type": "import",
+        "line": 57
+      }
+    ],
+    "tests/unit/extension/background.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/unit/frontend/authService.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/unit/functions/otp.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/unit/functions/users.test.js": [
+      {
+        "path": "@jest/globals",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/utils/global-setup.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 6
+      },
+      {
+        "path": "../fixtures/test-data",
+        "type": "import",
+        "line": 7
+      }
+    ],
+    "tests/utils/global-teardown.js": [
+      {
+        "path": "@playwright/test",
+        "type": "import",
+        "line": 6
+      }
+    ],
+    "tests/utils/setup.js": []
+  }
+}

@@ -8,7 +8,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../../css/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
@@ -284,19 +284,74 @@
                     const result = await response.json();
                     
                     if (result.success) {
-                        // Complete the registration process with Firebase
+                        // Set registration-in-progress flag so onAuthStateChanged doesn't sign the user out while we write Firestore
+                        sessionStorage.setItem("registrationInProgress", "1");
+
                         try {
-                            await this.completeRegistration();
+                            // Import Firebase service dynamically
+                            const { default: firebaseService } = await import('../../js/firebaseService.js?v=' + Date.now() + '&bust=' + Math.random());
                             
-                            this.showSuccess();
+                            // Get user data from session storage
+                            const userData = JSON.parse(sessionStorage.getItem('pendingUserData') || '{}');
+                            
+                            if (!userData.email) {
+                                throw new Error('No user data found in session storage');
+                            }
+                            
+                            // User should already be registered from the registration step
+                            // Just complete the registration with OTP verification
+                            console.log('🔐 Completing registration with OTP verification');
+                            
+                            const profileData = {
+                                name: `${userData.firstName} ${userData.lastName}`,
+                                role: userData.role || 'personal',
+                                firstName: userData.firstName,
+                                lastName: userData.lastName,
+                                ...userData
+                            };
+                            
+                            await firebaseService.completeRegistration(profileData);
+                            console.log('✅ User marked as OTP verified');
+                            
+                            // Sign in the user after successful OTP verification
+                            console.log('🔐 Signing in user after OTP verification');
+                            await firebaseService.login(userData.email, userData.password);
+                            console.log('✅ User signed in successfully');
+                            
+                            // Send welcome email
+                            try {
+                                await fetch('http://localhost:5002/api/email/registration-welcome', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        email: userData.email,
+                                        firstName: userData.firstName,
+                                        lastName: userData.lastName
+                                    })
+                                });
+                            } catch (emailError) {
+                                console.warn('Failed to send welcome email:', emailError);
+                                // Don't fail registration for email errors
+                            }
+                            
+                            // Remove registration flag
+                            sessionStorage.removeItem("registrationInProgress");
+                            
                             // Clear pending verification
                             sessionStorage.removeItem('pendingUserData');
                             
-                            // Redirect to dashboard after successful OTP verification
+                            this.showSuccess();
+                            
+                            // Redirect to dashboard after successful OTP verification and sign-in
                             setTimeout(() => {
                                 window.location.href = '/pages/personal/student-dashboard.html';
                             }, 2000);
+                            
                         } catch (registrationError) {
+                            // Remove flag if present
+                            sessionStorage.removeItem("registrationInProgress");
                             console.error('Registration completion failed:', registrationError);
                             this.showError('Registration failed. Please try again or contact support.');
                             this.clearOTPInputs();

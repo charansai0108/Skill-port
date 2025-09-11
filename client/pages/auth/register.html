@@ -8,7 +8,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../../css/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
@@ -451,7 +451,7 @@
         // Form submission handlers
         document.getElementById('personalRegistrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            console.log('Personal form submitted');
+            console.log('📝 Personal form submitted');
             
             // Prevent multiple submissions
             const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -462,7 +462,7 @@
             
             // Disable submit button
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending OTP...';
+            submitBtn.textContent = 'Creating Account...';
             
             const formData = new FormData(e.target);
             const userData = {
@@ -489,52 +489,61 @@
                 } else {
                     alert('Passwords do not match!');
                 }
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
                 return;
             }
             
             try {
+                console.log('📝 Submitting registration for:', userData.email);
+                submitBtn.textContent = 'Creating Account...';
+                
                 // Store user data for OTP verification
                 sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
                 
-                // Send OTP via our OTP server
-                const otpResponse = await fetch('http://localhost:5002/api/otp/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: userData.email,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName
-                    })
+                // Call the updated firebaseService.register method directly
+                const { default: firebaseService } = await import('../../js/firebaseService.js');
+                await firebaseService.register(userData.email, userData.password, {
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    role: userData.role,
+                    skillLevel: userData.skillLevel,
+                    educationLevel: userData.educationLevel,
+                    fieldOfStudy: userData.fieldOfStudy,
+                    bio: userData.bio
                 });
                 
-                const otpResult = await otpResponse.json();
+                // Registration will handle OTP sending and redirect automatically
+                console.log('✅ Registration completed, redirecting to OTP verification...');
                 
-                if (otpResult.success) {
-                    if (window.notifications) {
-                        window.notifications.success({
-                            title: 'OTP Sent!',
-                            message: 'Please check your email for the verification code'
-                        });
-                    }
-                    
-                    // Redirect to OTP verification page
-                    setTimeout(() => {
-                        window.location.href = 'verify-otp.html?email=' + encodeURIComponent(userData.email);
-                    }, 1500);
-                } else {
-                    throw new Error(otpResult.message || 'Failed to send OTP');
-                }
             } catch (error) {
-                console.error('Registration error:', error);
+                console.error('❌ Registration error:', error);
+                
+                let errorMessage = error.message || 'An error occurred during registration';
+                let errorTitle = 'Registration Failed';
+                
+                // Handle specific error cases
+                if (error.message.includes('email-already-in-use')) {
+                    errorTitle = 'Email Already Registered';
+                    errorMessage = 'This email is already registered. Please login instead or use a different email.';
+                } else if (error.message.includes('Email already registered and verified')) {
+                    errorTitle = 'Account Exists';
+                    errorMessage = 'This email is already registered and verified. Please login instead.';
+                } else if (error.message.includes('OTP sent to existing unverified account')) {
+                    errorTitle = 'OTP Sent';
+                    errorMessage = 'An OTP has been sent to your email. Please check your inbox.';
+                    // Redirect to OTP verification page
+                    window.location.href = `/pages/auth/verify-otp.html?email=${encodeURIComponent(userData.email)}`;
+                    return;
+                }
+                
                 if (window.notifications) {
                     window.notifications.error({
-                        title: 'Registration Failed',
-                        message: error.message || 'An error occurred during registration'
+                        title: errorTitle,
+                        message: errorMessage
                     });
                 } else {
-                    alert('Registration failed: ' + (error.message || 'An error occurred during registration'));
+                    alert(`${errorTitle}: ${errorMessage}`);
                 }
             } finally {
                 // Re-enable submit button
@@ -556,7 +565,7 @@
             
             // Disable submit button
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending OTP...';
+            submitBtn.textContent = 'Creating Account...';
             
             const formData = new FormData(e.target);
             const userData = {
@@ -584,43 +593,34 @@
                 } else {
                     alert('Passwords do not match!');
                 }
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
                 return;
             }
             
             try {
+                console.log('📝 Submitting community registration for:', userData.email);
+                submitBtn.textContent = 'Creating Account...';
+                
                 // Store user data for OTP verification
                 sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
                 
-                // Send OTP via our OTP server
-                const otpResponse = await fetch('http://localhost:5002/api/otp/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: userData.email,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName
-                    })
+                // Call the updated firebaseService.register method directly
+                const { default: firebaseService } = await import('../../js/firebaseService.js');
+                await firebaseService.register(userData.email, userData.password, {
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    role: userData.role,
+                    username: userData.username,
+                    organizationName: userData.organizationName,
+                    organizationType: userData.organizationType,
+                    organizationSize: userData.organizationSize,
+                    position: userData.position,
+                    organizationWebsite: userData.organizationWebsite
                 });
                 
-                const otpResult = await otpResponse.json();
-                
-                if (otpResult.success) {
-                    if (window.notifications) {
-                        window.notifications.success({
-                            title: 'OTP Sent!',
-                            message: 'Please check your email for the verification code'
-                        });
-                    }
-                    
-                    // Redirect to OTP verification page
-                    setTimeout(() => {
-                        window.location.href = 'verify-otp.html?email=' + encodeURIComponent(userData.email);
-                    }, 1500);
-                } else {
-                    throw new Error(otpResult.message || 'Failed to send OTP');
-                }
+                // Registration will handle OTP sending and redirect automatically
+                console.log('✅ Community registration completed, redirecting to OTP verification...');
             } catch (error) {
                 console.error('Community registration error:', error);
                 if (window.notifications) {
