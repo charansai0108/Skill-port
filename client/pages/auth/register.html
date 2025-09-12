@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - SkillPort</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="../../css/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -48,632 +45,257 @@
         
         .btn-primary:hover {
             background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
         }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            transform: translateY(-2px);
-        }
-        
+
         .role-card {
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
         }
-        
+
         .role-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
-        .form-container { 
-            display: none; 
-        }
-        
-        .form-container.show { 
-            display: block !important; 
-            animation: slideInUp 0.3s ease-out;
-        }
-        
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .auth-container {
-            animation: fadeInUp 0.6s ease-out;
+
+        .role-card.selected {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2, #ffffff);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen p-4">
-    <div class="auth-container max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="flex items-center justify-center gap-3 mb-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
-                </div>
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-                    SkillPort
-                </h1>
-            </div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-4">Create Your Account</h2>
-            <p class="text-slate-600 text-lg">Join the SkillPort community and start your journey</p>
-        </div>
+<body class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-red-100 flex items-center justify-center p-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+    </div>
 
-        <!-- Role Selection -->
-        <div id="roleSelection" class="max-w-4xl mx-auto mb-12">
-            <h3 class="text-xl font-bold text-slate-800 text-center mb-8">Choose Your Role</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Personal User Card -->
-                <div class="role-card auth-card rounded-3xl p-8 cursor-pointer" onclick="showForm('personal')">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <i data-lucide="user" class="w-10 h-10 text-white"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">Personal Learner</h3>
-                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">Track progress, join contests, build portfolio</p>
-                        <button class="btn-primary text-white px-8 py-4 rounded-xl font-bold text-lg">
-                            🚀 Start Learning Journey
-                        </button>
-                    </div>
+    <!-- Register Card -->
+    <div class="relative z-10 w-full max-w-2xl">
+        <div class="auth-card rounded-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl mb-4">
+                    <i data-lucide="user-plus" class="w-8 h-8 text-white"></i>
                 </div>
-                
-                <!-- Community User Card -->
-                <div class="role-card auth-card rounded-3xl p-8 cursor-pointer" onclick="showForm('community')">
-                    <div class="text-center">
-                        <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <i data-lucide="users" class="w-10 h-10 text-white"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Community Builder</h3>
-                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">Manage teams, create learning communities</p>
-                        <button class="btn-primary text-white px-8 py-4 rounded-xl font-bold text-lg">
-                            🌟 Build Community
-                        </button>
-                    </div>
-                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Join SkillPort</h1>
+                <p class="text-gray-600">Create your account and start your learning journey</p>
             </div>
-        </div>
 
-        <!-- Personal Registration Form -->
-        <div id="personalForm" class="form-container max-w-2xl mx-auto">
-            <div class="auth-card rounded-3xl p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Personal Learner Registration</h2>
-                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
+            <!-- Registration Form -->
+            <form id="registerForm" class="space-y-6">
+                <!-- Personal Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="firstName"
+                            class="form-input block w-full px-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter your first name"
+                            required
+                        >
+                    </div>
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="lastName"
+                            class="form-input block w-full px-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter your last name"
+                            required
+                        >
+                    </div>
                 </div>
-                
-                <form id="personalRegistrationForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">First Name *</label>
-                            <input type="text" name="firstName" required class="form-input w-full px-4 py-3 rounded-xl">
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
                         </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Last Name *</label>
-                            <input type="text" name="lastName" required class="form-input w-full px-4 py-3 rounded-xl">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Create a password"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword"
+                            class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Confirm your password"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Role Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-4">Account Type</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-4 text-center" data-role="personal">
+                            <i data-lucide="user" class="w-8 h-8 text-gray-600 mx-auto mb-2"></i>
+                            <h3 class="font-medium text-gray-900">Personal</h3>
+                            <p class="text-sm text-gray-600">Individual learning</p>
+                        </div>
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-4 text-center" data-role="student">
+                            <i data-lucide="graduation-cap" class="w-8 h-8 text-gray-600 mx-auto mb-2"></i>
+                            <h3 class="font-medium text-gray-900">Student</h3>
+                            <p class="text-sm text-gray-600">Academic learning</p>
+                        </div>
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-4 text-center" data-role="mentor">
+                            <i data-lucide="users" class="w-8 h-8 text-gray-600 mx-auto mb-2"></i>
+                            <h3 class="font-medium text-gray-900">Mentor</h3>
+                            <p class="text-sm text-gray-600">Guide others</p>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Username *</label>
-                            <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Email *</label>
-                            <input type="email" name="email" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
+                    <input type="hidden" id="selectedRole" name="role" value="personal">
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input 
+                            id="agreeTerms" 
+                            name="agreeTerms" 
+                            type="checkbox" 
+                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                            required
+                        >
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Skill Level *</label>
-                        <select name="skillLevel" required class="form-input w-full px-4 py-3 rounded-xl">
-                            <option value="">Select skill level</option>
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Education Level</label>
-                            <select name="educationLevel" class="form-input w-full px-4 py-3 rounded-xl">
-                                <option value="">Select education level</option>
-                                <option value="high-school">High School</option>
-                                <option value="bachelor">Bachelor's Degree</option>
-                                <option value="master">Master's Degree</option>
-                                <option value="phd">PhD</option>
-                                <option value="self-taught">Self Taught</option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Field of Study</label>
-                            <input type="text" name="fieldOfStudy" class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Computer Science">
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Bio</label>
-                        <textarea name="bio" rows="4" class="form-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about yourself..."></textarea>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Password *</label>
-                            <div class="relative">
-                                <input type="password" name="password" id="personalPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('personalPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Confirm Password *</label>
-                            <div class="relative">
-                                <input type="password" name="confirmPassword" id="personalConfirmPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('personalConfirmPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500 mt-1">
-                        <label class="ml-3 text-sm text-slate-600">
-                            I agree to the <a href="../terms.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Terms of Service</a> and <a href="../privacy.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Privacy Policy</a>
+                    <div class="ml-3 text-sm">
+                        <label for="agreeTerms" class="text-gray-700">
+                            I agree to the 
+                            <a href="../terms.html" class="text-red-600 hover:text-red-500">Terms of Service</a> 
+                            and 
+                            <a href="../privacy.html" class="text-red-600 hover:text-red-500">Privacy Policy</a>
                         </label>
                     </div>
-                    
-                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i>
-                        Create Personal Account
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Community Registration Form -->
-        <div id="communityForm" class="form-container max-w-2xl mx-auto">
-            <div class="auth-card rounded-3xl p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Community Builder Registration</h2>
-                    <button onclick="showRoleSelection()" class="text-slate-600 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
                 </div>
-                
-                <form id="communityRegistrationForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">First Name *</label>
-                            <input type="text" name="firstName" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Last Name *</label>
-                            <input type="text" name="lastName" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Username *</label>
-                            <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Email *</label>
-                            <input type="email" name="email" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Organization Name *</label>
-                            <input type="text" name="organizationName" required class="form-input w-full px-4 py-3 rounded-xl">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Organization Type *</label>
-                            <select name="organizationType" required class="form-input w-full px-4 py-3 rounded-xl">
-                                <option value="">Select organization type</option>
-                                <option value="university">University</option>
-                                <option value="bootcamp">Bootcamp</option>
-                                <option value="company">Company</option>
-                                <option value="school">School</option>
-                                <option value="nonprofit">Nonprofit</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Organization Size</label>
-                            <select name="organizationSize" class="form-input w-full px-4 py-3 rounded-xl">
-                                <option value="">Select size</option>
-                                <option value="small">Small (1-50 people)</option>
-                                <option value="medium">Medium (51-200 people)</option>
-                                <option value="large">Large (200+ people)</option>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Your Position</label>
-                            <input type="text" name="position" class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Professor, Manager">
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-slate-700">Organization Website</label>
-                        <input type="url" name="organizationWebsite" class="form-input w-full px-4 py-3 rounded-xl" placeholder="https://example.com">
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Password *</label>
-                            <div class="relative">
-                                <input type="password" name="password" id="communityPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('communityPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-slate-700">Confirm Password *</label>
-                            <div class="relative">
-                                <input type="password" name="confirmPassword" id="communityConfirmPassword" required class="form-input w-full px-4 py-3 pr-12 rounded-xl">
-                                <button type="button" class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg" onclick="togglePassword('communityConfirmPassword')">
-                                    <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <input type="checkbox" name="agreeTerms" required class="w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500 mt-1">
-                        <label class="ml-3 text-sm text-slate-600">
-                            I agree to the <a href="../terms.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Terms of Service</a> and <a href="../privacy.html" target="_blank" class="text-red-600 hover:text-red-700 font-medium">Privacy Policy</a>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                        Create Community Account
-                    </button>
-                </form>
-            </div>
-        </div>
 
-        <!-- Back to Login -->
-        <div class="text-center mt-12">
-            <p class="text-slate-600">
-                Already have an account? 
-                <a href="login.html" class="text-red-600 hover:text-red-700 font-semibold hover:underline">Sign in here</a>
-            </p>
+                <button 
+                    type="submit" 
+                    class="btn-primary w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                    <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="login.html" class="font-medium text-red-600 hover:text-red-500">
+                        Sign in here
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase Integration Scripts -->
-    <script type="module" src="../../js/apiService.js"></script>
-    <script src="../../js/notifications.js"></script>
-    <script type="module" src="../../js/firebaseService.js"></script>
-    <script type="module" src="../../js/authManager.js"></script>
-
-    <!-- JavaScript -->
     <script>
-        // Initialize Lucide icons with error handling
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                    lucide.createIcons();
-                    console.log('✅ Lucide icons initialized successfully');
-                } else {
-                    console.warn('⚠️ Lucide not available, using fallback icons');
-                    // Fallback: Replace icon elements with text/emoji
-                    document.querySelectorAll('[data-lucide]').forEach(icon => {
-                        const iconName = icon.getAttribute('data-lucide');
-                        const fallbackMap = {
-                            'target': '🎯',
-                            'user-plus': '👤',
-                            'user': '👤',
-                            'users': '👥',
-                            'eye': '👁️',
-                            'eye-off': '🙈',
-                            'x': '❌'
-                        };
-                        if (fallbackMap[iconName]) {
-                            icon.innerHTML = fallbackMap[iconName];
-                            icon.style.fontSize = '1.2em';
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('❌ Error initializing icons:', error);
-            }
-        });
-        
-        // Simple form switching
-        function showForm(role) {
-            console.log('Showing form for:', role);
-            
-            // Hide role selection
-            document.getElementById('roleSelection').style.display = 'none';
-            
-            // Show appropriate form
-            if (role === 'personal') {
-                document.getElementById('personalForm').classList.add('show');
-            } else if (role === 'community') {
-                document.getElementById('communityForm').classList.add('show');
-            }
-        }
-        
-        function showRoleSelection() {
-            console.log('Going back to role selection');
-            
-            // Hide all forms
-            document.querySelectorAll('.form-container').forEach(form => {
-                form.classList.remove('show');
-            });
-            
-            // Show role selection
-            document.getElementById('roleSelection').style.display = 'block';
-        }
-        
-        // Form submission handlers
-        document.getElementById('personalRegistrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('📝 Personal form submitted');
-            
-            // Prevent multiple submissions
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            if (submitBtn.disabled) {
-                console.log('Form already being submitted, ignoring...');
-                return;
-            }
-            
-            // Disable submit button
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating Account...';
-            
-            const formData = new FormData(e.target);
-            const userData = {
-                role: 'personal',
-                firstName: formData.get('firstName'),
-                lastName: formData.get('lastName'),
-                username: formData.get('username'),
-                email: formData.get('email'),
-                password: formData.get('password'),
-                confirmPassword: formData.get('confirmPassword'),
-                skillLevel: formData.get('skillLevel'),
-                educationLevel: formData.get('educationLevel'),
-                fieldOfStudy: formData.get('fieldOfStudy'),
-                bio: formData.get('bio'),
-                agreeTerms: formData.get('agreeTerms')
-            };
-            
-            if (userData.password !== userData.confirmPassword) {
-                if (window.notifications) {
-                    window.notifications.error({
-                        title: 'Password Mismatch',
-                        message: 'Passwords do not match!'
-                    });
-                } else {
-                    alert('Passwords do not match!');
-                }
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
-                return;
-            }
-            
-            try {
-                console.log('📝 Submitting registration for:', userData.email);
-                submitBtn.textContent = 'Creating Account...';
-                
-                // Store user data for OTP verification
-                sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
-                
-                // Call the updated firebaseService.register method directly
-                const { default: firebaseService } = await import('../../js/firebaseService.js');
-                await firebaseService.register(userData.email, userData.password, {
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    role: userData.role,
-                    skillLevel: userData.skillLevel,
-                    educationLevel: userData.educationLevel,
-                    fieldOfStudy: userData.fieldOfStudy,
-                    bio: userData.bio
-                });
-                
-                // Registration will handle OTP sending and redirect automatically
-                console.log('✅ Registration completed, redirecting to OTP verification...');
-                
-            } catch (error) {
-                console.error('❌ Registration error:', error);
-                
-                let errorMessage = error.message || 'An error occurred during registration';
-                let errorTitle = 'Registration Failed';
-                
-                // Handle specific error cases
-                if (error.message.includes('email-already-in-use')) {
-                    errorTitle = 'Email Already Registered';
-                    errorMessage = 'This email is already registered. Please login instead or use a different email.';
-                } else if (error.message.includes('Email already registered and verified')) {
-                    errorTitle = 'Account Exists';
-                    errorMessage = 'This email is already registered and verified. Please login instead.';
-                } else if (error.message.includes('OTP sent to existing unverified account')) {
-                    errorTitle = 'OTP Sent';
-                    errorMessage = 'An OTP has been sent to your email. Please check your inbox.';
-                    // Redirect to OTP verification page
-                    window.location.href = `/pages/auth/verify-otp.html?email=${encodeURIComponent(userData.email)}`;
-                    return;
-                }
-                
-                if (window.notifications) {
-                    window.notifications.error({
-                        title: errorTitle,
-                        message: errorMessage
-                    });
-                } else {
-                    alert(`${errorTitle}: ${errorMessage}`);
-                }
-            } finally {
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
-            }
-        });
-        
-        document.getElementById('communityRegistrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Community form submitted');
-            
-            // Prevent multiple submissions
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            if (submitBtn.disabled) {
-                console.log('Form already being submitted, ignoring...');
-                return;
-            }
-            
-            // Disable submit button
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating Account...';
-            
-            const formData = new FormData(e.target);
-            const userData = {
-                role: 'community-admin',
-                firstName: formData.get('firstName'),
-                lastName: formData.get('lastName'),
-                username: formData.get('username'),
-                email: formData.get('email'),
-                password: formData.get('password'),
-                confirmPassword: formData.get('confirmPassword'),
-                organizationName: formData.get('organizationName'),
-                organizationType: formData.get('organizationType'),
-                organizationSize: formData.get('organizationSize'),
-                position: formData.get('position'),
-                organizationWebsite: formData.get('organizationWebsite'),
-                agreeTerms: formData.get('agreeTerms')
-            };
-            
-            if (userData.password !== userData.confirmPassword) {
-                if (window.notifications) {
-                    window.notifications.error({
-                        title: 'Password Mismatch',
-                        message: 'Passwords do not match!'
-                    });
-                } else {
-                    alert('Passwords do not match!');
-                }
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
-                return;
-            }
-            
-            try {
-                console.log('📝 Submitting community registration for:', userData.email);
-                submitBtn.textContent = 'Creating Account...';
-                
-                // Store user data for OTP verification
-                sessionStorage.setItem('pendingUserData', JSON.stringify(userData));
-                
-                // Call the updated firebaseService.register method directly
-                const { default: firebaseService } = await import('../../js/firebaseService.js');
-                await firebaseService.register(userData.email, userData.password, {
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    role: userData.role,
-                    username: userData.username,
-                    organizationName: userData.organizationName,
-                    organizationType: userData.organizationType,
-                    organizationSize: userData.organizationSize,
-                    position: userData.position,
-                    organizationWebsite: userData.organizationWebsite
-                });
-                
-                // Registration will handle OTP sending and redirect automatically
-                console.log('✅ Community registration completed, redirecting to OTP verification...');
-            } catch (error) {
-                console.error('Community registration error:', error);
-                if (window.notifications) {
-                    window.notifications.error({
-                        title: 'Registration Failed',
-                        message: error.message || 'An error occurred during registration'
-                    });
-                } else {
-                    alert('Registration failed: ' + (error.message || 'An error occurred during registration'));
-                }
-            } finally {
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Account';
-            }
-        });
-        
-        // Password toggle functionality
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) {
-                console.error('Input element not found:', inputId);
-                return;
-            }
-            
-            const toggleBtn = input.parentNode?.querySelector('.password-toggle');
-            if (!toggleBtn) {
-                console.error('Toggle button not found for input:', inputId);
-                return;
-            }
-            
-            const eyeIcon = toggleBtn.querySelector('i, svg, .eye-icon');
-            if (!eyeIcon) {
-                console.error('Eye icon not found for input:', inputId);
-                return;
-            }
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                input.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
-            
-            // Re-initialize Lucide icons
+        // Initialize Lucide icons
+        function initializeIcons() {
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+            } else {
+                setTimeout(initializeIcons, 100);
             }
         }
-        
-        console.log('Registration page loaded successfully with Firebase integration!');
+        initializeIcons();
+
+        // Handle role selection
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Update hidden input
+                document.getElementById('selectedRole').value = this.dataset.role;
+            });
+        });
+
+        // Set default selection
+        document.querySelector('.role-card[data-role="personal"]').classList.add('selected');
+
+        // Handle form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // Validate password match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            const role = formData.get('role');
+            
+            // Show success message
+            alert('Registration successful! Redirecting to dashboard...');
+            
+            // Redirect based on role
+            let redirectUrl = '';
+            switch (role) {
+                case 'personal':
+                    redirectUrl = '../personal/student-dashboard.html';
+                    break;
+                case 'student':
+                    redirectUrl = '../student/user-dashboard.html';
+                    break;
+                case 'mentor':
+                    redirectUrl = '../mentor/mentor-dashboard.html';
+                    break;
+                default:
+                    redirectUrl = '../personal/student-dashboard.html';
+            }
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 1000);
+        });
     </script>
 </body>
-</html>
 </html>

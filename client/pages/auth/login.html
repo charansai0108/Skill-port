@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SkillPort</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="../../css/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -48,479 +45,154 @@
         
         .btn-primary:hover {
             background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            transform: translateY(-2px);
-        }
-        
-        .password-toggle {
-            transition: all 0.2s ease;
-        }
-        
-        .password-toggle:hover {
-            background: rgba(239, 68, 68, 0.1);
-            transform: scale(1.05);
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .auth-container {
-            animation: fadeInUp 0.6s ease-out;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen flex items-center justify-center p-4">
-    <div class="auth-container w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <!-- Auth Card -->
-        <div class="auth-card rounded-3xl p-8 lg:p-12">
-            <div class="text-center mb-8">
-                <div class="flex items-center justify-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <i data-lucide="target" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-                        SkillPort
-                    </h1>
-                </div>
-                <h2 class="text-xl font-semibold text-slate-800 mb-2">Welcome Back</h2>
-                <p class="text-slate-600">Sign in to your SkillPort account</p>
-                
-                <!-- Logout Button (shown if user is already authenticated) -->
-                <div id="logoutSection" class="mt-4 hidden">
-                    <p class="text-sm text-slate-500 mb-2">Already logged in?</p>
-                    <button id="logoutBtn" class="text-sm text-red-600 hover:text-red-700 font-medium underline">
-                        Logout and use different account
-                    </button>
-                </div>
-            </div>
+<body class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-red-100 flex items-center justify-center p-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+    </div>
 
-            <!-- Message Area -->
-            <div id="messageArea" class="mb-6 hidden">
-                <div id="emailVerificationMessage" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
-                    <div class="flex items-center">
-                        <i data-lucide="mail" class="w-5 h-5 text-blue-600 mr-3"></i>
-                        <div>
-                            <h3 class="text-sm font-medium text-blue-800">Email Verification Required</h3>
-                            <p class="text-sm text-blue-700 mt-1">Please check your email and click the verification link before signing in.</p>
-                        </div>
-                    </div>
+    <!-- Login Card -->
+    <div class="relative z-10 w-full max-w-md">
+        <div class="auth-card rounded-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl mb-4">
+                    <i data-lucide="zap" class="w-8 h-8 text-white"></i>
                 </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                <p class="text-gray-600">Sign in to your SkillPort account</p>
             </div>
 
             <!-- Login Form -->
             <form id="loginForm" class="space-y-6">
-                <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        required 
-                        class="form-input w-full px-4 py-3 rounded-xl"
-                        placeholder="Enter your email"
-                    >
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
                     <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                        </div>
                         <input 
                             type="password" 
                             id="password" 
-                            name="password" 
-                            required 
-                            class="form-input w-full px-4 py-3 pr-12 rounded-xl"
+                            name="password"
+                            class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             placeholder="Enter your password"
+                            required
                         >
-                        <button 
-                            type="button" 
-                            id="togglePassword"
-                            class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg"
-                            onclick="togglePassword('password')"
-                        >
-                            <i data-lucide="eye" class="w-5 h-5 text-slate-400"></i>
-                        </button>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <label class="flex items-center">
-                        <input type="checkbox" class="w-4 h-4 text-red-600 border-slate-300 rounded focus:ring-red-500">
-                        <span class="ml-2 text-sm text-slate-600">Remember me</span>
-                    </label>
-                    <a href="forgot-password.html" class="text-sm text-red-600 hover:text-red-700 font-medium">Forgot password?</a>
+                    <div class="flex items-center">
+                        <input 
+                            id="remember-me" 
+                            name="remember-me" 
+                            type="checkbox" 
+                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                        >
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-red-600 hover:text-red-500">
+                            Forgot password?
+                        </a>
+                    </div>
                 </div>
 
                 <button 
                     type="submit" 
-                    class="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
+                    class="btn-primary w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                    <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
                     Sign In
                 </button>
             </form>
 
-            <!-- Divider -->
-            <div class="my-6 flex items-center">
-                <div class="flex-1 border-t border-slate-200"></div>
-                <span class="px-4 text-sm text-slate-500">or</span>
-                <div class="flex-1 border-t border-slate-200"></div>
-            </div>
-
-            <!-- Social Login -->
-            <div class="space-y-3">
-                <button class="btn-secondary w-full py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2" onclick="showAlert('OAuth login via GitHub coming soon', 'info')">
-                    <i data-lucide="github" class="w-5 h-5"></i>
-                    Continue with GitHub
-                </button>
-                <button class="btn-secondary w-full py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2" onclick="showAlert('OAuth login via Google coming soon', 'info')">
-                    <i data-lucide="mail" class="w-5 h-5"></i>
-                    Continue with Google
-                </button>
-            </div>
-
-            <!-- Sign Up Link -->
-            <div class="text-center mt-8">
-                <p class="text-slate-600">
-                    Don't have an account? 
-                    <a href="register.html" class="text-red-600 hover:text-red-700 font-medium">Sign up</a>
-                </p>
-            </div>
-        </div>
-
-        <!-- Illustration -->
-        <div class="hidden lg:block">
-            <div class="auth-card rounded-3xl p-8 h-full flex items-center">
-                <div class="text-center">
-                    <div class="w-24 h-24 bg-gradient-to-br from-red-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <i data-lucide="user-check" class="w-12 h-12 text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Welcome to SkillPort</h2>
-                    <p class="text-slate-600 mb-8">Join our community of learners and developers. Access your personalized learning dashboard and track your progress.</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 p-4 rounded-xl">
-                            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                                <i data-lucide="target" class="w-5 h-5 text-red-600"></i>
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-semibold text-slate-800">Personalized Learning</h3>
-                                <p class="text-sm text-slate-600">Track your progress and goals</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-3 p-4 rounded-xl">
-                            <div class="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-                                <i data-lucide="users" class="w-5 h-5 text-pink-600"></i>
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-semibold text-slate-800">Join Communities</h3>
-                                <p class="text-sm text-slate-600">Connect with fellow developers</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-3 p-4 rounded-xl">
-                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                                <i data-lucide="trophy" class="w-5 h-5 text-orange-600"></i>
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-semibold text-slate-800">Earn Achievements</h3>
-                                <p class="text-sm text-slate-600">Complete challenges and win rewards</p>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Demo Credentials -->
+            <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
+                <div class="text-xs text-gray-600 space-y-1">
+                    <div><strong>Admin:</strong> admin@skillport.com / admin123</div>
+                    <div><strong>Mentor:</strong> mentor@skillport.com / mentor123</div>
+                    <div><strong>Student:</strong> student@skillport.com / student123</div>
                 </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="register.html" class="font-medium text-red-600 hover:text-red-500">
+                        Sign up here
+                    </a>
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- Alert Container -->
-    <div id="alert-container" class="fixed top-4 right-4 z-50"></div>
-
-    <!-- Firebase Integration Scripts -->
-    <script type="module" src="../../js/apiService.js"></script>
-    <script src="../../js/notifications.js"></script>
-    <script type="module" src="../../js/firebaseService.js"></script>
-    <script type="module" src="../../js/authManager.js"></script>
-
     <script>
-        // Initialize Lucide icons with error handling
+        // Initialize Lucide icons
         function initializeIcons() {
-            try {
-                if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                    lucide.createIcons();
-                    console.log('✅ Lucide icons initialized successfully');
-                } else {
-                    console.warn('⚠️ Lucide not available, using fallback icons');
-                    // Fallback: Replace icon elements with text/emoji
-                    document.querySelectorAll('[data-lucide]').forEach(icon => {
-                        const iconName = icon.getAttribute('data-lucide');
-                        const fallbackMap = {
-                            'target': '🎯',
-                            'log-in': '🔑',
-                            'eye': '👁️',
-                            'eye-off': '🙈',
-                            'github': '🐙',
-                            'mail': '📧',
-                            'user-check': '✅',
-                            'trophy': '🏆',
-                            'users': '👥'
-                        };
-                        icon.innerHTML = fallbackMap[iconName] || '📄';
-                        icon.style.fontSize = '1.2em';
-                    });
-                }
-            } catch (error) {
-                console.error('❌ Error initializing icons:', error);
-            }
-        }
-        
-        // Initialize icons when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeIcons);
-        } else {
-            initializeIcons();
-        }
-        
-        // Re-initialize icons after any dynamic content changes
-        setTimeout(initializeIcons, 100);
-        
-        // Password toggle functionality
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const toggleBtn = input.parentNode.querySelector('.password-toggle');
-            const eyeIcon = toggleBtn.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             } else {
-                input.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
+                setTimeout(initializeIcons, 100);
             }
-            lucide.createIcons();
         }
+        initializeIcons();
 
-        // Form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            try {
-                console.log('🔐 Attempting login for:', email);
-                
-                // Use Firebase service for login
-                const firebaseService = await import('../../js/firebaseService.js');
-                const response = await firebaseService.default.login(email, password);
-                
-                if (response.success) {
-                    if (window.notifications) {
-                        window.notifications.success({
-                            title: 'Login Successful',
-                            message: 'Welcome back! Redirecting...'
-                        });
-                    } else {
-                        showAlert('🎉 Login successful! Redirecting...', 'success');
-                    }
-                    
-                    // Redirect based on user role
-                    setTimeout(() => {
-                        const user = response.user;
-                        if (user && user.role) {
-                            let redirectUrl = '';
-                            switch (user.role) {
-                                case 'personal':
-                                    redirectUrl = '/pages/personal/student-dashboard.html';
-                                    break;
-                                case 'student':
-                                    redirectUrl = '/pages/student/user-dashboard.html';
-                                    break;
-                                case 'mentor':
-                                    redirectUrl = '/pages/mentor/mentor-dashboard.html';
-                                    break;
-                                case 'community-admin':
-                                    redirectUrl = '/pages/admin/admin-dashboard.html';
-                                    break;
-                                default:
-                                    redirectUrl = '/pages/personal/student-dashboard.html';
-                            }
-                            console.log('🔄 Redirecting to:', redirectUrl);
-                            window.location.href = redirectUrl;
-                        } else {
-                            console.log('🔄 No role found, redirecting to default dashboard');
-                            window.location.href = '/pages/personal/student-dashboard.html';
-                        }
-                    }, 1500);
-                } else {
-                    throw new Error(response.message);
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                if (window.notifications) {
-                    window.notifications.error({
-                        title: 'Login Failed',
-                        message: error.message || 'An error occurred during login'
-                    });
-                } else {
-                    showAlert('Login failed: ' + (error.message || 'Unknown error'), 'error');
-                }
+            // Simple demo role detection based on email
+            let redirectUrl = '';
+            if (email.includes('admin')) {
+                redirectUrl = '../admin/admin-dashboard.html';
+            } else if (email.includes('mentor')) {
+                redirectUrl = '../mentor/mentor-dashboard.html';
+            } else if (email.includes('student')) {
+                redirectUrl = '../student/user-dashboard.html';
+            } else {
+                redirectUrl = '../personal/student-dashboard.html';
             }
-        });
-
-        // Alert system
-        function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alert-container');
-            const alert = document.createElement('div');
             
-            const bgColor = type === 'success' ? 'bg-green-500' : 
-                           type === 'error' ? 'bg-red-500' : 
-                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            // Show success message
+            alert('Login successful! Redirecting to dashboard...');
             
-            alert.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg mb-4 max-w-sm`;
-            alert.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span>${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            `;
-            
-            alertContainer.appendChild(alert);
-            lucide.createIcons();
-            
-            // Auto-remove after 5 seconds
+            // Redirect after a short delay
             setTimeout(() => {
-                if (alert.parentElement) {
-                    alert.remove();
-                }
-            }, 5000);
-        }
-
-        // Check authentication status on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for email verification message in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const message = urlParams.get('message');
-            
-            if (message === 'verification-required') {
-                showVerificationRequiredMessage();
-            } else if (message === 'otp-not-verified') {
-                showOTPVerificationMessage();
-            } else if (message === 'email-not-verified') {
-                showEmailVerificationMessage();
-            }
-            
-            // Check if user is already logged in
-            if (typeof window.authManager !== 'undefined' && window.authManager.currentUser) {
-                console.log('User already logged in, redirecting...');
-                window.authManager.redirectByRole();
-            }
+                window.location.href = redirectUrl;
+            }, 1000);
         });
-
-        function showVerificationRequiredMessage() {
-            const messageArea = document.getElementById('messageArea');
-            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
-            
-            if (messageArea && emailVerificationMessage) {
-                messageArea.classList.remove('hidden');
-                emailVerificationMessage.classList.remove('hidden');
-                
-                // Update the message text for verification required
-                const messageText = emailVerificationMessage.querySelector('p');
-                if (messageText) {
-                    messageText.textContent = 'Please complete email or OTP verification before logging in.';
-                }
-                
-                lucide.createIcons();
-            }
-        }
-
-        function showOTPVerificationMessage() {
-            const messageArea = document.getElementById('messageArea');
-            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
-            
-            if (messageArea && emailVerificationMessage) {
-                messageArea.classList.remove('hidden');
-                emailVerificationMessage.classList.remove('hidden');
-                
-                // Update the message text for OTP verification
-                const messageText = emailVerificationMessage.querySelector('p');
-                if (messageText) {
-                    messageText.textContent = 'Please complete OTP verification before logging in.';
-                }
-                
-                lucide.createIcons();
-            }
-        }
-
-        function showEmailVerificationMessage() {
-            const messageArea = document.getElementById('messageArea');
-            const emailVerificationMessage = document.getElementById('emailVerificationMessage');
-            
-            if (messageArea && emailVerificationMessage) {
-                messageArea.classList.remove('hidden');
-                emailVerificationMessage.classList.remove('hidden');
-                lucide.createIcons();
-            }
-        }
-
-        // Check if user is already authenticated and show logout option
-        async function checkAuthStatus() {
-            try {
-                const { default: firebaseService } = await import('../../js/firebaseService.js');
-                if (firebaseService.currentUser) {
-                    console.log('🔐 User already authenticated, showing logout option');
-                    document.getElementById('logoutSection').classList.remove('hidden');
-                }
-            } catch (error) {
-                console.log('🔐 No authenticated user found');
-            }
-        }
-
-        // Logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', async function() {
-            try {
-                console.log('🔐 Logging out user...');
-                const { default: firebaseService } = await import('../../js/firebaseService.js');
-                await firebaseService.logout();
-                console.log('✅ User logged out successfully');
-                
-                // Hide logout section and reload page
-                document.getElementById('logoutSection').classList.add('hidden');
-                window.location.reload();
-            } catch (error) {
-                console.error('❌ Logout failed:', error);
-                alert('Logout failed. Please try again.');
-            }
-        });
-
-        // Check auth status when page loads
-        checkAuthStatus();
     </script>
 </body>
 </html>

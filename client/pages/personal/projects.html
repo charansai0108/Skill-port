@@ -6,16 +6,16 @@
     <title>Projects - SkillPort</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../css/tailwind.min.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script type="module" src="/js/apiService.js"></script>
-    <script type="module" src="/js/notifications.js"></script>
-    <script type="module" src="/js/authManager.js"></script>
-    <script type="module" src="/js/contextManager.js"></script>
-    <script type="module" src="/js/dataLoader.js"></script>
-    <script type="module" src="/js/uiHelpers.js"></script>
-    <script type="module" src="/js/pageController.js"></script>
-    <script type="module" src="/js/personalProjectsController.js"></script>
-    <script type="module" src="/js/firebaseService.js"></script>
+    <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script type="module" src="../../js/apiService.js"></script>
+    <script type="module" src="../../js/core/notifications.js"></script>
+    <script type="module" src="../../js/core/authManager.js"></script>
+    <script type="module" src="../../js/core/contextManager.js"></script>
+    <script type="module" src="../../js/core/dataLoader.js"></script>
+    <script type="module" src="../../js/core/uiHelpers.js"></script>
+    <script type="module" src="../../js/controllers/core/pageController.js"></script>
+    <script type="module" src="../../js/controllers/personal/personalProjectsController.js"></script>
+    <script type="module" src="../../js/core/firebaseService.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -630,8 +630,6 @@
             console.log('Showing projects for category:', category);
             // Implementation for filtering projects
         }
-    </script>
-
         function showProjectDetails(projectId) {
             const project = projects[projectId];
             if (!project) return;
@@ -971,9 +969,9 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
             if (diffDays === 1) return 'Updated today';
-            if (diffDays < 7) return `Updated ${diffDays} days ago`;
-            if (diffDays < 30) return `Updated ${Math.floor(diffDays / 7)} weeks ago`;
-            return `Updated ${Math.floor(diffDays / 30)} months ago`;
+            if (diffDays < 7) return 'Updated ' + diffDays + ' days ago';
+            if (diffDays < 30) return 'Updated ' + Math.floor(diffDays / 7) + ' weeks ago';
+            return 'Updated ' + Math.floor(diffDays / 30) + ' months ago';
         }
 
         // Initialize page functionality

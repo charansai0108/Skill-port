@@ -6,7 +6,7 @@
   <title>PW IOI Community - Give Feedback</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="../../css/tailwind.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     body { 
       font-family: 'Inter', sans-serif; 
@@ -325,9 +325,9 @@
   </div>
 
   <!-- Load API and App scripts -->
-  <script src="../../js/apiService.js"></script>
-  <script src="../../js/notifications.js"></script>
-  <script src="../../js/authManager.js"></script>
+  <script type="module" src="../../js/apiService.js"></script>
+  <script type="module" src="../../js/core/notifications.js"></script>
+  <script type="module" src="../../js/core/authManager.js"></script>
 
   <script>
     lucide.createIcons();

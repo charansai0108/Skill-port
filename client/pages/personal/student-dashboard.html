@@ -3,847 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Dashboard - SkillPort</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/tailwind.min.css">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script type="module" src="../../js/authManager.js"></script>
-    <script type="module" src="../../js/contextManager.js"></script>
-    <script type="module" src="../../js/dataLoader.js"></script>
-    <script type="module" src="../../js/uiHelpers.js"></script>
-    <script type="module" src="../../js/pageController.js"></script>
-    <script type="module" src="../../js/personalDashboardController.js"></script>
+    <title>Personal Dashboard - SkillPort Community</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="../../css/tailwind.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
         }
         
-        /* Enhanced glassy effects */
-        .glassy-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .glassy-card:hover {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.12);
-            transform: translateY(-2px);
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
-        }
-        
-        .card:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(59, 130, 246, 0.2);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transform: translateY(-1px);
-        }
-
         .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
+            animation: fadeInUp 0.3s ease-out;
         }
-
+        
         .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Enhanced hover effects */
-        .nav-link {
-            transition: all 0.2s ease;
-        }
-        
-        .nav-link:hover {
-            background: rgba(59, 130, 246, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        /* Smooth page transitions */
-        .page-content {
-            animation: fadeInUp 0.5s ease-out;
+            transform: translateY(-2px) scale(1.02);
         }
         
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        .goal-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .goal-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .activity-item {
-            transition: all 0.2s ease;
-        }
-
-        .activity-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-button {
-            transition: all 0.3s ease;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .page-header-icon {
-            transition: all 0.3s ease;
-        }
-
-        .page-header-icon:hover {
-            transform: rotate(5deg) scale(1.05);
-        }
-
-        .progress-bar {
-            background: rgba(226, 232, 240, 0.4);
-            border-radius: 9999px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-            border-radius: 9999px;
-            transition: width 0.3s ease;
-        }
-
-        .achievement-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-block;
-            margin: 0.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .achievement-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Ensure icons are visible */
-        [data-lucide] {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-        }
-
-        /* Debug styling for icons */
-        .icon-debug {
-            border: 2px solid red;
-            background: yellow;
-        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center gap-3 group">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
-                        <i data-lucide="target" class="w-5 h-5 text-white"></i>
+<body class="bg-gradient-to-br from-purple-50 to-pink-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                                <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <span class="ml-2 text-xl font-bold text-gray-900">SkillPort</span>
+                        </div>
                     </div>
-                    <span class="text-lg font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
-                        SkillPort Personal
-                    </span>
                 </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center gap-1">
-                    <a href="student-dashboard.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 shadow-sm">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-                    </a>
-                    <a href="projects.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
-                        <i data-lucide="folder" class="w-4 h-4"></i> Projects
-                    </a>
-                    <a href="tracker.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
-                        <i data-lucide="activity" class="w-4 h-4"></i> Tracker
-                    </a>
-                    <a href="stats.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Stats
-                    </a>
-                    <a href="communities.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
-                        <i data-lucide="users" class="w-4 h-4"></i> Communities
-                    </a>
-                    <a href="profile.html" class="nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white">
+                <div class="flex items-center space-x-4">
+                    <a href="../auth/login.html" class="text-gray-500 hover:text-gray-700">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
                     </a>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 page-content">
-        <!-- Page Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg page-header-icon">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold text-slate-800 mb-1">Dashboard</h1>
-                <p class="text-sm text-slate-600">Welcome back, <span id="userFirstName">User</span>! Here's your learning overview</p>
-            </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome to your personal space!</h1>
+            <p class="text-gray-600">Track your progress and continue your learning journey at your own pace.</p>
         </div>
 
-        <!-- Stats Section -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Problems Solved</p>
+                        <p class="text-2xl font-bold text-gray-900">23</p>
+                    </div>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800">Learning Overview</h2>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="stat-card rounded-xl p-4 text-center">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <i data-lucide="trophy" class="w-5 h-5 text-blue-600"></i>
-                        <span id="problems-solved-student" class="text-2xl font-bold text-blue-600">0</span>
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="star" class="w-6 h-6 text-pink-600"></i>
+                        </div>
                     </div>
-                    <div class="text-sm text-slate-600">Problems Solved</div>
-                    <div class="text-xs text-blue-600 mt-1">+0 this week</div>
-                </div>
-                
-                <div class="stat-card rounded-xl p-4 text-center">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <i data-lucide="star" class="w-5 h-5 text-green-600"></i>
-                        <span id="skill-rating-student" class="text-2xl font-bold text-green-600">0</span>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Current Streak</p>
+                        <p class="text-2xl font-bold text-gray-900">5 days</p>
                     </div>
-                    <div class="text-sm text-slate-600">Skill Rating</div>
-                    <div class="text-xs text-green-600 mt-1">+0 this month</div>
-                </div>
-                
-                <div class="stat-card rounded-xl p-4 text-center">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
-                        <span id="total-submissions-student" class="text-2xl font-bold text-purple-600">0</span>
-                    </div>
-                    <div class="text-sm text-slate-600">Total Submissions</div>
-                    <div class="text-xs text-purple-600 mt-1">Active member</div>
-                </div>
-                
-                <div class="stat-card rounded-xl p-4 text-center">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
-                        <span id="day-streak-student" class="text-2xl font-bold text-orange-600">0</span>
-                    </div>
-                    <div class="text-sm text-slate-600">Day Streak</div>
-                    <div class="text-xs text-orange-600 mt-1">Keep it up!</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Today's Goals Section -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="target" class="w-5 h-5 text-white"></i>
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Topics Learned</p>
+                        <p class="text-2xl font-bold text-gray-900">8</p>
+                    </div>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800">Today's Goals</h2>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="goal-card p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="edit-3" class="w-4 h-4 text-blue-600"></i>
+
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="award" class="w-6 h-6 text-green-600"></i>
                         </div>
-                        <span class="font-semibold text-slate-800">Solve Problems</span>
                     </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-blue-600">3/5</span>
-                    </div>
-                    <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 60%"></div>
-                    </div>
-                </div>
-                
-                <div class="goal-card p-4 bg-green-50 rounded-xl border border-green-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="book-open" class="w-4 h-4 text-green-600"></i>
-                        </div>
-                        <span class="font-semibold text-slate-800">Learn New Topic</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-green-600">1/1</span>
-                    </div>
-                    <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 100%"></div>
-                    </div>
-                </div>
-                
-                <div class="goal-card p-4 bg-purple-50 rounded-xl border border-purple-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="users" class="w-4 h-4 text-purple-600"></i>
-                        </div>
-                        <span class="font-semibold text-slate-800">Join Contest</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-slate-600">Progress</span>
-                        <span class="text-sm font-semibold text-purple-600">0/1</span>
-                    </div>
-                    <div class="progress-bar rounded-full h-2 overflow-hidden">
-                        <div class="progress-fill h-full rounded-full" style="width: 0%"></div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Achievements</p>
+                        <p class="text-2xl font-bold text-gray-900">3</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Skill Progress Section -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800">Skill Progress</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="code" class="w-5 h-5 text-blue-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800">Algorithms</h3>
-                            <p class="text-sm text-blue-600">Intermediate</p>
-                        </div>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Recommended Problems -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Recommended for You</h2>
+                        <a href="problems.html" class="text-sm text-blue-600 hover:text-blue-500">View All</a>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Problems Solved</span>
-                        <span class="text-sm font-bold text-blue-600">156</span>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-green-50 rounded-xl border border-green-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="globe" class="w-5 h-5 text-green-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800">Web Dev</h3>
-                            <p class="text-sm text-green-600">Advanced</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Projects Built</span>
-                        <span class="text-sm font-bold text-green-600">12</span>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="layout" class="w-5 h-5 text-amber-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800">System Design</h3>
-                            <p class="text-sm text-amber-600">Beginner</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Concepts Learned</span>
-                        <span class="text-sm font-bold text-amber-600">8</span>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="database" class="w-5 h-5 text-purple-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800">Database</h3>
-                            <p class="text-sm text-purple-600">Intermediate</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-600">Queries Mastered</span>
-                        <span class="text-sm font-bold text-purple-600">45</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar Sections -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Recent Activity -->
-            <div class="card rounded-2xl p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <i data-lucide="clock" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">Recent Activity</h3>
-                </div>
-                
-                <div id="recent-tasks-list" class="space-y-4">
-                    <p class="text-gray-500 text-center py-4">Loading recent tasks...</p>
-                </div>
-            </div>
-
-            <!-- Upcoming Contests -->
-            <div class="card rounded-2xl p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <i data-lucide="calendar" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">Upcoming Contests</h3>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i data-lucide="zap" class="w-4 h-4 text-blue-600"></i>
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Two Sum</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Easy</span>
                             </div>
-                            <span class="font-semibold text-slate-800 text-sm">Weekly Algorithm Challenge</span>
-                        </div>
-                        <p class="text-xs text-slate-600 mb-2">Test your problem-solving skills</p>
-                        <div class="flex items-center gap-2 text-xs text-blue-600">
-                            <i data-lucide="clock" class="w-3 h-3"></i>
-                            <span>Tomorrow at 2:00 PM</span>
-                        </div>
-                    </div>
-                    
-                    <div class="p-4 bg-green-50 rounded-xl border border-green-200">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                <i data-lucide="code" class="w-4 h-4 text-green-600"></i>
+                            <p class="text-sm text-gray-600 mb-3">Given an array of integers, return indices of the two numbers such that they add up to a specific target.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span><i data-lucide="users" class="w-4 h-4 inline mr-1"></i> 89% solved</span>
+                                    <span><i data-lucide="clock" class="w-4 h-4 inline mr-1"></i> 15 min avg</span>
+                                </div>
+                                <button class="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+                                    Start Problem
+                                </button>
                             </div>
-                            <span class="font-semibold text-slate-800 text-sm">Code Sprint</span>
                         </div>
-                        <p class="text-xs text-slate-600 mb-2">Fast-paced coding competition</p>
-                        <div class="flex items-center gap-2 text-xs text-green-600">
-                            <i data-lucide="clock" class="w-3 h-3"></i>
-                            <span>Saturday at 10:00 AM</span>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Binary Search</h3>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Medium</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Implement binary search algorithm to find a target value in a sorted array.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span><i data-lucide="users" class="w-4 h-4 inline mr-1"></i> 67% solved</span>
+                                    <span><i data-lucide="clock" class="w-4 h-4 inline mr-1"></i> 25 min avg</span>
+                                </div>
+                                <button class="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+                                    Start Problem
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Progress -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Learning Progress</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-900">Arrays & Strings</h3>
+                                <span class="text-sm text-gray-600">6/8 completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-purple-600 h-3 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">Almost there! Complete 2 more problems to master this topic.</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-900">Linked Lists</h3>
+                                <span class="text-sm text-gray-600">2/6 completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-pink-600 h-3 rounded-full" style="width: 33%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">Good start! Keep practicing to build confidence.</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-900">Dynamic Programming</h3>
+                                <span class="text-sm text-gray-600">0/10 completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-blue-600 h-3 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">Ready to start? This is an advanced topic that builds on previous concepts.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="card rounded-2xl p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">Quick Actions</h3>
-                </div>
-                
-                <div class="space-y-3">
-                    <button class="action-button w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='tracker.html'">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="edit-3" class="w-5 h-5 text-blue-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-slate-800">Start Practice</div>
-                            <div class="text-xs text-slate-600">Solve problems</div>
-                        </div>
-                    </button>
-                    
-                    <button class="action-button w-full p-4 bg-purple-50 hover:bg-purple-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='communities.html'">
-                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="users" class="w-5 h-5 text-purple-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-slate-800">Join Contest</div>
-                            <div class="text-xs text-slate-600">Compete with others</div>
-                        </div>
-                    </button>
-                    
-                    <button class="action-button w-full p-4 bg-green-50 hover:bg-green-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='projects.html'">
-                        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="folder" class="w-5 h-5 text-green-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-slate-800">View Projects</div>
-                            <div class="text-xs text-slate-600">Showcase your work</div>
-                        </div>
-                    </button>
-                    
-                    <button class="action-button w-full p-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-left flex items-center gap-3 transition-colors" onclick="location.href='stats.html'">
-                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-slate-800">View Analytics</div>
-                            <div class="text-xs text-slate-600">Track progress</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Achievements Section -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-600 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="award" class="w-5 h-5 text-white"></i>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800">Recent Achievements</h2>
-            </div>
-            
-            <div id="achievements-list" class="flex flex-wrap gap-2">
-                <p class="text-gray-500 text-center py-4 w-full">Loading achievements...</p>
-            </div>
-        </div>
-
-        <!-- Coding Platforms Section -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="code" class="w-5 h-5 text-white"></i>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800">Coding Platforms Progress</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- LeetCode Card -->
-                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="leetcode">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="code" class="w-6 h-6 text-orange-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-800">LeetCode</h3>
-                            <p class="text-sm text-orange-600">Premium Member</p>
-                        </div>
-                    </div>
-                    
+            <!-- Right Column -->
+            <div class="space-y-8">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Easy</span>
-                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Medium</span>
-                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Hard</span>
-                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
-                        </div>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="play" class="w-5 h-5 mr-3 text-purple-600"></i>
+                            Start Practice
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="book-open" class="w-5 h-5 mr-3 text-pink-600"></i>
+                            Browse Topics
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="target" class="w-5 h-5 mr-3 text-blue-600"></i>
+                            Set Goals
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3 text-green-600"></i>
+                            View Progress
+                        </button>
                     </div>
-                    
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-semibold text-slate-700">Total</span>
-                            <span class="text-2xl font-bold text-orange-600" data-total="0">0</span>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Solved "Valid Parentheses"</p>
+                                <p class="text-xs text-gray-500">Arrays & Strings</p>
+                            </div>
+                            <span class="text-xs text-gray-400">2h ago</span>
+                        </div>
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Read "Linked List Basics"</p>
+                                <p class="text-xs text-gray-500">Tutorial</p>
+                            </div>
+                            <span class="text-xs text-gray-400">1d ago</span>
+                        </div>
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="award" class="w-4 h-4 text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Earned "First Steps" badge</p>
+                                <p class="text-xs text-gray-500">Achievement</p>
+                            </div>
+                            <span class="text-xs text-gray-400">2d ago</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- GeeksforGeeks Card -->
-                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="gfg">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="book-open" class="w-6 h-6 text-green-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-800">GeeksforGeeks</h3>
-                            <p class="text-sm text-green-600">Free User</p>
-                        </div>
-                    </div>
-                    
+                <!-- Achievements -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Achievements</h2>
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Easy</span>
-                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
+                        <div class="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
+                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="trophy" class="w-4 h-4 text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">First Steps</p>
+                                <p class="text-xs text-gray-600">Solve your first problem</p>
+                            </div>
                         </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Medium</span>
-                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
+                        <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="star" class="w-4 h-4 text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Streak Master</p>
+                                <p class="text-xs text-gray-600">Solve problems for 5 days</p>
+                            </div>
                         </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Hard</span>
-                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-semibold text-slate-700">Total</span>
-                            <span class="text-2xl font-bold text-green-600" data-total="0">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- HackerRank Card -->
-                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="hackerrank">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="trophy" class="w-6 h-6 text-emerald-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-800">HackerRank</h3>
-                            <p class="text-sm text-emerald-600">6★ Python</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Easy</span>
-                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Medium</span>
-                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Hard</span>
-                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-semibold text-slate-700">Total</span>
-                            <span class="text-2xl font-bold text-emerald-600" data-total="0">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- InterviewBit Card -->
-                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300" data-platform="interviewbit">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                            <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-800">InterviewBit</h3>
-                            <p class="text-sm text-purple-600">Scaler Academy</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Easy</span>
-                            <span class="text-lg font-bold text-green-600" data-difficulty="easy">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Medium</span>
-                            <span class="text-lg font-bold text-yellow-600" data-difficulty="medium">0</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-600">Hard</span>
-                            <span class="text-lg font-bold text-red-600" data-difficulty="hard">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-semibold text-slate-700">Total</span>
-                            <span class="text-2xl font-bold text-purple-600" data-total="0">0</span>
+                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="target" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Goal Setter</p>
+                                <p class="text-xs text-gray-600">Set your first learning goal</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Learning Recommendations -->
-        <div class="card rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i data-lucide="lightbulb" class="w-5 h-5 text-white"></i>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800">Recommended for You</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="book" class="w-4 h-4 text-indigo-600"></i>
-                        </div>
-                        <span class="font-semibold text-slate-800 text-sm">Dynamic Programming</span>
-                    </div>
-                    <p class="text-xs text-slate-600 mb-2">Master advanced algorithms</p>
-                    <button class="text-xs text-indigo-600 font-medium hover:text-indigo-700" onclick="location.href='tracker.html'">Start Learning →</button>
-                </div>
-                
-                <div class="p-4 bg-pink-50 rounded-xl border border-pink-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="globe" class="w-4 h-4 text-pink-600"></i>
-                        </div>
-                        <span class="font-semibold text-slate-800 text-sm">System Design</span>
-                    </div>
-                    <p class="text-xs text-slate-600 mb-2">Build scalable applications</p>
-                    <button class="text-xs text-pink-600 font-medium hover:text-pink-700" onclick="location.href='tracker.html'">Start Learning →</button>
-                </div>
-                
-                <div class="p-4 bg-cyan-50 rounded-xl border border-cyan-200">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="database" class="w-4 h-4 text-cyan-600"></i>
-                        </div>
-                        <span class="font-semibold text-slate-800 text-sm">Database Optimization</span>
-                    </div>
-                    <p class="text-xs text-slate-600 mb-2">Improve query performance</p>
-                    <button class="text-xs text-cyan-600 font-medium hover:text-cyan-700" onclick="location.href='tracker.html'">Start Learning →</button>
-                </div>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // Initialize icons when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing icons...');
+        // Initialize Lucide icons
+        function initializeIcons() {
             if (typeof lucide !== 'undefined') {
-                try {
-                    lucide.createIcons();
-                    console.log('✅ Lucide icons initialized successfully');
-                    
-                    // Verify icons are rendered
-                    const iconElements = document.querySelectorAll('[data-lucide]');
-                    console.log('📊 Found', iconElements.length, 'icon elements');
-                    
-                    // Check if any icons are actually SVG elements
-                    const svgIcons = document.querySelectorAll('[data-lucide] svg');
-                    console.log('🎨 Rendered SVG icons:', svgIcons.length);
-                    
-                    // If no SVG icons are rendered, show fallback text
-                    if (svgIcons.length === 0) {
-                        console.warn('⚠️ No SVG icons found, showing fallback text');
-                        showIconFallbacks();
-                    }
-                } catch (error) {
-                    console.error('❌ Error initializing Lucide icons:', error);
-                    showIconFallbacks();
-                }
+                lucide.createIcons();
             } else {
-                console.error('❌ Lucide library not available');
-                showIconFallbacks();
-            }
-            
-            loadDashboardData();
-        });
-
-        // Fallback function to show text instead of icons
-        function showIconFallbacks() {
-            const iconMap = {
-                'target': '🎯',
-                'layout-dashboard': '📊',
-                'folder': '📁',
-                'activity': '📈',
-                'bar-chart-3': '📊',
-                'users': '👥',
-                'trophy': '🏆',
-                'star': '⭐',
-                'flame': '🔥',
-                'edit-3': '✏️',
-                'book-open': '📖',
-                'trending-up': '📈',
-                'code': '💻',
-                'globe': '🌐',
-                'layout': '🏗️',
-                'database': '🗄️',
-                'clock': '🕐',
-                'check-circle': '✅',
-                'calendar': '📅',
-                'zap': '⚡',
-                'award': '🏅',
-                'lightbulb': '💡',
-                'book': '📚'
-            };
-
-            const iconElements = document.querySelectorAll('[data-lucide]');
-            iconElements.forEach(element => {
-                const iconName = element.getAttribute('data-lucide');
-                const fallback = iconMap[iconName] || '❓';
-                element.textContent = fallback;
-                element.style.fontSize = '1.2em';
-                element.classList.add('icon-debug');
-            });
-        }
-
-        async function loadDashboardData() {
-            try {
-                // Initialize the personal dashboard controller
-                if (window.PersonalDashboardController) {
-                    const controller = new window.PersonalDashboardController();
-                    await controller.init();
-                } else {
-                    console.error('PersonalDashboardController not available');
-                    // Fallback to basic data loading
-                    await loadBasicDashboardData();
-                }
-            } catch (error) {
-                console.error('Failed to load dashboard data:', error);
-                await loadBasicDashboardData();
+                setTimeout(initializeIcons, 100);
             }
         }
-
-        async function loadBasicDashboardData() {
-            try {
-                // Basic fallback data loading
-                const user = window.authManager?.currentUser;
-                if (user) {
-                    const basicData = {
-                        firstName: user.displayName?.split(' ')[0] || 'User',
-                        lastName: user.displayName?.split(' ')[1] || '',
-                        email: user.email || 'N/A',
-                        progress: 0,
-                        skills: [],
-                        recentActivity: []
-                    };
-                    updateDashboard(basicData);
-                } else {
-                    // Redirect to login if no user
-                    window.location.href = '/pages/auth/login.html';
-                }
-            } catch (error) {
-                console.error('Failed to load basic dashboard data:', error);
-                window.location.href = '/pages/auth/login.html';
-            }
-        }
-
-        function updateDashboard(userData) {
-            // Update dashboard with user data
-            console.log('Dashboard updated with:', userData);
-        }
+        initializeIcons();
+    </script>
+</body>
+</html>

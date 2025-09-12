@@ -1,158 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Dashboard - SkillPort Community</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="../../css/tailwind.min.css" rel="stylesheet">
-  <script src="../../js/suppress-warnings.js"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script type="module" src="../../js/apiService.js"></script>
-  <script src="../../js/notifications.js"></script>
-  <script type="module" src="../../js/firebaseService.js"></script>
-  <script type="module" src="../../js/authManager.js"></script>
-  <script src="../../js/contextManager.js"></script>
-  <script src="../../js/dataLoader.js"></script>
-  <script src="../../js/uiHelpers.js"></script>
-  <script src="../../js/pageController.js"></script>
-  <script src="../../js/userDashboard.js"></script>
-  <style>
-    body { 
-      font-family: 'Inter', sans-serif; 
-    }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - SkillPort Community</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="../../css/tailwind.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease-in-out;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-  <!-- Navigation -->
-  <nav class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <h1 class="text-xl font-bold text-gray-900">SkillPort Community</h1>
-          </div>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <span class="ml-2 text-xl font-bold text-gray-900">SkillPort</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="../auth/login.html" class="text-gray-500 hover:text-gray-700">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <button id="refresh-dashboard" class="text-gray-500 hover:text-gray-700">
-            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-          </button>
-          <button id="logout-button" class="text-gray-500 hover:text-gray-700">
-            <i data-lucide="log-out" class="w-5 h-5"></i>
-          </button>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, Student!</h1>
+            <p class="text-gray-600">Continue your learning journey and track your progress.</p>
         </div>
-      </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Problems Solved</p>
+                        <p class="text-2xl font-bold text-gray-900">47</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="trophy" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Contests Joined</p>
+                        <p class="text-2xl font-bold text-gray-900">12</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="star" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Current Streak</p>
+                        <p class="text-2xl font-bold text-gray-900">7 days</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="award" class="w-6 h-6 text-orange-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Rank</p>
+                        <p class="text-2xl font-bold text-gray-900">#156</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Active Contests -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Active Contests</h2>
+                        <a href="contests.html" class="text-sm text-blue-600 hover:text-blue-500">View All</a>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Array Problems Challenge</h3>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Solve 10 array-based problems in 3 days</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span><i data-lucide="users" class="w-4 h-4 inline mr-1"></i> 234 participants</span>
+                                    <span><i data-lucide="clock" class="w-4 h-4 inline mr-1"></i> 2 days left</span>
+                                </div>
+                                <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                                    Join Contest
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-medium text-gray-900">Dynamic Programming</h3>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Starting Soon</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">Master DP concepts with 15 problems</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                    <span><i data-lucide="users" class="w-4 h-4 inline mr-1"></i> 89 participants</span>
+                                    <span><i data-lucide="clock" class="w-4 h-4 inline mr-1"></i> Starts in 5 hours</span>
+                                </div>
+                                <button class="px-4 py-2 bg-gray-300 text-gray-700 text-sm rounded-lg cursor-not-allowed">
+                                    Not Started
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Solved "Two Sum" problem</p>
+                                <p class="text-sm text-gray-500">Array Problems Challenge</p>
+                            </div>
+                            <span class="text-xs text-gray-400">2 hours ago</span>
+                        </div>
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="trophy" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Joined "Binary Search" contest</p>
+                                <p class="text-sm text-gray-500">Started solving problems</p>
+                            </div>
+                            <span class="text-xs text-gray-400">1 day ago</span>
+                        </div>
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="message-circle" class="w-5 h-5 text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Posted in discussion</p>
+                                <p class="text-sm text-gray-500">"How to optimize this solution?"</p>
+                            </div>
+                            <span class="text-xs text-gray-400">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-8">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="play" class="w-5 h-5 mr-3 text-blue-600"></i>
+                            Start Practice
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="trophy" class="w-5 h-5 mr-3 text-green-600"></i>
+                            Join Contest
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="book-open" class="w-5 h-5 mr-3 text-purple-600"></i>
+                            Browse Problems
+                        </button>
+                        <button class="w-full flex items-center p-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i data-lucide="users" class="w-5 h-5 mr-3 text-orange-600"></i>
+                            Find Study Group
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Weekly Leaderboard</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-yellow-800">1</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Alice Johnson</p>
+                                <p class="text-xs text-gray-500">47 problems solved</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-gray-800">2</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Bob Smith</p>
+                                <p class="text-xs text-gray-500">42 problems solved</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-orange-800">3</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Charlie Brown</p>
+                                <p class="text-xs text-gray-500">38 problems solved</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 bg-blue-50 rounded-lg p-2">
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-blue-800">156</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">You</p>
+                                <p class="text-xs text-gray-500">23 problems solved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Progress -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Study Progress</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Arrays & Strings</span>
+                                <span class="text-gray-900">8/10</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Dynamic Programming</span>
+                                <span class="text-gray-900">3/15</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: 20%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Graph Algorithms</span>
+                                <span class="text-gray-900">1/12</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-600 h-2 rounded-full" style="width: 8%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </nav>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <!-- User Profile Section -->
-    <div class="mb-8">
-      <div id="user-profile" data-loading>
-        <!-- User profile will be loaded here -->
-      </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div id="student-stats" data-loading>
-        <!-- Student stats will be loaded here -->
-      </div>
-      <div id="mentor-stats" data-loading>
-        <!-- Mentor stats will be loaded here -->
-      </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Left Column -->
-      <div class="space-y-8">
-        <!-- Recent Contests -->
-        <div class="bg-white rounded-lg shadow">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Recent Contests</h2>
-          </div>
-          <div class="p-6">
-            <div id="recent-contests" data-loading>
-              <!-- Recent contests will be loaded here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Progress Tracking -->
-        <div class="bg-white rounded-lg shadow">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Progress Tracking</h2>
-          </div>
-          <div class="p-6">
-            <div id="progress-tracking" data-loading>
-              <!-- Progress tracking will be loaded here -->
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Column -->
-      <div class="space-y-8">
-        <!-- Mentor Recommendations -->
-        <div class="bg-white rounded-lg shadow">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Mentor Recommendations</h2>
-          </div>
-          <div class="p-6">
-            <div id="mentor-recommendations" data-loading>
-              <!-- Mentor recommendations will be loaded here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Assigned Students (for mentors) -->
-        <div class="bg-white rounded-lg shadow" id="assigned-students-section" style="display: none;">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Assigned Students</h2>
-          </div>
-          <div class="p-6">
-            <div id="assigned-students" data-loading>
-              <!-- Assigned students will be loaded here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Mentor Contests (for mentors) -->
-        <div class="bg-white rounded-lg shadow" id="mentor-contests-section" style="display: none;">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">My Contests</h2>
-          </div>
-          <div class="p-6">
-            <div id="mentor-contests" data-loading>
-              <!-- Mentor contests will be loaded here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Mentor Performance (for mentors) -->
-        <div class="bg-white rounded-lg shadow" id="mentor-performance-section" style="display: none;">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Performance</h2>
-          </div>
-          <div class="p-6">
-            <div id="mentor-performance" data-loading>
-              <!-- Mentor performance will be loaded here -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    lucide.createIcons();
-  </script>
+    <script>
+        // Initialize Lucide icons
+        function initializeIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                setTimeout(initializeIcons, 100);
+            }
+        }
+        initializeIcons();
+    </script>
 </body>
 </html>
