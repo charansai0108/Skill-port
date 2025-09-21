@@ -1,0 +1,79 @@
+{
+  "manifest_version": 3,
+  "name": "SkillPort Tracker",
+  "version": "1.0.1",
+  "description": "Secure submission tracking for LeetCode, GFG, HackerRank, and InterviewBit.",
+  "permissions": [
+    "scripting", 
+    "activeTab", 
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://www.leetcode.com/*",
+    "https://geeksforgeeks.org/*",
+    "https://www.geeksforgeeks.org/*",
+    "https://hackerrank.com/*",
+    "https://www.hackerrank.com/*",
+    "https://interviewbit.com/*",
+    "https://www.interviewbit.com/*",
+    "http://localhost:5001/*",
+    "http://127.0.0.1:5001/*"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "SkillPort Tracker",
+    "default_icon": {
+      "16": "public/icon16.png",
+      "48": "public/icon48.png",
+      "128": "public/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://leetcode.com/problems/*/submissions/*",
+        "https://www.leetcode.com/problems/*/submissions/*"
+      ],
+      "js": ["scripts/content/leetcode.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://practice.geeksforgeeks.org/problems/*",
+        "https://www.geeksforgeeks.org/problems/*"
+      ],
+      "js": ["scripts/content/gfg.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.hackerrank.com/challenges/*/submissions/*",
+        "https://hackerrank.com/challenges/*/submissions/*"
+      ],
+      "js": ["scripts/content/hackerrank.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.interviewbit.com/problems/*/submissions/*",
+        "https://interviewbit.com/problems/*/submissions/*"
+      ],
+      "js": ["scripts/content/interviewbit.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["popup/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
