@@ -20,9 +20,16 @@ import {
   Clock,
   AlertCircle,
   FileText,
-  Activity
+  Activity,
+  ArrowUpRight,
+  ArrowDownRight,
+  Eye,
+  Edit,
+  MoreHorizontal
 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminCard } from '@/components/ui/AdminCard'
+import { AdminButton } from '@/components/ui/AdminButton'
 
 export default function AdminDashboardPage() {
   return (
@@ -41,165 +48,413 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* System Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          <div className="stat-card bg-white rounded-lg shadow-lg p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <AdminCard hover className="group">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Total Users</p>
-                <p className="text-2xl font-bold text-slate-900">1,247</p>
-                <p className="text-sm text-green-600">+12 this week</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Total Users</p>
+                  <div className="flex items-center gap-1 text-green-600 text-xs">
+                    <ArrowUpRight className="w-3 h-3" />
+                    <span>+12 this week</span>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">1,247</p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full w-3/4 transition-all duration-500"></div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-7 h-7 text-white" />
               </div>
             </div>
-          </div>
-          <div className="stat-card bg-white rounded-lg shadow-lg p-6">
+          </AdminCard>
+
+          <AdminCard hover className="group">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Active Mentors</p>
-                <p className="text-2xl font-bold text-slate-900">23</p>
-                <p className="text-sm text-green-600">+3 this month</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Active Mentors</p>
+                  <div className="flex items-center gap-1 text-green-600 text-xs">
+                    <ArrowUpRight className="w-3 h-3" />
+                    <span>+3 this month</span>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">23</p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full w-5/6 transition-all duration-500"></div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-green-600" />
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="w-7 h-7 text-white" />
               </div>
             </div>
-          </div>
-          <div className="stat-card bg-white rounded-lg shadow-lg p-6">
+          </AdminCard>
+
+          <AdminCard hover className="group">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Active Contests</p>
-                <p className="text-2xl font-bold text-slate-900">8</p>
-                <p className="text-sm text-green-600">+2 this month</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Active Contests</p>
+                  <div className="flex items-center gap-1 text-green-600 text-xs">
+                    <ArrowUpRight className="w-3 h-3" />
+                    <span>+2 this month</span>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">8</p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full w-1/2 transition-all duration-500"></div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Trophy className="w-6 h-6 text-amber-600" />
+              <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Trophy className="w-7 h-7 text-white" />
               </div>
             </div>
-          </div>
-          <div className="stat-card bg-white rounded-lg shadow-lg p-6">
+          </AdminCard>
+
+          <AdminCard hover className="group">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Problems Solved</p>
-                <p className="text-2xl font-bold text-slate-600">3,456</p>
-                <p className="text-sm text-green-600">+89 this week</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Problems Solved</p>
+                  <div className="flex items-center gap-1 text-green-600 text-xs">
+                    <ArrowUpRight className="w-3 h-3" />
+                    <span>+89 this week</span>
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">3,456</p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full w-11/12 transition-all duration-500"></div>
+                </div>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-purple-600" />
+              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Target className="w-7 h-7 text-white" />
               </div>
             </div>
-          </div>
+          </AdminCard>
         </div>
 
         {/* Recent Activity & Community Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Recent Activity */}
-          <div className="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+          <AdminCard className="h-96">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+              <AdminButton variant="ghost" size="sm">
+                <Eye className="w-4 h-4 mr-2" />
+                View All
+              </AdminButton>
+            </div>
             <div className="space-y-4 h-64 overflow-y-auto">
-              <div className="text-center py-8">
-                <div className="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin">⟳</div>
-                <p className="text-sm text-slate-500">Loading recent activity...</p>
+              <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <UserPlus className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">New student registered</p>
+                  <p className="text-xs text-gray-600 mt-1">John Doe joined the platform</p>
+                  <p className="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Trophy className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Contest completed</p>
+                  <p className="text-xs text-gray-600 mt-1">Weekly Challenge #3 finished</p>
+                  <p className="text-xs text-gray-500 mt-1">15 minutes ago</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-100">
+                <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">New community post</p>
+                  <p className="text-xs text-gray-600 mt-1">Algorithm discussion started</p>
+                  <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
+                </div>
               </div>
             </div>
-          </div>
+          </AdminCard>
 
           {/* Community Insights */}
-          <div className="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Community Insights</h2>
+          <AdminCard className="h-96">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Community Insights</h2>
+              <AdminButton variant="ghost" size="sm">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Analytics
+              </AdminButton>
+            </div>
             <div className="space-y-4 h-64 overflow-y-auto">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-slate-900">Active Users Today</span>
+                  <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">Active Users Today</span>
+                    <p className="text-xs text-gray-600">Online right now</p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold text-blue-600">24</span>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-blue-600">24</span>
+                  <p className="text-xs text-green-600">+12% from yesterday</p>
+                </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-slate-900">New Registrations</span>
+                  <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">New Registrations</span>
+                    <p className="text-xs text-gray-600">This week</p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold text-green-600">8</span>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-green-600">8</span>
+                  <p className="text-xs text-green-600">+3 from last week</p>
+                </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+              
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl border border-amber-200 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <MessageCircle className="w-5 h-5 text-amber-600" />
-                  <span className="text-sm font-medium text-slate-900">Community Posts</span>
+                  <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">Community Posts</span>
+                    <p className="text-xs text-gray-600">Today</p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold text-amber-600">12</span>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-amber-600">12</span>
+                  <p className="text-xs text-green-600">+5 from yesterday</p>
+                </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <Award className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-medium text-slate-900">Contest Submissions</span>
+                  <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">Contest Submissions</span>
+                    <p className="text-xs text-gray-600">This week</p>
+                  </div>
                 </div>
-                <span className="text-sm font-semibold text-purple-600">45</span>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-purple-600">45</span>
+                  <p className="text-xs text-green-600">+18 from last week</p>
+                </div>
               </div>
             </div>
-          </div>
+          </AdminCard>
         </div>
 
         {/* Recent Users & Mentors */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Recent Users */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-80">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Recent Users</h2>
-              <Link href="/admin/users" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</Link>
+          <AdminCard className="h-96">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Recent Users</h2>
+              <AdminButton variant="ghost" size="sm" asChild>
+                <Link href="/admin/users">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View All
+                </Link>
+              </AdminButton>
             </div>
             <div className="space-y-3 h-64 overflow-y-auto">
-              <div className="text-center py-8">
-                <div className="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin">⟳</div>
-                <p className="text-sm text-slate-500">Loading recent users...</p>
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">John Doe</p>
+                  <p className="text-xs text-gray-600">john.doe@example.com</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 2 hours ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Sarah Wilson</p>
+                  <p className="text-xs text-gray-600">sarah.wilson@example.com</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 1 day ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Mike Johnson</p>
+                  <p className="text-xs text-gray-600">mike.johnson@example.com</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 3 days ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
               </div>
             </div>
-          </div>
+          </AdminCard>
 
           {/* Recent Mentors */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-80">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Recent Mentors</h2>
-              <Link href="/admin/mentors" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</Link>
+          <AdminCard className="h-96">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Recent Mentors</h2>
+              <AdminButton variant="ghost" size="sm" asChild>
+                <Link href="/admin/mentors">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View All
+                </Link>
+              </AdminButton>
             </div>
             <div className="space-y-3 h-64 overflow-y-auto">
-              <div className="text-center py-8">
-                <div className="w-8 h-8 text-slate-400 mx-auto mb-2 animate-spin">⟳</div>
-                <p className="text-sm text-slate-500">Loading recent mentors...</p>
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Dr. Emily Chen</p>
+                  <p className="text-xs text-gray-600">Algorithms Expert</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 1 week ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Prof. David Kim</p>
+                  <p className="text-xs text-gray-600">Data Structures Specialist</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 2 weeks ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100 hover:shadow-md transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">Lisa Rodriguez</p>
+                  <p className="text-xs text-gray-600">System Design Expert</p>
+                  <p className="text-xs text-gray-500 mt-1">Joined 3 weeks ago</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AdminButton variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </AdminButton>
+                  <AdminButton variant="ghost" size="sm">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </AdminButton>
+                </div>
               </div>
             </div>
-          </div>
+          </AdminCard>
         </div>
 
         {/* Quick Actions */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            <Link href="/admin/users" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-              <UserPlus className="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold text-slate-900 mb-2">Add New User</h3>
-              <p className="text-sm text-slate-600">Create user account with credentials</p>
+            <Link href="/admin/users" className="group">
+              <AdminCard hover className="text-center h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <UserPlus className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Add New User</h3>
+                <p className="text-sm text-gray-600">Create user account with credentials</p>
+              </AdminCard>
             </Link>
-            <Link href="/admin/mentors" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-              <GraduationCap className="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold text-slate-900 mb-2">Add New Mentor</h3>
-              <p className="text-sm text-slate-600">Create mentor account and assign</p>
+            
+            <Link href="/admin/mentors" className="group">
+              <AdminCard hover className="text-center h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <GraduationCap className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Add New Mentor</h3>
+                <p className="text-sm text-gray-600">Create mentor account and assign</p>
+              </AdminCard>
             </Link>
-            <Link href="/admin/contests" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-              <PlusCircle className="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold text-slate-900 mb-2">Create Contest</h3>
-              <p className="text-sm text-slate-600">Set up new contest and assign mentor</p>
+            
+            <Link href="/admin/contests" className="group">
+              <AdminCard hover className="text-center h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <PlusCircle className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Create Contest</h3>
+                <p className="text-sm text-gray-600">Set up new contest and assign mentor</p>
+              </AdminCard>
             </Link>
-            <Link href="/admin/analytics" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-              <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold text-slate-900 mb-2">View Analytics</h3>
-              <p className="text-sm text-slate-600">System-wide performance reports</p>
+            
+            <Link href="/admin/analytics" className="group">
+              <AdminCard hover className="text-center h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">View Analytics</h3>
+                <p className="text-sm text-gray-600">System-wide performance reports</p>
+              </AdminCard>
             </Link>
-            <Link href="/admin/leaderboard" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer">
-              <Award className="w-12 h-12 text-indigo-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
-              <p className="text-sm text-slate-600">Overall system rankings</p>
+            
+            <Link href="/admin/leaderboard" className="group">
+              <AdminCard hover className="text-center h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">View Leaderboard</h3>
+                <p className="text-sm text-gray-600">Overall system rankings</p>
+              </AdminCard>
             </Link>
           </div>
         </div>

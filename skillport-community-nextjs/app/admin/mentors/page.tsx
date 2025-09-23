@@ -28,9 +28,24 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
-  UserPlus
+  UserPlus,
+  Download,
+  Upload,
+  RefreshCw,
+  Star,
+  BookOpen,
+  User,
+  AtSign,
+  Lock,
+  Save
 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminCard } from '@/components/ui/AdminCard'
+import { AdminButton } from '@/components/ui/AdminButton'
+import { AdminInput } from '@/components/ui/AdminInput'
+import { AdminTable, AdminTableHeader, AdminTableBody, AdminTableRow, AdminTableCell, AdminTableHeaderCell } from '@/components/ui/AdminTable'
+import { AdminModal } from '@/components/ui/AdminModal'
+import { AdminAvatar } from '@/components/ui/AdminAvatar'
 
 interface Mentor {
   id: number
@@ -336,332 +351,410 @@ export default function AdminMentorsPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                <GraduationCap className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-slate-700">Mentor Management</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Mentor Management</h1>
+                <p className="text-gray-600">Manage and monitor all mentor accounts</p>
               </div>
             </div>
-            <button 
-              onClick={() => setShowAddModal(true)}
-              className="action-button bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
-            >
-              <UserPlus className="w-5 h-5" />
-              Add New Mentor
-            </button>
+            <div className="flex items-center gap-3">
+              <AdminButton variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </AdminButton>
+              <AdminButton variant="outline" size="sm">
+                <Upload className="w-4 h-4 mr-2" />
+                Import
+              </AdminButton>
+              <AdminButton variant="primary" onClick={() => setShowAddModal(true)}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Mentor
+              </AdminButton>
+            </div>
           </div>
         </div>
 
-        {/* Mentors Table */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200/50">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gradient-to-r from-slate-50 to-blue-50">
-                <tr>
-                  <th className="px-8 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Mentor</th>
-                  <th className="px-8 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Email</th>
-                  <th className="px-8 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Specialization</th>
-                  <th className="px-8 py-4 text-center text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-slate-200">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center">
-                        <Loader className="w-8 h-8 text-slate-400 mb-2 animate-spin loading-pulse" />
-                        <p className="text-slate-500">Loading mentors...</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : pageMentors.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center">
-                        <GraduationCap className="w-8 h-8 text-slate-400 mb-2" />
-                        <p className="text-slate-500">No mentors found</p>
-                        <p className="text-sm text-slate-400 mt-1">Create your first mentor to get started</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  pageMentors.map((mentor) => (
-                    <tr key={mentor.id} className="hover:bg-slate-50">
-                      <td className="px-8 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                            {mentor.firstName.charAt(0)}{mentor.lastName.charAt(0)}
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-sm font-medium text-slate-900">{mentor.firstName} {mentor.lastName}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-4 whitespace-nowrap text-sm text-slate-900">{mentor.email}</td>
-                      <td className="px-8 py-4 whitespace-nowrap text-sm text-slate-900">{mentor.specialization}</td>
-                      <td className="px-8 py-4 whitespace-nowrap text-center">
-                        <button 
-                          onClick={() => deleteMentor(mentor.id, `${mentor.firstName} ${mentor.lastName}`)}
-                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Mentors</p>
+                <p className="text-2xl font-bold text-gray-900">{mentors.length}</p>
+                <p className="text-xs text-green-600">+3 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Mentors</p>
+                <p className="text-2xl font-bold text-gray-900">{mentors.filter(m => m.status === 'active').length}</p>
+                <p className="text-xs text-green-600">+2 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-bold text-gray-900">{mentors.reduce((sum, m) => sum + m.mentorStats.totalStudents, 0)}</p>
+                <p className="text-xs text-green-600">+15 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Avg. Rating</p>
+                <p className="text-2xl font-bold text-gray-900">4.2</p>
+                <p className="text-xs text-green-600">+0.3 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-amber-600" />
+              </div>
+            </div>
+          </AdminCard>
         </div>
+
+        {/* Search and Filters */}
+        <AdminCard className="mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <AdminInput
+                placeholder="Search mentors by name, email, or specialization..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon={<Search className="w-4 h-4" />}
+              />
+            </div>
+            <div className="flex gap-3">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <AdminButton variant="outline" size="sm">
+                <Filter className="w-4 h-4 mr-2" />
+                Filters
+              </AdminButton>
+              <AdminButton variant="ghost" size="sm">
+                <RefreshCw className="w-4 h-4" />
+              </AdminButton>
+            </div>
+          </div>
+        </AdminCard>
+
+        {/* Mentors Table */}
+        <AdminTable>
+          <AdminTableHeader>
+            <AdminTableHeaderCell className="w-1/5">Mentor</AdminTableHeaderCell>
+            <AdminTableHeaderCell className="w-1/5">Email</AdminTableHeaderCell>
+            <AdminTableHeaderCell className="w-1/5">Specialization</AdminTableHeaderCell>
+            <AdminTableHeaderCell className="w-1/5" align="center">Actions</AdminTableHeaderCell>
+          </AdminTableHeader>
+          <AdminTableBody>
+            {isLoading ? (
+              <AdminTableRow>
+                <AdminTableCell colSpan={4} className="text-center py-12">
+                  <div className="flex flex-col items-center">
+                    <Loader className="w-8 h-8 text-slate-400 mb-2 animate-spin loading-pulse" />
+                    <p className="text-slate-500">Loading mentors...</p>
+                  </div>
+                </AdminTableCell>
+              </AdminTableRow>
+            ) : pageMentors.length === 0 ? (
+              <AdminTableRow>
+                <AdminTableCell colSpan={4} className="text-center py-12">
+                  <div className="flex flex-col items-center">
+                    <GraduationCap className="w-8 h-8 text-slate-400 mb-2" />
+                    <p className="text-slate-500">No mentors found</p>
+                    <p className="text-sm text-slate-400 mt-1">Create your first mentor to get started</p>
+                  </div>
+                </AdminTableCell>
+              </AdminTableRow>
+            ) : (
+              pageMentors.map((mentor) => (
+                <AdminTableRow key={mentor.id}>
+                  <AdminTableCell>
+                    <div className="flex items-center">
+                      <AdminAvatar
+                        src={`https://ui-avatars.com/api/?name=${mentor.firstName}+${mentor.lastName}&background=10b981&color=fff&size=40`}
+                        alt={`${mentor.firstName} ${mentor.lastName}`}
+                        size="sm"
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-slate-900">{mentor.firstName} {mentor.lastName}</div>
+                      </div>
+                    </div>
+                  </AdminTableCell>
+                  <AdminTableCell>{mentor.email}</AdminTableCell>
+                  <AdminTableCell>{mentor.specialization}</AdminTableCell>
+                  <AdminTableCell align="center">
+                    <AdminButton
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteMentor(mentor.id, `${mentor.firstName} ${mentor.lastName}`)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </AdminButton>
+                  </AdminTableCell>
+                </AdminTableRow>
+              ))
+            )}
+          </AdminTableBody>
+        </AdminTable>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-8">
-            <button 
+          <div className="flex justify-center items-center gap-3 mt-8">
+            <AdminButton
+              variant="outline"
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="action-button px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
+              className="flex items-center gap-2"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
-            </button>
-            <span className="px-4 py-2 text-slate-700 bg-slate-50 rounded-lg border border-slate-200">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button 
+            </AdminButton>
+            
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <AdminButton
+                  key={page}
+                  variant={page === currentPage ? "primary" : "ghost"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="w-10 h-10 p-0"
+                >
+                  {page}
+                </AdminButton>
+              ))}
+            </div>
+            
+            <AdminButton
+              variant="outline"
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="action-button px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
+              className="flex items-center gap-2"
             >
               Next
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </AdminButton>
           </div>
         )}
       </main>
 
       {/* Add Mentor Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">Add New Mentor</h2>
-                <button 
-                  onClick={() => setShowAddModal(false)}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
+      <AdminModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add New Mentor"
+        size="md"
+      >
+        <form onSubmit={handleMentorSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AdminInput
+              label="First Name"
+              name="firstName"
+              type="text"
+              required
+              placeholder="Enter first name"
+              icon={<User className="w-5 h-5" />}
+            />
             
-            <div className="p-6">
-              <form onSubmit={handleMentorSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">First Name *</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter first name"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Last Name *</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter last name"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter email address"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Username *</label>
-                  <input
-                    type="text"
-                    name="username"
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter username"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Specialization *</label>
-                  <input
-                    type="text"
-                    name="specialization"
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="e.g., Algorithms, Data Structures, Mathematics"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Password *</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      required
-                      className="w-full px-4 py-3 pr-12 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                      placeholder="Enter password"
-                    />
-                    <button 
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">Minimum 8 characters</p>
-                </div>
-                
-                <div className="flex gap-3 mt-8 justify-between">
-                  <button 
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="glass-button px-6 py-3 border border-slate-300/50 text-slate-700 rounded-xl hover:bg-slate-50/60 hover:border-slate-400/70 hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/40"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="glass-button px-6 py-3 bg-gradient-to-r from-green-600/80 to-emerald-600/80 text-white rounded-xl hover:from-green-700/90 hover:to-emerald-700/90 hover:shadow-lg hover:scale-105 transition-all duration-300 backdrop-blur-md border border-green-500/30"
-                  >
-                    Add
-                  </button>
-                </div>
-              </form>
-            </div>
+            <AdminInput
+              label="Last Name"
+              name="lastName"
+              type="text"
+              required
+              placeholder="Enter last name"
+              icon={<User className="w-5 h-5" />}
+            />
           </div>
-        </div>
-      )}
+          
+          <AdminInput
+            label="Email"
+            name="email"
+            type="email"
+            required
+            placeholder="Enter email address"
+            icon={<Mail className="w-5 h-5" />}
+          />
+          
+          <AdminInput
+            label="Username"
+            name="username"
+            type="text"
+            required
+            placeholder="Enter username"
+            icon={<AtSign className="w-5 h-5" />}
+          />
+          
+          <AdminInput
+            label="Specialization"
+            name="specialization"
+            type="text"
+            required
+            placeholder="e.g., Algorithms, Data Structures, Mathematics"
+            icon={<GraduationCap className="w-5 h-5" />}
+            helperText="What subjects can this mentor teach?"
+          />
+          
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                required
+                className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm pl-10 pr-12 py-2.5"
+                placeholder="Enter password"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="w-5 h-5 text-gray-400" />
+              </div>
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">Minimum 8 characters with letters and numbers</p>
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <AdminButton
+              type="button"
+              variant="outline"
+              onClick={() => setShowAddModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              className="flex-1"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add Mentor
+            </AdminButton>
+          </div>
+        </form>
+      </AdminModal>
 
       {/* Edit Mentor Modal */}
-      {showEditModal && editingMentor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">Edit Mentor</h2>
-                <button 
-                  onClick={() => {
-                    setShowEditModal(false)
-                    setEditingMentor(null)
-                  }}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
+      <AdminModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setEditingMentor(null)
+        }}
+        title="Edit Mentor"
+        size="md"
+      >
+        {editingMentor && (
+          <form onSubmit={handleMentorUpdate} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <AdminInput
+                label="First Name"
+                name="firstName"
+                type="text"
+                defaultValue={editingMentor.firstName}
+                required
+                placeholder="Enter first name"
+                icon={<User className="w-5 h-5" />}
+              />
+              
+              <AdminInput
+                label="Last Name"
+                name="lastName"
+                type="text"
+                defaultValue={editingMentor.lastName}
+                required
+                placeholder="Enter last name"
+                icon={<User className="w-5 h-5" />}
+              />
             </div>
             
-            <div className="p-6">
-              <form onSubmit={handleMentorUpdate} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">First Name *</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    defaultValue={editingMentor.firstName}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter first name"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Last Name *</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    defaultValue={editingMentor.lastName}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter last name"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    defaultValue={editingMentor.email}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter email address"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Username *</label>
-                  <input
-                    type="text"
-                    name="username"
-                    defaultValue={editingMentor.username}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="Enter username"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Specialization *</label>
-                  <input
-                    type="text"
-                    name="specialization"
-                    defaultValue={editingMentor.specialization}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all hover:border-slate-300 hover:shadow-md"
-                    placeholder="e.g., Algorithms, Data Structures, Mathematics"
-                  />
-                </div>
-                
-                <div className="flex gap-3 mt-8">
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      setShowEditModal(false)
-                      setEditingMentor(null)
-                    }}
-                    className="glass-button px-6 py-3 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-400 hover:shadow-lg transition-all duration-300 backdrop-blur-sm bg-white/80"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="glass-button px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 hover:shadow-lg hover:scale-105 transition-all duration-300 backdrop-blur-sm"
-                  >
-                    Update
-                  </button>
-                </div>
-              </form>
+            <AdminInput
+              label="Email"
+              name="email"
+              type="email"
+              defaultValue={editingMentor.email}
+              required
+              placeholder="Enter email address"
+              icon={<Mail className="w-5 h-5" />}
+            />
+            
+            <AdminInput
+              label="Username"
+              name="username"
+              type="text"
+              defaultValue={editingMentor.username}
+              required
+              placeholder="Enter username"
+              icon={<AtSign className="w-5 h-5" />}
+            />
+            
+            <AdminInput
+              label="Specialization"
+              name="specialization"
+              type="text"
+              defaultValue={editingMentor.specialization}
+              required
+              placeholder="e.g., Algorithms, Data Structures, Mathematics"
+              icon={<GraduationCap className="w-5 h-5" />}
+              helperText="What subjects can this mentor teach?"
+            />
+            
+            <div className="flex gap-3 pt-4">
+              <AdminButton
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingMentor(null)
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton
+                type="submit"
+                className="flex-1"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Update Mentor
+              </AdminButton>
             </div>
-          </div>
-        </div>
-      )}
+          </form>
+        )}
+      </AdminModal>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && deletingMentor && (

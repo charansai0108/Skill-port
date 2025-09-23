@@ -18,8 +18,21 @@ import {
   XCircle,
   AlertTriangle as Warning,
   Info,
-  X
+  X,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Star,
+  Trophy,
+  Target
 } from 'lucide-react'
+import { MentorCard } from '@/components/ui/MentorCard'
+import { MentorButton } from '@/components/ui/MentorButton'
+import { MentorInput } from '@/components/ui/MentorInput'
+import { MentorToast } from '@/components/ui/MentorToast'
+import { MentorAvatar } from '@/components/ui/MentorAvatar'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 
 interface Student {
   id: string
@@ -206,7 +219,7 @@ export default function MentorProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200/50 p-6">
+            <MentorCard>
               <h3 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
                 <Settings className="w-5 h-5 text-orange-600" />
                 Settings
@@ -219,9 +232,9 @@ export default function MentorProfilePage() {
                     <button
                       key={item.id}
                       onClick={() => setActiveSection(item.id)}
-                      className={`nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium transition-all duration-300 rounded-xl ${
+                      className={`nav-item w-full text-left px-4 py-3 flex items-center gap-3 text-sm font-medium transition-all duration-300 rounded-xl hover:-translate-y-0.5 hover:shadow-md ${
                         activeSection === item.id
-                          ? 'bg-orange-50 text-orange-700 border-l-4 border-orange-500'
+                          ? 'bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border-l-4 border-orange-500 shadow-sm'
                           : 'text-slate-600 hover:bg-orange-50 hover:text-slate-900'
                       }`}
                     >
@@ -231,14 +244,14 @@ export default function MentorProfilePage() {
                   )
                 })}
               </nav>
-            </div>
+            </MentorCard>
           </div>
 
           {/* Content Area */}
           <div className="lg:col-span-3">
             {/* Profile Section */}
             {activeSection === 'profile' && (
-              <div className="content-section bg-white rounded-2xl shadow-lg border border-slate-200/50 p-8">
+              <MentorCard className="p-8">
                 <h2 className="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
                   <User className="w-6 h-6 text-orange-600" />
                   Profile Information
@@ -246,16 +259,13 @@ export default function MentorProfilePage() {
                 
                 {/* Profile Image */}
                 <div className="text-center mb-8">
-                  <div className="profile-image-container relative inline-block mb-4">
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl border-4 border-white">
-                      <span className="text-white font-bold text-4xl">SS</span>
-                    </div>
-                    <div className="profile-image-overlay absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <label htmlFor="imageUpload" className="cursor-pointer text-white">
-                        <Camera className="w-8 h-8" />
-                      </label>
-                    </div>
-                  </div>
+                  <MentorAvatar
+                    src={profileImage}
+                    alt="Profile Picture"
+                    size="xl"
+                    onImageChange={() => fileInputRef.current?.click()}
+                    className="mx-auto mb-4"
+                  />
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -269,45 +279,36 @@ export default function MentorProfilePage() {
                 
                 {/* Profile Form */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={profileData.name}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                      className="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all duration-200 focus:border-orange-500 focus:shadow-lg focus:-translate-y-1"
-                    />
-                  </div>
+                  <MentorInput
+                    label="Full Name"
+                    value={profileData.name}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                    icon={<User className="w-5 h-5" />}
+                  />
                   
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                      className="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all duration-200 focus:border-orange-500 focus:shadow-lg focus:-translate-y-1"
-                    />
-                  </div>
+                  <MentorInput
+                    label="Email Address"
+                    type="email"
+                    value={profileData.email}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                    icon={<Mail className="w-5 h-5" />}
+                  />
                   
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all duration-200 focus:border-orange-500 focus:shadow-lg focus:-translate-y-1"
-                    />
-                  </div>
+                  <MentorInput
+                    label="Phone Number"
+                    type="tel"
+                    value={profileData.phone}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                    icon={<Phone className="w-5 h-5" />}
+                  />
                   
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Location</label>
-                    <input
-                      type="text"
-                      value={profileData.location}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
-                      className="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all duration-200 focus:border-orange-500 focus:shadow-lg focus:-translate-y-1"
-                    />
-                  </div>
+                  <MentorInput
+                    label="Location"
+                    type="text"
+                    value={profileData.location}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, location: e.target.value }))}
+                    icon={<MapPin className="w-5 h-5" />}
+                  />
                   
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Bio</label>
@@ -315,22 +316,23 @@ export default function MentorProfilePage() {
                       value={profileData.bio}
                       onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
-                      className="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none transition-all duration-200 focus:border-orange-500 focus:shadow-lg focus:-translate-y-1 resize-none"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-orange-500 focus:shadow-lg transition-all duration-300 resize-none"
                       placeholder="Tell us about your background, expertise, and mentoring philosophy..."
                     />
                   </div>
                 </div>
                 
                 <div className="mt-6">
-                  <button
+                  <MentorButton
                     onClick={handleProfileSave}
-                    className="btn-primary bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex items-center gap-2"
+                    variant="gradient-orange"
+                    className="flex items-center gap-2"
                   >
                     <Save className="w-5 h-5" />
                     Save Profile
-                  </button>
+                  </MentorButton>
                 </div>
-              </div>
+              </MentorCard>
             )}
 
             {/* Password Section */}
@@ -456,7 +458,7 @@ export default function MentorProfilePage() {
 
             {/* Students Section */}
             {activeSection === 'students' && (
-              <div className="content-section bg-white rounded-2xl shadow-lg border border-slate-200/50 p-8">
+              <MentorCard className="p-8">
                 <h2 className="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
                   <Users className="w-6 h-6 text-green-600" />
                   My Students
@@ -465,17 +467,20 @@ export default function MentorProfilePage() {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-slate-800">Current Students ({students.length})</h3>
-                    <button className="btn-primary bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex items-center gap-2">
+                    <MentorButton
+                      variant="gradient-orange"
+                      className="flex items-center gap-2"
+                    >
                       <UserPlus className="w-4 h-4" />
                       Add Student
-                    </button>
+                    </MentorButton>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {students.map((student) => (
-                      <div key={student.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                      <MentorCard key={student.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-10 h-10 bg-gradient-to-br ${student.avatarColor} rounded-full flex items-center justify-center`}>
+                          <div className={`w-12 h-12 bg-gradient-to-br ${student.avatarColor} rounded-full flex items-center justify-center shadow-lg`}>
                             <span className="text-white text-sm font-bold">{student.initials}</span>
                           </div>
                           <div>
@@ -483,17 +488,19 @@ export default function MentorProfilePage() {
                             <p className="text-sm text-slate-600">{student.performance}% Performance</p>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{student.status}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <StatusBadge status={student.status.toLowerCase() as any} />
                           {student.badges.map((badge, index) => (
-                            <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{badge}</span>
+                            <span key={index} className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                              {badge}
+                            </span>
                           ))}
                         </div>
-                      </div>
+                      </MentorCard>
                     ))}
                   </div>
                 </div>
-              </div>
+              </MentorCard>
             )}
 
             {/* Logout Section */}
@@ -532,26 +539,15 @@ export default function MentorProfilePage() {
       </main>
 
       {/* Toast Notification System */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => {
-          const Icon = getToastIcon(toast.type)
-          return (
-            <div
-              key={toast.id}
-              className={`${getToastColor(toast.type)} text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 flex items-center gap-3`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{toast.message}</span>
-              <button
-                onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
-                className="ml-auto text-white/80 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          )
-        })}
-      </div>
+      {toasts.map((toast) => (
+        <MentorToast
+          key={toast.id}
+          id={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onDismiss={(id) => setToasts(prev => prev.filter(t => t.id !== id))}
+        />
+      ))}
     </div>
   )
 }

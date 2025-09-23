@@ -35,6 +35,10 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <link rel="stylesheet" href="/tailwind.css" />
+        <script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          async
+        />
       </head>
       <body className={inter.className}>
         {isHomepage && <Header />}

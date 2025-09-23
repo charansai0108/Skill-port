@@ -298,17 +298,12 @@ export default function PersonalCommunitiesPage() {
     }
   ])
 
-  const handleJoinCommunity = (communityId: string) => {
-    // In a real app, this would make an API call to join the community
-    alert(`Joining community: ${communityId}`)
-  }
-
   const handleViewCommunity = (communityId: string) => {
     // In a real app, this would navigate to the community page
     alert(`Viewing community: ${communityId}`)
   }
 
-  const filteredCommunities = allCommunities.filter(community =>
+  const filteredAllCommunities = allCommunities.filter(community =>
     community.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     community.category.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -657,7 +652,7 @@ export default function PersonalCommunitiesPage() {
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-slate-800 mb-8 text-center">Explore More Communities</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredCommunities.map((community) => {
+          {filteredAllCommunities.map((community) => {
             const IconComponent = community.icon
             return (
               <div key={community.id} className="community-card rounded-2xl p-6 text-center flex flex-col group hover:shadow-xl transition-all duration-300">

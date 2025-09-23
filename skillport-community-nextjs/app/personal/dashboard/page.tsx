@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { api } from '@/lib/api'
+import { DashboardSummary } from '@/lib/types'
 import {
   LayoutDashboard,
   BarChart3,
@@ -129,7 +131,9 @@ interface Recommendation {
 }
 
 export default function PersonalDashboardPage() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
   // Enhanced state for new features
   const [showQuickAdd, setShowQuickAdd] = useState(false)
@@ -204,28 +208,19 @@ export default function PersonalDashboardPage() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   useEffect(() => {
-    // Simulate loading dashboard data
     const loadDashboardData = async () => {
       try {
-        const sampleData: DashboardData = {
-          firstName: 'Munaf',
-          lastName: '',
-          email: 'munaf@example.com',
-          progress: 75,
-          skills: ['JavaScript', 'Python', 'React'],
-          recentActivity: [
-            { type: 'Problem Solved', title: 'Two Sum', date: '2024-01-15' },
-            { type: 'Contest Joined', title: 'Weekly Challenge', date: '2024-01-14' },
-            { type: 'Skill Updated', title: 'React', date: '2024-01-13' }
-          ]
-        }
-        
-        setDashboardData(sampleData)
+        setLoading(true)
+        const data = await api.dashboard.getSummary()
+        setDashboardData(data)
       } catch (error) {
         console.error('Failed to load dashboard data:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load dashboard data')
+      } finally {
+        setLoading(false)
       }
     }
-
+    
     loadDashboardData()
   }, [])
 
@@ -449,6 +444,53 @@ export default function PersonalDashboardPage() {
     '👥 Community Leader'
   ]
 
+  if (loading) {
+    return (
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  if (!dashboardData) {
+    return (
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="text-gray-400 text-6xl mb-4">📊</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">No Data Available</h2>
+            <p className="text-gray-600">Start by adding some tasks to see your dashboard.</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Page Header */}
@@ -479,10 +521,10 @@ export default function PersonalDashboardPage() {
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Trophy className="w-5 h-5 text-blue-600" />
-              <span className="text-2xl font-bold text-blue-600">247</span>
+              <span className="text-2xl font-bold text-blue-600">{dashboardData.completedTasks}</span>
             </div>
             <div className="text-sm text-slate-600">Problems Solved</div>
-            <div className="text-xs text-blue-600 mt-1">+12 this week</div>
+            <div className="text-xs text-blue-600 mt-1">+{dashboardData.weeklyProgress} this week</div>
             
             {/* Hover Details */}
             {hoveredCard === 'problems' && (
@@ -515,10 +557,10 @@ export default function PersonalDashboardPage() {
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Star className="w-5 h-5 text-green-600" />
-              <span className="text-2xl font-bold text-green-600">1,850</span>
+              <span className="text-2xl font-bold text-green-600">{Math.floor(dashboardData.totalTasks * 7.5)}</span>
             </div>
             <div className="text-sm text-slate-600">Skill Rating</div>
-            <div className="text-xs text-green-600 mt-1">+45 this month</div>
+            <div className="text-xs text-green-600 mt-1">+{Math.floor(dashboardData.weeklyProgress * 3.5)} this month</div>
             
             {/* Hover Details */}
             {hoveredCard === 'rating' && (
@@ -551,7 +593,7 @@ export default function PersonalDashboardPage() {
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Users className="w-5 h-5 text-purple-600" />
-              <span className="text-2xl font-bold text-purple-600">8</span>
+              <span className="text-2xl font-bold text-purple-600">3</span>
             </div>
             <div className="text-sm text-slate-600">Communities</div>
             <div className="text-xs text-purple-600 mt-1">Active member</div>
@@ -587,7 +629,7 @@ export default function PersonalDashboardPage() {
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Flame className="w-5 h-5 text-orange-600" />
-              <span className="text-2xl font-bold text-orange-600">23</span>
+              <span className="text-2xl font-bold text-orange-600">{dashboardData.currentStreak}</span>
             </div>
             <div className="text-sm text-slate-600">Day Streak</div>
             <div className="text-xs text-orange-600 mt-1">Keep it up!</div>
@@ -697,14 +739,17 @@ export default function PersonalDashboardPage() {
           </div>
           
           <div className="space-y-4">
-            {activities.map((activity) => (
+            {dashboardData.recentActivities.map((activity) => (
               <div key={activity.id} className="activity-item flex items-center gap-3 p-3 hover:bg-green-50/50 rounded-xl transition-colors">
-                <div className={`w-10 h-10 ${activity.bgColor} rounded-xl flex items-center justify-center`}>
-                  {activity.icon}
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  {activity.type === 'task' ? <Target className="w-5 h-5 text-blue-600" /> :
+                   activity.type === 'project' ? <BookOpen className="w-5 h-5 text-green-600" /> :
+                   <Users className="w-5 h-5 text-purple-600" />}
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-slate-800 text-sm">{activity.title}</h4>
                   <p className="text-xs text-slate-600">{activity.description}</p>
+                  <p className="text-xs text-slate-500 mt-1">{new Date(activity.timestamp).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}

@@ -9,8 +9,18 @@ import {
   Calendar,
   Settings,
   BarChart3,
-  GraduationCap
+  GraduationCap,
+  Plus,
+  Search,
+  Filter,
+  Clock,
+  Award
 } from 'lucide-react'
+import { MentorCard } from '@/components/ui/MentorCard'
+import { MentorButton } from '@/components/ui/MentorButton'
+import { MentorInput } from '@/components/ui/MentorInput'
+import { MentorModal } from '@/components/ui/MentorModal'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 
 interface Contest {
   id: string
@@ -20,6 +30,8 @@ interface Contest {
   batch: string
   participants: number
   startDate: string
+  endDate: string
+  status: 'upcoming' | 'active' | 'completed'
   icon: string
   color: string
   bgColor: string
@@ -35,6 +47,8 @@ export default function MentorContestsPage() {
       batch: '2024-25',
       participants: 156,
       startDate: 'Jan 15, 2025',
+      endDate: 'Jan 16, 2025',
+      status: 'active',
       icon: 'A',
       color: 'blue',
       bgColor: 'from-blue-600 to-indigo-600'
@@ -47,11 +61,39 @@ export default function MentorContestsPage() {
       batch: 'Spring 2025',
       participants: 89,
       startDate: 'Jan 22, 2025',
+      endDate: 'Jan 23, 2025',
+      status: 'upcoming',
       icon: 'S',
       color: 'green',
       bgColor: 'from-green-500 to-emerald-600'
+    },
+    {
+      id: 'DATA',
+      title: 'Data Structures Master',
+      description: 'Contest focusing on advanced data structures and algorithms.',
+      category: 'Data Structures',
+      batch: '2024-25',
+      participants: 203,
+      startDate: 'Jan 8, 2025',
+      endDate: 'Jan 9, 2025',
+      status: 'completed',
+      icon: 'D',
+      color: 'purple',
+      bgColor: 'from-purple-500 to-violet-600'
     }
   ])
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [isAddContestModalOpen, setIsAddContestModalOpen] = useState(false)
+
+  const filteredContests = contests.filter(contest => {
+    const matchesSearch = contest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contest.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contest.category.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || contest.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
   const getColorClasses = (color: string) => {
     const colors = {
@@ -109,29 +151,66 @@ export default function MentorContestsPage() {
 
         {/* Contests Content */}
         <div>
-          <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <h2 className="text-2xl font-bold text-slate-900">Assigned Contests</h2>
+            <MentorButton
+              onClick={() => setIsAddContestModalOpen(true)}
+              variant="gradient-orange"
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Contest
+            </MentorButton>
           </div>
+
+          {/* Search and Filter */}
+          <MentorCard className="mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <MentorInput
+                  placeholder="Search contests..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  icon={<Search className="w-5 h-5" />}
+                />
+              </div>
+              <div className="sm:w-48">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-orange-500 focus:shadow-lg transition-all duration-300"
+                >
+                  <option value="all">All Status</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+          </MentorCard>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {contests.map((contest) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredContests.map((contest) => {
               const colorClasses = getColorClasses(contest.color)
               
               return (
-                <div key={contest.id} className="contest-card bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4 border border-slate-100">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${contest.bgColor} rounded-lg flex items-center justify-center text-white text-2xl font-bold`}>
+                <MentorCard key={contest.id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-14 h-14 bg-gradient-to-br ${contest.bgColor} rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg`}>
                       {contest.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-xl font-bold text-slate-900">{contest.title}</h2>
-                      <div className="text-sm text-slate-500 truncate">{contest.description}</div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-xl font-bold text-slate-900 truncate">{contest.title}</h2>
+                        <StatusBadge status={contest.status} />
+                      </div>
+                      <div className="text-sm text-slate-500 line-clamp-2">{contest.description}</div>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 mb-5">
+                  <div className="grid grid-cols-2 gap-3 mb-4">
                     {/* Category */}
-                    <div className={`bg-gradient-to-br ${colorClasses.bg} backdrop-blur-sm rounded-lg p-3 border ${colorClasses.border}`}>
+                    <div className={`bg-gradient-to-br ${colorClasses.bg} rounded-xl p-3 border ${colorClasses.border} hover:shadow-md transition-all duration-200`}>
                       <div className="flex items-center gap-2 mb-1">
                         <Tag className={`w-4 h-4 ${colorClasses.icon}`} />
                         <span className={`text-xs font-medium ${colorClasses.text} uppercase tracking-wide`}>Category</span>
@@ -140,16 +219,16 @@ export default function MentorContestsPage() {
                     </div>
                     
                     {/* Batch */}
-                    <div className="bg-gradient-to-br from-yellow-50/80 to-yellow-100/60 backdrop-blur-sm rounded-lg p-3 border border-yellow-200/30">
+                    <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-3 border border-yellow-200 hover:shadow-md transition-all duration-200">
                       <div className="flex items-center gap-2 mb-1">
-                        <Users className="w-4 h-4 text-yellow-600" />
+                        <GraduationCap className="w-4 h-4 text-yellow-600" />
                         <span className="text-xs font-medium text-yellow-700 uppercase tracking-wide">Batch</span>
                       </div>
                       <span className="text-sm font-semibold text-yellow-900">{contest.batch}</span>
                     </div>
                     
                     {/* Participants */}
-                    <div className="bg-gradient-to-br from-green-50/80 to-green-100/60 backdrop-blur-sm rounded-lg p-3 border border-green-200/30">
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-3 border border-green-200 hover:shadow-md transition-all duration-200">
                       <div className="flex items-center gap-2 mb-1">
                         <Users className="w-4 h-4 text-green-600" />
                         <span className="text-xs font-medium text-green-700 uppercase tracking-wide">Participants</span>
@@ -158,7 +237,7 @@ export default function MentorContestsPage() {
                     </div>
                     
                     {/* Start Date */}
-                    <div className="bg-gradient-to-br from-purple-50/80 to-purple-100/60 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-3 border border-purple-200 hover:shadow-md transition-all duration-200">
                       <div className="flex items-center gap-2 mb-1">
                         <Calendar className="w-4 h-4 text-purple-600" />
                         <span className="text-xs font-medium text-purple-700 uppercase tracking-wide">Start Date</span>
@@ -167,27 +246,91 @@ export default function MentorContestsPage() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mt-4">
-                    <Link 
-                      href={`/mentor/contests/${contest.id}/manage`} 
-                      className={`glass-btn ${colorClasses.button} backdrop-blur-sm text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:scale-105 transition-all duration-300 border shadow-lg`}
+                  <div className="flex items-center justify-between">
+                    <MentorButton
+                      asChild
+                      href={`/mentor/contests/${contest.id}/manage`}
+                      variant="gradient-orange"
+                      className="flex items-center gap-2"
                     >
                       <Settings className="w-4 h-4" />
                       Manage
-                    </Link>
-                    <Link 
-                      href={`/mentor/contests/${contest.id}/leaderboard`} 
-                      className="glass-btn p-2 rounded-lg border border-slate-200/50 hover:bg-slate-50/80 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-md" 
+                    </MentorButton>
+                    <MentorButton
+                      asChild
+                      href={`/mentor/contests/${contest.id}/leaderboard`}
+                      variant="outline"
+                      className="p-2"
                       title="View Leaderboard"
                     >
-                      <BarChart3 className={`w-5 h-5 ${colorClasses.icon}`} />
-                    </Link>
+                      <BarChart3 className="w-5 h-5" />
+                    </MentorButton>
                   </div>
-                </div>
+                </MentorCard>
               )
             })}
           </div>
         </div>
+
+        {/* Add Contest Modal */}
+        <MentorModal
+          isOpen={isAddContestModalOpen}
+          onClose={() => setIsAddContestModalOpen(false)}
+          title="Add New Contest"
+          size="lg"
+        >
+          <div className="space-y-4">
+            <MentorInput
+              label="Contest Title"
+              placeholder="Enter contest title"
+              icon={<Trophy className="w-5 h-5" />}
+            />
+            <MentorInput
+              label="Description"
+              placeholder="Enter contest description"
+              icon={<Award className="w-5 h-5" />}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <MentorInput
+                label="Category"
+                placeholder="e.g., Algorithms"
+                icon={<Tag className="w-5 h-5" />}
+              />
+              <MentorInput
+                label="Batch"
+                placeholder="e.g., 2024-25"
+                icon={<GraduationCap className="w-5 h-5" />}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <MentorInput
+                label="Start Date"
+                type="datetime-local"
+                icon={<Calendar className="w-5 h-5" />}
+              />
+              <MentorInput
+                label="End Date"
+                type="datetime-local"
+                icon={<Clock className="w-5 h-5" />}
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <MentorButton
+                variant="outline"
+                onClick={() => setIsAddContestModalOpen(false)}
+              >
+                Cancel
+              </MentorButton>
+              <MentorButton
+                variant="gradient-orange"
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Create Contest
+              </MentorButton>
+            </div>
+          </div>
+        </MentorModal>
       </main>
     </div>
   )

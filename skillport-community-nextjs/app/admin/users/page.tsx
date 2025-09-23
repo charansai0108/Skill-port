@@ -24,9 +24,19 @@ import {
   GraduationCap,
   Trophy,
   BarChart3,
-  Award as AwardIcon
+  Award as AwardIcon,
+  Eye,
+  Download,
+  Upload,
+  RefreshCw
 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminCard } from '@/components/ui/AdminCard'
+import { AdminButton } from '@/components/ui/AdminButton'
+import { AdminInput } from '@/components/ui/AdminInput'
+import { AdminTable, AdminTableHeader, AdminTableBody, AdminTableRow, AdminTableCell, AdminTableHeaderCell } from '@/components/ui/AdminTable'
+import { AdminModal } from '@/components/ui/AdminModal'
+import { AdminAvatar } from '@/components/ui/AdminAvatar'
 
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -302,207 +312,326 @@ export default function AdminUsersPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Users className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Student Management</h1>
+                <p className="text-gray-600">Manage and monitor all student accounts</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-semibold text-slate-700 leading-snug">
-                Student Management
-              </h1>
+            <div className="flex items-center gap-3">
+              <AdminButton variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </AdminButton>
+              <AdminButton variant="outline" size="sm">
+                <Upload className="w-4 h-4 mr-2" />
+                Import
+              </AdminButton>
+              <AdminButton variant="primary" onClick={() => setShowAddModal(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Student
+              </AdminButton>
             </div>
           </div>
         </div>
 
-        {/* Students Section Header */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">All Students</h2>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+                <p className="text-xs text-green-600">+12 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Students</p>
+                <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.status === 'active').length}</p>
+                <p className="text-xs text-green-600">+8 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Inactive Students</p>
+                <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.status === 'inactive').length}</p>
+                <p className="text-xs text-red-600">-4 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                <UserX className="w-6 h-6 text-red-600" />
+              </div>
+            </div>
+          </AdminCard>
+          
+          <AdminCard hover>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Avg. Rating</p>
+                <p className="text-2xl font-bold text-gray-900">3.7</p>
+                <p className="text-xs text-green-600">+0.2 this month</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Award className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </AdminCard>
         </div>
+
+        {/* Search and Filters */}
+        <AdminCard className="mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <AdminInput
+                placeholder="Search students by name, email, or username..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                icon={<Search className="w-4 h-4" />}
+              />
+            </div>
+            <div className="flex gap-3">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <AdminButton variant="outline" size="sm">
+                <Filter className="w-4 h-4 mr-2" />
+                Filters
+              </AdminButton>
+              <AdminButton variant="ghost" size="sm">
+                <RefreshCw className="w-4 h-4" />
+              </AdminButton>
+            </div>
+          </div>
+        </AdminCard>
 
         {/* Users Table */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200/50">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gradient-to-r from-slate-50 to-blue-50">
-                <tr>
-                  <th className="px-8 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Student</th>
-                  <th className="px-8 py-4 text-left text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Email</th>
-                  <th className="px-8 py-4 text-center text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Status</th>
-                  <th className="px-8 py-4 text-center text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Joined</th>
-                  <th className="px-8 py-4 text-center text-sm font-semibold text-slate-700 uppercase tracking-wider border-b border-slate-200 w-1/5">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-slate-200">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center">
-                        <Loader className="w-8 h-8 text-slate-400 mb-2 animate-spin loading-pulse" />
-                        <p className="text-slate-500">Loading users...</p>
+        <AdminTable>
+          <AdminTableHeader>
+            <AdminTableHeaderCell>Student</AdminTableHeaderCell>
+            <AdminTableHeaderCell>Email</AdminTableHeaderCell>
+            <AdminTableHeaderCell align="center">Status</AdminTableHeaderCell>
+            <AdminTableHeaderCell align="center">Joined</AdminTableHeaderCell>
+            <AdminTableHeaderCell align="center">Rating</AdminTableHeaderCell>
+            <AdminTableHeaderCell align="center">Actions</AdminTableHeaderCell>
+          </AdminTableHeader>
+          <AdminTableBody>
+            {isLoading ? (
+              <AdminTableRow>
+                <AdminTableCell colSpan={6} className="text-center py-12">
+                  <div className="flex flex-col items-center">
+                    <Loader className="w-8 h-8 text-gray-400 mb-2 animate-spin" />
+                    <p className="text-gray-500">Loading students...</p>
+                  </div>
+                </AdminTableCell>
+              </AdminTableRow>
+            ) : pageUsers.length === 0 ? (
+              <AdminTableRow>
+                <AdminTableCell colSpan={6} className="text-center py-12">
+                  <div className="flex flex-col items-center">
+                    <Users className="w-8 h-8 text-gray-400 mb-2" />
+                    <p className="text-gray-500">No students found</p>
+                  </div>
+                </AdminTableCell>
+              </AdminTableRow>
+            ) : (
+              pageUsers.map((user) => (
+                <AdminTableRow key={user.id} hover>
+                  <AdminTableCell>
+                    <div className="flex items-center gap-3">
+                      <AdminAvatar
+                        src={`https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`}
+                        size="md"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">{user.firstName} {user.lastName}</div>
+                        <div className="text-sm text-gray-500">@{user.username}</div>
                       </div>
-                    </td>
-                  </tr>
-                ) : pageUsers.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center">
-                        <Users className="w-8 h-8 text-slate-400 mb-2" />
-                        <p className="text-slate-500">No students found</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  pageUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50">
-                      <td className="px-8 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-sm font-medium text-slate-900">{user.firstName} {user.lastName}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-4 whitespace-nowrap text-sm text-slate-900">{user.email}</td>
-                      <td className="px-8 py-4 whitespace-nowrap text-center">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(user.status)}`}>
-                          {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-8 py-4 whitespace-nowrap text-sm text-slate-500 text-center">{user.joined}</td>
-                      <td className="px-8 py-4 whitespace-nowrap text-center">
-                        <button 
-                          onClick={() => deleteUser(user.id)}
-                          className="text-red-600 hover:text-red-900 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </div>
+                  </AdminTableCell>
+                  <AdminTableCell>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-900">{user.email}</span>
+                    </div>
+                  </AdminTableCell>
+                  <AdminTableCell align="center">
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusBadge(user.status)}`}>
+                      {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                    </span>
+                  </AdminTableCell>
+                  <AdminTableCell align="center">
+                    <div className="flex items-center gap-2 justify-center">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-500">{user.joined}</span>
+                    </div>
+                  </AdminTableCell>
+                  <AdminTableCell align="center">
+                    <div className="flex items-center gap-1 justify-center">
+                      <Award className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm font-medium text-gray-900">{user.rating}</span>
+                    </div>
+                  </AdminTableCell>
+                  <AdminTableCell align="center">
+                    <div className="flex items-center gap-2 justify-center">
+                      <AdminButton variant="ghost" size="sm">
+                        <Eye className="w-4 h-4" />
+                      </AdminButton>
+                      <AdminButton variant="ghost" size="sm" onClick={() => editUser(user)}>
+                        <Edit className="w-4 h-4" />
+                      </AdminButton>
+                      <AdminButton variant="ghost" size="sm" onClick={() => deleteUser(user.id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </AdminButton>
+                    </div>
+                  </AdminTableCell>
+                </AdminTableRow>
+              ))
+            )}
+          </AdminTableBody>
+        </AdminTable>
 
         {/* Pagination */}
-        <div className="flex justify-center items-center gap-2 mt-8">
-          <button 
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="action-button px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Previous
-          </button>
-          <span className="px-4 py-2 text-slate-700 bg-slate-50 rounded-lg border border-slate-200">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button 
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="action-button px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        <div className="flex justify-between items-center mt-8">
+          <div className="text-sm text-gray-500">
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} students
+          </div>
+          <div className="flex items-center gap-2">
+            <AdminButton 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </AdminButton>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const page = i + 1
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              })}
+            </div>
+            <AdminButton 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </AdminButton>
+          </div>
         </div>
       </main>
 
       {/* Add/Edit User Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">
-                {editingUser ? 'Edit User' : 'Add New User'}
-              </h3>
-              <button 
-                onClick={() => {
-                  setShowAddModal(false)
-                  setEditingUser(null)
-                }}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleUserSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  defaultValue={editingUser?.firstName || ''}
-                  required
-                  className="form-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  defaultValue={editingUser?.lastName || ''}
-                  required
-                  className="form-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  defaultValue={editingUser?.username || ''}
-                  required
-                  className="form-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  defaultValue={editingUser?.email || ''}
-                  required
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              <div className="flex gap-3 pt-4">
-                <button 
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Save User
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setShowAddModal(false)
-                    setEditingUser(null)
-                  }}
-                  className="flex-1 bg-slate-300 hover:bg-slate-400 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+      <AdminModal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false)
+          setEditingUser(null)
+        }}
+        title={editingUser ? 'Edit Student' : 'Add New Student'}
+        size="md"
+      >
+        <form onSubmit={handleUserSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AdminInput
+              label="First Name"
+              name="firstName"
+              defaultValue={editingUser?.firstName || ''}
+              required
+              helperText="Enter the student's first name"
+            />
+            <AdminInput
+              label="Last Name"
+              name="lastName"
+              defaultValue={editingUser?.lastName || ''}
+              required
+              helperText="Enter the student's last name"
+            />
           </div>
-        </div>
-      )}
+          
+          <AdminInput
+            label="Username"
+            name="username"
+            defaultValue={editingUser?.username || ''}
+            required
+            helperText="Choose a unique username"
+          />
+          
+          <AdminInput
+            label="Email Address"
+            name="email"
+            type="email"
+            defaultValue={editingUser?.email || ''}
+            required
+            helperText="Enter a valid email address"
+            icon={<Mail className="w-4 h-4" />}
+          />
+          
+          <AdminInput
+            label="Password"
+            name="password"
+            type="password"
+            required
+            helperText="Enter a secure password"
+          />
+          
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <AdminButton
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowAddModal(false)
+                setEditingUser(null)
+              }}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              variant="primary"
+            >
+              {editingUser ? 'Update Student' : 'Add Student'}
+            </AdminButton>
+          </div>
+        </form>
+      </AdminModal>
     </div>
   )
 }
