@@ -5,6 +5,14 @@ import { prisma } from './prisma'
 import { UserRole } from '@prisma/client'
 import crypto from 'crypto'
 
+/**
+ * Authentication utilities for SkillPort Community
+ * 
+ * Note: Type assertions (as any) are used for email verification and password reset fields
+ * that exist in the Prisma schema but may not be reflected in the generated types
+ * until the database is properly synced with `npx prisma db push`
+ */
+
 const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h'
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d'
@@ -12,6 +20,9 @@ const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d'
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required')
 }
+
+// Ensure JWT_SECRET is defined for type safety
+const jwtSecret = JWT_SECRET as string
 
 export interface AdminUser {
   id: string
@@ -51,12 +62,12 @@ export async function comparePassword(password: string, hashedPassword: string):
 
 export function generateToken(user: AdminUser | StudentUser, userType: 'admin' | 'student'): string {
   const payload = userType === 'admin' ? { admin: user } : { student: user }
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
+  return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
 }
 
 export function verifyToken(token: string): AuthToken | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthToken
+    return jwt.verify(token, jwtSecret) as AuthToken
   } catch (error) {
     return null
   }
@@ -209,7 +220,7 @@ export async function generateEmailVerificationToken(email: string): Promise<str
     data: {
       emailVerificationToken: token,
       emailVerificationExpires: expires
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   return token
@@ -222,7 +233,7 @@ export async function verifyEmailToken(token: string): Promise<boolean> {
       emailVerificationExpires: {
         gt: new Date()
       }
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   if (!user) {
@@ -235,7 +246,7 @@ export async function verifyEmailToken(token: string): Promise<boolean> {
       emailVerified: true,
       emailVerificationToken: null,
       emailVerificationExpires: null
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   return true
@@ -259,7 +270,7 @@ export async function generatePasswordResetToken(email: string): Promise<string 
     data: {
       passwordResetToken: token,
       passwordResetExpires: expires
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   return token
@@ -272,7 +283,7 @@ export async function verifyPasswordResetToken(token: string): Promise<string | 
       passwordResetExpires: {
         gt: new Date()
       }
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   return user?.id || null
@@ -293,7 +304,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
       password: hashedPassword,
       passwordResetToken: null,
       passwordResetExpires: null
-    }
+    } as any // Type assertion for fields that exist in schema but not in generated types
   })
 
   return true
@@ -310,8 +321,8 @@ export async function authenticateStudentWithVerification(email: string, passwor
       return null
     }
 
-    // Check if email is verified
-    if (!user.emailVerified) {
+    // Check if email is verified (using type assertion for field that exists in schema)
+    if (!(user as any).emailVerified) {
       throw new Error('EMAIL_NOT_VERIFIED')
     }
 
