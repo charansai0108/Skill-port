@@ -5,10 +5,10 @@ import { validateData, contestParticipantSchema, paginationSchema } from '@/lib/
 
 const prisma = new PrismaClient()
 
-export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const contestId = params.id
+    const { id: contestId } = await params
     const { searchParams } = new URL(request.url)
 
     // Validate pagination parameters
@@ -102,10 +102,10 @@ export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }:
   }
 })
 
-export const POST = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const POST = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const contestId = params.id
+    const { id: contestId } = await params
     const body = await request.json()
 
     const validation = validateData(contestParticipantSchema, body)

@@ -41,7 +41,7 @@ Sentry.init({
   
   // Integrations
   integrations: [
-    new Sentry.BrowserTracing({
+    Sentry.browserTracingIntegration({
       // Set sampling rate for performance monitoring
       tracePropagationTargets: [
         'localhost',
@@ -49,7 +49,7 @@ Sentry.init({
         /^https:\/\/api\.skillport\.com/
       ],
     }),
-    new Sentry.Replay({
+    Sentry.replayIntegration({
       // Capture 10% of all sessions
       sessionSampleRate: 0.1,
       // Capture 100% of sessions with an error

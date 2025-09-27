@@ -77,41 +77,11 @@ export default function MentorProfilePage() {
     certifications: '• Google Certified Educator\n• Microsoft Certified: Azure Developer Associate\n• AWS Certified Solutions Architect'
   })
 
-  const students: Student[] = [
-    {
-      id: '1',
-      name: 'Alex Johnson',
-      initials: 'AJ',
-      performance: 95,
-      status: 'Active',
-      badges: ['Contest Winner'],
-      avatarColor: 'from-blue-500 to-indigo-600'
-    },
-    {
-      id: '2',
-      name: 'Priya Sharma',
-      initials: 'PS',
-      performance: 92,
-      status: 'Active',
-      badges: ['Top Performer'],
-      avatarColor: 'from-green-500 to-emerald-600'
-    },
-    {
-      id: '3',
-      name: 'Rahul Kumar',
-      initials: 'RK',
-      performance: 89,
-      status: 'Active',
-      badges: ['Improving'],
-      avatarColor: 'from-purple-500 to-violet-600'
-    }
-  ]
 
   const navigationItems = [
     { id: 'profile', label: 'Profile', icon: User, color: 'text-orange-600' },
     { id: 'password', label: 'Password', icon: Lock, color: 'text-purple-600' },
     { id: 'specialization', label: 'Specialization', icon: Award, color: 'text-amber-600' },
-    { id: 'students', label: 'My Students', icon: Users, color: 'text-green-600' },
     { id: 'logout', label: 'Logout', icon: LogOut, color: 'text-red-600' }
   ]
 
@@ -456,52 +426,6 @@ export default function MentorProfilePage() {
               </div>
             )}
 
-            {/* Students Section */}
-            {activeSection === 'students' && (
-              <MentorCard className="p-8">
-                <h2 className="text-2xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                  <Users className="w-6 h-6 text-green-600" />
-                  My Students
-                </h2>
-                
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-slate-800">Current Students ({students.length})</h3>
-                    <MentorButton
-                      variant="gradient-orange"
-                      className="flex items-center gap-2"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      Add Student
-                    </MentorButton>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {students.map((student) => (
-                      <MentorCard key={student.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-12 h-12 bg-gradient-to-br ${student.avatarColor} rounded-full flex items-center justify-center shadow-lg`}>
-                            <span className="text-white text-sm font-bold">{student.initials}</span>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-slate-800">{student.name}</h4>
-                            <p className="text-sm text-slate-600">{student.performance}% Performance</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <StatusBadge status={student.status.toLowerCase() as any} />
-                          {student.badges.map((badge, index) => (
-                            <span key={index} className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
-                              {badge}
-                            </span>
-                          ))}
-                        </div>
-                      </MentorCard>
-                    ))}
-                  </div>
-                </div>
-              </MentorCard>
-            )}
 
             {/* Logout Section */}
             {activeSection === 'logout' && (

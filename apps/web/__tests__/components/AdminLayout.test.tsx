@@ -1,22 +1,14 @@
 import { render, screen } from '@testing-library/react'
-import { AdminLayout } from '@/components/layout/roles/AdminLayout'
-
-// Mock the AdminHeader component
-jest.mock('@/components/layout/AdminHeader', () => {
-  return function MockAdminHeader() {
-    return <div data-testid="admin-header">Admin Header</div>
-  }
-})
+import AdminLayout from '@/components/layout/roles/AdminLayout'
 
 describe('AdminLayout', () => {
-  it('renders admin header and children', () => {
+  it('renders children content', () => {
     render(
       <AdminLayout>
         <div data-testid="admin-content">Admin Dashboard Content</div>
       </AdminLayout>
     )
     
-    expect(screen.getByTestId('admin-header')).toBeInTheDocument()
     expect(screen.getByTestId('admin-content')).toBeInTheDocument()
   })
 

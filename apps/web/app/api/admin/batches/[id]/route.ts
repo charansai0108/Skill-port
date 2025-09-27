@@ -3,9 +3,9 @@ import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib
 import { prisma } from '@/lib/prisma'
 
 // GET /api/admin/batches/[id] - Get batch by ID
-export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     const batch = await prisma.batch.findUnique({
       where: { id },
@@ -75,7 +75,7 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
     // Transform mentors data
     const transformedBatch = {
       ...batch,
-      mentors: batch.mentors.map(mb => mb.mentor)
+      mentors: batch.mentors.map((mb: any) => mb.mentor)
     }
 
     return createSuccessResponse(transformedBatch, 'Batch retrieved successfully')
@@ -87,9 +87,9 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // PUT /api/admin/batches/[id] - Update batch
-export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, description, startDate, endDate, status } = body
 
@@ -149,9 +149,9 @@ export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // DELETE /api/admin/batches/[id] - Delete batch
-export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Check if batch exists
     const existingBatch = await prisma.batch.findUnique({

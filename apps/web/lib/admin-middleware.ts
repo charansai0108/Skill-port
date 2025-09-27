@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentAdmin, createActivityLog } from './auth'
 
-export function withAdminAuth(handler: (request: NextRequest, admin: any) => Promise<NextResponse>) {
-  return async (request: NextRequest) => {
+export function withAdminAuth(handler: (request: NextRequest, admin: any, context?: any) => Promise<NextResponse>) {
+  return async (request: NextRequest, context?: any) => {
     try {
       const admin = await getCurrentAdmin(request)
       
@@ -13,7 +13,7 @@ export function withAdminAuth(handler: (request: NextRequest, admin: any) => Pro
         )
       }
 
-      return handler(request, admin)
+      return handler(request, admin, context)
     } catch (error) {
       console.error('Admin middleware error:', error)
       return NextResponse.json(

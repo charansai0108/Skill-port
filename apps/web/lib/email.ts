@@ -1,16 +1,26 @@
 import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransporter({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
+// Initialize transporter only if email credentials are available
+let transporter: nodemailer.Transporter | null = null
+
+if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter = nodemailer.createTransporter({
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  })
+}
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
+  if (!transporter) {
+    console.warn('Email service not configured, skipping verification email')
+    return false
+  }
+
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify-email?token=${token}`
   
   const mailOptions = {
@@ -76,6 +86,11 @@ export async function sendVerificationEmail(email: string, token: string, name: 
 }
 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
+  if (!transporter) {
+    console.warn('Email service not configured, skipping password reset email')
+    return false
+  }
+
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`
   
   const mailOptions = {
@@ -141,6 +156,11 @@ export async function sendPasswordResetEmail(email: string, token: string, name:
 }
 
 export async function sendWelcomeEmail(email: string, name: string) {
+  if (!transporter) {
+    console.warn('Email service not configured, skipping welcome email')
+    return false
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,

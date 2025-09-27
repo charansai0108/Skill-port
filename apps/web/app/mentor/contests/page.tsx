@@ -10,7 +10,6 @@ import {
   Settings,
   BarChart3,
   GraduationCap,
-  Plus,
   Search,
   Filter,
   Clock,
@@ -85,7 +84,6 @@ export default function MentorContestsPage() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [isAddContestModalOpen, setIsAddContestModalOpen] = useState(false)
 
   const filteredContests = contests.filter(contest => {
     const matchesSearch = contest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -153,14 +151,6 @@ export default function MentorContestsPage() {
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <h2 className="text-2xl font-bold text-slate-900">Assigned Contests</h2>
-            <MentorButton
-              onClick={() => setIsAddContestModalOpen(true)}
-              variant="gradient-orange"
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Add Contest
-            </MentorButton>
           </div>
 
           {/* Search and Filter */}
@@ -189,7 +179,7 @@ export default function MentorContestsPage() {
             </div>
           </MentorCard>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredContests.map((contest) => {
               const colorClasses = getColorClasses(contest.color)
               
@@ -272,65 +262,6 @@ export default function MentorContestsPage() {
           </div>
         </div>
 
-        {/* Add Contest Modal */}
-        <MentorModal
-          isOpen={isAddContestModalOpen}
-          onClose={() => setIsAddContestModalOpen(false)}
-          title="Add New Contest"
-          size="lg"
-        >
-          <div className="space-y-4">
-            <MentorInput
-              label="Contest Title"
-              placeholder="Enter contest title"
-              icon={<Trophy className="w-5 h-5" />}
-            />
-            <MentorInput
-              label="Description"
-              placeholder="Enter contest description"
-              icon={<Award className="w-5 h-5" />}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <MentorInput
-                label="Category"
-                placeholder="e.g., Algorithms"
-                icon={<Tag className="w-5 h-5" />}
-              />
-              <MentorInput
-                label="Batch"
-                placeholder="e.g., 2024-25"
-                icon={<GraduationCap className="w-5 h-5" />}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MentorInput
-                label="Start Date"
-                type="datetime-local"
-                icon={<Calendar className="w-5 h-5" />}
-              />
-              <MentorInput
-                label="End Date"
-                type="datetime-local"
-                icon={<Clock className="w-5 h-5" />}
-              />
-            </div>
-            <div className="flex justify-end gap-3 pt-4">
-              <MentorButton
-                variant="outline"
-                onClick={() => setIsAddContestModalOpen(false)}
-              >
-                Cancel
-              </MentorButton>
-              <MentorButton
-                variant="gradient-orange"
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Create Contest
-              </MentorButton>
-            </div>
-          </div>
-        </MentorModal>
       </main>
     </div>
   )

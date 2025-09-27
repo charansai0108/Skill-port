@@ -27,9 +27,9 @@ describe('Button Component', () => {
 
   it('renders as different variants', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>)
-    expect(screen.getByText('Primary')).toHaveClass('bg-red-600')
+    expect(screen.getByText('Primary')).toHaveClass('bg-gradient-to-r')
 
     rerender(<Button variant="secondary">Secondary</Button>)
-    expect(screen.getByText('Secondary')).toHaveClass('bg-slate-100')
+    expect(screen.getByText('Secondary')).toHaveClass('bg-white/90')
   })
 })

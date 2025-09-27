@@ -5,10 +5,10 @@ import { UpdateProjectRequest } from '@/lib/types'
 
 async function updateProject(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const projectId = params.id
+  const { id: projectId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)
@@ -43,10 +43,10 @@ async function updateProject(
 
 async function deleteProject(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const projectId = params.id
+  const { id: projectId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)

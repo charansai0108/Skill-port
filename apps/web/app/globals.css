@@ -387,6 +387,16 @@
     display: none;  /* Safari and Chrome */
   }
 
+  /* Hide scrollbars globally for all overflow elements */
+  * {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  
+  *::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+
   /* Staggered animation delays for stat cards */
   .stat-card:nth-child(1) { animation-delay: 0.05s; }
   .stat-card:nth-child(2) { animation-delay: 0.1s; }

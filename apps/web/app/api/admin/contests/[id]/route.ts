@@ -3,9 +3,9 @@ import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib
 import { prisma } from '@/lib/prisma'
 
 // GET /api/admin/contests/[id] - Get contest by ID
-export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     const contest = await prisma.contest.findUnique({
       where: { id },
@@ -64,9 +64,9 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // PUT /api/admin/contests/[id] - Update contest
-export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, description, startDate, endDate, batchId, maxParticipants, status } = body
 
@@ -133,9 +133,9 @@ export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // DELETE /api/admin/contests/[id] - Delete contest
-export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Check if contest exists
     const existingContest = await prisma.contest.findUnique({

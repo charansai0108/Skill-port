@@ -1,14 +1,17 @@
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
 
-if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  throw new Error('Razorpay credentials are required')
+// Initialize Razorpay only if credentials are available
+let razorpay: Razorpay | null = null
+
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  })
 }
 
-export const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-})
+export { razorpay }
 
 // Subscription plans configuration
 export const SUBSCRIPTION_PLANS = {
@@ -101,6 +104,10 @@ export type SubscriptionPlanId = keyof typeof SUBSCRIPTION_PLANS
 
 // Generate Razorpay order
 export async function createRazorpayOrder(amount: number, currency: string = 'INR', receipt?: string) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   const options = {
     amount: amount * 100, // Razorpay expects amount in paise
     currency,
@@ -140,6 +147,10 @@ export async function createRazorpaySubscription(
   customerId: string,
   totalCount?: number
 ) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   const plan = Object.values(SUBSCRIPTION_PLANS).find(p => p.id === planId)
   if (!plan) {
     throw new Error('Invalid subscription plan')
@@ -167,6 +178,10 @@ export async function createRazorpaySubscription(
 
 // Get subscription details
 export async function getSubscriptionDetails(subscriptionId: string) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   try {
     const subscription = await razorpay.subscriptions.fetch(subscriptionId)
     return subscription
@@ -178,6 +193,10 @@ export async function getSubscriptionDetails(subscriptionId: string) {
 
 // Cancel subscription
 export async function cancelSubscription(subscriptionId: string, cancelAtCycleEnd: boolean = true) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   try {
     const subscription = await razorpay.subscriptions.cancel(subscriptionId, {
       cancel_at_cycle_end: cancelAtCycleEnd
@@ -191,6 +210,10 @@ export async function cancelSubscription(subscriptionId: string, cancelAtCycleEn
 
 // Get payment details
 export async function getPaymentDetails(paymentId: string) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   try {
     const payment = await razorpay.payments.fetch(paymentId)
     return payment
@@ -207,6 +230,10 @@ export async function generateInvoice(
   currency: string = 'INR',
   description?: string
 ) {
+  if (!razorpay) {
+    throw new Error('Razorpay is not configured')
+  }
+
   const options = {
     type: 'invoice',
     description: description || 'SkillPort Subscription',

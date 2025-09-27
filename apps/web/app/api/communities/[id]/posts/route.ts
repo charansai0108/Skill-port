@@ -5,10 +5,10 @@ import { PostData } from '@/lib/types'
 
 async function getCommunityPosts(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const communityId = params.id
+  const { id: communityId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)
@@ -58,10 +58,10 @@ async function getCommunityPosts(
 
 async function createCommunityPost(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const communityId = params.id
+  const { id: communityId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)

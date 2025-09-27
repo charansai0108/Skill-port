@@ -56,10 +56,10 @@ export async function GET(request: NextRequest) {
     ])
 
     // Transform data into activity feed format
-    const activities = []
+    const activities: any[] = []
 
     // Add submissions
-    submissions.forEach(submission => {
+    submissions.forEach((submission: any) => {
       activities.push({
         id: `submission-${submission.id}`,
         type: 'submission',
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Add contest participations
-    contestParticipations.forEach(participation => {
+    contestParticipations.forEach((participation: any) => {
       activities.push({
         id: `contest-${participation.id}`,
         type: 'contest',
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Add feedback
-    feedbacks.forEach(feedback => {
+    feedbacks.forEach((feedback: any) => {
       activities.push({
         id: `feedback-${feedback.id}`,
         type: 'feedback',
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Add notifications
-    notifications.forEach(notification => {
+    notifications.forEach((notification: any) => {
       activities.push({
         id: `notification-${notification.id}`,
         type: 'general',

@@ -1,0 +1,23 @@
+{
+  "name": "@skillport/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "lint": "echo 'No linting specified for ui package'",
+    "test": "echo 'No tests specified for ui package'"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "lucide-react": "^0.263.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "eslint": "8.46.0",
+    "eslint-config-next": "15.0.0-rc.0",
+    "typescript": "5.1.6"
+  }
+}

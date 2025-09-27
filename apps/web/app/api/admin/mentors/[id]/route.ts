@@ -3,9 +3,9 @@ import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib
 import { prisma } from '@/lib/prisma'
 
 // GET /api/admin/mentors/[id] - Get mentor by ID
-export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     const mentor = await prisma.mentor.findUnique({
       where: { id },
@@ -56,9 +56,9 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // PUT /api/admin/mentors/[id] - Update mentor
-export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, email, specialization, bio, profilePic, isActive, batchIds } = body
 
@@ -157,9 +157,9 @@ export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // DELETE /api/admin/mentors/[id] - Delete mentor
-export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Check if mentor exists
     const existingMentor = await prisma.mentor.findUnique({

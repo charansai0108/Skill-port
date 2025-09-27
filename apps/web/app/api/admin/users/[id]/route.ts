@@ -4,9 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
 
 // GET /api/admin/users/[id] - Get user by ID
-export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -52,9 +52,9 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // PUT /api/admin/users/[id] - Update user
-export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, email, role, status, batchId, profilePic, bio } = body
 
@@ -117,9 +117,9 @@ export const PUT = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // DELETE /api/admin/users/[id] - Delete user
-export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const DELETE = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({

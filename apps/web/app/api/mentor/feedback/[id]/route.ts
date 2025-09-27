@@ -5,10 +5,10 @@ import { validateData, updateFeedbackSchema } from '@/lib/mentor-validation'
 
 const prisma = new PrismaClient()
 
-export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const feedbackId = params.id
+    const { id: feedbackId } = await params
 
     const feedback = await prisma.feedback.findFirst({
       where: {
@@ -69,10 +69,10 @@ export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }:
   }
 })
 
-export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const feedbackId = params.id
+    const { id: feedbackId } = await params
     const body = await request.json()
 
     const validation = validateData(updateFeedbackSchema, body)
@@ -169,10 +169,10 @@ export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }:
   }
 })
 
-export const DELETE = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const feedbackId = params.id
+    const { id: feedbackId } = await params
 
     // Check if feedback exists and belongs to mentor
     const feedback = await prisma.feedback.findFirst({

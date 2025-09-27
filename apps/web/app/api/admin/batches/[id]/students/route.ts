@@ -3,9 +3,9 @@ import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib
 import { prisma } from '@/lib/prisma'
 
 // POST /api/admin/batches/[id]/students - Add students to batch
-export const POST = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const POST = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { studentIds } = body
 

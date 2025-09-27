@@ -41,8 +41,9 @@ Sentry.init({
   
   // Integrations
   integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app: undefined }),
-    new Sentry.Integrations.Prisma({ client: undefined }),
+    // Use the new integrations API
+    Sentry.httpIntegration({ tracing: true }),
+    Sentry.expressIntegration({ app: undefined }),
+    Sentry.prismaIntegration({ client: undefined }),
   ],
 })

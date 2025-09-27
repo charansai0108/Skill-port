@@ -3,9 +3,9 @@ import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib
 import { prisma } from '@/lib/prisma'
 
 // GET /api/admin/contests/[id]/participants - Get contest participants
-export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const GET = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '10')))
@@ -71,9 +71,9 @@ export const GET = withAdminAuth(async (request: NextRequest, admin, { params }:
 })
 
 // POST /api/admin/contests/[id]/participants - Add participants to contest
-export const POST = withAdminAuth(async (request: NextRequest, admin, { params }: { params: { id: string } }) => {
+export const POST = withAdminAuth(async (request: NextRequest, admin, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { userIds } = body
 

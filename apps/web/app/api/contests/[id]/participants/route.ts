@@ -7,7 +7,7 @@ import { LeaderboardEntry } from '@/lib/types'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate student
@@ -16,7 +16,7 @@ export async function GET(
       return createErrorResponse('Unauthorized', 401)
     }
 
-    const contestId = params.id
+    const { id: contestId } = await params
     const queryParams = parseQueryParams(request)
     
     const {

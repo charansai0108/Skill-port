@@ -5,10 +5,10 @@ import { UpdateTaskRequest } from '@/lib/types'
 
 async function updateTask(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const taskId = params.id
+  const { id: taskId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)
@@ -45,10 +45,10 @@ async function updateTask(
 
 async function deleteTask(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const userId = getUserIdFromRequest(request)
-  const taskId = params.id
+  const { id: taskId } = await params
 
   if (!userId) {
     return createErrorResponse('User ID is required', 401)

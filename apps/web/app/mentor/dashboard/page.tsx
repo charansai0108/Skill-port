@@ -255,7 +255,7 @@ export default function MentorDashboardPage() {
           <MentorCard>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-900">Top Performing Students</h2>
-              <Link href="/mentor/students" className="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</Link>
+              <Link href="/mentor/leaderboard" className="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</Link>
             </div>
             <div className="space-y-3">
               {topStudents.map((student) => (

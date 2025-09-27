@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import '../../../app/admin/admin.css'
-import { AdminHeader } from '../AdminHeader'
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - SkillPort Community',
@@ -14,7 +12,6 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <AdminHeader />
       <main>{children}</main>
     </div>
   )

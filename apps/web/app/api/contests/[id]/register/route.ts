@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate student
@@ -14,7 +14,7 @@ export async function POST(
       return createErrorResponse('Unauthorized', 401)
     }
 
-    const contestId = params.id
+    const { id: contestId } = await params
 
     // Check if contest exists and is open for registration
     const contest = await prisma.contest.findUnique({

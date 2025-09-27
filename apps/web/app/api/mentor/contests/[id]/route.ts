@@ -5,10 +5,10 @@ import { validateData, updateContestSchema } from '@/lib/mentor-validation'
 
 const prisma = new PrismaClient()
 
-export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const contestId = params.id
+    const { id: contestId } = await params
 
     const contest = await prisma.contest.findFirst({
       where: {
@@ -91,10 +91,10 @@ export const GET = withMentorAuth(async (request: MentorAuthRequest, { params }:
   }
 })
 
-export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const contestId = params.id
+    const { id: contestId } = await params
     const body = await request.json()
 
     const validation = validateData(updateContestSchema, body)
@@ -239,10 +239,10 @@ export const PUT = withMentorAuth(async (request: MentorAuthRequest, { params }:
   }
 })
 
-export const DELETE = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withMentorAuth(async (request: MentorAuthRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     const mentorId = request.mentor!.id
-    const contestId = params.id
+    const { id: contestId } = await params
 
     // Check if contest exists and belongs to mentor
     const contest = await prisma.contest.findFirst({

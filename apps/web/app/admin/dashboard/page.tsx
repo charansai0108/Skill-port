@@ -34,6 +34,52 @@ import { AdminButton } from '@/components/ui/AdminButton'
 export default function AdminDashboardPage() {
   return (
     <div>
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                <LayoutDashboard className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                PW IOI
+              </span>
+            </div>
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/admin/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 shadow-sm transition-all duration-300 hover:bg-red-100 hover:shadow-md hover:-translate-y-0.5">
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Link>
+              <Link href="/admin/users" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <Users className="w-4 h-4" />
+                Students
+              </Link>
+              <Link href="/admin/mentors" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <GraduationCap className="w-4 h-4" />
+                Mentors
+              </Link>
+              <Link href="/admin/contests" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <Trophy className="w-4 h-4" />
+                Contests
+              </Link>
+              <Link href="/admin/analytics" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <BarChart3 className="w-4 h-4" />
+                Analytics
+              </Link>
+              <Link href="/admin/leaderboard" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                <Award className="w-4 h-4" />
+                Leaderboard
+              </Link>
+              <Link href="/admin/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" alt="Profile" className="w-8 h-8 rounded-full object-cover shadow-lg border-2 border-white" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
         <div className="mb-8">
@@ -145,7 +191,7 @@ export default function AdminDashboardPage() {
                 View All
               </AdminButton>
             </div>
-            <div className="space-y-4 h-64 overflow-y-auto">
+            <div className="space-y-4 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                 <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
                   <UserPlus className="w-5 h-5 text-white" />
@@ -190,7 +236,7 @@ export default function AdminDashboardPage() {
                 Analytics
               </AdminButton>
             </div>
-            <div className="space-y-4 h-64 overflow-y-auto">
+            <div className="space-y-4 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -264,14 +310,14 @@ export default function AdminDashboardPage() {
           <AdminCard className="h-96">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">Recent Users</h2>
-              <AdminButton variant="ghost" size="sm" asChild>
-                <Link href="/admin/users">
+              <Link href="/admin/users">
+                <AdminButton variant="ghost" size="sm">
                   <Eye className="w-4 h-4 mr-2" />
                   View All
-                </Link>
-              </AdminButton>
+                </AdminButton>
+              </Link>
             </div>
-            <div className="space-y-3 h-64 overflow-y-auto">
+            <div className="space-y-3 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                   <User className="w-6 h-6 text-white" />
@@ -335,14 +381,14 @@ export default function AdminDashboardPage() {
           <AdminCard className="h-96">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">Recent Mentors</h2>
-              <AdminButton variant="ghost" size="sm" asChild>
-                <Link href="/admin/mentors">
+              <Link href="/admin/mentors">
+                <AdminButton variant="ghost" size="sm">
                   <Eye className="w-4 h-4 mr-2" />
                   View All
-                </Link>
-              </AdminButton>
+                </AdminButton>
+              </Link>
             </div>
-            <div className="space-y-3 h-64 overflow-y-auto">
+            <div className="space-y-3 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-300">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
                   <GraduationCap className="w-6 h-6 text-white" />
@@ -404,9 +450,9 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-12">
+        {/* <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-5 gap-6">
             <Link href="/admin/users" className="group">
               <AdminCard hover className="text-center h-full">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -457,7 +503,7 @@ export default function AdminDashboardPage() {
               </AdminCard>
             </Link>
           </div>
-        </div>
+        </div> */}
 
         {/* Alerts & Contest Management */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -467,7 +513,7 @@ export default function AdminDashboardPage() {
               <h2 className="text-xl font-bold text-slate-900">Alerts & Notifications</h2>
               <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">3</span>
             </div>
-            <div className="space-y-3 h-64 overflow-y-auto">
+            <div className="space-y-3 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
                 <Flag className="w-5 h-5 text-red-600" />
                 <div className="flex-1">
@@ -547,7 +593,7 @@ export default function AdminDashboardPage() {
               <h2 className="text-xl font-bold text-slate-900">Performance Metrics</h2>
               <Link href="/admin/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View Details</Link>
             </div>
-            <div className="space-y-4 h-64 overflow-y-auto">
+            <div className="space-y-4 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Target className="w-5 h-5 text-green-600" />
@@ -578,7 +624,7 @@ export default function AdminDashboardPage() {
               <h2 className="text-xl font-bold text-slate-900">Community Health</h2>
               <Link href="/admin/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">View Details</Link>
             </div>
-            <div className="space-y-4 h-64 overflow-y-auto">
+            <div className="space-y-4 h-64 overflow-y-auto scrollbar-hide">
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-5 h-5 text-green-600" />
