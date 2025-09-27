@@ -1,0 +1,299 @@
+name: Database Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:
+
+jobs:
+  # Backup database
+  backup-database:
+    name: Database Backup
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Create database backup
+        run: |
+          # Create backup directory
+          mkdir -p backups
+          
+          # Generate backup filename with timestamp
+          BACKUP_FILE="skillport-backup-$(date +%Y%m%d_%H%M%S).sql"
+          
+          # Create database backup
+          pg_dump ${{ secrets.PRODUCTION_DATABASE_URL }} > backups/$BACKUP_FILE
+          
+          # Compress backup
+          gzip backups/$BACKUP_FILE
+          
+          echo "Backup created: backups/$BACKUP_FILE.gz"
+
+      - name: Upload backup to GitHub Releases
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.upload_url }}
+          asset_path: ./backups/$BACKUP_FILE.gz
+          asset_name: $BACKUP_FILE.gz
+          asset_content_type: application/gzip
+
+      - name: Upload backup to cloud storage
+        run: |
+          # Upload to AWS S3 (if configured)
+          if [ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            aws s3 cp backups/$BACKUP_FILE.gz s3://${{ secrets.S3_BUCKET_NAME }}/backups/
+          fi
+          
+          # Upload to Google Cloud Storage (if configured)
+          if [ -n "${{ secrets.GOOGLE_CLOUD_KEY }}" ]; then
+            echo "${{ secrets.GOOGLE_CLOUD_KEY }}" > gcloud-key.json
+            gcloud auth activate-service-account --key-file gcloud-key.json
+            gsutil cp backups/$BACKUP_FILE.gz gs://${{ secrets.GCS_BUCKET_NAME }}/backups/
+          fi
+
+      - name: Cleanup old backups
+        run: |
+          # Keep only last 7 days of backups
+          find backups/ -name "*.sql.gz" -mtime +7 -delete
+
+  # Backup application data
+  backup-application:
+    name: Application Data Backup
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create application backup
+        run: |
+          # Create backup directory
+          mkdir -p app-backups
+          
+          # Generate backup filename with timestamp
+          APP_BACKUP_FILE="skillport-app-backup-$(date +%Y%m%d_%H%M%S).tar.gz"
+          
+          # Create application backup (excluding node_modules and .next)
+          tar -czf app-backups/$APP_BACKUP_FILE \
+            --exclude=node_modules \
+            --exclude=.next \
+            --exclude=.git \
+            --exclude=backups \
+            --exclude=app-backups \
+            .
+
+      - name: Upload application backup
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.upload_url }}
+          asset_path: ./app-backups/$APP_BACKUP_FILE
+          asset_name: $APP_BACKUP_FILE
+          asset_content_type: application/gzip
+
+  # Backup configuration and secrets
+  backup-config:
+    name: Configuration Backup
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create configuration backup
+        run: |
+          # Create config backup directory
+          mkdir -p config-backups
+          
+          # Generate backup filename with timestamp
+          CONFIG_BACKUP_FILE="skillport-config-backup-$(date +%Y%m%d_%H%M%S).tar.gz"
+          
+          # Create configuration backup
+          tar -czf config-backups/$CONFIG_BACKUP_FILE \
+            .github/ \
+            docker-compose.yml \
+            Dockerfile \
+            nginx.conf \
+            *.md \
+            package.json \
+            package-lock.json \
+            tsconfig.json \
+            tailwind.config.js \
+            next.config.ts
+
+      - name: Upload configuration backup
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.upload_url }}
+          asset_path: ./config-backups/$CONFIG_BACKUP_FILE
+          asset_name: $CONFIG_BACKUP_FILE
+          asset_content_type: application/gzip
+
+  # Verify backup integrity
+  verify-backup:
+    name: Verify Backup Integrity
+    runs-on: ubuntu-latest
+    needs: [backup-database, backup-application, backup-config]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download latest backup
+        run: |
+          # Download the latest backup for verification
+          LATEST_BACKUP=$(gh release list --limit 1 --json assets --jq '.[0].assets[0].name' | grep skillport-backup)
+          gh release download --pattern "$LATEST_BACKUP"
+
+      - name: Verify backup integrity
+        run: |
+          # Verify backup file integrity
+          if [ -f "$LATEST_BACKUP" ]; then
+            echo "✅ Backup file downloaded successfully"
+            
+            # Check if file is not corrupted
+            if gzip -t "$LATEST_BACKUP"; then
+              echo "✅ Backup file integrity verified"
+            else
+              echo "❌ Backup file is corrupted"
+              exit 1
+            fi
+          else
+            echo "❌ Failed to download backup file"
+            exit 1
+          fi
+
+      - name: Test backup restoration
+        run: |
+          # Test backup restoration (dry run)
+          echo "Testing backup restoration..."
+          
+          # Extract backup
+          gunzip -c "$LATEST_BACKUP" > test-restore.sql
+          
+          # Check SQL file structure
+          if head -n 10 test-restore.sql | grep -q "PostgreSQL database dump"; then
+            echo "✅ Backup SQL structure verified"
+          else
+            echo "❌ Backup SQL structure invalid"
+            exit 1
+          fi
+          
+          # Cleanup test files
+          rm -f test-restore.sql
+
+  # Notify backup status
+  notify-backup:
+    name: Notify Backup Status
+    runs-on: ubuntu-latest
+    needs: [backup-database, backup-application, backup-config, verify-backup]
+    if: always()
+    steps:
+      - name: Notify backup completion
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#backups'
+          text: |
+            📦 **Daily Backup Report**
+            
+            **Status:** ${{ job.status }}
+            **Time:** $(date)
+            
+            **Backups Created:**
+            - Database backup: ${{ needs.backup-database.result }}
+            - Application backup: ${{ needs.backup-application.result }}
+            - Configuration backup: ${{ needs.backup-config.result }}
+            - Verification: ${{ needs.verify-backup.result }}
+            
+            **Next Backup:** Tomorrow at 2:00 AM UTC
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Cleanup old backups
+  cleanup-backups:
+    name: Cleanup Old Backups
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List old releases
+        run: |
+          # List releases older than 30 days
+          OLD_RELEASES=$(gh release list --limit 100 --json createdAt,id --jq '.[] | select(.createdAt < (now - 2592000)) | .id')
+          
+          if [ -n "$OLD_RELEASES" ]; then
+            echo "Found old releases to cleanup:"
+            echo "$OLD_RELEASES"
+            
+            # Delete old releases (uncomment to enable)
+            # echo "$OLD_RELEASES" | xargs -I {} gh release delete {} --yes
+          else
+            echo "No old releases found"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Backup monitoring
+  monitor-backups:
+    name: Monitor Backup Health
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check backup frequency
+        run: |
+          # Check if backups are being created regularly
+          LAST_BACKUP=$(gh release list --limit 1 --json createdAt --jq '.[0].createdAt')
+          CURRENT_TIME=$(date -u +%s)
+          LAST_BACKUP_TIME=$(date -d "$LAST_BACKUP" +%s)
+          TIME_DIFF=$((CURRENT_TIME - LAST_BACKUP_TIME))
+          
+          # Alert if no backup in last 25 hours
+          if [ $TIME_DIFF -gt 90000 ]; then
+            echo "⚠️ Warning: No backup created in the last 25 hours"
+            echo "Last backup: $LAST_BACKUP"
+            echo "Current time: $(date -u)"
+          else
+            echo "✅ Backups are being created regularly"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check backup size
+        run: |
+          # Check if backup size is reasonable
+          LATEST_BACKUP_SIZE=$(gh release list --limit 1 --json assets --jq '.[0].assets[0].size')
+          
+          # Alert if backup is too small (less than 1MB) or too large (more than 1GB)
+          if [ "$LATEST_BACKUP_SIZE" -lt 1048576 ]; then
+            echo "⚠️ Warning: Backup size is unusually small: $LATEST_BACKUP_SIZE bytes"
+          elif [ "$LATEST_BACKUP_SIZE" -gt 1073741824 ]; then
+            echo "⚠️ Warning: Backup size is unusually large: $LATEST_BACKUP_SIZE bytes"
+          else
+            echo "✅ Backup size is within normal range: $LATEST_BACKUP_SIZE bytes"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

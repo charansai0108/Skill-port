@@ -1,0 +1,817 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .hero-card {
+    @apply bg-white backdrop-blur-xl border border-gray-200 shadow-lg transition-all duration-300 ease-in-out;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .hero-card:hover {
+    @apply bg-white shadow-xl;
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+  
+  .feature-card {
+    @apply bg-white backdrop-blur-xl border border-gray-200 shadow-lg transition-all duration-300 ease-in-out;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .feature-card:hover {
+    @apply bg-white shadow-xl -translate-y-1;
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+
+  .form-input {
+    @apply bg-white border border-gray-300 transition-all duration-200 ease-in-out;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .form-input:focus {
+    @apply bg-white border-red-500 shadow-sm ring-2 ring-red-100;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-red-600 to-red-700 text-white transition-all duration-300 ease-in-out;
+  }
+  
+  .btn-primary:hover {
+    @apply from-red-700 to-red-800 -translate-y-0.5 shadow-lg;
+  }
+
+  /* Login Page Styles */
+  .auth-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .auth-card:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+  }
+  
+  .form-input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.2s ease;
+  }
+  
+  .form-input:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  }
+  
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    color: #64748b;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    transform: translateY(-2px);
+  }
+  
+  .password-toggle {
+    transition: all 0.2s ease;
+  }
+  
+  .password-toggle:hover {
+    background: rgba(239, 68, 68, 0.1);
+    transform: scale(1.05);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Role Selection Styles */
+  .role-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .role-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+  }
+  
+  .form-container { 
+    display: none; 
+  }
+  
+  .form-container.show { 
+    display: block !important; 
+    animation: slideInUp 0.3s ease-out;
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Success Card Styles */
+  .success-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+  
+  .feature-item {
+    transition: all 0.3s ease;
+  }
+  
+  .feature-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Password Strength Styles */
+  .strength-bar {
+    background: rgba(226, 232, 240, 0.5);
+    backdrop-filter: blur(5px);
+  }
+  
+  .strength-fill {
+    transition: all 0.3s ease;
+  }
+
+  /* Error Card Styles */
+  .error-card {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  
+  .btn-secondary:hover {
+    @apply bg-white border-red-300 text-red-600 -translate-y-0.5;
+  }
+
+  /* Admin Dashboard Styles */
+  .nav-link {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .stat-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.65);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .dashboard-card {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-card:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .action-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.65);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .action-card:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .btn-hover {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(10px);
+  }
+  
+  .btn-hover:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .page-content {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Admin Users Page Styles */
+  .user-card {
+    @apply transition-all duration-200 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .user-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .action-button {
+    @apply transition-all duration-200 ease-in-out;
+    backdrop-filter: blur(10px);
+  }
+  
+  .action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+  }
+
+  .filter-card {
+    @apply transition-all duration-200 ease-in-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .filter-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  }
+
+  .form-input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .mobile-menu {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .mobile-menu.open {
+    transform: translateX(0);
+  }
+
+  /* Better mobile touch targets */
+  @media (max-width: 768px) {
+    .mobile-touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Staggered animation delays for user cards */
+  .user-card:nth-child(1) { animation-delay: 0.05s; }
+  .user-card:nth-child(2) { animation-delay: 0.1s; }
+  .user-card:nth-child(3) { animation-delay: 0.15s; }
+  .user-card:nth-child(4) { animation-delay: 0.2s; }
+  .user-card:nth-child(5) { animation-delay: 0.25s; }
+
+  /* Admin Mentors Page Styles */
+  .mentor-card {
+    @apply transition-all duration-200 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .mentor-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .stat-card {
+    @apply transition-all duration-200 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .stat-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .glass-button {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(10px);
+  }
+
+  .glass-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+
+  /* Staggered animation delays for stat cards */
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.1s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+  /* Admin Contests Page Styles */
+  .contest-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.6s ease-out;
+    border-radius: 0.75rem;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .contest-card:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .contest-card .flex.gap-3 {
+    margin-top: auto;
+  }
+
+  /* Contest card hover effects - SAME border style as form inputs */
+  .contest-card {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .contest-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Stats cards hover effects - SAME border style as form inputs */
+  .stat-card {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Enhanced form input hover effects - EXACT same as admin-dashboard */
+  .form-input {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .form-input:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .form-input:focus {
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  /* Enhanced modal hover effects */
+  .modal-content {
+    @apply transition-all duration-300 ease-in-out;
+    border: 2px solid transparent;
+  }
+  
+  .modal-content:hover {
+    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  }
+
+  /* Hide scrollbar */
+  .modal-content::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .modal-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Dropdown options background styling */
+  select option {
+    background-color: #f8fafc;
+    color: #1e293b;
+    padding: 8px 12px;
+  }
+  
+  select option:hover {
+    background-color: #e2e8f0;
+  }
+  
+  select option:checked {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  /* Mobile menu */
+  .mobile-menu {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .mobile-menu.open {
+    transform: translateX(0);
+  }
+
+  /* Better mobile touch targets */
+  @media (max-width: 768px) {
+    .mobile-touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Admin Analytics Page Styles */
+  .analytics-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .analytics-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Analytics card hover effects - SAME border style as contest page */
+  .analytics-card {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .analytics-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Chart container hover effects */
+  .chart-container {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .chart-container:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Admin Leaderboard Page Styles */
+  .leaderboard-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .leaderboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Enhanced card hover effects - SAME border style as other admin pages */
+  .leaderboard-card {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .leaderboard-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Filter sidebar hover effects */
+  .filter-card {
+    @apply transition-all duration-200 ease-in-out;
+    border: 3px solid transparent !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .filter-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Enhanced table row hover effects */
+  .leaderboard-row {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .leaderboard-row:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: scale(1.01);
+  }
+
+  /* Enhanced button hover effects */
+  .action-button {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .action-button:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Glassy button effects */
+  .glass-btn {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(10px);
+  }
+  
+  .glass-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Top Performers podium cards hover effects - SAME as admin-dashboard */
+  .podium-card {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .podium-card:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  /* Enhanced minimal glassy stat cards - same as admin-dashboard */
+  .stat-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.65);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 8px 24px rgba(31, 38, 135, 0.2);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  /* Admin Profile Page Styles */
+  .nav-item {
+    @apply transition-all duration-300 ease-in-out;
+    border-radius: 12px;
+  }
+  
+  .nav-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateX(4px);
+  }
+  
+  .nav-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-left: 4px solid #3b82f6;
+    color: #1d4ed8;
+  }
+  
+  /* Content section animations */
+  .content-section {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Form input styling */
+  .form-input {
+    @apply transition-all duration-200 ease-in-out;
+    border: 2px solid transparent;
+  }
+  
+  .form-input:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  /* Button hover effects */
+  .btn-primary {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Profile image hover effect */
+  .profile-image-container:hover .profile-image-overlay {
+    opacity: 1;
+  }
+  
+  .profile-image-overlay {
+    @apply transition-opacity duration-300 ease-in-out;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.5; 
+  }
+}
+
+/* Mentor Contest Manage Styles */
+.modal-bg {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.nav-link {
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(249, 115, 22, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px);
+}
+
+.dashboard-card {
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(31, 38, 135, 0.15);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.btn-hover {
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(10px);
+}
+
+.btn-hover:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.glass-btn {
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(10px);
+}
+
+.glass-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
+}
+
+.table-row-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.table-row-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.page-content {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

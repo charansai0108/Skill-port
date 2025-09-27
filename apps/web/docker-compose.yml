@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:13
+    container_name: skillport-postgres
+    environment:
+      POSTGRES_DB: skillport_db
+      POSTGRES_USER: skillport_user
+      POSTGRES_PASSWORD: skillport_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillport_user -d skillport_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: skillport-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SkillPort Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: skillport-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://skillport_user:skillport_password@postgres:5432/skillport_db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your-super-secure-jwt-secret-key-here
+      - JWT_EXPIRES_IN=24h
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_USER=your-email@gmail.com
+      - EMAIL_PASS=your-app-password
+      - EMAIL_FROM=noreply@skillport.com
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
+      - RAZORPAY_KEY_ID=your-razorpay-key-id
+      - RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=your-razorpay-public-key-id
+      - NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+      - SENTRY_DSN=your-sentry-dsn
+      - SENTRY_ORG=your-sentry-org
+      - SENTRY_PROJECT=skillport-web
+      - RATE_LIMIT_MAX=100
+      - RATE_LIMIT_WINDOW_MS=900000
+      - NEXTAUTH_SECRET=your-nextauth-secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - MAX_FILE_SIZE=5242880
+      - ALLOWED_FILE_TYPES=image/jpeg,image/png,image/gif,application/pdf
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: skillport-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  # Database Migration Service
+  migrate:
+    image: node:18-alpine
+    container_name: skillport-migrate
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://skillport_user:skillport_password@postgres:5432/skillport_db
+    command: >
+      sh -c "
+        npm install &&
+        npx prisma generate &&
+        npx prisma db push &&
+        npm run db:seed &&
+        npm run db:seed:admin
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  postgres_data:
+  redis_data:

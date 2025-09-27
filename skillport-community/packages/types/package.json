@@ -1,0 +1,22 @@
+{
+  "name": "@skillport/types",
+  "version": "2.0.0",
+  "description": "Shared TypeScript type definitions for SkillPort Community",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@skillport/hooks",
+  "version": "2.0.0",
+  "description": "Shared React hooks for SkillPort Community",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

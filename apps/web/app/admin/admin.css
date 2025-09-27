@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .nav-link:hover {
+    @apply bg-white/90 border-blue-300 shadow-lg -translate-y-0.5;
+  }
+  
+  .stat-card {
+    @apply transition-all duration-300 ease-in-out;
+    animation: fadeInUp 0.3s ease-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.65);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card:hover {
+    @apply bg-white/85 border-blue-400 shadow-xl;
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .dashboard-card {
+    @apply transition-all duration-300 ease-in-out;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-card:hover {
+    @apply bg-white/90 border-white/40 shadow-xl;
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

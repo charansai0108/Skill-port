@@ -1,0 +1,27 @@
+{
+  "name": "@skillport/extension",
+  "version": "2.0.0",
+  "description": "SkillPort Community Browser Extension",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.251",
+    "eslint": "^8.0.0",
+    "jest": "^29.7.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

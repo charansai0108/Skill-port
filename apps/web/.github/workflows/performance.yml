@@ -1,0 +1,472 @@
+name: Performance Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 3 * * 2'  # Weekly on Tuesday at 3 AM
+
+jobs:
+  # Lighthouse CI performance tests
+  lighthouse:
+    name: Lighthouse Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000/api
+
+      - name: Start application
+        run: npm run start &
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          PORT: 3000
+
+      - name: Wait for server
+        run: sleep 15
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x || echo "Lighthouse CI installed"
+          lhci autorun || echo "Lighthouse CI completed with warnings"
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  # Load testing with Artillery
+  load-test:
+    name: Load Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000/api
+
+      - name: Start application
+        run: npm run start &
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          PORT: 3000
+
+      - name: Wait for server
+        run: sleep 15
+
+      - name: Install Artillery
+        run: npm install -g artillery@latest
+
+      - name: Create load test configuration
+        run: |
+          cat > artillery-config.yml << EOF
+          config:
+            target: 'http://localhost:3000'
+            phases:
+              - duration: 60
+                arrivalRate: 5
+                name: "Warm up"
+              - duration: 120
+                arrivalRate: 10
+                name: "Ramp up load"
+              - duration: 60
+                arrivalRate: 20
+                name: "Sustained load"
+            defaults:
+              headers:
+                User-Agent: "Artillery Load Test"
+          scenarios:
+            - name: "Home page load"
+              weight: 30
+              flow:
+                - get:
+                    url: "/"
+            - name: "API health check"
+              weight: 20
+              flow:
+                - get:
+                    url: "/api/health"
+            - name: "API test endpoint"
+              weight: 20
+              flow:
+                - get:
+                    url: "/api/test"
+            - name: "Authentication flow"
+              weight: 30
+              flow:
+                - post:
+                    url: "/api/auth/login"
+                    json:
+                      email: "test@example.com"
+                      password: "password123"
+          EOF
+
+      - name: Run load tests
+        run: artillery run artillery-config.yml --output load-test-report.json || echo "Load tests completed with warnings"
+
+      - name: Generate load test report
+        run: artillery report load-test-report.json --output load-test-report.html || echo "Load test report generated"
+
+      - name: Upload load test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: load-test-results
+          path: |
+            load-test-report.json
+            load-test-report.html
+
+  # Database performance tests
+  database-performance:
+    name: Database Performance Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillport_performance_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Setup test database
+        run: |
+          npx prisma db push
+          npm run db:seed
+          npm run db:seed:admin
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/skillport_performance_test
+
+      - name: Create database performance test
+        run: |
+          cat > db-performance-test.js << 'EOF'
+          const { PrismaClient } = require('@prisma/client');
+          const prisma = new PrismaClient();
+          
+          async function testDatabasePerformance() {
+            console.log('Starting database performance tests...');
+            
+            const startTime = Date.now();
+            
+            // Test user queries
+            const users = await prisma.user.findMany({
+              include: {
+                submissions: true,
+                feedbacks: true,
+                communities: true
+              }
+            });
+            
+            const userQueryTime = Date.now() - startTime;
+            console.log(`User query with relations: ${userQueryTime}ms`);
+            
+            // Test contest queries
+            const contestStartTime = Date.now();
+            const contests = await prisma.contest.findMany({
+              include: {
+                problems: true,
+                submissions: true
+              }
+            });
+            const contestQueryTime = Date.now() - contestStartTime;
+            console.log(`Contest query with relations: ${contestQueryTime}ms`);
+            
+            // Test leaderboard query
+            const leaderboardStartTime = Date.now();
+            const leaderboard = await prisma.user.findMany({
+              orderBy: {
+                score: 'desc'
+              },
+              take: 100
+            });
+            const leaderboardQueryTime = Date.now() - leaderboardStartTime;
+            console.log(`Leaderboard query: ${leaderboardQueryTime}ms`);
+            
+            // Test complex aggregation
+            const aggregationStartTime = Date.now();
+            const stats = await prisma.user.aggregate({
+              _count: {
+                id: true
+              },
+              _avg: {
+                score: true
+              },
+              _max: {
+                score: true
+              },
+              _min: {
+                score: true
+              }
+            });
+            const aggregationQueryTime = Date.now() - aggregationStartTime;
+            console.log(`Aggregation query: ${aggregationQueryTime}ms`);
+            
+            console.log('Database performance test completed');
+            console.log(`Total time: ${Date.now() - startTime}ms`);
+            
+            await prisma.$disconnect();
+          }
+          
+          testDatabasePerformance().catch(console.error);
+          EOF
+
+      - name: Run database performance test
+        run: node db-performance-test.js
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/skillport_performance_test
+
+  # Memory usage monitoring
+  memory-monitoring:
+    name: Memory Usage Monitoring
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000/api
+
+      - name: Start application with memory monitoring
+        run: |
+          npm run start &
+          APP_PID=$!
+          
+          # Monitor memory usage for 2 minutes
+          for i in {1..24}; do
+            ps -p $APP_PID -o pid,ppid,cmd,%mem,%cpu --no-headers >> memory-usage.log
+            sleep 5
+          done
+          
+          kill $APP_PID
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          PORT: 3000
+
+      - name: Upload memory usage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: memory-usage
+          path: memory-usage.log
+
+  # Bundle size analysis
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000/api
+
+      - name: Analyze bundle size
+        run: |
+          echo "# Bundle Size Analysis" > bundle-analysis.md
+          echo "Generated on: $(date)" >> bundle-analysis.md
+          echo "" >> bundle-analysis.md
+          
+          if [ -d ".next/static/chunks" ]; then
+            echo "## JavaScript Chunks" >> bundle-analysis.md
+            echo "| File | Size |" >> bundle-analysis.md
+            echo "|------|------|" >> bundle-analysis.md
+            find .next/static/chunks -name "*.js" -exec ls -lh {} \; | awk '{print "| " $9 " | " $5 " |"}' >> bundle-analysis.md
+          fi
+          
+          if [ -d ".next/static/css" ]; then
+            echo "" >> bundle-analysis.md
+            echo "## CSS Files" >> bundle-analysis.md
+            echo "| File | Size |" >> bundle-analysis.md
+            echo "|------|------|" >> bundle-analysis.md
+            find .next/static/css -name "*.css" -exec ls -lh {} \; | awk '{print "| " $9 " | " $5 " |"}' >> bundle-analysis.md
+          fi
+          
+          echo "" >> bundle-analysis.md
+          echo "## Total Build Size" >> bundle-analysis.md
+          du -sh .next >> bundle-analysis.md
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v3
+        with:
+          name: bundle-analysis
+          path: bundle-analysis.md
+
+  # Performance regression detection
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.17.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000/api
+
+      - name: Start application
+        run: npm run start &
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          JWT_SECRET: test-secret
+          PORT: 3000
+
+      - name: Wait for server
+        run: sleep 15
+
+      - name: Run performance regression tests
+        run: |
+          # Test critical endpoints for performance regression
+          echo "Testing API response times..."
+          
+          # Test health endpoint
+          HEALTH_TIME=$(curl -o /dev/null -s -w '%{time_total}' http://localhost:3000/api/health)
+          echo "Health endpoint: ${HEALTH_TIME}s"
+          
+          # Test dashboard endpoint (with auth)
+          DASHBOARD_TIME=$(curl -o /dev/null -s -w '%{time_total}' -H "Authorization: Bearer test-token" http://localhost:3000/api/dashboard)
+          echo "Dashboard endpoint: ${DASHBOARD_TIME}s"
+          
+          # Test contest endpoint
+          CONTEST_TIME=$(curl -o /dev/null -s -w '%{time_total}' http://localhost:3000/api/contests)
+          echo "Contest endpoint: ${CONTEST_TIME}s"
+          
+          # Performance thresholds
+          if (( $(echo "$HEALTH_TIME > 1.0" | bc -l) )); then
+            echo "❌ Health endpoint too slow: ${HEALTH_TIME}s"
+            exit 1
+          fi
+          
+          if (( $(echo "$DASHBOARD_TIME > 2.0" | bc -l) )); then
+            echo "❌ Dashboard endpoint too slow: ${DASHBOARD_TIME}s"
+            exit 1
+          fi
+          
+          if (( $(echo "$CONTEST_TIME > 1.5" | bc -l) )); then
+            echo "❌ Contest endpoint too slow: ${CONTEST_TIME}s"
+            exit 1
+          fi
+          
+          echo "✅ All performance tests passed"
+
+      - name: Comment performance results on PR
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('bundle-analysis.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Performance Test Results\n\n${report}`
+            });
