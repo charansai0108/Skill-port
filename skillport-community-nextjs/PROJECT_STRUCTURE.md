@@ -5,7 +5,49 @@
 This document provides a comprehensive overview of the SkillPort Community project structure, including all directories, files, and their purposes.
 
 ```plaintext
-skillport-community-nextjs/
+skillport-community/                        → Root project directory
+├── 📁 .github/                            → GitHub Actions CI/CD workflows (Root)
+│   └── workflows/
+│       ├── ci-cd.yml                      → Main CI/CD pipeline
+│       ├── deploy.yml                     → Deployment automation
+│       └── tests.yml                      → Test automation
+│
+├── 📁 .vscode/                            → VS Code workspace settings
+│   └── settings.json                      → VS Code configuration
+│
+├── 📁 SKILL-EXTENSION/                    → Browser Extension (Legacy)
+│   ├── 📁 background/                     → Extension background scripts
+│   │   └── background.js                  → Background service worker
+│   ├── 📁 content_scripts/               → Content scripts for platforms
+│   │   ├── gfg.js                         → GeeksforGeeks integration
+│   │   ├── hackerrank.js                  → HackerRank integration
+│   │   ├── interviewbit.js                → InterviewBit integration
+│   │   └── leetcode.js                    → LeetCode integration
+│   ├── 📁 popup/                         → Extension popup interface
+│   ├── manifest.json                      → Extension manifest
+│   ├── package.json                       → Extension dependencies
+│   ├── package-lock.json                  → Dependency lock file
+│   └── server.js                          → Extension server
+│
+├── 📁 SKILL-EXTENSION-NEW/                → Browser Extension (Updated)
+│   ├── 📁 popup/                          → Extension popup interface
+│   │   ├── popup.css                      → Popup styles
+│   │   ├── popup.html                     → Popup HTML
+│   │   └── popup.js                       → Popup functionality
+│   ├── 📁 public/                         → Extension static assets
+│   │   └── icon16.png                     → Extension icon
+│   ├── 📁 scripts/                        → Extension scripts
+│   │   ├── background.js                  → Background service worker
+│   │   └── 📁 content/                    → Content scripts
+│   │       ├── gfg.js                     → GeeksforGeeks integration
+│   │       ├── hackerrank.js              → HackerRank integration
+│   │       ├── interviewbit.js            → InterviewBit integration
+│   │       └── leetcode.js                → LeetCode integration
+│   ├── manifest.json                      → Extension manifest
+│   ├── package.json                       → Extension dependencies
+│   └── server.js                          → Extension server
+│
+├── 📁 skillport-community-nextjs/        → Main Next.js Application
 ├── 📁 .github/                          → GitHub Actions CI/CD workflows
 │   └── workflows/
 │       ├── backup.yml                   → Daily database backup automation
@@ -295,31 +337,28 @@ skillport-community-nextjs/
 
 ## 🏗️ Architecture Overview
 
-### **Frontend (Next.js 15 App Router)**
-- **`app/`**: Next.js App Router pages and layouts
-- **`components/`**: Reusable React components
-- **`lib/`**: Utility functions and custom hooks
+### **Main Application (Next.js 15)**
+- **`skillport-community-nextjs/`**: Complete web application
+- **Frontend**: Next.js App Router pages and layouts
+- **Backend**: RESTful API endpoints and database
+- **Components**: Reusable React components
 
-### **Backend (API Routes)**
-- **`app/api/`**: RESTful API endpoints
-- **`lib/`**: Server-side utilities and middleware
-- **`prisma/`**: Database schema and migrations
+### **Browser Extensions**
+- **`SKILL-EXTENSION/`**: Legacy browser extension
+- **`SKILL-EXTENSION-NEW/`**: Updated browser extension
+- **Platform Integration**: LeetCode, HackerRank, GeeksforGeeks, InterviewBit
+- **Data Sync**: Real-time submission tracking
 
-### **Configuration & Deployment**
-- **`.github/workflows/`**: CI/CD automation
-- **`Dockerfile`**: Container configuration
-- **`docker-compose.yml`**: Multi-service setup
-- **`nginx.conf`**: Reverse proxy configuration
+### **Development & Deployment**
+- **`.github/workflows/`**: CI/CD automation (both root and app level)
+- **`.vscode/`**: VS Code workspace configuration
+- **Docker**: Container configuration and deployment
+- **Testing**: Jest test suites and quality assurance
 
-### **Testing & Quality**
-- **`__tests__/`**: Jest test files
-- **`eslint.config.mjs`**: Code linting
-- **`jest.config.js`**: Test configuration
-
-### **Documentation**
-- **`*.md`**: Comprehensive project documentation
-- **API Documentation**: Role-specific API guides
-- **Migration Guides**: Production deployment instructions
+### **Project Structure**
+- **Root Level**: Browser extensions, CI/CD, workspace settings
+- **Application Level**: Next.js app with complete backend/frontend
+- **Documentation**: Comprehensive guides and API documentation
 
 ## 🎯 Key Features
 
@@ -329,10 +368,16 @@ skillport-community-nextjs/
 - **Student**: Learning and contest participation
 - **Personal**: Individual learning tracking
 
+### **Browser Extension Integration**
+- **Legacy Extension**: `SKILL-EXTENSION/` with basic functionality
+- **Updated Extension**: `SKILL-EXTENSION-NEW/` with enhanced features
+- **Platform Support**: LeetCode, HackerRank, GeeksforGeeks, InterviewBit
+- **Real-Time Sync**: Automatic submission tracking and data synchronization
+
 ### **Real-Time Features**
 - **WebSocket Integration**: Live leaderboards and chat
-- **Browser Extension**: External platform tracking
-- **Notifications**: Real-time updates
+- **Extension Data Flow**: Browser extension to web application
+- **Notifications**: Real-time updates and alerts
 
 ### **Payment & Subscriptions**
 - **Razorpay Integration**: Payment processing
