@@ -60,7 +60,7 @@ export async function comparePassword(password: string, hashedPassword: string):
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(user: AdminUser | StudentUser, userType: 'admin' | 'student'): string {
+export function generateToken(user: AdminUser | StudentUser, userType: string): string {
   const payload = userType === 'admin' ? { admin: user } : { student: user }
   return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
 }
@@ -75,15 +75,19 @@ export function verifyToken(token: string): AuthToken | null {
 
 export async function authenticateAdmin(email: string, password: string): Promise<AdminUser | null> {
   try {
-    const admin = await prisma.admin.findUnique({
-      where: { email, isActive: true }
+    const admin = await prisma.admin.findFirst({
+      where: { 
+        user: { email },
+        isActive: true 
+      },
+      include: { user: true }
     })
 
     if (!admin) {
       return null
     }
 
-    const isValidPassword = await verifyPassword(password, admin.password)
+    const isValidPassword = await verifyPassword(password, admin.user.password)
     if (!isValidPassword) {
       return null
     }
@@ -95,11 +99,11 @@ export async function authenticateAdmin(email: string, password: string): Promis
     })
 
     return {
-      id: admin.id,
-      name: admin.name,
-      email: admin.email,
-      role: admin.role,
-      profilePic: admin.profilePic || undefined
+      id: admin.user.id,
+      name: admin.user.name,
+      email: admin.user.email,
+      role: admin.user.role,
+      profilePic: admin.user.profilePic || undefined
     }
   } catch (error) {
     console.error('Authentication error:', error)
@@ -128,8 +132,12 @@ export async function getCurrentAdmin(request: NextRequest): Promise<AdminUser |
 
   // Verify admin still exists and is active
   try {
-    const admin = await prisma.admin.findUnique({
-      where: { id: decoded.admin.id, isActive: true }
+    const admin = await prisma.admin.findFirst({
+      where: { 
+        userId: decoded.admin.id, 
+        isActive: true 
+      },
+      include: { user: true }
     })
 
     if (!admin) {
@@ -146,7 +154,7 @@ export async function getCurrentAdmin(request: NextRequest): Promise<AdminUser |
 export async function authenticateStudent(email: string, password: string): Promise<StudentUser | null> {
   try {
     const user = await prisma.user.findUnique({
-      where: { email, status: 'ACTIVE' }
+      where: { email }
     })
 
     if (!user) {
@@ -162,9 +170,7 @@ export async function authenticateStudent(email: string, password: string): Prom
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      profilePic: user.profilePic || undefined,
-      batchId: user.batchId || undefined
+      role: user.role as any
     }
   } catch (error) {
     console.error('Student authentication error:', error)
@@ -183,10 +189,10 @@ export async function getCurrentStudent(request: NextRequest): Promise<StudentUs
     return null
   }
 
-  // Verify student still exists and is active
+  // Verify student still exists
   try {
     const user = await prisma.user.findUnique({
-      where: { id: decoded.student.id, status: 'ACTIVE' }
+      where: { id: decoded.student.id }
     })
 
     if (!user) {
@@ -196,6 +202,46 @@ export async function getCurrentStudent(request: NextRequest): Promise<StudentUs
     return decoded.student
   } catch (error) {
     console.error('Error verifying student:', error)
+    return null
+  }
+}
+
+export async function getCurrentUser(request: NextRequest): Promise<StudentUser | null> {
+  const token = getTokenFromRequest(request)
+  if (!token) {
+    return null
+  }
+
+  const decoded = verifyToken(token)
+  if (!decoded) {
+    return null
+  }
+
+  // Check for both admin and student tokens
+  const userData = decoded.admin || decoded.student
+  if (!userData) {
+    return null
+  }
+
+  // Verify user still exists
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userData.id }
+    })
+
+    if (!user) {
+      return null
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role as any,
+      profilePic: user.profilePic || undefined
+    }
+  } catch (error) {
+    console.error('Error verifying user:', error)
     return null
   }
 }

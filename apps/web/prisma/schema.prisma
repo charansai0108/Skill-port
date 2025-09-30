@@ -1,4 +1,4 @@
-// Simple schema for testing
+// Production-ready schema for SkillPort Community
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,27 +8,264 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  STUDENT
+  MENTOR
+  ADMIN
+  COMMUNITY_ADMIN
+  PERSONAL
+}
+
+enum ContestStatus {
+  UPCOMING
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum SubmissionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVIEWING
+}
+
+enum FeedbackStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
-  role      String   @default("STUDENT")
+  role      UserRole @default(STUDENT)
+  profilePic String?
+  bio       String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  emailVerified Boolean @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  submissions     Submission[]
+  mentorFeedbacks Feedback[] @relation("MentorFeedbacks")
+  studentFeedbacks Feedback[] @relation("StudentFeedbacks")
+  contests        Contest[]
+  communities     Community[]
+  communityMembers CommunityMember[]
+  contestParticipants ContestParticipant[]
+  activityLogs    ActivityLog[]
+  tasks           Task[]
+  projects        Project[]
+  notifications   Notification[]
 
   @@map("users")
 }
 
-model Task {
+model Contest {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  status      ContestStatus @default(UPCOMING)
+  maxParticipants Int?
+  rules       String?
+  prizes      String?
+  createdById String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  creator       User           @relation(fields: [createdById], references: [id])
+  submissions   Submission[]
+  participants  ContestParticipant[]
+
+  @@map("contests")
+}
+
+model Submission {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  code        String?
+  platform    String
+  difficulty  String
+  status      SubmissionStatus @default(PENDING)
+  score       Int?
+  accuracy    Float?
+  userId      String
+  contestId   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id])
+  contest Contest? @relation(fields: [contestId], references: [id])
+  feedbacks Feedback[]
+
+  @@map("submissions")
+}
+
+model Feedback {
+  id          String         @id @default(cuid())
+  content     String
+  rating      Int
+  status      FeedbackStatus @default(PENDING)
+  mentorId    String
+  studentId   String
+  submissionId String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  mentor     User       @relation("MentorFeedbacks", fields: [mentorId], references: [id])
+  student    User       @relation("StudentFeedbacks", fields: [studentId], references: [id])
+  submission Submission? @relation(fields: [submissionId], references: [id])
+
+  @@map("feedbacks")
+}
+
+model ContestParticipant {
+  id        String   @id @default(cuid())
+  userId    String
+  contestId String
+  score     Int      @default(0)
+  rank      Int?
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  contest Contest @relation(fields: [contestId], references: [id])
+
+  @@unique([userId, contestId])
+  @@map("contest_participants")
+}
+
+model Community {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  type        String
+  isPublic    Boolean  @default(true)
+  adminId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  admin    User              @relation(fields: [adminId], references: [id])
+  members  CommunityMember[]
+  events   CommunityEvent[]
+
+  @@map("communities")
+}
+
+model CommunityMember {
   id          String   @id @default(cuid())
   userId      String
+  communityId String
+  role        String   @default("MEMBER")
+  joinedAt    DateTime @default(now())
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id])
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@unique([userId, communityId])
+  @@map("community_members")
+}
+
+model CommunityEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  communityId String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@map("community_events")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
   description String
   platform    String
   difficulty  String
   completed   Boolean  @default(false)
+  userId      String
+  dueDate     DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
   @@map("tasks")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String   @default("IN_PROGRESS")
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("projects")
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("activity_logs")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String   // 'VERIFICATION' or 'RESET'
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("otps")
 }

@@ -51,33 +51,68 @@ export default function RegisterPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const userData = {
-      role: 'personal',
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
-      username: formData.get('username'),
+      name: `${formData.get('firstName')} ${formData.get('lastName')}`,
       email: formData.get('email'),
       password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword'),
-      skillLevel: formData.get('skillLevel'),
-      educationLevel: formData.get('educationLevel'),
-      fieldOfStudy: formData.get('fieldOfStudy'),
-      bio: formData.get('bio'),
-      agreeTerms: formData.get('agreeTerms')
+      role: 'PERSONAL',
+      phone: '',
+      bio: formData.get('bio') as string || ''
     }
 
-    if (userData.password !== userData.confirmPassword) {
+    if (userData.password !== formData.get('confirmPassword')) {
       showAlert('Passwords do not match!', 'error')
       return
     }
 
     try {
-      // Simulate API call
-      showAlert('🎉 Registration successful! Please check your email for OTP verification.', 'success')
-      setTimeout(() => {
-        showOTPForm(userData.email as string)
-      }, 1500)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        showAlert('🎉 Registration successful! Redirecting to your dashboard...', 'success')
+        setTimeout(() => {
+          // Determine redirect URL based on user role
+          let redirectUrl: string = '/personal/dashboard'
+          switch (userData.role) {
+            case 'ADMIN':
+              redirectUrl = '/admin/dashboard'
+              break
+            case 'MENTOR':
+              redirectUrl = '/mentor/dashboard'
+              break
+            case 'STUDENT':
+              redirectUrl = '/student/dashboard'
+              break
+            case 'COMMUNITY_ADMIN':
+              redirectUrl = '/community/dashboard'
+              break
+            case 'PERSONAL':
+            default:
+              redirectUrl = '/personal/dashboard'
+              break
+          }
+          
+          try {
+            router.push(redirectUrl)
+          } catch (error) {
+            console.error('Redirect error:', error)
+            // Fallback to window.location if router.push fails
+            window.location.href = redirectUrl
+          }
+        }, 2000)
+      } else {
+        showAlert(result.message || result.error || 'Registration failed', 'error')
+      }
     } catch (error) {
-      showAlert('Registration failed: ' + (error as Error).message, 'error')
+      console.error('Registration error:', error)
+      showAlert('Registration failed. Please try again.', 'error')
     }
   }
 
@@ -85,34 +120,68 @@ export default function RegisterPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const userData = {
-      role: 'community',
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
-      username: formData.get('username'),
+      name: `${formData.get('firstName')} ${formData.get('lastName')}`,
       email: formData.get('email'),
       password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword'),
-      organizationName: formData.get('organizationName'),
-      organizationType: formData.get('organizationType'),
-      organizationSize: formData.get('organizationSize'),
-      position: formData.get('position'),
-      organizationWebsite: formData.get('organizationWebsite'),
-      agreeTerms: formData.get('agreeTerms')
+      role: 'MENTOR',
+      phone: '',
+      bio: `Organization: ${formData.get('organizationName')}, Position: ${formData.get('position')}`
     }
 
-    if (userData.password !== userData.confirmPassword) {
+    if (userData.password !== formData.get('confirmPassword')) {
       showAlert('Passwords do not match!', 'error')
       return
     }
 
     try {
-      // Simulate API call
-      showAlert('🎉 Registration successful! Please check your email for OTP verification.', 'success')
-      setTimeout(() => {
-        showOTPForm(userData.email as string)
-      }, 1500)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        showAlert('🎉 Registration successful! Redirecting to your dashboard...', 'success')
+        setTimeout(() => {
+          // Determine redirect URL based on user role
+          let redirectUrl: string = '/personal/dashboard'
+          switch (userData.role) {
+            case 'ADMIN':
+              redirectUrl = '/admin/dashboard'
+              break
+            case 'MENTOR':
+              redirectUrl = '/mentor/dashboard'
+              break
+            case 'STUDENT':
+              redirectUrl = '/student/dashboard'
+              break
+            case 'COMMUNITY_ADMIN':
+              redirectUrl = '/community/dashboard'
+              break
+            case 'PERSONAL':
+            default:
+              redirectUrl = '/personal/dashboard'
+              break
+          }
+          
+          try {
+            router.push(redirectUrl)
+          } catch (error) {
+            console.error('Redirect error:', error)
+            // Fallback to window.location if router.push fails
+            window.location.href = redirectUrl
+          }
+        }, 2000)
+      } else {
+        showAlert(result.message || result.error || 'Registration failed', 'error')
+      }
     } catch (error) {
-      showAlert('Registration failed: ' + (error as Error).message, 'error')
+      console.error('Registration error:', error)
+      showAlert('Registration failed. Please try again.', 'error')
     }
   }
 

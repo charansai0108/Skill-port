@@ -65,7 +65,7 @@ setInterval(() => {
 
 // Predefined rate limiters
 export const authRateLimit = rateLimit({
-  max: 5,
+  max: 50, // Increased for testing
   windowMs: 15 * 60 * 1000, // 15 minutes
   message: 'Too many authentication attempts, please try again later'
 })

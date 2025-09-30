@@ -32,7 +32,7 @@ export const passwordSchema = z.string()
 export const nameSchema = z.string()
   .min(2, 'Name must be at least 2 characters')
   .max(100, 'Name too long')
-  .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
+  .regex(/^[a-zA-Z0-9\s]+$/, 'Name can only contain letters, numbers and spaces')
   .transform(sanitizeText)
 
 export const phoneSchema = z.string()
@@ -46,16 +46,7 @@ export const registerSchema = z.object({
   name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
-  confirmPassword: z.string(),
-  role: z.enum(['STUDENT', 'MENTOR', 'ADMIN']).optional().default('STUDENT'),
-  phone: phoneSchema.optional(),
-  bio: z.string()
-    .max(500, 'Bio too long')
-    .optional()
-    .transform(val => val ? sanitizeHtml(val) : '')
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+  role: z.enum(['STUDENT', 'MENTOR', 'ADMIN', 'PERSONAL']).optional().default('STUDENT')
 })
 
 // User login validation
@@ -147,7 +138,7 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { succe
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        errors: error.errors.map(err => `${err.path.join('.')}: ${err.message}`)
+        errors: error.errors?.map(err => `${err.path.join('.')}: ${err.message}`) || ['Validation failed']
       }
     }
     return {

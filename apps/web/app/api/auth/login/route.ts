@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticateStudentWithVerification, generateToken } from '@/lib/auth'
+import { authenticateStudent, authenticateAdmin, generateToken } from '@/lib/auth'
 import { createResponse, createErrorResponse } from '@/lib/api-utils'
 import { loginSchema, validateInput } from '@/lib/validation'
 
@@ -15,15 +15,21 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = validation.data
 
-    // Authenticate user with email verification check
-    const user = await authenticateStudentWithVerification(email, password)
-
+    // Authenticate user
+    const user = await authenticateStudent(email, password)
+    
     if (!user) {
       return createErrorResponse('Invalid credentials', 401)
     }
 
+    // Determine user type based on role
+    let userType = 'student'
+    if (user.role === 'ADMIN') {
+      userType = 'admin'
+    }
+
     // Generate JWT token
-    const token = generateToken(user, 'student')
+    const token = generateToken(user, userType)
 
     return createResponse(
       {
@@ -43,11 +49,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Login error:', error)
-    
-    if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
-      return createErrorResponse('Please verify your email before logging in', 403)
-    }
-    
     return createErrorResponse('Login failed', 500)
   }
 }

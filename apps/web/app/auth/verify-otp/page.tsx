@@ -1,107 +1,133 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { 
-  Target, 
-  ArrowLeft, 
-  RefreshCw, 
-  CheckCircle, 
-  AlertCircle,
-  Clock,
-  Shield,
-  Mail
-} from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Target, Check, AlertCircle, Loader2, RefreshCw } from 'lucide-react'
 
 export default function VerifyOTPPage() {
-  const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [otp, setOtp] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const [email, setEmail] = useState('')
+  const [resendLoading, setResendLoading] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
-  const [alerts, setAlerts] = useState<Array<{ id: number; message: string; type: string }>>([])
+
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const showAlert = (message: string, type: string = 'info') => {
-    const id = Date.now()
-    setAlerts(prev => [...prev, { id, message, type }])
-    setTimeout(() => {
-      setAlerts(prev => prev.filter(alert => alert.id !== id))
-    }, 5000)
-  }
-
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) return // Prevent multiple characters
-    
-    const newOtp = [...otp]
-    newOtp[index] = value
-    
-    // Auto-focus next input
-    if (value && index < 5) {
-      const nextInput = document.getElementById(`otp-${index + 1}`)
-      nextInput?.focus()
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) {
+      setEmail(emailParam)
+    } else {
+      router.push('/auth/register')
     }
-    
-    setOtp(newOtp)
-    setError('')
-  }
+  }, [searchParams, router])
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      const prevInput = document.getElementById(`otp-${index - 1}`)
-      prevInput?.focus()
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000)
+      return () => clearTimeout(timer)
     }
-  }
+  }, [resendCooldown])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    setError('')
-
-    const otpCode = otp.join('')
     
-    if (otpCode.length !== 6) {
-      setError('Please enter the complete 6-digit code')
-      setIsLoading(false)
+    if (otp.length !== 6) {
+      setError('Please enter a 6-digit code')
       return
     }
 
-    // Simulate API call
-    setTimeout(() => {
-      if (otpCode === '123456') {
-        showAlert('OTP verified successfully! Redirecting to dashboard...', 'success')
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          code: otp,
+          type: 'VERIFICATION'
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSuccess(true)
         setTimeout(() => {
-          router.push('/admin/dashboard')
-        }, 1500)
+          router.push('/auth/login')
+        }, 2000)
       } else {
-        setError('Invalid OTP code. Please try again.')
-        showAlert('Invalid OTP code. Please try again.', 'error')
+        setError(data.message || 'Invalid OTP')
       }
-      setIsLoading(false)
-    }, 1000)
+    } catch (err) {
+      console.error('OTP verification error:', err)
+      setError('Failed to verify OTP. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleResend = () => {
-    if (resendCooldown > 0) return
-    
-    setResendCooldown(60)
-    const interval = setInterval(() => {
-      setResendCooldown(prev => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          return 0
-        }
-        return prev - 1
+  const handleResendOTP = async () => {
+    setResendLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          type: 'VERIFICATION'
+        }),
       })
-    }, 1000)
-    
-    showAlert('OTP code resent to your email', 'success')
+
+      if (response.ok) {
+        setResendCooldown(60) // 60 seconds cooldown
+        setError(null)
+      } else {
+        const data = await response.json()
+        setError(data.message || 'Failed to resend OTP')
+      }
+    } catch (err) {
+      console.error('Resend OTP error:', err)
+      setError('Failed to resend OTP. Please try again.')
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Email Verified!</h1>
+            <p className="text-gray-600 mb-6">Your account has been successfully verified. Redirecting to login...</p>
+            <div className="flex items-center justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-green-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 min-h-screen flex items-center justify-center p-4">
-      <div className="auth-container w-full max-w-md">
-        {/* Auth Card */}
-        <div className="auth-card rounded-3xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -111,128 +137,87 @@ export default function VerifyOTPPage() {
                 SkillPort
               </h1>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Verify Your Email</h2>
-            <p className="text-slate-600">
-              We&apos;ve sent a 6-digit verification code to
-            </p>
-            <p className="text-slate-900 font-medium">admin@skillport.com</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Verify Your Email</h2>
+            <p className="text-gray-600">We've sent a 6-digit code to <span className="font-semibold">{email}</span></p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-4 text-center">
-                Enter verification code
-              </label>
-              <div className="flex justify-center space-x-3">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    id={`otp-${index}`}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 text-center text-xl font-bold form-input rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
-                ))}
-              </div>
-              {error && (
-                <div className="mt-3 flex items-center justify-center text-red-600">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
+            <div className="space-y-2">
+              <label htmlFor="otp" className="block text-sm font-medium text-gray-700">Enter Verification Code</label>
+              <input
+                type="text"
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="w-full px-4 py-3 text-center text-2xl font-bold tracking-widest border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                placeholder="000000"
+                maxLength={6}
+                required
+              />
             </div>
 
-            <button 
-              type="submit" 
-              className="btn-primary w-full py-3 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2"
-              disabled={isLoading || otp.join('').length !== 6}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || otp.length !== 6}
+              className="w-full py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-xl hover:from-red-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {isLoading ? (
+              {loading ? (
                 <>
-                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Verifying...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
-                  Verify Code
+                  <Check className="w-5 h-5" />
+                  Verify Email
                 </>
               )}
             </button>
-          </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-slate-600 mb-4">
-              Didn&apos;t receive the code?
-            </p>
-            <button
-              onClick={handleResend}
-              disabled={resendCooldown > 0}
-              className="text-sm font-medium text-red-600 hover:text-red-500 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1 mx-auto"
-            >
-              {resendCooldown > 0 ? (
-                <>
-                  <Clock className="w-4 h-4" />
-                  Resend in {resendCooldown}s
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4" />
-                  Resend Code
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center justify-center text-sm text-slate-600 hover:text-slate-900 mx-auto"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to login
-            </button>
-          </div>
-
-          <div className="mt-6 p-4 bg-slate-50 rounded-xl">
-            <h3 className="text-sm font-medium text-slate-700 mb-2">Demo Code:</h3>
-            <div className="text-xs text-slate-600">
-              <div>Use <strong>123456</strong> for testing</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Alert Container */}
-      <div className="fixed top-4 right-4 z-50">
-        {alerts.map((alert) => (
-          <div
-            key={alert.id}
-            className={`${
-              alert.type === 'success' ? 'bg-green-500' : 
-              alert.type === 'error' ? 'bg-red-500' : 
-              alert.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-            } text-white px-6 py-3 rounded-lg shadow-lg mb-4 max-w-sm`}
-          >
-            <div className="flex items-center justify-between">
-              <span>{alert.message}</span>
-              <button 
-                onClick={() => setAlerts(prev => prev.filter(a => a.id !== alert.id))}
-                className="ml-4 text-white hover:text-gray-200"
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">Didn't receive the code?</p>
+              <button
+                type="button"
+                onClick={handleResendOTP}
+                disabled={resendLoading || resendCooldown > 0}
+                className="text-red-600 hover:text-red-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
               >
-                ×
+                {resendLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : resendCooldown > 0 ? (
+                  `Resend in ${resendCooldown}s`
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Resend Code
+                  </>
+                )}
               </button>
             </div>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600">
+              Wrong email?{' '}
+              <button
+                onClick={() => router.push('/auth/register')}
+                className="text-red-600 hover:text-red-700 font-medium"
+              >
+                Go back
+              </button>
+            </p>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )

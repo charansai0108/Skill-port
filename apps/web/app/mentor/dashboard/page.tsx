@@ -1,378 +1,341 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  LayoutDashboard, 
-  Users, 
-  Target, 
-  CheckCircle, 
-  BarChart3, 
-  Trophy, 
-  MessageCircle, 
-  ArrowRight, 
-  Mail, 
-  MapPin, 
-  Clock,
-  GraduationCap,
-  ChevronDown,
-  ChevronUp
-} from 'lucide-react'
 import Link from 'next/link'
-import { MentorCard } from '@/components/ui/MentorCard'
-import { MentorButton } from '@/components/ui/MentorButton'
-import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
-import { MentorToast } from '@/components/ui/MentorToast'
+import {
+  Users,
+  MessageSquare,
+  Trophy,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  RefreshCw,
+  User,
+  Target,
+  BarChart3
+} from 'lucide-react'
 
-interface MentorStats {
-  activeStudents: number
-  tasksAssigned: number
-  completedTasks: number
-  successRate: number
-}
-
-interface TopStudent {
-  id: number
-  name: string
-  score: number
-  rank: number
-  color: string
-}
-
-interface ActiveContest {
-  id: number
-  title: string
-  participants: number
-  timeLeft: string
-  color: string
-}
-
-interface Activity {
-  id: number
-  type: string
-  title: string
-  description: string
-  time: string
-  icon: string
-  color: string
+interface DashboardData {
+  user: {
+    id: string
+    name: string
+    email: string
+    role: string
+    profilePic?: string
+  }
+  stats: {
+    assignedStudents: number
+    totalFeedbacks: number
+    pendingFeedbacks: number
+    activeContests: number
+  }
+  assignedStudents: any[]
+  recentFeedbacks: any[]
+  pendingFeedbacks: any[]
+  contests: any[]
+  notifications: any[]
 }
 
 export default function MentorDashboardPage() {
-  const [mentorStats, setMentorStats] = useState<MentorStats>({
-    activeStudents: 24,
-    tasksAssigned: 156,
-    completedTasks: 142,
-    successRate: 91
-  })
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const [isActivityCollapsed, setIsActivityCollapsed] = useState(false)
-  const [toasts, setToasts] = useState<Array<{id: string, message: string, type: 'success' | 'error' | 'warning' | 'info'}>>([])
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
-  const addToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
-    const id = Math.random().toString(36).substr(2, 9)
-    setToasts(prev => [...prev, { id, message, type }])
-  }
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error('No authentication token found')
+      }
 
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id))
-  }
+      const response = await fetch('/api/dashboard/mentor', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
 
-  const [topStudents, setTopStudents] = useState<TopStudent[]>([
-    { id: 1, name: 'Alex Johnson', score: 95, rank: 1, color: 'green' },
-    { id: 2, name: 'Priya Sharma', score: 92, rank: 2, color: 'blue' },
-    { id: 3, name: 'Rahul Kumar', score: 89, rank: 3, color: 'purple' }
-  ])
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          window.location.href = '/auth/login'
+          return
+        }
+        throw new Error(`Failed to fetch dashboard data: ${response.statusText}`)
+      }
 
-  const [activeContests, setActiveContests] = useState<ActiveContest[]>([
-    { id: 1, title: 'Weekly Algorithm Challenge', participants: 156, timeLeft: '2 days', color: 'orange' },
-    { id: 2, title: 'Data Structures Master', participants: 89, timeLeft: '5 days', color: 'blue' }
-  ])
-
-  const [recentActivities, setRecentActivities] = useState<Activity[]>([
-    {
-      id: 1,
-      type: 'feedback',
-      title: 'Gave feedback to Alex Johnson',
-      description: 'Algorithm contest submission review',
-      time: '2 hours ago',
-      icon: 'message-circle',
-      color: 'green'
-    },
-    {
-      id: 2,
-      type: 'contest',
-      title: 'Created new contest',
-      description: '"Dynamic Programming Masterclass"',
-      time: '1 day ago',
-      icon: 'trophy',
-      color: 'blue'
-    },
-    {
-      id: 3,
-      type: 'student',
-      title: 'New student assigned',
-      description: 'Rahul Kumar joined your mentorship',
-      time: '3 days ago',
-      icon: 'users',
-      color: 'purple'
-    },
-    {
-      id: 4,
-      type: 'task',
-      title: 'Task completed',
-      description: 'Weekly progress review for Priya Sharma',
-      time: '1 week ago',
-      icon: 'check-circle',
-      color: 'amber'
+      const result = await response.json()
+      setData(result)
+    } catch (err) {
+      console.error('Dashboard fetch error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data')
+    } finally {
+      setLoading(false)
     }
-  ])
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      green: 'from-green-50 to-emerald-50 border-green-100 text-green-600',
-      blue: 'from-blue-50 to-indigo-50 border-blue-100 text-blue-600',
-      purple: 'from-purple-50 to-violet-50 border-purple-100 text-purple-600',
-      orange: 'from-orange-50 to-amber-50 border-orange-100 text-orange-600',
-      amber: 'from-amber-50 to-orange-50 border-amber-100 text-amber-600'
-    }
-    return colors[color as keyof typeof colors] || colors.blue
   }
 
-  const getIconColor = (color: string) => {
-    const colors = {
-      green: 'from-green-500 to-emerald-600',
-      blue: 'from-blue-500 to-indigo-600',
-      purple: 'from-purple-500 to-violet-600',
-      orange: 'from-orange-500 to-amber-600',
-      amber: 'from-amber-500 to-orange-600'
-    }
-    return colors[color as keyof typeof colors] || colors.blue
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    )
   }
 
-  const getRankColor = (rank: number) => {
-    const colors = {
-      1: 'from-green-500 to-emerald-600',
-      2: 'from-blue-500 to-indigo-600',
-      3: 'from-purple-500 to-violet-600'
-    }
-    return colors[rank as keyof typeof colors] || colors[1]
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={fetchDashboardData}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
   }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-8 h-8 mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-600">No data available</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { user, stats, assignedStudents, recentFeedbacks, pendingFeedbacks, contests, notifications } = data
 
   return (
-    <div>
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 page-content">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center shadow-lg">
-              <LayoutDashboard className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-700 leading-snug">Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Mentor Dashboard</h1>
+              <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={fetchDashboardData}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <RefreshCw className="w-5 h-5" />
+              </button>
+              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Mentor Stats Cards */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MentorCard className="text-center bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 hover:shadow-xl">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <AnimatedCounter 
-              value={mentorStats.activeStudents} 
-              className="text-3xl font-bold text-green-600 mb-2"
-            />
-            <div className="text-sm text-slate-600 font-medium">Active Students</div>
-          </MentorCard>
-
-          <MentorCard className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 hover:shadow-xl">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Target className="w-6 h-6 text-white" />
-            </div>
-            <AnimatedCounter 
-              value={mentorStats.tasksAssigned} 
-              className="text-3xl font-bold text-blue-600 mb-2"
-            />
-            <div className="text-sm text-slate-600 font-medium">Tasks Assigned</div>
-          </MentorCard>
-
-          <MentorCard className="text-center bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 hover:shadow-xl">
-            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <CheckCircle className="w-6 h-6 text-white" />
-            </div>
-            <AnimatedCounter 
-              value={mentorStats.completedTasks} 
-              className="text-3xl font-bold text-amber-600 mb-2"
-            />
-            <div className="text-sm text-slate-600 font-medium">Completed Tasks</div>
-          </MentorCard>
-
-          <MentorCard className="text-center bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 hover:shadow-xl">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <BarChart3 className="w-6 h-6 text-white" />
-            </div>
-            <AnimatedCounter 
-              value={mentorStats.successRate} 
-              suffix="%" 
-              className="text-3xl font-bold text-purple-600 mb-2"
-            />
-            <div className="text-sm text-slate-600 font-medium">Success Rate</div>
-          </MentorCard>
-        </div>
-
-        {/* Dashboard Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Profile Section */}
-          <MentorCard className="group cursor-pointer" onClick={() => window.location.href = '/mentor/profile'}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-900 group-hover:text-orange-600 transition-colors">Profile</h2>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
-            </div>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-orange-200 group-hover:border-orange-400 transition-colors">
-                <span className="text-white font-bold text-xl">SS</span>
-              </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-slate-900 group-hover:text-orange-700 transition-colors">Satya Sai</h3>
-                <p className="text-slate-600 text-sm">Computer Science Mentor</p>
-                <p className="text-orange-600 text-sm font-medium">5 years experience</p>
+                <p className="text-sm font-medium text-gray-600">Assigned Students</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.assignedStudents}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
             </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-600">satya.sai@pwioi.edu</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-600">Mumbai, India</span>
-              </div>
-            </div>
-          </MentorCard>
+          </div>
 
-          {/* Top Performing Students */}
-          <MentorCard>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Top Performing Students</h2>
-              <Link href="/mentor/leaderboard" className="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</Link>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Feedbacks</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalFeedbacks}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-green-600" />
+              </div>
             </div>
-            <div className="space-y-3">
-              {topStudents.map((student) => (
-                <div key={student.id} className={`flex items-center justify-between p-3 bg-gradient-to-r ${getColorClasses(student.color)} rounded-xl border hover:shadow-md transition-all duration-200`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 bg-gradient-to-br ${getRankColor(student.rank)} rounded-full flex items-center justify-center shadow-sm`}>
-                      <span className="text-white text-sm font-bold">{student.rank}</span>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending Feedbacks</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.pendingFeedbacks}</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Contests</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.activeContests}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Pending Feedbacks */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Pending Feedbacks</h2>
+                <Link href="/mentor/feedback" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {pendingFeedbacks.length > 0 ? (
+                  pendingFeedbacks.map((feedback) => (
+                    <div key={feedback.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                        <div>
+                          <p className="font-medium text-gray-900">{feedback.student.name}</p>
+                          <p className="text-sm text-gray-600">
+                            {feedback.submission ? feedback.submission.title : 'General feedback'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">
+                          {new Date(feedback.createdAt).toLocaleDateString()}
+                        </p>
+                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                          Review
+                        </button>
+                      </div>
                     </div>
-                    <span className="font-medium text-slate-900">{student.name}</span>
-                  </div>
-                  <span className={`text-sm font-bold ${getColorClasses(student.color).split(' ')[3]}`}>{student.score}%</span>
-                </div>
-              ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No pending feedbacks</p>
+                )}
+              </div>
             </div>
-          </MentorCard>
 
-          {/* Active Contests */}
-          <MentorCard>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Active Contests</h2>
-              <Link href="/mentor/contests" className="text-orange-600 hover:text-orange-700 text-sm font-medium">View All</Link>
+            {/* Assigned Students */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Assigned Students</h2>
+                <Link href="/mentor/students" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {assignedStudents.length > 0 ? (
+                  assignedStudents.map((student) => (
+                    <div key={student.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{student.name}</p>
+                          <p className="text-sm text-gray-600">{student.email}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">
+                          {student._count.submissions} submissions
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {student._count.studentFeedbacks} feedbacks
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No assigned students</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-3">
-              {activeContests.map((contest) => (
-                <div key={contest.id} className={`p-3 bg-gradient-to-r ${getColorClasses(contest.color)} rounded-xl border hover:shadow-md transition-all duration-200`}>
-                  <h4 className="font-medium text-slate-900">{contest.title}</h4>
-                  <p className="text-sm text-slate-600 mb-2">{contest.participants} participants</p>
-                  <div className={`flex items-center gap-2 text-xs ${getColorClasses(contest.color).split(' ')[3]}`}>
-                    <Clock className="w-3 h-3" />
-                    <span>Ends in {contest.timeLeft}</span>
-                  </div>
-                </div>
-              ))}
+          </div>
+
+          {/* Recent Feedbacks & Notifications */}
+          <div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Recent Feedbacks</h2>
+                <Link href="/mentor/feedback" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View all
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {recentFeedbacks.length > 0 ? (
+                  recentFeedbacks.map((feedback) => (
+                    <div key={feedback.id} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium text-gray-900">{feedback.student.name}</p>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          feedback.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {feedback.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        {feedback.submission ? feedback.submission.title : 'General feedback'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(feedback.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No recent feedbacks</p>
+                )}
+              </div>
             </div>
-          </MentorCard>
+
+            {/* Notifications */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  {notifications.length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div key={notification.id} className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                      <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No notifications</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-
-        {/* Recent Activity Feed */}
-        <MentorCard className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-900">Recent Activity</h2>
-            <button
-              onClick={() => setIsActivityCollapsed(!isActivityCollapsed)}
-              className="flex items-center gap-2 text-orange-600 hover:text-orange-700 text-sm font-medium transition-colors"
-            >
-              {isActivityCollapsed ? 'Show All' : 'Collapse'}
-              {isActivityCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-            </button>
-          </div>
-          <div className={`space-y-4 transition-all duration-300 ${isActivityCollapsed ? 'max-h-32 overflow-hidden' : ''}`}>
-            {recentActivities.slice(0, isActivityCollapsed ? 2 : recentActivities.length).map((activity) => (
-              <div key={activity.id} className={`flex items-center gap-4 p-3 bg-gradient-to-r ${getColorClasses(activity.color)} rounded-xl border hover:shadow-md transition-all duration-200`}>
-                <div className={`w-10 h-10 bg-gradient-to-br ${getIconColor(activity.color)} rounded-full flex items-center justify-center shadow-sm`}>
-                  {activity.icon === 'message-circle' && <MessageCircle className="w-5 h-5 text-white" />}
-                  {activity.icon === 'trophy' && <Trophy className="w-5 h-5 text-white" />}
-                  {activity.icon === 'users' && <Users className="w-5 h-5 text-white" />}
-                  {activity.icon === 'check-circle' && <CheckCircle className="w-5 h-5 text-white" />}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-900">{activity.title}</p>
-                  <p className="text-xs text-slate-600">{activity.description}</p>
-                </div>
-                <span className="text-xs text-slate-500">{activity.time}</span>
-              </div>
-            ))}
-          </div>
-        </MentorCard>
-
-        {/* Quick Actions */}
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <MentorCard className="text-center group cursor-pointer" onClick={() => window.location.href = '/mentor/students'}>
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">My Students</h3>
-              <p className="text-sm text-slate-600">View and manage your students</p>
-            </MentorCard>
-
-            <MentorCard className="text-center group cursor-pointer" onClick={() => window.location.href = '/mentor/tasks'}>
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Target className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-green-600 transition-colors">Assign Tasks</h3>
-              <p className="text-sm text-slate-600">Create and assign new tasks</p>
-            </MentorCard>
-
-            <MentorCard className="text-center group cursor-pointer" onClick={() => window.location.href = '/mentor/feedback'}>
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">Give Feedback</h3>
-              <p className="text-sm text-slate-600">Provide feedback to students</p>
-            </MentorCard>
-
-            <MentorCard className="text-center group cursor-pointer" onClick={() => window.location.href = '/mentor/leaderboard'}>
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <BarChart3 className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-amber-600 transition-colors">Leaderboard</h3>
-              <p className="text-sm text-slate-600">View contest leaderboards</p>
-            </MentorCard>
-          </div>
-        </div>
-
-        {/* Toast Notifications */}
-        {toasts.map((toast) => (
-          <MentorToast
-            key={toast.id}
-            id={toast.id}
-            message={toast.message}
-            type={toast.type}
-            onDismiss={removeToast}
-          />
-        ))}
-      </main>
+      </div>
     </div>
   )
 }

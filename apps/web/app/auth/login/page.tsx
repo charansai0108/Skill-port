@@ -20,23 +20,66 @@ export default function LoginPage() {
     }, 5000)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Simple demo role detection
-    let redirectUrl: string = ROUTES.personal
-    if (email.includes('admin')) {
-      redirectUrl = ROUTES.admin
-    } else if (email.includes('mentor')) {
-      redirectUrl = ROUTES.mentor
-    } else if (email.includes('student')) {
-      redirectUrl = ROUTES.student
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+        const result = await response.json()
+
+        if (response.ok && result.success) {
+          // Store token and user data
+          localStorage.setItem('token', result.data.token)
+          localStorage.setItem('user', JSON.stringify(result.data.user))
+          
+          showAlert('🎉 Login successful! Redirecting...', 'success')
+          setTimeout(() => {
+            // Determine redirect URL based on user role
+            let redirectUrl: string = '/personal/dashboard'
+            switch (result.data.user.role) {
+              case 'ADMIN':
+                redirectUrl = '/admin/dashboard'
+                break
+              case 'MENTOR':
+                redirectUrl = '/mentor/dashboard'
+                break
+              case 'STUDENT':
+                redirectUrl = '/student/dashboard'
+                break
+              case 'COMMUNITY_ADMIN':
+                redirectUrl = '/community/dashboard'
+                break
+              case 'PERSONAL':
+              default:
+                redirectUrl = '/personal/dashboard'
+                break
+            }
+            
+            console.log(`🔄 Redirecting ${result.data.user.role} user to: ${redirectUrl}`)
+            
+            try {
+              router.push(redirectUrl)
+            } catch (error) {
+              console.error('Redirect error:', error)
+              // Fallback to window.location if router.push fails
+              console.log(`🔄 Fallback redirect to: ${redirectUrl}`)
+              window.location.href = redirectUrl
+            }
+          }, 1500)
+        } else {
+          showAlert(result.message || result.error || 'Login failed', 'error')
+        }
+    } catch (error) {
+      console.error('Login error:', error)
+      showAlert('Login failed. Please try again.', 'error')
     }
-    
-    showAlert('🎉 Login successful! Redirecting...', 'success')
-    setTimeout(() => {
-      router.push(redirectUrl)
-    }, 1500)
   }
 
   const togglePassword = () => {

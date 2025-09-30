@@ -2,24 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/useAuth'
-import { AuthRedirect } from '@/components/AuthRedirect'
 import {
-  Target,
-  CheckCircle,
-  Trophy,
-  TrendingUp,
-  Mail,
-  MapPin,
-  Clock,
   Users,
-  BarChart3,
-  MessageSquare,
-  User,
-  BookOpen,
-  Loader2,
+  Calendar,
+  Activity,
   AlertCircle,
-  RefreshCw
+  Loader2,
+  RefreshCw,
+  User,
+  Target,
+  BarChart3,
+  Plus
 } from 'lucide-react'
 
 interface DashboardData {
@@ -31,22 +24,19 @@ interface DashboardData {
     profilePic?: string
   }
   stats: {
-    totalSubmissions: number
-    acceptedSubmissions: number
-    accuracy: number
-    totalTasks: number
-    completedTasks: number
-    activeContests: number
+    totalCommunities: number
+    totalMembers: number
+    totalEvents: number
+    activeCommunities: number
   }
-  recentSubmissions: any[]
-  recentTasks: any[]
-  recentContests: any[]
+  communities: any[]
+  communityMembers: any[]
+  events: any[]
   recentActivities: any[]
   notifications: any[]
 }
 
-export default function StudentDashboardPage() {
-  const { user: authUser, loading: authLoading } = useAuth('STUDENT')
+export default function CommunityDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +51,7 @@ export default function StudentDashboardPage() {
         throw new Error('No authentication token found')
       }
 
-      const response = await fetch('/api/dashboard/student', {
+      const response = await fetch('/api/dashboard/community', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -89,17 +79,15 @@ export default function StudentDashboardPage() {
   }
 
   useEffect(() => {
-    if (!authLoading && authUser) {
-      fetchDashboardData()
-    }
-  }, [authLoading, authUser])
+    fetchDashboardData()
+  }, [])
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">{authLoading ? 'Checking authentication...' : 'Loading dashboard...'}</p>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     )
@@ -134,28 +122,30 @@ export default function StudentDashboardPage() {
     )
   }
 
-  const { user, stats, recentSubmissions, recentTasks, recentContests, recentActivities, notifications } = data
+  const { user, stats, communities, communityMembers, events, recentActivities, notifications } = data
 
   return (
-    <>
-      <AuthRedirect requiredRole="STUDENT" currentPath="/student/dashboard" />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
-              <p className="text-gray-600 mt-2">Here's your learning progress overview</p>
+              <h1 className="text-3xl font-bold text-gray-900">Community Dashboard</h1>
+              <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
             </div>
             <div className="flex items-center gap-4">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Create Community
+              </button>
               <button
                 onClick={fetchDashboardData}
                 className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <RefreshCw className="w-5 h-5" />
               </button>
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -167,11 +157,12 @@ export default function StudentDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Submissions</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalSubmissions}</p>
+                <p className="text-sm font-medium text-gray-600">Total Communities</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalCommunities}</p>
+                <p className="text-xs text-green-600 mt-1">{stats.activeCommunities} active</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-blue-600" />
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -179,11 +170,11 @@ export default function StudentDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Accepted</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.acceptedSubmissions}</p>
+                <p className="text-sm font-medium text-gray-600">Total Members</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalMembers}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <User className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
@@ -191,11 +182,11 @@ export default function StudentDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Accuracy</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.accuracy.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-gray-600">Total Events</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalEvents}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+                <Calendar className="w-6 h-6 text-purple-600" />
               </div>
             </div>
           </div>
@@ -203,79 +194,113 @@ export default function StudentDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Tasks Completed</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.completedTasks}/{stats.totalTasks}</p>
+                <p className="text-sm font-medium text-gray-600">Active Communities</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.activeCommunities}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-orange-600" />
+                <Activity className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Submissions */}
+          {/* Communities */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Submissions</h2>
-                <Link href="/student/submissions" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View all
+                <h2 className="text-xl font-semibold text-gray-900">Your Communities</h2>
+                <Link href="/community/manage" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  Manage all
                 </Link>
               </div>
               <div className="space-y-4">
-                {recentSubmissions.length > 0 ? (
-                  recentSubmissions.map((submission) => (
-                    <div key={submission.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                {communities.length > 0 ? (
+                  communities.map((community) => (
+                    <div key={community.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          submission.status === 'ACCEPTED' ? 'bg-green-500' : 
-                          submission.status === 'REJECTED' ? 'bg-red-500' : 'bg-yellow-500'
-                        }`} />
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <Users className="w-6 h-6 text-purple-600" />
+                        </div>
                         <div>
-                          <p className="font-medium text-gray-900">{submission.title}</p>
-                          <p className="text-sm text-gray-600">{submission.platform} • {submission.difficulty}</p>
+                          <h3 className="font-medium text-gray-900">{community.name}</h3>
+                          <p className="text-sm text-gray-600">{community.description}</p>
+                          <p className="text-xs text-gray-500">{community.type}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">
-                          {submission.score || 0} pts
+                          {community._count.members} members
                         </p>
                         <p className="text-xs text-gray-500">
-                          {new Date(submission.createdAt).toLocaleDateString()}
+                          {community._count.events} events
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No submissions yet</p>
+                  <div className="text-center py-8">
+                    <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-500 mb-4">No communities yet</p>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      Create Your First Community
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Activities */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Community Activities</h2>
+                <Link href="/community/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View analytics
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {recentActivities.length > 0 ? (
+                  recentActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-900">{activity.action}</p>
+                        <p className="text-xs text-gray-600">
+                          {activity.user.name} • {new Date(activity.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No recent activities</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Recent Contests */}
+          {/* Events & Notifications */}
           <div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Active Contests</h2>
-                <Link href="/student/contests" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <h2 className="text-xl font-semibold text-gray-900">Upcoming Events</h2>
+                <Link href="/community/events" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                   View all
                 </Link>
               </div>
               <div className="space-y-4">
-                {recentContests.length > 0 ? (
-                  recentContests.map((contest) => (
-                    <div key={contest.id} className="p-4 bg-gray-50 rounded-lg">
-                      <h3 className="font-medium text-gray-900 mb-2">{contest.title}</h3>
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>{contest.participants?.length || 0} participants</span>
-                        <span className="text-blue-600">Score: {contest.userScore || 0}</span>
+                {events.length > 0 ? (
+                  events.map((event) => (
+                    <div key={event.id} className="p-3 bg-gray-50 rounded-lg">
+                      <h3 className="font-medium text-gray-900 mb-2">{event.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{event.description}</p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{event.community.name}</span>
+                        <span>{new Date(event.date).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No active contests</p>
+                  <p className="text-gray-500 text-center py-4">No upcoming events</p>
                 )}
               </div>
             </div>
@@ -304,6 +329,6 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

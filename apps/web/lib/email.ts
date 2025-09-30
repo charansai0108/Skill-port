@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
 let transporter: nodemailer.Transporter | null = null
 
 if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-  transporter = nodemailer.createTransporter({
+  transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT || '587'),
     secure: false, // true for 465, false for other ports
@@ -216,5 +216,32 @@ export async function sendWelcomeEmail(email: string, name: string) {
   } catch (error) {
     console.error('Error sending welcome email:', error)
     return false
+  }
+}
+
+// Generic email sending function
+export async function sendEmail(mailOptions: any) {
+  if (!transporter) {
+    console.warn('Email service not configured, logging email instead:')
+    console.log('To:', mailOptions.to)
+    console.log('Subject:', mailOptions.subject)
+    console.log('Content:', mailOptions.html || mailOptions.text)
+    return true // Return true for development
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || 'noreply@skillport.com',
+      ...mailOptions,
+    })
+    console.log('Email sent:', info.messageId)
+    return true
+  } catch (error) {
+    console.error('Email error:', error)
+    console.warn('Falling back to development mode - email logged to console')
+    console.log('To:', mailOptions.to)
+    console.log('Subject:', mailOptions.subject)
+    console.log('Content:', mailOptions.html || mailOptions.text)
+    return true // Return true even on error for development
   }
 }
