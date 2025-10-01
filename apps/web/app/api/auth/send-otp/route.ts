@@ -1,67 +1,101 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email'
-import crypto from 'crypto'
+import { generateOTP } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, type = 'VERIFICATION' } = await request.json()
+    const { email } = await request.json()
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    })
 
-    // Store OTP in database
-    await prisma.oTP.create({
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Check if already verified
+    if (user.isVerified) {
+      return NextResponse.json({
+        error: 'Account is already verified. Please login.',
+        code: 'ALREADY_VERIFIED'
+      }, { status: 400 })
+    }
+
+    // Generate new OTP
+    const otp = generateOTP()
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+    // Update user with new OTP
+    await prisma.user.update({
+      where: { email },
       data: {
-        email,
-        code: otp,
-        type,
-        expiresAt
+        otpCode: otp,
+        otpExpiry
       }
     })
 
-    // Send email
-    const subject = type === 'VERIFICATION' 
-      ? 'Verify your SkillPort account' 
-      : 'Reset your SkillPort password'
-    
-    const html = `
+    // Send OTP email
+    const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #dc2626;">SkillPort Community</h2>
-        <p>Your verification code is:</p>
-        <div style="background-color: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0;">
-          <h1 style="color: #dc2626; font-size: 32px; margin: 0; letter-spacing: 4px;">${otp}</h1>
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">SkillPort Verification</h1>
         </div>
-        <p>This code will expire in 10 minutes.</p>
-        <p>If you didn't request this code, please ignore this email.</p>
+        
+        <div style="padding: 30px; background: #f8f9fa;">
+          <h2 style="color: #333; margin-bottom: 20px;">Hi ${user.name}!</h2>
+          
+          <p style="color: #666; line-height: 1.6; margin-bottom: 25px;">
+            Your new verification code is:
+          </p>
+          
+          <div style="background-color: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+            <h1 style="color: #667eea; font-size: 36px; margin: 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otp}</h1>
+          </div>
+          
+          <p style="color: #666; line-height: 1.6;">
+            This code will expire in <strong>10 minutes</strong>.
+          </p>
+          
+          <p style="color: #999; font-size: 14px; margin-top: 30px;">
+            If you didn't request this code, please ignore this email.
+          </p>
+        </div>
+        
+        <div style="background: #333; color: white; padding: 20px; text-align: center; font-size: 14px;">
+          <p style="margin: 0;">© 2024 SkillPort. All rights reserved.</p>
+        </div>
       </div>
     `
 
     const emailSent = await sendEmail({
       to: email,
-      subject,
-      html
+      subject: 'SkillPort - Your Verification Code',
+      html: emailHtml
     })
 
-    // In development, if email fails, we still return success but log the OTP
+    // In development, log OTP if email fails
     if (!emailSent) {
       console.log(`🔐 OTP for ${email}: ${otp}`)
-      console.log(`📧 Email sending failed, but OTP is stored in database`)
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: emailSent ? 'OTP sent successfully' : 'OTP generated (check console for development)',
-      otp: !emailSent ? otp : undefined // Include OTP in response for development
-    })
+      message: emailSent ? 'OTP sent successfully to your email' : 'OTP generated (check console in dev mode)',
+      ...((!emailSent) && { otp, devMode: true })
+    }, { status: 200 })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Send OTP error:', error)
-    return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 })
+    return NextResponse.json({
+      error: 'Failed to send OTP',
+      details: error.message
+    }, { status: 500 })
   }
 }

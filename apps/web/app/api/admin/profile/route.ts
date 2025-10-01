@@ -1,79 +1,173 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAdminAuth, createSuccessResponse, createErrorResponse } from '@/lib/admin-middleware'
 import { prisma } from '@/lib/prisma'
-import { hashPassword, verifyPassword } from '@/lib/auth'
+import { getCurrentAdmin } from '@/lib/auth'
 
-// GET /api/admin/profile - Get admin profile
-export const GET = withAdminAuth(async (request: NextRequest, admin) => {
+export async function GET(request: NextRequest) {
   try {
-    const adminProfile = await prisma.admin.findUnique({
+    const admin = await getCurrentAdmin(request)
+    
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get admin user details
+    const user = await prisma.user.findUnique({
       where: { id: admin.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profilePic: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        createdAt: true,
-        updatedAt: true
+      include: {
+        communities: {
+          include: {
+            _count: {
+              select: {
+                members: true,
+                batches: true
+              }
+            }
+          }
+        }
       }
     })
 
-    if (!adminProfile) {
-      return createErrorResponse('Admin profile not found', 404)
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return createSuccessResponse(adminProfile, 'Admin profile retrieved successfully')
+    // Get batches managed by this admin
+    const batches = await prisma.batch.findMany({
+      where: {
+        community: {
+          adminId: admin.id
+        }
+      },
+      include: {
+        students: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            username: true,
+            isActive: true
+          }
+        },
+        _count: {
+          select: {
+            students: true
+          }
+        }
+      },
+      orderBy: { name: 'asc' }
+    })
+
+    // Format batches
+    const formattedBatches = batches.map(batch => ({
+      id: batch.id,
+      name: batch.name,
+      count: batch._count.students,
+      color: ['blue', 'green', 'purple', 'orange', 'red'][batches.indexOf(batch) % 5],
+      students: batch.students.map(s => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        username: s.username || s.email.split('@')[0],
+        status: s.isActive ? 'active' : 'inactive'
+      }))
+    }))
+
+    // Get admin stats
+    const stats = {
+      totalStudents: await prisma.user.count({
+        where: {
+          role: 'STUDENT',
+          communityId: user.communityId
+        }
+      }),
+      totalMentors: await prisma.user.count({
+        where: {
+          role: 'MENTOR',
+          communityId: user.communityId
+        }
+      }),
+      totalBatches: batches.length,
+      totalCommunities: user.communities.length
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        profile: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          phone: user.phone,
+          bio: user.bio,
+          profilePic: user.profilePic,
+          communityId: user.communityId,
+          createdAt: user.createdAt.toISOString()
+        },
+        batches: formattedBatches,
+        stats,
+        communities: user.communities.map(c => ({
+          id: c.id,
+          name: c.name,
+          description: c.description,
+          type: c.type,
+          isPublic: c.isPublic,
+          memberCount: c._count.members,
+          batchCount: c._count.batches
+        }))
+      }
+    })
 
   } catch (error: any) {
-    console.error('Get admin profile error:', error)
-    return createErrorResponse('Failed to fetch admin profile', 500)
+    console.error('Profile API error:', error)
+    return NextResponse.json({
+      error: 'Failed to fetch profile',
+      details: error.message
+    }, { status: 500 })
   }
-})
+}
 
-// PUT /api/admin/profile - Update admin profile
-export const PUT = withAdminAuth(async (request: NextRequest, admin) => {
+// Update profile
+export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { name, email, profilePic } = body
-
-    // Check if email is being changed and if it already exists
-    if (email && email !== admin.email) {
-      const emailExists = await prisma.admin.findUnique({
-        where: { email }
-      })
-
-      if (emailExists) {
-        return createErrorResponse('Email already exists', 409)
-      }
+    const admin = await getCurrentAdmin(request)
+    
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Update admin profile
-    const updatedAdmin = await prisma.admin.update({
+    const body = await request.json()
+    const { name, username, phone, bio } = body
+
+    const updatedUser = await prisma.user.update({
       where: { id: admin.id },
       data: {
-        ...(name && { name }),
-        ...(email && { email }),
-        ...(profilePic !== undefined && { profilePic })
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profilePic: true,
-        role: true,
-        isActive: true,
-        lastLogin: true,
-        updatedAt: true
+        name,
+        username,
+        phone,
+        bio
       }
     })
 
-    return createSuccessResponse(updatedAdmin, 'Admin profile updated successfully')
+    return NextResponse.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        phone: updatedUser.phone,
+        bio: updatedUser.bio
+      }
+    })
 
   } catch (error: any) {
-    console.error('Update admin profile error:', error)
-    return createErrorResponse('Failed to update admin profile', 500)
+    console.error('Profile update error:', error)
+    return NextResponse.json({
+      error: 'Failed to update profile',
+      details: error.message
+    }, { status: 500 })
   }
-})
+}

@@ -41,9 +41,6 @@ export function useAuth(requiredRole?: string) {
             case 'STUDENT':
               router.push('/student/dashboard')
               break
-            case 'COMMUNITY_ADMIN':
-              router.push('/community/dashboard')
-              break
             case 'PERSONAL':
             default:
               router.push('/personal/dashboard')
@@ -83,9 +80,6 @@ export function useAuth(requiredRole?: string) {
         break
       case 'STUDENT':
         redirectUrl = '/student/dashboard'
-        break
-      case 'COMMUNITY_ADMIN':
-        redirectUrl = '/community/dashboard'
         break
       case 'PERSONAL':
       default:

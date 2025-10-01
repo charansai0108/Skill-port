@@ -30,6 +30,7 @@ export interface AdminUser {
   email: string
   role: string
   profilePic?: string
+  communityId?: string | null
 }
 
 export interface StudentUser {
@@ -60,8 +61,14 @@ export async function comparePassword(password: string, hashedPassword: string):
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(user: AdminUser | StudentUser, userType: string): string {
-  const payload = userType === 'admin' ? { admin: user } : { student: user }
+export function generateToken(user: any): string {
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    communityId: user.communityId || null,
+    name: user.name
+  }
   return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
 }
 
@@ -126,25 +133,38 @@ export async function getCurrentAdmin(request: NextRequest): Promise<AdminUser |
   }
 
   const decoded = verifyToken(token)
-  if (!decoded || !decoded.admin) {
+  if (!decoded) {
     return null
   }
 
-  // Verify admin still exists and is active
+  const userData = (decoded as any)
+  if (!userData.id || !userData.role) {
+    return null
+  }
+
+  // Check if user has admin role
+  if (userData.role !== 'ADMIN') {
+    return null
+  }
+
+  // Verify user still exists and is active
   try {
-    const admin = await prisma.admin.findFirst({
-      where: { 
-        userId: decoded.admin.id, 
-        isActive: true 
-      },
-      include: { user: true }
+    const user = await prisma.user.findUnique({
+      where: { id: userData.id }
     })
 
-    if (!admin) {
+    if (!user || !user.isActive) {
       return null
     }
 
-    return decoded.admin
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profilePic: user.profilePic || undefined,
+      communityId: user.communityId
+    }
   } catch (error) {
     console.error('Error verifying admin:', error)
     return null
@@ -185,41 +205,12 @@ export async function getCurrentStudent(request: NextRequest): Promise<StudentUs
   }
 
   const decoded = verifyToken(token)
-  if (!decoded || !decoded.student) {
-    return null
-  }
-
-  // Verify student still exists
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.student.id }
-    })
-
-    if (!user) {
-      return null
-    }
-
-    return decoded.student
-  } catch (error) {
-    console.error('Error verifying student:', error)
-    return null
-  }
-}
-
-export async function getCurrentUser(request: NextRequest): Promise<StudentUser | null> {
-  const token = getTokenFromRequest(request)
-  if (!token) {
-    return null
-  }
-
-  const decoded = verifyToken(token)
   if (!decoded) {
     return null
   }
 
-  // Check for both admin and student tokens
-  const userData = decoded.admin || decoded.student
-  if (!userData) {
+  const userData = (decoded as any)
+  if (!userData.id || !userData.email) {
     return null
   }
 
@@ -238,7 +229,49 @@ export async function getCurrentUser(request: NextRequest): Promise<StudentUser 
       name: user.name,
       email: user.email,
       role: user.role as any,
-      profilePic: user.profilePic || undefined
+      profilePic: user.profilePic || undefined,
+      batchId: user.batchId || undefined
+    }
+  } catch (error) {
+    console.error('Error verifying student:', error)
+    return null
+  }
+}
+
+export async function getCurrentUser(request: NextRequest): Promise<StudentUser | null> {
+  const token = getTokenFromRequest(request)
+  if (!token) {
+    return null
+  }
+
+  const decoded = verifyToken(token)
+  if (!decoded) {
+    return null
+  }
+
+  // Get user data from new JWT structure
+  const userData = (decoded as any)
+  if (!userData.id || !userData.email) {
+    return null
+  }
+
+  // Verify user still exists
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userData.id }
+    })
+
+    if (!user) {
+      return null
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role as any,
+      profilePic: user.profilePic || undefined,
+      batchId: user.batchId || undefined
     }
   } catch (error) {
     console.error('Error verifying user:', error)
@@ -360,16 +393,16 @@ export async function resetPassword(token: string, newPassword: string): Promise
 export async function authenticateStudentWithVerification(email: string, password: string): Promise<StudentUser | null> {
   try {
     const user = await prisma.user.findUnique({
-      where: { email, status: 'ACTIVE' }
+      where: { email, isActive: true }
     })
 
     if (!user) {
       return null
     }
 
-    // Check if email is verified (using type assertion for field that exists in schema)
-    if (!(user as any).emailVerified) {
-      throw new Error('EMAIL_NOT_VERIFIED')
+    // Check if user is verified
+    if (!user.isVerified) {
+      throw new Error('USER_NOT_VERIFIED')
     }
 
     const isValidPassword = await verifyPassword(password, user.password)
@@ -389,4 +422,57 @@ export async function authenticateStudentWithVerification(email: string, passwor
     console.error('Student authentication error:', error)
     return null
   }
+}
+
+// OTP Helper Functions
+export function generateOTP(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+export async function saveOTP(email: string, otp: string): Promise<void> {
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+  
+  await prisma.user.update({
+    where: { email },
+    data: {
+      otpCode: otp,
+      otpExpiry: expiresAt
+    }
+  })
+}
+
+export async function verifyOTP(email: string, otp: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { email }
+  })
+
+  if (!user || !user.otpCode || !user.otpExpiry) {
+    return false
+  }
+
+  // Check if OTP matches and hasn't expired
+  if (user.otpCode !== otp) {
+    return false
+  }
+
+  if (new Date() > user.otpExpiry) {
+    return false
+  }
+
+  // Clear OTP and mark as verified
+  await prisma.user.update({
+    where: { email },
+    data: {
+      otpCode: null,
+      otpExpiry: null,
+      isVerified: true,
+      emailVerified: true
+    }
+  })
+
+  return true
+}
+
+export function generateCommunityCode(): string {
+  return Math.random().toString(36).substring(2, 10).toUpperCase()
 }

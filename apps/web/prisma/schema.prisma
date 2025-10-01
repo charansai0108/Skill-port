@@ -11,8 +11,7 @@ datasource db {
 enum UserRole {
   STUDENT
   MENTOR
-  ADMIN
-  COMMUNITY_ADMIN
+  ADMIN  // Community Admin - manages their community
   PERSONAL
 }
 
@@ -39,13 +38,20 @@ enum FeedbackStatus {
 model User {
   id        String   @id @default(cuid())
   name      String
+  username  String?  @unique
   email     String   @unique
   password  String
-  role      UserRole @default(STUDENT)
+  role      UserRole @default(PERSONAL)
   profilePic String?
   bio       String?
   phone     String?
+  communityId String?
+  batchId   String?
+  subject   String?  // For mentors
   isActive  Boolean  @default(true)
+  isVerified Boolean @default(false)
+  otpCode   String?
+  otpExpiry DateTime?
   emailVerified Boolean @default(false)
   emailVerificationToken String?
   emailVerificationExpires DateTime?
@@ -55,6 +61,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
+  batch           Batch? @relation(fields: [batchId], references: [id])
   submissions     Submission[]
   mentorFeedbacks Feedback[] @relation("MentorFeedbacks")
   studentFeedbacks Feedback[] @relation("StudentFeedbacks")
@@ -153,10 +160,12 @@ model ContestParticipant {
 model Community {
   id          String   @id @default(cuid())
   name        String
+  slug        String?  @unique // URL-friendly identifier
   description String
-  type        String
+  type        String   // "public" or "private"
   isPublic    Boolean  @default(true)
   adminId     String
+  communityCode String? @unique // For easy joining
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -164,6 +173,8 @@ model Community {
   admin    User              @relation(fields: [adminId], references: [id])
   members  CommunityMember[]
   events   CommunityEvent[]
+  batches  Batch[]
+  allowedEmails CommunityAllowedEmail[]
 
   @@map("communities")
 }
@@ -268,4 +279,36 @@ model OTP {
   createdAt DateTime @default(now())
 
   @@map("otps")
+}
+
+model Batch {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  communityId String
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  community Community @relation(fields: [communityId], references: [id])
+  students  User[]
+
+  @@map("batches")
+}
+
+model CommunityAllowedEmail {
+  id          String   @id @default(cuid())
+  email       String
+  communityId String
+  batchId     String?
+  role        String   @default("STUDENT") // STUDENT or MENTOR
+  createdAt   DateTime @default(now())
+
+  // Relations
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@unique([email, communityId])
+  @@map("community_allowed_emails")
 }

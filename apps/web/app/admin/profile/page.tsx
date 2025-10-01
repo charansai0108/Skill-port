@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { 
   User, 
   Lock, 
@@ -18,7 +19,14 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Info
+  Info,
+  Shield,
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  Trophy,
+  BarChart3,
+  Award
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,6 +37,7 @@ interface Toast {
 }
 
 export default function AdminProfilePage() {
+  const pathname = usePathname()
   const [activeSection, setActiveSection] = useState('profile')
   const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face')
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -37,6 +46,8 @@ export default function AdminProfilePage() {
   const [selectedBatch, setSelectedBatch] = useState('')
   const [batchStudents, setBatchStudents] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const isActive = (href: string) => pathname === href
 
   const batches = [
     { name: '2024-25', count: 24, color: 'blue' },
@@ -199,7 +210,49 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <div>
+    <>
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                PW IOI
+              </span>
+            </div>
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/admin/dashboard" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/dashboard') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
+              </Link>
+              <Link href="/admin/users" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/users') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Users className="w-4 h-4" /> Students
+              </Link>
+              <Link href="/admin/mentors" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/mentors') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <GraduationCap className="w-4 h-4" /> Mentors
+              </Link>
+              <Link href="/admin/contests" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/contests') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Trophy className="w-4 h-4" /> Contests
+              </Link>
+              <Link href="/admin/analytics" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/analytics') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <BarChart3 className="w-4 h-4" /> Analytics
+              </Link>
+              <Link href="/admin/leaderboard" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/leaderboard') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Award className="w-4 h-4" /> Leaderboard
+              </Link>
+              <Link href="/admin/profile" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/profile') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center text-white text-sm font-semibold shadow-lg border-2 border-white">
+                  A
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div>
       {/* Toast Notifications */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map((toast) => (
@@ -677,6 +730,7 @@ export default function AdminProfilePage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

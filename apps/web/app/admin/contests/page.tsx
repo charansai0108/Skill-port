@@ -61,9 +61,46 @@ export default function AdminContestsPage() {
   const [deletingContest, setDeletingContest] = useState<DeletingContest | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [contests, setContests] = useState<any[]>([])
+  const [stats, setStats] = useState<any>({})
 
-  // Sample contest data
-  const [contests, setContests] = useState([
+  // Fetch contests from API
+  useEffect(() => {
+    fetchContests()
+  }, [searchTerm, statusFilter])
+
+  const fetchContests = async () => {
+    try {
+      setIsLoading(true)
+      const token = localStorage.getItem('token')
+      
+      const params = new URLSearchParams({
+        ...(searchTerm && { search: searchTerm }),
+        ...(statusFilter !== 'all' && { status: statusFilter })
+      })
+
+      const response = await fetch(`/api/admin/contests?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) throw new Error('Failed to fetch contests')
+
+      const result = await response.json()
+      setContests(result.data.contests)
+      setStats(result.data.stats)
+    } catch (error) {
+      console.error('Error fetching contests:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // OLD hardcoded data removed
+  /*
+  const [oldContests] = useState([
     {
       id: 1,
       name: 'Weekly Algorithm Challenge',
@@ -149,17 +186,13 @@ export default function AdminContestsPage() {
       color: 'pink'
     }
   ])
+  */
 
-  const [currentContests, setCurrentContests] = useState([...contests])
+  // Filtering now handled by API
+  const filteredContests = contests
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
+  // OLD filtering removed
+  /*
   const filteredContests = currentContests.filter(contest => {
     const matchesSearch = contest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contest.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -169,6 +202,7 @@ export default function AdminContestsPage() {
     
     return matchesSearch && matchesStatus
   })
+  */
 
   const getStatusBadge = (status: string) => {
     switch (status) {

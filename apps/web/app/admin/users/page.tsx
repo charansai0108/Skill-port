@@ -43,26 +43,67 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [roleFilter, setRoleFilter] = useState('all')
+  const [batchFilter, setBatchFilter] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{
-    id: number
-    firstName: string
-    lastName: string
-    username: string
-    email: string
-    status: string
-    joined: string
-    problemsSolved: number
-    rating: number
-  } | null>(null)
+  const [editingUser, setEditingUser] = useState<any | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [users, setUsers] = useState<any[]>([])
+  const [batches, setBatches] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   const usersPerPage = 10
 
-  // Sample student data
-  const [users, setUsers] = useState([
+  // Pagination calculations
+  const startIndex = (currentPage - 1) * usersPerPage
+  const endIndex = startIndex + usersPerPage
+
+  // Fetch students from API
+  useEffect(() => {
+    fetchStudents()
+  }, [currentPage, searchTerm, statusFilter, batchFilter])
+
+  const fetchStudents = async () => {
+    try {
+      setIsLoading(true)
+      const token = localStorage.getItem('token')
+      
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: usersPerPage.toString(),
+        ...(searchTerm && { search: searchTerm }),
+        ...(batchFilter !== 'all' && { batchId: batchFilter }),
+        ...(statusFilter !== 'all' && { status: statusFilter })
+      })
+
+      const response = await fetch(`/api/admin/students?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch students')
+      }
+
+      const result = await response.json()
+      setUsers(result.data.students)
+      setBatches(result.data.batches || [])
+      setTotalPages(result.data.pagination.totalPages)
+      setTotal(result.data.pagination.total)
+    } catch (error) {
+      console.error('Error fetching students:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // OLD hardcoded data removed - now using API
+  /*
+  const [oldUsers] = useState([
     {
       id: 1,
       firstName: 'Rahul',
@@ -174,31 +215,12 @@ export default function AdminUsersPage() {
       rating: 3.6
     }
   ])
+  */
 
-  const [currentUsers, setCurrentUsers] = useState([...users])
-
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const filteredUsers = currentUsers.filter(user => {
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase()
-    const matchesSearch = fullName.includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.username.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter
-    
-    return matchesSearch && matchesStatus
-  })
-
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
-  const startIndex = (currentPage - 1) * usersPerPage
-  const endIndex = startIndex + usersPerPage
-  const pageUsers = filteredUsers.slice(startIndex, endIndex)
+  // Filtering now handled by API
+  const filteredUsers = users
+  const currentUsers = users
+  const pageUsers = users // Pagination now handled by API
 
   const getStatusBadge = (status: string) => {
     switch (status) {

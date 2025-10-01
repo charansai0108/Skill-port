@@ -1,52 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { verifyOTP } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, code, type = 'VERIFICATION' } = await request.json()
+    const body = await request.json()
+    const { email, otp } = body
 
-    if (!email || !code) {
-      return NextResponse.json({ error: 'Email and code are required' }, { status: 400 })
+    if (!email || !otp) {
+      return NextResponse.json({
+        error: 'Email and OTP are required'
+      }, { status: 400 })
     }
 
-    // Find valid OTP
-    const otpRecord = await prisma.oTP.findFirst({
-      where: {
-        email,
-        code,
-        type,
-        used: false,
-        expiresAt: {
-          gt: new Date()
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    })
+
+    if (!user) {
+      return NextResponse.json({
+        error: 'User not found'
+      }, { status: 404 })
+    }
+
+    // Check if already verified
+    if (user.isVerified) {
+      return NextResponse.json({
+        error: 'Account is already verified. Please login.',
+        code: 'ALREADY_VERIFIED'
+      }, { status: 400 })
+    }
+
+    // Verify OTP
+    const isValid = await verifyOTP(email, otp)
+
+    if (!isValid) {
+      return NextResponse.json({
+        error: 'Invalid or expired OTP. Please request a new one.',
+        code: 'INVALID_OTP'
+      }, { status: 400 })
+    }
+
+    // Get updated user data
+    const verifiedUser = await prisma.user.findUnique({
+      where: { email }
+    })
+
+    // Log activity
+    try {
+      await prisma.activityLog.create({
+        data: {
+          userId: user.id,
+          action: 'EMAIL_VERIFIED',
+          details: `User ${email} verified their email successfully`
         }
-      }
-    })
-
-    if (!otpRecord) {
-      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 })
-    }
-
-    // Mark OTP as used
-    await prisma.oTP.update({
-      where: { id: otpRecord.id },
-      data: { used: true }
-    })
-
-    // If verification, mark user as verified
-    if (type === 'VERIFICATION') {
-      await prisma.user.update({
-        where: { email },
-        data: { emailVerified: true }
       })
+    } catch (err) {
+      console.error('Activity log error:', err)
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'OTP verified successfully' 
-    })
+    // Determine redirect URL based on role
+    let redirectUrl = '/personal/dashboard'
+    
+    switch (verifiedUser?.role) {
+      case 'ADMIN':
+        redirectUrl = '/admin/dashboard'
+        break
+      case 'COMMUNITY_ADMIN':
+        redirectUrl = '/community/dashboard'
+        break
+      case 'MENTOR':
+        redirectUrl = '/mentor/dashboard'
+        break
+      case 'STUDENT':
+        redirectUrl = '/student/dashboard'
+        break
+      case 'PERSONAL':
+      default:
+        redirectUrl = '/auth/login' // Redirect to login for personal users
+        break
+    }
 
-  } catch (error) {
-    console.error('Verify OTP error:', error)
-    return NextResponse.json({ error: 'Failed to verify OTP' }, { status: 500 })
+    return NextResponse.json({
+      success: true,
+      message: 'Email verified successfully! You can now login.',
+      data: {
+        email: verifiedUser?.email,
+        role: verifiedUser?.role,
+        redirectUrl,
+        verified: true
+      }
+    }, { status: 200 })
+
+  } catch (error: any) {
+    console.error('OTP verification error:', error)
+    return NextResponse.json({
+      error: 'OTP verification failed',
+      details: error.message
+    }, { status: 500 })
   }
 }

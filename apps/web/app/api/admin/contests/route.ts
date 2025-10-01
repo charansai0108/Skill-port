@@ -1,191 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAdminAuth, validatePaginationParams, createSuccessResponse, createErrorResponse } from '@/lib/admin-middleware'
 import { prisma } from '@/lib/prisma'
+import { getCurrentAdmin } from '@/lib/auth'
 
-// GET /api/admin/contests - List contests with pagination and filters
-export const GET = withAdminAuth(async (request: NextRequest, admin) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const { page, limit, skip } = validatePaginationParams({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit')
-    })
+    const admin = await getCurrentAdmin(request)
+    
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
+    // Get query parameters
+    const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
-    const status = searchParams.get('status') || ''
-    const batchId = searchParams.get('batchId') || ''
-    const dateRange = searchParams.get('dateRange') || ''
+    const status = searchParams.get('status') || 'all'
 
     // Build where clause
     const where: any = {}
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } }
       ]
     }
 
-    if (status) {
-      where.status = status
+    if (status !== 'all') {
+      where.status = status.toUpperCase()
     }
 
-    if (batchId) {
-      where.batchId = batchId
-    }
-
-    if (dateRange) {
-      const now = new Date()
-      switch (dateRange) {
-        case 'upcoming':
-          where.startDate = { gt: now }
-          break
-        case 'active':
-          where.startDate = { lte: now }
-          where.endDate = { gte: now }
-          break
-        case 'completed':
-          where.endDate = { lt: now }
-          break
-        case 'thisWeek':
-          const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-          where.startDate = { gte: weekStart }
-          break
-        case 'thisMonth':
-          const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-          where.startDate = { gte: monthStart }
-          break
-      }
-    }
-
-    // Get contests with pagination
-    const [contests, totalCount] = await Promise.all([
-      prisma.contest.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          status: true,
-          startDate: true,
-          endDate: true,
-          maxParticipants: true,
-          createdAt: true,
-          batch: {
-            select: {
-              id: true,
-              name: true
-            }
-          },
-          _count: {
-            select: {
-              participants: true
-            }
-          }
-        },
-        orderBy: { startDate: 'desc' },
-        skip,
-        take: limit
-      }),
-      prisma.contest.count({ where })
-    ])
-
-    return createSuccessResponse({
-      contests,
-      pagination: {
-        page,
-        limit,
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
-    }, 'Contests retrieved successfully')
-
-  } catch (error: any) {
-    console.error('Get contests error:', error)
-    return createErrorResponse('Failed to fetch contests', 500)
-  }
-})
-
-// POST /api/admin/contests - Create new contest
-export const POST = withAdminAuth(async (request: NextRequest, admin) => {
-  try {
-    const body = await request.json()
-    const { name, description, startDate, endDate, batchId, maxParticipants, participantIds } = body
-
-    // Validate required fields
-    if (!name || !startDate || !endDate) {
-      return createErrorResponse('Missing required fields: name, startDate, endDate')
-    }
-
-    // Validate dates
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    
-    if (start >= end) {
-      return createErrorResponse('End date must be after start date')
-    }
-
-    if (start < new Date()) {
-      return createErrorResponse('Start date cannot be in the past')
-    }
-
-    // Create contest with participants in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Create contest
-      const contest = await tx.contest.create({
-        data: {
-          name,
-          description: description || null,
-          startDate: start,
-          endDate: end,
-          batchId: batchId || null,
-          maxParticipants: maxParticipants || null
-        }
-      })
-
-      // Add participants if provided
-      if (participantIds && participantIds.length > 0) {
-        await tx.contestParticipant.createMany({
-          data: participantIds.map((userId: string) => ({
-            contestId: contest.id,
-            userId
-          }))
-        })
-      }
-
-      return contest
-    })
-
-    // Get created contest with details
-    const contest = await prisma.contest.findUnique({
-      where: { id: result.id },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-        maxParticipants: true,
-        createdAt: true,
-        batch: {
+    // Get contests
+    const contests = await prisma.contest.findMany({
+      where,
+      orderBy: { startDate: 'desc' },
+      include: {
+        creator: {
           select: {
             id: true,
-            name: true
+            name: true,
+            email: true
           }
         },
         _count: {
           select: {
-            participants: true
+            participants: true,
+            submissions: true
           }
         }
       }
     })
 
-    return createSuccessResponse(contest, 'Contest created successfully', 201)
+    // Format response
+    const formattedContests = contests.map(contest => ({
+      id: contest.id,
+      name: contest.title,
+      title: contest.title,
+      description: contest.description,
+      category: 'Programming', // Default category
+      batch: '2024-25', // Can be linked to batch if needed
+      status: contest.status.toLowerCase(),
+      participants: contest._count.participants,
+      submissions: contest._count.submissions,
+      startDate: contest.startDate.toISOString(),
+      endDate: contest.endDate.toISOString(),
+      mentor: contest.creator.name,
+      mentorEmail: contest.creator.email,
+      icon: 'code',
+      color: contest.status === 'ACTIVE' ? 'blue' : contest.status === 'UPCOMING' ? 'green' : 'gray',
+      rules: contest.rules,
+      prizes: contest.prizes
+    }))
+
+    // Get summary stats
+    const stats = {
+      total: contests.length,
+      active: contests.filter(c => c.status === 'ACTIVE').length,
+      upcoming: contests.filter(c => c.status === 'UPCOMING').length,
+      ended: contests.filter(c => c.status === 'ENDED').length
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        contests: formattedContests,
+        stats
+      }
+    })
 
   } catch (error: any) {
-    console.error('Create contest error:', error)
-    return createErrorResponse('Failed to create contest', 500)
+    console.error('Contests API error:', error)
+    return NextResponse.json({
+      error: 'Failed to fetch contests',
+      details: error.message
+    }, { status: 500 })
   }
-})
+}

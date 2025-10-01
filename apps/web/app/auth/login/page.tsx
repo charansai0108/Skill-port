@@ -40,30 +40,13 @@ export default function LoginPage() {
           localStorage.setItem('user', JSON.stringify(result.data.user))
           
           showAlert('🎉 Login successful! Redirecting...', 'success')
+          
+          // Use the redirect URL from the API response
+          const redirectUrl = result.data.redirectUrl || '/personal/dashboard'
+          
+          console.log(`🔄 Redirecting ${result.data.user.role} user to: ${redirectUrl}`)
+          
           setTimeout(() => {
-            // Determine redirect URL based on user role
-            let redirectUrl: string = '/personal/dashboard'
-            switch (result.data.user.role) {
-              case 'ADMIN':
-                redirectUrl = '/admin/dashboard'
-                break
-              case 'MENTOR':
-                redirectUrl = '/mentor/dashboard'
-                break
-              case 'STUDENT':
-                redirectUrl = '/student/dashboard'
-                break
-              case 'COMMUNITY_ADMIN':
-                redirectUrl = '/community/dashboard'
-                break
-              case 'PERSONAL':
-              default:
-                redirectUrl = '/personal/dashboard'
-                break
-            }
-            
-            console.log(`🔄 Redirecting ${result.data.user.role} user to: ${redirectUrl}`)
-            
             try {
               router.push(redirectUrl)
             } catch (error) {

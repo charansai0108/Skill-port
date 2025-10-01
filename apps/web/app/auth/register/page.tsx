@@ -76,37 +76,16 @@ export default function RegisterPage() {
       const result = await response.json()
 
       if (response.ok && result.success) {
-        showAlert('🎉 Registration successful! Redirecting to your dashboard...', 'success')
-        setTimeout(() => {
-          // Determine redirect URL based on user role
-          let redirectUrl: string = '/personal/dashboard'
-          switch (userData.role) {
-            case 'ADMIN':
-              redirectUrl = '/admin/dashboard'
-              break
-            case 'MENTOR':
-              redirectUrl = '/mentor/dashboard'
-              break
-            case 'STUDENT':
-              redirectUrl = '/student/dashboard'
-              break
-            case 'COMMUNITY_ADMIN':
-              redirectUrl = '/community/dashboard'
-              break
-            case 'PERSONAL':
-            default:
-              redirectUrl = '/personal/dashboard'
-              break
-          }
-          
-          try {
-            router.push(redirectUrl)
-          } catch (error) {
-            console.error('Redirect error:', error)
-            // Fallback to window.location if router.push fails
-            window.location.href = redirectUrl
-          }
-        }, 2000)
+        showAlert('🎉 Registration successful! Check your email for OTP verification.', 'success')
+        
+        // Show OTP in console for development
+        if (result.data?.otp) {
+          console.log('🔐 Your OTP:', result.data.otp)
+          showAlert(`Dev Mode: Your OTP is ${result.data.otp}`, 'info')
+        }
+        
+        // Show OTP verification form
+        showOTPForm(userData.email as string)
       } else {
         showAlert(result.message || result.error || 'Registration failed', 'error')
       }
@@ -123,7 +102,8 @@ export default function RegisterPage() {
       name: `${formData.get('firstName')} ${formData.get('lastName')}`,
       email: formData.get('email'),
       password: formData.get('password'),
-      role: 'MENTOR',
+      role: 'ADMIN',
+      communityName: formData.get('organizationName') || `${formData.get('firstName')}'s Community`,
       phone: '',
       bio: `Organization: ${formData.get('organizationName')}, Position: ${formData.get('position')}`
     }
@@ -145,37 +125,20 @@ export default function RegisterPage() {
       const result = await response.json()
 
       if (response.ok && result.success) {
-        showAlert('🎉 Registration successful! Redirecting to your dashboard...', 'success')
-        setTimeout(() => {
-          // Determine redirect URL based on user role
-          let redirectUrl: string = '/personal/dashboard'
-          switch (userData.role) {
-            case 'ADMIN':
-              redirectUrl = '/admin/dashboard'
-              break
-            case 'MENTOR':
-              redirectUrl = '/mentor/dashboard'
-              break
-            case 'STUDENT':
-              redirectUrl = '/student/dashboard'
-              break
-            case 'COMMUNITY_ADMIN':
-              redirectUrl = '/community/dashboard'
-              break
-            case 'PERSONAL':
-            default:
-              redirectUrl = '/personal/dashboard'
-              break
-          }
-          
-          try {
-            router.push(redirectUrl)
-          } catch (error) {
-            console.error('Redirect error:', error)
-            // Fallback to window.location if router.push fails
-            window.location.href = redirectUrl
-          }
-        }, 2000)
+        const message = result.data?.communityCode 
+          ? `🎉 Community created! Code: ${result.data.communityCode}. Check your email for OTP.`
+          : '🎉 Registration successful! Check your email for OTP verification.'
+        
+        showAlert(message, 'success')
+        
+        // Show OTP in console for development
+        if (result.data?.otp) {
+          console.log('🔐 Your OTP:', result.data.otp)
+          showAlert(`Dev Mode: Your OTP is ${result.data.otp}`, 'info')
+        }
+        
+        // Show OTP verification form
+        showOTPForm(userData.email as string)
       } else {
         showAlert(result.message || result.error || 'Registration failed', 'error')
       }
@@ -191,11 +154,27 @@ export default function RegisterPage() {
     const otp = formData.get('otp')
 
     try {
-      // Simulate OTP verification
-      showAlert('🎉 Email verified successfully! Redirecting...', 'success')
-      setTimeout(() => {
-        router.push('/auth/login')
-      }, 2000)
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: currentEmail,
+          otp
+        }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        showAlert('🎉 Email verified successfully! Redirecting to login...', 'success')
+        setTimeout(() => {
+          router.push('/auth/login')
+        }, 2000)
+      } else {
+        showAlert(result.error || 'OTP verification failed', 'error')
+      }
     } catch (error) {
       showAlert('OTP verification failed: ' + (error as Error).message, 'error')
     }

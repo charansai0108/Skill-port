@@ -82,11 +82,55 @@ export default function AdminMentorsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [mentors, setMentors] = useState<any[]>([])
+  const [specializations, setSpecializations] = useState<string[]>([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   const mentorsPerPage = 9
 
-  // Sample mentor data
-  const [mentors, setMentors] = useState([
+  // Fetch mentors from API
+  useEffect(() => {
+    fetchMentors()
+  }, [currentPage, searchTerm, specializationFilter, statusFilter])
+
+  const fetchMentors = async () => {
+    try {
+      setIsLoading(true)
+      const token = localStorage.getItem('token')
+      
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: mentorsPerPage.toString(),
+        ...(searchTerm && { search: searchTerm }),
+        ...(specializationFilter !== 'all' && { specialization: specializationFilter }),
+        ...(statusFilter !== 'all' && { status: statusFilter })
+      })
+
+      const response = await fetch(`/api/admin/mentors?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) throw new Error('Failed to fetch mentors')
+
+      const result = await response.json()
+      setMentors(result.data.mentors)
+      setSpecializations(result.data.specializations || [])
+      setTotalPages(result.data.pagination.totalPages)
+      setTotal(result.data.pagination.total)
+    } catch (error) {
+      console.error('Error fetching mentors:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // OLD hardcoded data removed
+  /*
+  const [oldMentors] = useState([
     {
       id: 1,
       firstName: 'Dr. Rajesh',
@@ -178,17 +222,13 @@ export default function AdminMentorsPage() {
       }
     }
   ])
+  */
 
-  const [currentMentors, setCurrentMentors] = useState([...mentors])
+  // Filtering now handled by API
+  const filteredMentors = mentors
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
+  // OLD filtering logic removed
+  /*
   const filteredMentors = currentMentors.filter(mentor => {
     const fullName = `${mentor.firstName} ${mentor.lastName}`.toLowerCase()
     const matchesSearch = fullName.includes(searchTerm.toLowerCase()) ||
@@ -201,10 +241,9 @@ export default function AdminMentorsPage() {
     return matchesSearch && matchesSpecialization && matchesStatus
   })
 
-  const totalPages = Math.ceil(filteredMentors.length / mentorsPerPage)
-  const startIndex = (currentPage - 1) * mentorsPerPage
-  const endIndex = startIndex + mentorsPerPage
-  const pageMentors = filteredMentors.slice(startIndex, endIndex)
+  // Pagination now handled by API
+  const pageMentors = mentors
+  */
 
   const getStatusBadge = (status: string) => {
     switch (status) {

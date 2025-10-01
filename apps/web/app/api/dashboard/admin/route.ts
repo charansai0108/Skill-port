@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentAdmin } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser(request)
+    const user = await getCurrentAdmin(request)
     
-    if (!user || user.role !== 'ADMIN') {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -31,6 +31,25 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         role: true,
+        createdAt: true,
+        batch: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+
+    // Get recent mentors specifically
+    const recentMentors = await prisma.user.findMany({
+      where: { role: 'MENTOR' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        subject: true,
         createdAt: true
       }
     })
@@ -134,6 +153,7 @@ export async function GET(request: NextRequest) {
         activeUsers: totalUsers // All users are considered active in the new schema
       },
       recentUsers,
+      recentMentors,
       recentContests,
       recentSubmissions,
       recentCommunities,

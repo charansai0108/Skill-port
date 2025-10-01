@@ -1,183 +1,127 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAdminAuth, validatePaginationParams, createSuccessResponse, createErrorResponse } from '@/lib/admin-middleware'
 import { prisma } from '@/lib/prisma'
-import { hashPassword } from '@/lib/auth'
+import { getCurrentAdmin } from '@/lib/auth'
 
-// GET /api/admin/mentors - List mentors with pagination and filters
-export const GET = withAdminAuth(async (request: NextRequest, admin) => {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const { page, limit, skip } = validatePaginationParams({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit')
-    })
+    const admin = await getCurrentAdmin(request)
+    
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
+    // Get query parameters
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
     const search = searchParams.get('search') || ''
-    const batch = searchParams.get('batch') || ''
-    const status = searchParams.get('status') || ''
+    const specialization = searchParams.get('specialization') || ''
+    const status = searchParams.get('status') || 'all'
+    const skip = (page - 1) * limit
 
     // Build where clause
-    const where: any = {}
+    const where: any = {
+      role: 'MENTOR'
+    }
 
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } },
-        { specialization: { contains: search, mode: 'insensitive' } }
+        { subject: { contains: search, mode: 'insensitive' } }
       ]
     }
 
-    if (batch) {
-      where.batches = {
-        some: {
-          batchId: batch
-        }
-      }
+    if (specialization) {
+      where.subject = { contains: specialization, mode: 'insensitive' }
     }
 
-    if (status) {
+    if (status !== 'all') {
       where.isActive = status === 'active'
     }
 
     // Get mentors with pagination
-    const [mentors, totalCount] = await Promise.all([
-      prisma.mentor.findMany({
+    const [mentors, total] = await Promise.all([
+      prisma.user.findMany({
         where,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          specialization: true,
-          bio: true,
-          profilePic: true,
-          isActive: true,
-          rating: true,
-          totalStudents: true,
-          createdAt: true,
-          batches: {
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          contests: {
             select: {
-              batch: {
-                select: {
-                  id: true,
-                  name: true
-                }
-              }
+              id: true,
+              status: true
+            }
+          },
+          mentorFeedbacks: {
+            select: {
+              id: true,
+              rating: true
+            }
+          },
+          _count: {
+            select: {
+              mentorFeedbacks: true,
+              contests: true
             }
           }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit
+        }
       }),
-      prisma.mentor.count({ where })
+      prisma.user.count({ where })
     ])
 
-    // Transform mentors data
-    const transformedMentors = mentors.map(mentor => ({
-      ...mentor,
-      batches: mentor.batches.map(mb => mb.batch)
-    }))
+    // Format response
+    const formattedMentors = mentors.map(mentor => {
+      const ratings = mentor.mentorFeedbacks.map(f => f.rating)
+      const averageRating = ratings.length > 0 
+        ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+        : 0
 
-    return createSuccessResponse({
-      mentors: transformedMentors,
-      pagination: {
-        page,
-        limit,
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
-    }, 'Mentors retrieved successfully')
-
-  } catch (error: any) {
-    console.error('Get mentors error:', error)
-    return createErrorResponse('Failed to fetch mentors', 500)
-  }
-})
-
-// POST /api/admin/mentors - Create new mentor
-export const POST = withAdminAuth(async (request: NextRequest, admin) => {
-  try {
-    const body = await request.json()
-    const { name, email, password, specialization, bio, profilePic, batchIds } = body
-
-    // Validate required fields
-    if (!name || !email || !password || !specialization) {
-      return createErrorResponse('Missing required fields: name, email, password, specialization')
-    }
-
-    // Check if email already exists
-    const existingMentor = await prisma.mentor.findUnique({
-      where: { email }
-    })
-
-    if (existingMentor) {
-      return createErrorResponse('Mentor with this email already exists', 409)
-    }
-
-    // Hash password
-    const hashedPassword = await hashPassword(password)
-
-    // Create mentor with batches in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Create mentor
-      const mentor = await tx.mentor.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          specialization,
-          bio: bio || null,
-          profilePic: profilePic || null
-        }
-      })
-
-      // Assign batches if provided
-      if (batchIds && batchIds.length > 0) {
-        await tx.mentorBatch.createMany({
-          data: batchIds.map((batchId: string) => ({
-            mentorId: mentor.id,
-            batchId
-          }))
-        })
-      }
-
-      return mentor
-    })
-
-    // Get created mentor with batches
-    const mentor = await prisma.mentor.findUnique({
-      where: { id: result.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        specialization: true,
-        bio: true,
-        profilePic: true,
-        isActive: true,
-        rating: true,
-        totalStudents: true,
-        createdAt: true,
-        batches: {
-          select: {
-            batch: {
-              select: {
-                id: true,
-                name: true
-              }
-            }
-          }
+      return {
+        id: mentor.id,
+        firstName: mentor.name.split(' ')[0] || mentor.name,
+        lastName: mentor.name.split(' ').slice(1).join(' ') || '',
+        name: mentor.name,
+        email: mentor.email,
+        username: mentor.username || mentor.email.split('@')[0],
+        specialization: mentor.subject || 'General',
+        status: mentor.isActive ? 'active' : 'inactive',
+        createdAt: mentor.createdAt.toISOString(),
+        mentorStats: {
+          totalStudents: mentor._count.mentorFeedbacks, // Students who received feedback
+          activeContests: mentor.contests.filter(c => c.status === 'ACTIVE').length,
+          averageRating: Math.round(averageRating * 10) / 10
         }
       }
     })
 
-    return createSuccessResponse({
-      ...mentor,
-      batches: mentor?.batches.map(mb => mb.batch) || []
-    }, 'Mentor created successfully', 201)
+    // Get unique specializations
+    const specializations = await prisma.user.findMany({
+      where: { role: 'MENTOR', subject: { not: null } },
+      select: { subject: true },
+      distinct: ['subject']
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        mentors: formattedMentors,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        },
+        specializations: specializations.map(s => s.subject).filter(Boolean)
+      }
+    })
 
   } catch (error: any) {
-    console.error('Create mentor error:', error)
-    return createErrorResponse('Failed to create mentor', 500)
+    console.error('Mentors API error:', error)
+    return NextResponse.json({
+      error: 'Failed to fetch mentors',
+      details: error.message
+    }, { status: 500 })
   }
-})
+}

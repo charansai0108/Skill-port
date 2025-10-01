@@ -36,9 +36,6 @@ export function AuthRedirect({ requiredRole, currentPath }: AuthRedirectProps) {
             case 'STUDENT':
               redirectUrl = '/student/dashboard'
               break
-            case 'COMMUNITY_ADMIN':
-              redirectUrl = '/community/dashboard'
-              break
             case 'PERSONAL':
             default:
               redirectUrl = '/personal/dashboard'

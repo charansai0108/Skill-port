@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getCurrentStudent } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentStudent(request)
+    const user = await getCurrentUser(request)
     
     if (!user || user.role !== 'PERSONAL') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

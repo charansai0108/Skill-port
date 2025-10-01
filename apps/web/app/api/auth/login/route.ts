@@ -1,54 +1,131 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticateStudent, authenticateAdmin, generateToken } from '@/lib/auth'
-import { createResponse, createErrorResponse } from '@/lib/api-utils'
-import { loginSchema, validateInput } from '@/lib/validation'
+import { prisma } from '@/lib/prisma'
+import { verifyPassword, generateToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+    const { email, password } = body
+
     // Validate input
-    const validation = validateInput(loginSchema, body)
-    if (!validation.success) {
-      return createErrorResponse(validation.errors.join(', '), 400)
+    if (!email || !password) {
+      return NextResponse.json({
+        error: 'Email and password are required'
+      }, { status: 400 })
     }
 
-    const { email, password } = validation.data
+    // Find user by email with community data
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        communities: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
+        }
+      }
+    })
 
-    // Authenticate user
-    const user = await authenticateStudent(email, password)
-    
     if (!user) {
-      return createErrorResponse('Invalid credentials', 401)
+      return NextResponse.json({
+        error: 'Invalid email or password'
+      }, { status: 401 })
     }
 
-    // Determine user type based on role
-    let userType = 'student'
-    if (user.role === 'ADMIN') {
-      userType = 'admin'
+    // Check if user is verified
+    if (!user.isVerified) {
+      return NextResponse.json({
+        error: 'Please verify your email first. Check your inbox for the OTP.',
+        code: 'NOT_VERIFIED',
+        email: user.email
+      }, { status: 403 })
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return NextResponse.json({
+        error: 'Your account has been deactivated. Please contact support.'
+      }, { status: 403 })
+    }
+
+    // Verify password
+    const isValidPassword = await verifyPassword(password, user.password)
+    if (!isValidPassword) {
+      return NextResponse.json({
+        error: 'Invalid email or password'
+      }, { status: 401 })
     }
 
     // Generate JWT token
-    const token = generateToken(user, userType)
+    const token = generateToken(user)
 
-    return createResponse(
-      {
+    // Get community slug if user is admin
+    const community = user.communities[0] // Admin creates community, so they own it
+    const communitySlug = community?.slug
+
+    // Determine redirect URL based on role
+    let redirectUrl = '/personal/dashboard'
+    
+    switch (user.role) {
+      case 'ADMIN':
+        // Redirect to their community's admin dashboard
+        redirectUrl = communitySlug 
+          ? `/community/${communitySlug}/dashboard`
+          : '/admin/dashboard' // Fallback to old route if no community
+        break
+      case 'MENTOR':
+        redirectUrl = '/mentor/dashboard'
+        break
+      case 'STUDENT':
+        redirectUrl = '/student/dashboard'
+        break
+      case 'PERSONAL':
+      default:
+        redirectUrl = '/personal/dashboard'
+        break
+    }
+
+    // Log activity
+    try {
+      await prisma.activityLog.create({
+        data: {
+          userId: user.id,
+          action: 'USER_LOGIN',
+          details: `User ${user.email} logged in successfully`
+        }
+      })
+    } catch (err) {
+      // Don't fail login if activity log fails
+      console.error('Activity log error:', err)
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Login successful',
+      data: {
         user: {
           id: user.id,
           name: user.name,
+          username: user.username,
           email: user.email,
           role: user.role,
           profilePic: user.profilePic,
-          batchId: user.batchId
+          communityId: user.communityId,
+          batchId: user.batchId,
+          communitySlug
         },
-        token
-      },
-      200,
-      'Login successful'
-    )
+        token,
+        redirectUrl
+      }
+    }, { status: 200 })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error)
-    return createErrorResponse('Login failed', 500)
+    return NextResponse.json({
+      error: 'Login failed',
+      details: error.message
+    }, { status: 500 })
   }
 }

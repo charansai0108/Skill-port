@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 import {
   Users,
   Trophy,
@@ -13,8 +15,17 @@ import {
   User,
   Target,
   TrendingUp,
-  CheckCircle,
-  Clock
+  GraduationCap,
+  UserPlus,
+  PlusCircle,
+  Award,
+  Flag,
+  UserCheck,
+  Clock,
+  MessageCircle,
+  FileText,
+  LayoutDashboard,
+  Shield
 } from 'lucide-react'
 
 interface DashboardData {
@@ -35,14 +46,14 @@ interface DashboardData {
     activeUsers: number
   }
   recentUsers: any[]
-  recentContests: any[]
-  recentSubmissions: any[]
-  recentCommunities: any[]
+  recentMentors: any[]
   recentActivities: any[]
   notifications: any[]
 }
 
 export default function AdminDashboardPage() {
+  const pathname = usePathname()
+  const { user: authUser, loading: authLoading } = useAuth('ADMIN')
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -88,273 +99,482 @@ export default function AdminDashboardPage() {
     fetchDashboardData()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    )
-  }
+  const { user, stats, recentUsers, recentActivities, notifications } = data || {}
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={fetchDashboardData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Try Again
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-8 h-8 mx-auto mb-4 text-gray-600" />
-          <p className="text-gray-600">No data available</p>
-        </div>
-      </div>
-    )
-  }
-
-  const { user, stats, recentUsers, recentContests, recentSubmissions, recentCommunities, recentActivities, notifications } = data
+  const isActive = (href: string) => pathname === href
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-2">Platform overview and management</p>
+    <>
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                PW IOI
+              </span>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={fetchDashboardData}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <RefreshCw className="w-5 h-5" />
-              </button>
-              <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
-                <p className="text-xs text-green-600 mt-1">{stats.activeUsers} active</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Students</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <User className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Mentors</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalMentors}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Contests</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalContests}</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Trophy className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Submissions</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalSubmissions}</p>
-              </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-indigo-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Communities</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalCommunities}</p>
-              </div>
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
-                <Activity className="w-6 h-6 text-pink-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Users */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Users</h2>
-                <Link href="/admin/users" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View all
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {recentUsers.length > 0 ? (
-                  recentUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{user.name}</p>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
-                          user.role === 'MENTOR' ? 'bg-green-100 text-green-800' :
-                          user.role === 'STUDENT' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user.role}
-                        </span>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/admin/dashboard" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/dashboard') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
+              </Link>
+              <Link href="/admin/users" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/users') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Users className="w-4 h-4" /> Students
+              </Link>
+              <Link href="/admin/mentors" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/mentors') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <GraduationCap className="w-4 h-4" /> Mentors
+              </Link>
+              <Link href="/admin/contests" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/contests') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Trophy className="w-4 h-4" /> Contests
+              </Link>
+              <Link href="/admin/analytics" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/analytics') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <BarChart3 className="w-4 h-4" /> Analytics
+              </Link>
+              <Link href="/admin/leaderboard" className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/admin/leaderboard') ? 'bg-red-50 text-red-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}>
+                <Award className="w-4 h-4" /> Leaderboard
+              </Link>
+              <Link href="/admin/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+                {authUser ? (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center text-white text-sm font-semibold shadow-lg border-2 border-white">
+                    {authUser.name?.charAt(0).toUpperCase() || 'A'}
+                  </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No users found</p>
+                  <User className="w-8 h-8" />
                 )}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {(authLoading || loading) && (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={fetchDashboardData}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!authLoading && !loading && !error && data && (
+        <>
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
+                <LayoutDashboard className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-700 leading-snug">Dashboard</h1>
+              </div>
+            </div>
+          </div>
+
+          {/* System Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div className="stat-card bg-white rounded-lg shadow-lg p-6 backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600">Total Users</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.totalUsers}</p>
+                  <p className="text-sm text-green-600">+{stats.activeUsers} active</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
             </div>
 
-            {/* Recent Activities */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Activities</h2>
-                <Link href="/admin/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View all
-                </Link>
+            <div className="stat-card bg-white rounded-lg shadow-lg p-6 backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600">Active Mentors</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.totalMentors}</p>
+                  <p className="text-sm text-green-600">+2 this month</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-green-600" />
+                </div>
               </div>
-              <div className="space-y-4">
+            </div>
+
+            <div className="stat-card bg-white rounded-lg shadow-lg p-6 backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600">Active Contests</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.totalContests}</p>
+                  <p className="text-sm text-green-600">+3 this month</p>
+                </div>
+                <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-amber-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="stat-card bg-white rounded-lg shadow-lg p-6 backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:shadow-xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600">Problems Solved</p>
+                  <p className="text-2xl font-bold text-slate-600">{stats.totalSubmissions}</p>
+                  <p className="text-sm text-green-600">+15 this week</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Target className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity & Community Insights */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Recent Activity */}
+            <div className="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80 backdrop-filter backdrop-blur-lg bg-opacity-70 border border-white border-opacity-20 hover:bg-opacity-90 hover:shadow-2xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
+              <div className="space-y-4 h-64 overflow-y-auto">
                 {recentActivities.length > 0 ? (
                   recentActivities.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <div key={activity.id} className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Activity className="w-4 h-4 text-blue-600" />
+                      </div>
                       <div className="flex-1">
-                        <p className="text-sm text-gray-900">{activity.action}</p>
-                        <p className="text-xs text-gray-600">
-                          {activity.user.name} • {new Date(activity.createdAt).toLocaleDateString()}
+                        <p className="text-sm font-medium text-slate-900">{activity.action}</p>
+                        <p className="text-xs text-slate-500">
+                          {activity.user?.name || 'Unknown'} • {new Date(activity.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No recent activities</p>
+                  <div className="text-center py-8">
+                    <p className="text-sm text-slate-500">No recent activity</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Community Insights */}
+            <div className="dashboard-card bg-white rounded-lg shadow-lg p-6 h-80 backdrop-filter backdrop-blur-lg bg-opacity-70 border border-white border-opacity-20 hover:bg-opacity-90 hover:shadow-2xl hover:-translate-y-0.5 hover:scale-105 transition-all duration-300">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">Community Insights</h2>
+              <div className="space-y-4 h-64 overflow-y-auto">
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-slate-900">Active Users Today</span>
+                  </div>
+                  <span className="text-sm font-semibold text-blue-600">{stats.activeUsers}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-slate-900">New Registrations</span>
+                  </div>
+                  <span className="text-sm font-semibold text-green-600">{recentUsers.length}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm font-medium text-slate-900">Community Posts</span>
+                  </div>
+                  <span className="text-sm font-semibold text-amber-600">{stats.totalCommunities}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Award className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm font-medium text-slate-900">Contest Submissions</span>
+                  </div>
+                  <span className="text-sm font-semibold text-purple-600">{stats.totalSubmissions}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Users & Mentors */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Recent Users */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Recent Users</h2>
+                <Link href="/admin/users" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All
+                </Link>
+              </div>
+              <div className="space-y-3 h-64 overflow-y-auto">
+                {recentUsers.length > 0 ? (
+                  recentUsers.slice(0, 5).map((user) => (
+                    <div key={user.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900">{user.name}</p>
+                        <p className="text-xs text-slate-500">{user.email}</p>
+                      </div>
+                      <span className="text-xs text-slate-500">{new Date(user.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-slate-500">No recent users</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Mentors */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Recent Mentors</h2>
+                <Link href="/admin/mentors" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All
+                </Link>
+              </div>
+              <div className="space-y-3 h-64 overflow-y-auto">
+                {recentUsers.filter(u => u.role === 'MENTOR').length > 0 ? (
+                  recentUsers.filter(u => u.role === 'MENTOR').slice(0, 5).map((mentor) => (
+                    <div key={mentor.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors">
+                      <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        {mentor.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900">{mentor.name}</p>
+                        <p className="text-xs text-slate-500">Expert • 0 students</p>
+                      </div>
+                      <span className="text-xs text-green-600">active</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-slate-500">No recent mentors</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Recent Contests & Notifications */}
-          <div>
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Contests</h2>
-                <Link href="/admin/contests" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View all
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {recentContests.length > 0 ? (
-                  recentContests.map((contest) => (
-                    <div key={contest.id} className="p-3 bg-gray-50 rounded-lg">
-                      <h3 className="font-medium text-gray-900 mb-2">{contest.title}</h3>
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>By {contest.creator.name}</span>
-                        <span>{contest._count.participants} participants</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(contest.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-4">No contests found</p>
-                )}
-              </div>
+          {/* Quick Actions */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              <Link href="/admin/users" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:-translate-y-0.5 hover:scale-105">
+                <UserPlus className="w-12 h-12 text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-slate-900 mb-2">Add New User</h3>
+                <p className="text-sm text-slate-600">Create user account with credentials</p>
+              </Link>
+              <Link href="/admin/mentors" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:-translate-y-0.5 hover:scale-105">
+                <GraduationCap className="w-12 h-12 text-green-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-slate-900 mb-2">Add New Mentor</h3>
+                <p className="text-sm text-slate-600">Create mentor account and assign</p>
+              </Link>
+              <Link href="/admin/contests" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:-translate-y-0.5 hover:scale-105">
+                <PlusCircle className="w-12 h-12 text-amber-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-slate-900 mb-2">Create Contest</h3>
+                <p className="text-sm text-slate-600">Set up new contest and assign mentor</p>
+              </Link>
+              <Link href="/admin/analytics" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:-translate-y-0.5 hover:scale-105">
+                <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-slate-900 mb-2">View Analytics</h3>
+                <p className="text-sm text-slate-600">System-wide performance reports</p>
+              </Link>
+              <Link href="/admin/leaderboard" className="action-card bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all group cursor-pointer backdrop-filter backdrop-blur-lg bg-opacity-65 border-2 border-white border-opacity-60 hover:bg-opacity-85 hover:border-blue-400 hover:-translate-y-0.5 hover:scale-105">
+                <Award className="w-12 h-12 text-indigo-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="font-semibold text-slate-900 mb-2">View Leaderboard</h3>
+                <p className="text-sm text-slate-600">Overall system rankings</p>
+              </Link>
             </div>
+          </div>
 
-            {/* Notifications */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          {/* Alerts & Contest Management */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Alerts & Notifications */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Alerts & Notifications</h2>
+                <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
                   {notifications.length}
                 </span>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 h-64 overflow-y-auto">
                 {notifications.length > 0 ? (
-                  notifications.map((notification) => (
-                    <div key={notification.id} className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                      <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                  notifications.slice(0, 3).map((notification, index) => (
+                    <div key={notification.id} className={`flex items-center gap-3 p-3 rounded-lg border-l-4 ${
+                      index === 0 ? 'bg-red-50 border-red-400' :
+                      index === 1 ? 'bg-yellow-50 border-yellow-400' :
+                      'bg-blue-50 border-blue-400'
+                    }`}>
+                      <Flag className={`w-5 h-5 ${
+                        index === 0 ? 'text-red-600' :
+                        index === 1 ? 'text-yellow-600' :
+                        'text-blue-600'
+                      }`} />
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${
+                          index === 0 ? 'text-red-900' :
+                          index === 1 ? 'text-yellow-900' :
+                          'text-blue-900'
+                        }`}>{notification.title}</p>
+                        <p className={`text-xs ${
+                          index === 0 ? 'text-red-600' :
+                          index === 1 ? 'text-yellow-600' :
+                          'text-blue-600'
+                        }`}>{notification.message}</p>
+                      </div>
+                      <button className={`text-xs ${
+                        index === 0 ? 'text-red-600 hover:text-red-800' :
+                        index === 1 ? 'text-yellow-600 hover:text-yellow-800' :
+                        'text-blue-600 hover:text-blue-800'
+                      }`}>Review</button>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No notifications</p>
+                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                    <AlertCircle className="w-5 h-5 text-blue-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900">System Alert</p>
+                      <p className="text-xs text-blue-600">All systems operational</p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
+
+            {/* Contest Management */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Contest Management</h2>
+                <Link href="/admin/contests" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All
+                </Link>
+              </div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{stats.totalContests}</div>
+                    <div className="text-xs text-green-600">Active Contests</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">2</div>
+                    <div className="text-xs text-blue-600">Pending Start</div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-amber-50 rounded-lg border-l-4 border-amber-400">
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="w-4 h-4 text-amber-600" />
+                      <span className="text-xs font-medium text-amber-900">Contests needing mentors</span>
+                    </div>
+                    <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-xs font-bold">1</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-medium text-blue-900">Total participants today</span>
+                    </div>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-bold">{stats.totalStudents}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-purple-600" />
+                      <span className="text-xs font-medium text-purple-900">Submissions pending review</span>
+                    </div>
+                    <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-bold">{stats.totalSubmissions}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+
+          {/* Performance & Community Health */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Performance Metrics */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Performance Metrics</h2>
+                <Link href="/admin/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View Details
+                </Link>
+              </div>
+              <div className="space-y-4 h-64 overflow-y-auto">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Target className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-slate-900">Contest Success Rate</span>
+                  </div>
+                  <span className="text-sm font-semibold text-green-600">87%</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-slate-900">Avg Mentor Response</span>
+                  </div>
+                  <span className="text-sm font-semibold text-blue-600">2.3 hrs</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm font-medium text-slate-900">User Engagement</span>
+                  </div>
+                  <span className="text-sm font-semibold text-purple-600">73%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Community Health */}
+            <div className="bg-white rounded-lg shadow-lg p-6 h-80">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900">Community Health</h2>
+                <Link href="/admin/analytics" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View Details
+                </Link>
+              </div>
+              <div className="space-y-4 h-64 overflow-y-auto">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-slate-900">Weekly Growth</span>
+                  </div>
+                  <span className="text-sm font-semibold text-green-600">+12%</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-slate-900">Active Discussions</span>
+                  </div>
+                  <span className="text-sm font-semibold text-blue-600">18</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Award className="w-5 h-5 text-amber-600" />
+                    <span className="text-sm font-medium text-slate-900">Top Contributors</span>
+                  </div>
+                  <span className="text-sm font-semibold text-amber-600">24</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+      </main>
+    </>
   )
 }
