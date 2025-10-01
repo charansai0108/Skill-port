@@ -73,7 +73,11 @@ export default function MentorDashboardPage() {
       }
 
       const result = await response.json()
-      setData(result)
+      if (result.success) {
+        setData(result.data)
+      } else {
+        throw new Error(result.error || 'Failed to fetch dashboard data')
+      }
     } catch (err) {
       console.error('Dashboard fetch error:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data')
@@ -136,7 +140,7 @@ export default function MentorDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Mentor Dashboard</h1>
-              <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
+              <p className="text-gray-600 mt-2">Welcome back, {data?.user?.name || 'Mentor'}</p>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -146,7 +150,7 @@ export default function MentorDashboardPage() {
                 <RefreshCw className="w-5 h-5" />
               </button>
               <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user.name.charAt(0).toUpperCase()}
+                {data?.user?.name?.charAt(0).toUpperCase() || 'M'}
               </div>
             </div>
           </div>
