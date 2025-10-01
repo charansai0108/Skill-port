@@ -52,7 +52,9 @@ export default function MentorDashboardPage() {
 
       const token = localStorage.getItem('token')
       if (!token) {
-        throw new Error('No authentication token found')
+        setError('Please log in to access the mentor dashboard')
+        setLoading(false)
+        return
       }
 
       const response = await fetch(`/api/community/${communitySlug}/mentor/dashboard`, {
@@ -107,13 +109,23 @@ export default function MentorDashboardPage() {
         <div className="text-center">
           <AlertCircle className="w-8 h-8 mx-auto mb-4 text-red-600" />
           <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={fetchDashboardData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Try Again
-          </button>
+          {error.includes('log in') ? (
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <User className="w-4 h-4" />
+              Go to Login
+            </Link>
+          ) : (
+            <button
+              onClick={fetchDashboardData}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
+          )}
         </div>
       </div>
     )
@@ -130,7 +142,7 @@ export default function MentorDashboardPage() {
     )
   }
 
-  const { user, stats, assignedStudents, recentFeedbacks, pendingFeedbacks, contests, notifications } = data
+  const { user, stats, assignedStudents, recentFeedbacks, pendingFeedbacks, contests, notifications } = data || {}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
