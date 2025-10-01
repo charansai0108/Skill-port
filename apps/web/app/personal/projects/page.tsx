@@ -71,6 +71,9 @@ export default function PersonalProjectsPage() {
   const [showProjectModal, setShowProjectModal] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
     description: '',
@@ -84,7 +87,68 @@ export default function PersonalProjectsPage() {
     features: ''
   })
 
-  const projects: Project[] = [
+  // Fetch projects data
+  useEffect(() => {
+    const fetchProjectsData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const token = localStorage.getItem('token')
+        if (!token) {
+          throw new Error('No authentication token found')
+        }
+
+        const response = await fetch('/api/personal/projects', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects data')
+        }
+
+        const result = await response.json()
+        if (result.success) {
+          const { projects: apiProjects } = result.data
+          
+          // Transform API data to match component interface
+          const transformedProjects = apiProjects.map((project: any) => ({
+            id: project.id,
+            title: project.title,
+            status: project.status === 'IN_PROGRESS' ? 'In Progress' : 
+                   project.status === 'COMPLETED' ? 'Completed' :
+                   project.status === 'ON_HOLD' ? 'On Hold' : 'Planning',
+            description: project.description,
+            technologies: project.tags || [],
+            category: project.category || 'Web Development',
+            completionDate: project.endDate ? new Date(project.endDate).toLocaleDateString() : undefined,
+            views: '0',
+            rating: 0,
+            github: '',
+            liveDemo: '',
+            features: [],
+            challenges: '',
+            solutions: '',
+            progress: project.progress || 0
+          }))
+          
+          setProjects(transformedProjects)
+        }
+      } catch (error) {
+        console.error('Error fetching projects data:', error)
+        setError('Failed to load projects data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjectsData()
+  }, [])
+
+  // Mock projects for fallback
+  const mockProjects: Project[] = [
     {
       id: 'ecommerce',
       title: 'E-Commerce Platform',

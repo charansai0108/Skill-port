@@ -41,14 +41,94 @@ interface LearningGoal {
 export default function PersonalProfilePage() {
   const [activeSection, setActiveSection] = useState('profile')
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [loading, setLoading] = useState(true)
   const [profileData, setProfileData] = useState({
-    firstName: 'Munaf',
+    firstName: '',
     lastName: '',
-    username: 'munaf',
-    bio: 'Passionate software developer with expertise in algorithms and web development. Always learning and growing!',
-    profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    username: '',
+    email: '',
+    phone: '',
+    bio: '',
+    location: '',
+    profileImage: ''
   })
-  const [learningGoals, setLearningGoals] = useState<LearningGoal[]>([
+  const [learningGoals, setLearningGoals] = useState<LearningGoal[]>([])
+  const [achievements, setAchievements] = useState<any[]>([])
+  const [communityMemberships, setCommunityMemberships] = useState<any[]>([])
+  const [recentActivity, setRecentActivity] = useState<any[]>([])
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: 'public',
+    showEmail: false,
+    showPhone: false,
+    showLocation: false,
+    allowMentorProgress: true,
+    publicProfile: true,
+    theme: 'light'
+  })
+
+  // Toast functions
+  const addToast = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    const id = Math.random().toString(36).substr(2, 9)
+    setToasts(prev => [...prev, { id, message, type }])
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id))
+    }, 5000)
+  }
+
+  // Fetch profile data
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true)
+        const token = localStorage.getItem('token')
+        if (!token) {
+          throw new Error('No authentication token found')
+        }
+
+        const response = await fetch('/api/personal/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data')
+        }
+
+        const result = await response.json()
+        if (result.success) {
+          const { profile, learningGoals: goals, achievements: userAchievements, communityMemberships: memberships, recentActivity: activity, privacySettings: settings } = result.data
+          
+          setProfileData({
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            username: profile.username,
+            email: profile.email,
+            phone: profile.phone,
+            bio: profile.bio,
+            location: profile.location,
+            profileImage: profile.profileImage
+          })
+          setLearningGoals(goals || [])
+          setAchievements(userAchievements || [])
+          setCommunityMemberships(memberships || [])
+          setRecentActivity(activity || [])
+          setPrivacySettings(settings || privacySettings)
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error)
+        addToast('Failed to load profile data', 'error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfileData()
+  }, [])
+
+  // Mock learning goals for now (will be replaced by API data)
+  const mockLearningGoals: LearningGoal[] = [
     {
       id: '1',
       title: 'Master Data Structures',

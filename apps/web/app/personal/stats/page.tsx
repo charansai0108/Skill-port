@@ -68,24 +68,79 @@ interface ChartData {
 
 export default function PersonalStatsPage() {
   const [statsData, setStatsData] = useState<StatsData>({
-    problemsSolved: 247,
-    skillRating: 1850,
-    dayStreak: 23,
-    achievements: 8,
+    problemsSolved: 0,
+    skillRating: 0,
+    dayStreak: 0,
+    achievements: 0,
     weeklyProgress: {
-      monday: 5,
-      tuesday: 4,
-      wednesday: 3,
-      thursday: 5,
-      friday: 2
+      monday: 0,
+      tuesday: 0,
+      wednesday: 0,
+      thursday: 0,
+      friday: 0
     },
-    topSkills: [
-      { name: 'Algorithms', percentage: 95 },
-      { name: 'Web Development', percentage: 88 },
-      { name: 'Database', percentage: 82 },
-      { name: 'Mobile Development', percentage: 75 }
-    ]
+    topSkills: []
   })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch stats data
+  useEffect(() => {
+    const fetchStatsData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const token = localStorage.getItem('token')
+        if (!token) {
+          throw new Error('No authentication token found')
+        }
+
+        const response = await fetch('/api/personal/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch stats data')
+        }
+
+        const result = await response.json()
+        if (result.success) {
+          const { stats } = result.data
+          
+          // Transform API data to match component interface
+          setStatsData({
+            problemsSolved: stats.submissions?.total || 0,
+            skillRating: stats.submissions?.averageScore || 0,
+            dayStreak: stats.tasks?.completionRate || 0,
+            achievements: stats.achievements?.total || 0,
+            weeklyProgress: {
+              monday: stats.activity?.chartData?.[0]?.activities || 0,
+              tuesday: stats.activity?.chartData?.[1]?.activities || 0,
+              wednesday: stats.activity?.chartData?.[2]?.activities || 0,
+              thursday: stats.activity?.chartData?.[3]?.activities || 0,
+              friday: stats.activity?.chartData?.[4]?.activities || 0
+            },
+            topSkills: [
+              { name: 'Algorithms', percentage: stats.submissions?.accuracy || 0 },
+              { name: 'Web Development', percentage: stats.projects?.averageProgress || 0 },
+              { name: 'Database', percentage: stats.tasks?.completionRate || 0 },
+              { name: 'Mobile Development', percentage: stats.communities?.total * 10 || 0 }
+            ]
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching stats data:', error)
+        setError('Failed to load statistics data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStatsData()
+  }, [])
 
   // Enhanced state for filters and charts
   const [filters, setFilters] = useState<FilterState>({

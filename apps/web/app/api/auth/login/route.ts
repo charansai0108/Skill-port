@@ -61,9 +61,38 @@ export async function POST(request: NextRequest) {
     // Generate JWT token
     const token = generateToken(user)
 
-    // Get community slug if user is admin
-    const community = user.communities[0] // Admin creates community, so they own it
-    const communitySlug = community?.slug
+    // Get community slug for admin, mentor, and student users
+    let communitySlug = null
+    if (user.role === 'ADMIN') {
+      const community = user.communities[0] // Admin creates community, so they own it
+      communitySlug = community?.slug
+    } else if (user.role === 'MENTOR' && user.communityId) {
+      // For mentors, get their community by communityId
+      const community = await prisma.community.findUnique({
+        where: { id: user.communityId },
+        select: { slug: true }
+      })
+      communitySlug = community?.slug
+    } else if (user.role === 'STUDENT' && user.communityId) {
+      // For students, get their community by communityId
+      const community = await prisma.community.findUnique({
+        where: { id: user.communityId },
+        select: { slug: true }
+      })
+      communitySlug = community?.slug
+    } else if (user.role === 'PERSONAL') {
+      // For personal users, get their first joined community
+      const communityMember = await prisma.communityMember.findFirst({
+        where: { userId: user.id },
+        include: {
+          community: {
+            select: { slug: true }
+          }
+        },
+        orderBy: { createdAt: 'asc' }
+      })
+      communitySlug = communityMember?.community?.slug
+    }
 
     // Determine redirect URL based on role
     let redirectUrl = '/personal/dashboard'
@@ -76,14 +105,20 @@ export async function POST(request: NextRequest) {
           : '/admin/dashboard' // Fallback to old route if no community
         break
       case 'MENTOR':
-        redirectUrl = '/mentor/dashboard'
+        redirectUrl = communitySlug 
+          ? `/community/${communitySlug}/mentor/dashboard`
+          : '/mentor/dashboard' // Fallback to old route if no community
         break
       case 'STUDENT':
-        redirectUrl = '/student/dashboard'
+        redirectUrl = communitySlug 
+          ? `/community/${communitySlug}/user/dashboard`
+          : '/student/dashboard' // Fallback to old route if no community
         break
       case 'PERSONAL':
       default:
-        redirectUrl = '/personal/dashboard'
+        redirectUrl = communitySlug 
+          ? `/community/${communitySlug}/user/dashboard`
+          : '/personal/dashboard' // Fallback to old route if no community
         break
     }
 

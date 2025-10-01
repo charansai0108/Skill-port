@@ -31,7 +31,8 @@ async function main() {
       password: hashedPassword,
       role: 'MENTOR',
       emailVerified: true,
-      bio: 'Experienced software engineer and coding mentor'
+      bio: 'Experienced software engineer and coding mentor',
+      subject: 'Computer Science'
     }
   })
 
@@ -57,7 +58,7 @@ async function main() {
       name: 'Community Manager',
       email: 'community@skillport.com',
       password: hashedPassword,
-      role: 'COMMUNITY_ADMIN',
+      role: 'ADMIN',
       emailVerified: true,
       bio: 'Community manager for coding bootcamps and universities'
     }
@@ -83,6 +84,7 @@ async function main() {
     create: {
       id: 'community-1',
       name: 'Coding Bootcamp 2024',
+      slug: 'coding-bootcamp-2024',
       description: 'A community for coding bootcamp students and alumni',
       type: 'bootcamp',
       isPublic: true,
@@ -99,6 +101,23 @@ async function main() {
       communityId: community.id,
       role: 'MEMBER'
     }
+  })
+
+  // Add mentor to community
+  await prisma.communityMember.upsert({
+    where: { userId_communityId: { userId: mentor.id, communityId: community.id } },
+    update: {},
+    create: {
+      userId: mentor.id,
+      communityId: community.id,
+      role: 'MENTOR'
+    }
+  })
+
+  // Update mentor to have communityId
+  await prisma.user.update({
+    where: { id: mentor.id },
+    data: { communityId: community.id }
   })
 
   // Create contests
