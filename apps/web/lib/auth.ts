@@ -42,6 +42,16 @@ export interface StudentUser {
   batchId?: string
 }
 
+export interface MentorUser {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+  profilePic?: string
+  communityId?: string | null
+  subject?: string
+}
+
 export interface AuthToken {
   admin?: AdminUser
   student?: StudentUser
@@ -234,6 +244,47 @@ export async function getCurrentStudent(request: NextRequest): Promise<StudentUs
     }
   } catch (error) {
     console.error('Error verifying student:', error)
+    return null
+  }
+}
+
+export async function getCurrentMentor(request: NextRequest): Promise<MentorUser | null> {
+  const token = getTokenFromRequest(request)
+  if (!token) {
+    return null
+  }
+
+  const decoded = verifyToken(token)
+  if (!decoded) {
+    return null
+  }
+
+  const userData = (decoded as any)
+  if (!userData.id || !userData.email) {
+    return null
+  }
+
+  // Verify user still exists and is a mentor
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userData.id }
+    })
+
+    if (!user || user.role !== 'MENTOR') {
+      return null
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role as any,
+      profilePic: user.profilePic || undefined,
+      communityId: user.communityId || undefined,
+      subject: user.subject || undefined
+    }
+  } catch (error) {
+    console.error('Error verifying mentor:', error)
     return null
   }
 }

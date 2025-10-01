@@ -127,23 +127,6 @@ export default function PersonalProfilePage() {
     fetchProfileData()
   }, [])
 
-  // Mock learning goals for now (will be replaced by API data)
-  const mockLearningGoals: LearningGoal[] = [
-    {
-      id: '1',
-      title: 'Master Data Structures',
-      category: 'algorithms',
-      progress: 75,
-      target: 'Complete 50 problems by end of month'
-    },
-    {
-      id: '2',
-      title: 'Web Development',
-      category: 'web-development',
-      progress: 60,
-      target: 'Build 3 full-stack projects'
-    }
-  ])
   const [preferences, setPreferences] = useState({
     difficulty: 'beginner',
     learningStyle: ['visual', 'practical'],

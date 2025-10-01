@@ -303,6 +303,7 @@ export default function StudentDashboardPage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
     </>
   )
