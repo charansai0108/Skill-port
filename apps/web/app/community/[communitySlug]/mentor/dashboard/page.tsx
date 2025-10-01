@@ -230,7 +230,7 @@ export default function MentorDashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {pendingFeedbacks.length > 0 ? (
+                {pendingFeedbacks && pendingFeedbacks.length > 0 ? (
                   pendingFeedbacks.map((feedback) => (
                     <div key={feedback.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
                       <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export default function MentorDashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {assignedStudents.length > 0 ? (
+                {assignedStudents && assignedStudents.length > 0 ? (
                   assignedStudents.map((student) => (
                     <div key={student.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-3">
@@ -306,7 +306,7 @@ export default function MentorDashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {recentFeedbacks.length > 0 ? (
+                {recentFeedbacks && recentFeedbacks.length > 0 ? (
                   recentFeedbacks.map((feedback) => (
                     <div key={feedback.id} className="p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
@@ -336,11 +336,11 @@ export default function MentorDashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
                 <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  {notifications.length}
+                  {notifications?.length || 0}
                 </span>
               </div>
               <div className="space-y-3">
-                {notifications.length > 0 ? (
+                {notifications && notifications.length > 0 ? (
                   notifications.map((notification) => (
                     <div key={notification.id} className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm font-medium text-gray-900">{notification.title}</p>

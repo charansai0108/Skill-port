@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentMentor } from '@/lib/auth'
 
-export const GET = async (request: NextRequest, { params }: { params: { slug: string } }) => {
+export const GET = async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
   try {
-    const { slug } = params
+    const { slug } = await params
     const mentor = await getCurrentMentor(request)
 
     if (!mentor) {
@@ -79,9 +79,9 @@ export const GET = async (request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export const POST = async (request: NextRequest, { params }: { params: { slug: string } }) => {
+export const POST = async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
   try {
-    const { slug } = params
+    const { slug } = await params
     const mentor = await getCurrentMentor(request)
 
     if (!mentor) {
