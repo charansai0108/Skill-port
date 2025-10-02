@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentAdmin } from '@/lib/auth'
 
-export const GET = async (request: NextRequest, { params }: { params: { slug: string } }) => {
+export const GET = async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
   try {
-    const { slug } = params
+    const { slug } = await params
     const admin = await getCurrentAdmin(request)
 
     if (!admin) {
@@ -59,10 +59,10 @@ export const GET = async (request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export const POST = async (request: NextRequest, { params }: { params: { slug: string } }) => {
+export const POST = async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
   console.log('POST /api/community/[slug]/batches called')
   try {
-    const { slug } = params
+    const { slug } = await params
     console.log('Slug:', slug)
     const admin = await getCurrentAdmin(request)
     console.log('Admin:', admin ? 'Found' : 'Not found')
